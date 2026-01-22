@@ -24,17 +24,18 @@ Date Added to KEV + ~21 days = Due Date
 ```
 
 **Example:**
+
 - Date Added: 2024-01-15
 - Due Date: 2024-02-05 (21 days later)
 
 **Variations:**
 
-| Severity          | Timeline  | Rationale                          |
-| ----------------- | --------- | ---------------------------------- |
-| Critical RCE      | 2 weeks   | Immediate threat to systems        |
-| Auth Bypass       | 2-3 weeks | High impact, moderate urgency      |
-| Info Disclosure   | 3-4 weeks | Lower immediate risk               |
-| Widespread attack | 1-2 weeks | Active ransomware/APT campaigns    |
+| Severity          | Timeline  | Rationale                       |
+| ----------------- | --------- | ------------------------------- |
+| Critical RCE      | 2 weeks   | Immediate threat to systems     |
+| Auth Bypass       | 2-3 weeks | High impact, moderate urgency   |
+| Info Disclosure   | 3-4 weeks | Lower immediate risk            |
+| Widespread attack | 1-2 weeks | Active ransomware/APT campaigns |
 
 ## Required Action Field
 
@@ -90,24 +91,28 @@ Planning: Migration/replacement project required
 ### Priority Levels
 
 **Critical Priority (P0):**
+
 - Due date within 7 days
 - Direct product match in production
 - Active ransomware campaigns
 - RCE or auth bypass vulnerabilities
 
 **High Priority (P1):**
+
 - Due date within 7-14 days
 - Similar product in environment
 - Known APT exploitation
 - Privilege escalation vulnerabilities
 
 **Medium Priority (P2):**
+
 - Due date within 14-21 days
 - Indirect relevance (dependencies, supply chain)
 - Opportunistic exploitation
 - Information disclosure vulnerabilities
 
 **Low Priority (P3):**
+
 - Due date >21 days
 - No environmental match
 - Limited exploitation observed
@@ -118,6 +123,7 @@ Planning: Migration/replacement project required
 ### Notes Field Indicators
 
 **Ransomware Indicators:**
+
 - References to ransomware groups (LockBit, BlackCat, etc.)
 - "Mass exploitation"
 - "Widespread campaigns"
@@ -125,6 +131,7 @@ Planning: Migration/replacement project required
 **Action:** Immediate priority elevation, threat hunt for IOCs
 
 **APT Indicators:**
+
 - Nation-state threat actors (APT28, APT29, etc.)
 - "Targeted attacks"
 - "Espionage campaigns"
@@ -132,6 +139,7 @@ Planning: Migration/replacement project required
 **Action:** Enhanced monitoring, incident response readiness
 
 **Opportunistic Indicators:**
+
 - "Exploit code publicly available"
 - "Scanner activity observed"
 - "Botnet incorporation"
@@ -214,14 +222,14 @@ Consequences: None (regulatory), risk-based decisions
 
 ### Remediation Status Tracking
 
-| Status       | Definition                                    | Next Action                |
-| ------------ | --------------------------------------------- | -------------------------- |
-| Identified   | CVE found in KEV, not yet validated           | Validate presence          |
-| Validated    | Confirmed in environment                      | Begin planning             |
-| In Progress  | Remediation underway                          | Continue implementation    |
-| Remediated   | Patch applied, verified                       | Final documentation        |
-| Mitigated    | Compensating controls in place (not patched)  | Monitor for patch release  |
-| Risk Accepted | Decided not to remediate                      | Document business decision |
+| Status        | Definition                                   | Next Action                |
+| ------------- | -------------------------------------------- | -------------------------- |
+| Identified    | CVE found in KEV, not yet validated          | Validate presence          |
+| Validated     | Confirmed in environment                     | Begin planning             |
+| In Progress   | Remediation underway                         | Continue implementation    |
+| Remediated    | Patch applied, verified                      | Final documentation        |
+| Mitigated     | Compensating controls in place (not patched) | Monitor for patch release  |
+| Risk Accepted | Decided not to remediate                     | Document business decision |
 
 ### Reporting Template
 
@@ -237,11 +245,13 @@ Consequences: None (regulatory), risk-based decisions
 **Status:** {Identified/Validated/In Progress/Remediated/Mitigated/Risk Accepted}
 
 **Environmental Impact:**
+
 - Affected Systems: {Count}
 - Exposure: {Internal/External/DMZ}
 - Business Impact: {Critical/High/Medium/Low}
 
 **Remediation Plan:**
+
 - Action: {Patch/Mitigate/Disable/Remove}
 - Timeline: {Date range}
 - Owner: {Team/Person}
@@ -258,6 +268,7 @@ Consequences: None (regulatory), risk-based decisions
 **Situation:** Vendor has not released patch before due date
 
 **Actions:**
+
 1. Implement vendor-provided mitigations
 2. Apply network-level controls (WAF, IDS)
 3. Restrict access to vulnerable service
@@ -269,6 +280,7 @@ Consequences: None (regulatory), risk-based decisions
 **Situation:** Affected product no longer supported by vendor
 
 **Actions:**
+
 1. Immediate isolation/removal planning
 2. Network segmentation as interim control
 3. Budget/procurement for replacement
@@ -280,6 +292,7 @@ Consequences: None (regulatory), risk-based decisions
 **Situation:** Patch causes application issues
 
 **Actions:**
+
 1. Document compatibility issue
 2. Work with vendor on resolution
 3. Implement compensating controls

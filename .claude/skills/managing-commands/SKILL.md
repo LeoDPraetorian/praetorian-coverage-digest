@@ -1,6 +1,6 @@
 ---
 name: managing-commands
-description: Use when creating, auditing, fixing, or listing slash commands - enforces Router Pattern (commands delegate to skills), validates frontmatter compliance, detects Tool/Logic Leakage
+description: Use when managing slash commands - enforces Router Pattern, validates frontmatter, detects Tool/Logic Leakage
 allowed-tools: Bash, Edit, Glob, Grep, Read, Write
 ---
 
@@ -279,3 +279,27 @@ This skill consolidates:
 4. **Verbatim output** — pass through skill output exactly
 5. **Imperative instructions** — "Invoke..." not "Help..."
 6. **Explicit mapping** — map $1, $2 to skill args
+
+## Integration
+
+### Called By
+
+- `/skill-manager` command - Main command entry point for skill management operations
+- User direct invocation via `skill: "managing-commands"`
+
+### Requires (invoke before starting)
+
+None - Entry point skill that provides command lifecycle management
+
+### Calls (during execution)
+
+None - Executes TypeScript CLI scripts directly via npm (audit.ts, create.ts, fix.ts, list.ts)
+
+### Pairs With (conditional)
+
+| Skill                       | Trigger                | Purpose                                               |
+| --------------------------- | ---------------------- | ----------------------------------------------------- |
+| `creating-skills` (LIBRARY) | Command creation needs | When creating command that delegates to backing skill |
+| `auditing-skills` (LIBRARY) | Pattern similarity     | Similar audit workflow for skills vs commands         |
+| `fixing-skills` (LIBRARY)   | Pattern similarity     | Similar fix workflow for skills vs commands           |
+| `managing-skills` (CORE)    | Parallel management    | Skill management counterpart to command management    |

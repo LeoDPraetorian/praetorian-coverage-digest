@@ -8,13 +8,13 @@ understanding, MVP scope, and architecture diagram **Last Synchronized**:
 
 ## Document Metadata
 
-| Property           | Value                                     |
-| ------------------ | ----------------------------------------- |
-| **Document ID**    | 01-OVERVIEW-ARCHITECTURE                  |
-| **Token Count**    | ~1,200 tokens                             |
-| **Read Time**      | 5-10 minutes                              |
-| **Prerequisites**  | None (starting point)                     |
-| **Next Documents** | 02-SCOPE-CHECKPOINTS, 03-METHODOLOGY      |
+| Property           | Value                                |
+| ------------------ | ------------------------------------ |
+| **Document ID**    | 01-OVERVIEW-ARCHITECTURE             |
+| **Token Count**    | ~1,200 tokens                        |
+| **Read Time**      | 5-10 minutes                         |
+| **Prerequisites**  | None (starting point)                |
+| **Next Documents** | 02-SCOPE-CHECKPOINTS, 03-METHODOLOGY |
 
 ---
 
@@ -101,7 +101,7 @@ The MVP delivers four core outputs:
                          /threat-model {prompt}
                               Command Router
 
-                                  skill: "threat-modeling-orchestrator"
+                                  Read(".claude/skill-library/security/threat-model/threat-modeling-orchestrator/SKILL.md")
 
 
                          SCOPE SELECTION

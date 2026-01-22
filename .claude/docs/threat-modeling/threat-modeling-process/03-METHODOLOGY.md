@@ -8,13 +8,13 @@ Synchronized**: 2026-01-10 **Status**: Ready for Implementation
 
 ## Document Metadata
 
-| Property           | Value                                        |
-| ------------------ | -------------------------------------------- |
-| **Document ID**    | 03-METHODOLOGY                               |
-| **Token Count**    | ~700 tokens                                  |
-| **Read Time**      | 5-8 minutes                                  |
+| Property           | Value                                          |
+| ------------------ | ---------------------------------------------- |
+| **Document ID**    | 03-METHODOLOGY                                 |
+| **Token Count**    | ~700 tokens                                    |
+| **Read Time**      | 5-8 minutes                                    |
 | **Prerequisites**  | 01-OVERVIEW-ARCHITECTURE, 02-SCOPE-CHECKPOINTS |
-| **Next Documents** | 04-PHASE-DETAILS                             |
+| **Next Documents** | 04-PHASE-DETAILS                               |
 
 ---
 
@@ -133,8 +133,8 @@ interface ThreatModelEntry {
   cvss: {
     version: "4.0";
     base: {
-      score: number;        // 0.0-10.0
-      vector: string;       // CVSS:4.0/AV:N/AC:L/...
+      score: number; // 0.0-10.0
+      vector: string; // CVSS:4.0/AV:N/AC:L/...
     };
     threat: {
       score: number;
@@ -142,11 +142,11 @@ interface ThreatModelEntry {
       exploitMaturity: "Attacked" | "POC" | "Unreported";
     };
     environmental: {
-      score: number;        // Business-contextualized from Phase 1
-      vector: string;       // Includes CR/IR/AR from business context
+      score: number; // Business-contextualized from Phase 1
+      vector: string; // Includes CR/IR/AR from business context
     };
     overall: {
-      score: number;        // Final score (0.0-10.0)
+      score: number; // Final score (0.0-10.0)
       severity: "Critical" | "High" | "Medium" | "Low" | "None";
       priorityRank: number; // Ordering for test planning
     };

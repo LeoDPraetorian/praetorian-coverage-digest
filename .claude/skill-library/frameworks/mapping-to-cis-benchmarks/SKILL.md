@@ -152,6 +152,7 @@ CIS Benchmarks use a three-state scoring model:
 **Critical Finding**: No direct CVE-to-CIS API mapping database exists. Integration occurs through CIS Control 7 (Continuous Vulnerability Management).
 
 **Integration Architecture**:
+
 ```
 CVE Database (NVD)
     ↓
@@ -167,6 +168,7 @@ Compliance Report
 ### CIS Control 7: Continuous Vulnerability Management
 
 **Primary control for vulnerability-to-CIS mapping**:
+
 - **Requirements**: Authenticated scans quarterly minimum, SCAP-compliant tools
 - **Standards**: CVE list, NIST SCAP, standardized vulnerability classification
 - **Implementation Groups**: Controls 7.1-7.4 apply to all (IG1, IG2, IG3)
@@ -174,20 +176,24 @@ Compliance Report
 ### Tool Integration Examples
 
 **Tenable Integration**:
+
 - Active credentialed scanning across all implementation groups
 - CIS Control 3/18 dashboard for vulnerability management
 - Real-time continuous monitoring and reporting
 
 **Nucleus Platform**:
+
 - Native import of CIS compliance scan data
 - Each CIS control becomes a finding in compliance section
 - Severity scoring from scanner + third-party data
 
 **Qualys SCA**:
+
 - Automated security configuration assessment based on CIS Benchmarks
 - Integration with GRC, ticketing systems, SIEM, ERM, IDS
 
 **SIEM Integration Pattern**:
+
 ```
 System Configuration Change
     ↓
@@ -203,6 +209,7 @@ Automated alert/remediation triggered
 ### Vulnerability Finding Structure
 
 **Include in vulnerability findings**:
+
 ```json
 {
   "cve_id": "CVE-2024-1234",
@@ -281,7 +288,7 @@ None - terminal skill providing framework documentation
 | `mapping-to-cwe`          | When mapping to multiple frameworks    | Map finding to CWE weakness      |
 | `mapping-to-mitre-attack` | When threat context needed             | Map to ATT&CK tactics/techniques |
 | `mapping-to-nist-csf`     | When NIST CSF compliance also required | Map to NIST CSF categories       |
-| `scoring-cvss-threats`            | When quantitative risk scoring needed  | Calculate CVSS score             |
+| `scoring-cvss-threats`    | When quantitative risk scoring needed  | Calculate CVSS score             |
 | `mapping-to-sans-top-25`  | When prioritizing by exploitability    | Map to SANS Top 25 weaknesses    |
 
 ## References

@@ -380,12 +380,12 @@ For each detected ambiguity:
 
 ## Related Skills
 
-| Skill                      | Access Method                     | Purpose                                   |
-| -------------------------- | --------------------------------- | ----------------------------------------- |
-| **orchestrating-research** | `skill: "orchestrating-research"` | Consumes analyze mode output for research |
-| **brainstorming**          | `skill: "brainstorming"`          | Design refinement after clarification     |
-| **engineering-prompts**    | `skill: "engineering-prompts"`    | Prompt optimization patterns              |
-| **using-skills**           | `skill: "using-skills"`           | Skill discovery workflow                  |
+| Skill                              | Access Method                                                            | Purpose                                   |
+| ---------------------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| `orchestrating-research` (LIBRARY) | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` | Consumes analyze mode output for research |
+| **brainstorming**                  | `skill: "brainstorming"`                                                 | Design refinement after clarification     |
+| **engineering-prompts**            | `skill: "engineering-prompts"`                                           | Prompt optimization patterns              |
+| **using-skills**                   | `skill: "using-skills"`                                                  | Skill discovery workflow                  |
 
 ## Changelog
 

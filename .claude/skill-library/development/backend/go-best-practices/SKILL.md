@@ -84,12 +84,12 @@ func Run() error {
 
 ### Why This Pattern?
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Testable** | Can import `pkg/runner` in tests, call functions directly |
-| **Reusable** | Other tools can import and use your CLI logic |
+| Benefit        | Explanation                                                 |
+| -------------- | ----------------------------------------------------------- |
+| **Testable**   | Can import `pkg/runner` in tests, call functions directly   |
+| **Reusable**   | Other tools can import and use your CLI logic               |
 | **Consistent** | Matches Praetorian tooling conventions (fingerprintx, etc.) |
-| **Clean** | Separates entry point from implementation |
+| **Clean**      | Separates entry point from implementation                   |
 
 ### Reference Implementation
 
@@ -170,12 +170,12 @@ func analyzeResponse(conn net.Conn) (*Result, error) {
 
 ### Why This Pattern?
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Human readable** | Reader sees the important stuff first |
-| **API clarity** | Exported functions are immediately visible |
-| **Navigation** | Easy to find what you're looking for |
-| **Review friendly** | Reviewers understand purpose quickly |
+| Benefit             | Explanation                                |
+| ------------------- | ------------------------------------------ |
+| **Human readable**  | Reader sees the important stuff first      |
+| **API clarity**     | Exported functions are immediately visible |
+| **Navigation**      | Easy to find what you're looking for       |
+| **Review friendly** | Reviewers understand purpose quickly       |
 
 ### Anti-Pattern: Random Organization
 
@@ -304,11 +304,11 @@ func handleStatus(status string) error {
 
 ### Why This Pattern?
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Readable** | Happy path is visually prominent |
-| **Debuggable** | Each exit point is clear |
-| **Testable** | Each condition is a separate test case |
+| Benefit          | Explanation                                |
+| ---------------- | ------------------------------------------ |
+| **Readable**     | Happy path is visually prominent           |
+| **Debuggable**   | Each exit point is clear                   |
+| **Testable**     | Each condition is a separate test case     |
 | **Maintainable** | Adding conditions doesn't increase nesting |
 
 ### The Nesting Limit
@@ -369,17 +369,18 @@ var writer *JSONWriter = NewJSONWriter(os.Stdout)
 
 ### Why This Matters
 
-| Benefit | Explanation |
-|---------|-------------|
-| **Readability** | Consumer works with interface, not implementation |
-| **Testability** | Easy to mock - just implement the interface |
-| **Flexibility** | Swap implementations without changing consumer code |
-| **Compile-time checks** | Interface compliance verified automatically |
-| **No var _ hacks** | Don't need `var _ Interface = (*Type)(nil)` |
+| Benefit                 | Explanation                                         |
+| ----------------------- | --------------------------------------------------- |
+| **Readability**         | Consumer works with interface, not implementation   |
+| **Testability**         | Easy to mock - just implement the interface         |
+| **Flexibility**         | Swap implementations without changing consumer code |
+| **Compile-time checks** | Interface compliance verified automatically         |
+| **No var \_ hacks**     | Don't need `var _ Interface = (*Type)(nil)`         |
 
 ### When to Return Concrete Type
 
 Return concrete type ONLY when:
+
 - The type has no interface (it's standalone)
 - Consumer needs access to type-specific methods not on interface
 - You're building an internal utility not meant for polymorphism
@@ -452,12 +453,12 @@ var probeCmd = &cobra.Command{
 
 ### Naming Convention
 
-| Command | Run Function |
-|---------|--------------|
-| `probeCmd` | `runProbe` |
-| `listCmd` | `runList` |
+| Command       | Run Function  |
+| ------------- | ------------- |
+| `probeCmd`    | `runProbe`    |
+| `listCmd`     | `runList`     |
 | `validateCmd` | `runValidate` |
-| `versionCmd` | `runVersion` |
+| `versionCmd`  | `runVersion`  |
 
 ### Use RunE for Error Handling
 
@@ -487,13 +488,13 @@ Run: func(cmd *cobra.Command, args []string) {
 
 ## Quick Reference
 
-| Pattern | Rule |
-|---------|------|
-| **CLI Structure** | Thin main.go → `runner.Run()`, logic in `pkg/runner/` |
-| **Constructors** | Return interface when polymorphism intended |
-| **Cobra Commands** | Extract Run logic to named functions |
-| **Function Order** | Exported → Main logic → Helpers |
-| **Nesting** | Return early, max 2 levels, happy path at lowest indent |
+| Pattern            | Rule                                                    |
+| ------------------ | ------------------------------------------------------- |
+| **CLI Structure**  | Thin main.go → `runner.Run()`, logic in `pkg/runner/`   |
+| **Constructors**   | Return interface when polymorphism intended             |
+| **Cobra Commands** | Extract Run logic to named functions                    |
+| **Function Order** | Exported → Main logic → Helpers                         |
+| **Nesting**        | Return early, max 2 levels, happy path at lowest indent |
 
 ---
 

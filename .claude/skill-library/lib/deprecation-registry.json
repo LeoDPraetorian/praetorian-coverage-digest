@@ -1,7 +1,7 @@
 {
   "$schema": "./deprecation-registry.schema.json",
   "version": "1.0.0",
-  "lastUpdated": "2025-12-19",
+  "lastUpdated": "2026-01-18",
   "description": "Central registry of deprecated commands, skills, agents, and patterns. Used by audit-references and fix-references skills to detect and remediate outdated references.",
 
   "commands": {
@@ -180,11 +180,10 @@
       "migrationNotes": "Use claude-skill-write to create skills based on detected patterns"
     },
     "claude-skill-rename": {
-      "replacedBy": null,
+      "replacedBy": "renaming-skills",
       "deprecatedDate": "2025-11-29",
-      "reason": "Skill renaming functionality integrated into /skill-manager rename command",
-      "migrationNotes": "Use: /skill-manager rename OLD_NAME NEW_NAME",
-      "status": "removed"
+      "reason": "Replaced by instruction-based renaming-skills library skill",
+      "migrationNotes": "Use: Read('.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md')"
     },
     "claude-mcp-audit-references": {
       "replacedBy": "mcp-code-compliance",
@@ -260,10 +259,10 @@
       "migrationNotes": "Use: npm run -w @chariot/agent-manager search -- <query>"
     },
     "claude-agent-rename": {
-      "replacedBy": "agent-manager",
+      "replacedBy": "renaming-agents",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified agent-manager skill (rename operation)",
-      "migrationNotes": "Use: npm run -w @chariot/agent-manager rename -- <old-name> <new-name>"
+      "reason": "Replaced by instruction-based renaming-agents library skill",
+      "migrationNotes": "Use: Read('.claude/skill-library/claude/agent-management/renaming-agents/SKILL.md')"
     },
     "claude-agent-skill-discovery": {
       "replacedBy": "agent-manager",
@@ -272,22 +271,22 @@
       "migrationNotes": "Skill discovery runs automatically after agent creation/update"
     },
     "claude-skill-write": {
-      "replacedBy": "skill-manager",
+      "replacedBy": "creating-skills",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified skill-manager skill (create/update operations)",
-      "migrationNotes": "Use: npm run -w @chariot/skill-manager create -- <name> \"<desc>\" OR npm run -w @chariot/skill-manager update -- <name> \"<changes>\""
+      "reason": "Replaced by instruction-based creating-skills (for new) and updating-skills (for existing)",
+      "migrationNotes": "Use: Read('.claude/skill-library/claude/skill-management/creating-skills/SKILL.md') for new skills, Read('.claude/skill-library/claude/skill-management/updating-skills/SKILL.md') for updates"
     },
     "claude-skill-compliance": {
-      "replacedBy": "skill-manager",
+      "replacedBy": "auditing-skills",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified skill-manager skill (audit/fix operations)",
-      "migrationNotes": "Use: npm run -w @chariot/skill-manager audit -- [name] [--phase N] OR npm run -w @chariot/skill-manager fix -- <name> [--dry-run]"
+      "reason": "Replaced by instruction-based auditing-skills library skill",
+      "migrationNotes": "Use: Read('.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md')"
     },
     "claude-skill-search": {
-      "replacedBy": "managing-skills",
+      "replacedBy": "searching-skills",
       "deprecatedDate": "2025-11-29",
-      "reason": "Consolidated into unified managing-skills skill with enhanced dual-location search",
-      "migrationNotes": "Use: skill: \"managing-skills\" or /skill-manager command"
+      "reason": "Replaced by instruction-based searching-skills library skill with dual-location search",
+      "migrationNotes": "Use: Read('.claude/skill-library/claude/skill-management/searching-skills/SKILL.md')"
     },
     "agent-manager": {
       "replacedBy": "managing-agents",
@@ -393,11 +392,11 @@
   },
 
   "_metadata": {
-    "maintainers": ["claude-skill-write", "agent-manager"],
+    "maintainers": ["creating-skills", "managing-agents"],
     "consumers": [
-      "claude-skill-compliance",
-      "agent-manager",
-      "tool-manager"
+      "auditing-skills",
+      "managing-agents",
+      "managing-tool-wrappers"
     ],
     "updateProtocol": "When renaming via /skill-manager rename or /agent-manager rename, the skill should automatically add an entry here (NOT YET IMPLEMENTED - manual for now)",
     "legacyConsumers": [

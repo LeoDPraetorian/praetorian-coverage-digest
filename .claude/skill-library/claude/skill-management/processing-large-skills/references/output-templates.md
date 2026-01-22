@@ -32,11 +32,11 @@ This document provides complete templates for all three analysis modes.
 ## Component Map
 
 ┌─────────────────┬───────────────┬────────────┬───────────┐
-│      File       │    Purpose    │  Priority  │  Extends  │
+│ File │ Purpose │ Priority │ Extends │
 ├─────────────────┼───────────────┼────────────┼───────────┤
-│ SKILL.md        │ Core workflow │ Required   │ -         │
+│ SKILL.md │ Core workflow │ Required │ - │
 ├─────────────────┼───────────────┼────────────┼───────────┤
-│ references/X.md │ {purpose}     │ {priority} │ {section} │
+│ references/X.md │ {purpose} │ {priority} │ {section} │
 └─────────────────┴───────────────┴────────────┴───────────┘
 
 ## Reading Order
@@ -80,15 +80,15 @@ This document provides complete templates for all three analysis modes.
 ## Comparison Matrix
 
 ┌────────────┬───────────┬───────────┐
-│   Aspect   │ {skill-a} │ {skill-b} │
+│ Aspect │ {skill-a} │ {skill-b} │
 ├────────────┼───────────┼───────────┤
-│ Purpose    │ ...       │ ...       │
+│ Purpose │ ... │ ... │
 ├────────────┼───────────┼───────────┤
-│ Triggers   │ ...       │ ...       │
+│ Triggers │ ... │ ... │
 ├────────────┼───────────┼───────────┤
-│ Complexity │ ...       │ ...       │
+│ Complexity │ ... │ ... │
 ├────────────┼───────────┼───────────┤
-│ Output     │ ...       │ ...       │
+│ Output │ ... │ ... │
 └────────────┴───────────┴───────────┘
 
 ## Overlapping Capabilities

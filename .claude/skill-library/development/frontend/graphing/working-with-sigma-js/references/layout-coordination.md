@@ -23,17 +23,17 @@ Store layout state on graph for cross-hook access:
 
 ```typescript
 // In layout hook
-graph.setAttribute('layout', layoutInstance);
-graph.setAttribute('layoutRunning', true);
+graph.setAttribute("layout", layoutInstance);
+graph.setAttribute("layoutRunning", true);
 
 // In culling hook
-const isLayoutRunning = graph.getAttribute('layoutRunning');
+const isLayoutRunning = graph.getAttribute("layoutRunning");
 if (isLayoutRunning) {
   return; // Skip culling during layout
 }
 
 // In camera hook
-const layout = graph.getAttribute('layout');
+const layout = graph.getAttribute("layout");
 if (layout?.isRunning()) {
   layout.stop(); // Pause layout during camera movement
 }
@@ -42,13 +42,11 @@ if (layout?.isRunning()) {
 ## Layout Hook with Coordination
 
 ```typescript
-import { useEffect, useRef, useCallback } from 'react';
-import { useSigma } from '@react-sigma/core';
-import FA2Layout from 'graphology-layout-forceatlas2/worker';
+import { useEffect, useRef, useCallback } from "react";
+import { useSigma } from "@react-sigma/core";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
 
-export const useCoordinatedLayout = (
-  settings = { gravity: 1, scalingRatio: 10 }
-) => {
+export const useCoordinatedLayout = (settings = { gravity: 1, scalingRatio: 10 }) => {
   const sigma = useSigma();
   const graph = sigma.getGraph();
   const layoutRef = useRef<FA2Layout | null>(null);
@@ -62,8 +60,8 @@ export const useCoordinatedLayout = (
     layoutRef.current = layout;
 
     // Store on graph for other hooks
-    graph.setAttribute('layout', layout);
-    graph.setAttribute('layoutRunning', true);
+    graph.setAttribute("layout", layout);
+    graph.setAttribute("layoutRunning", true);
 
     layout.start();
 
@@ -71,7 +69,7 @@ export const useCoordinatedLayout = (
     setTimeout(() => {
       if (layout.isRunning()) {
         layout.stop();
-        graph.setAttribute('layoutRunning', false);
+        graph.setAttribute("layoutRunning", false);
       }
     }, 10000);
   }, [graph, settings]);
@@ -79,15 +77,15 @@ export const useCoordinatedLayout = (
   const stopLayout = useCallback(() => {
     if (layoutRef.current?.isRunning()) {
       layoutRef.current.stop();
-      graph.setAttribute('layoutRunning', false);
+      graph.setAttribute("layoutRunning", false);
     }
   }, [graph]);
 
   useEffect(() => {
     return () => {
       stopLayout();
-      graph.removeAttribute('layout');
-      graph.removeAttribute('layoutRunning');
+      graph.removeAttribute("layout");
+      graph.removeAttribute("layoutRunning");
     };
   }, [graph, stopLayout]);
 
@@ -98,9 +96,9 @@ export const useCoordinatedLayout = (
 ## Culling Hook with Layout Awareness
 
 ```typescript
-import { useEffect, useCallback } from 'react';
-import { useSigma } from '@react-sigma/core';
-import { useViewportBounds } from './camera-patterns';
+import { useEffect, useCallback } from "react";
+import { useSigma } from "@react-sigma/core";
+import { useViewportBounds } from "./camera-patterns";
 
 export const useLayoutAwareCulling = () => {
   const sigma = useSigma();
@@ -109,7 +107,7 @@ export const useLayoutAwareCulling = () => {
 
   const updateVisibility = useCallback(() => {
     // Skip culling during layout
-    const isLayoutRunning = graph.getAttribute('layoutRunning');
+    const isLayoutRunning = graph.getAttribute("layoutRunning");
     if (isLayoutRunning) {
       return;
     }
@@ -121,7 +119,7 @@ export const useLayoutAwareCulling = () => {
         attrs.y >= bounds.minY &&
         attrs.y <= bounds.maxY;
 
-      graph.setNodeAttribute(nodeId, 'hidden', !inViewport);
+      graph.setNodeAttribute(nodeId, "hidden", !inViewport);
     });
 
     sigma.refresh();
@@ -136,8 +134,8 @@ export const useLayoutAwareCulling = () => {
 ## Camera Hook with Layout Pausing
 
 ```typescript
-import { useEffect, useRef } from 'react';
-import { useSigma } from '@react-sigma/core';
+import { useEffect, useRef } from "react";
+import { useSigma } from "@react-sigma/core";
 
 export const useCameraLayoutCoordination = () => {
   const sigma = useSigma();
@@ -152,10 +150,10 @@ export const useCameraLayoutCoordination = () => {
       isInteractingRef.current = true;
 
       // Pause layout during camera movement
-      const layout = graph.getAttribute('layout');
+      const layout = graph.getAttribute("layout");
       if (layout?.isRunning()) {
         layout.stop();
-        graph.setAttribute('layoutPausedByCamera', true);
+        graph.setAttribute("layoutPausedByCamera", true);
       }
     };
 
@@ -169,21 +167,21 @@ export const useCameraLayoutCoordination = () => {
         isInteractingRef.current = false;
 
         // Resume layout if it was paused
-        const layout = graph.getAttribute('layout');
-        const wasPaused = graph.getAttribute('layoutPausedByCamera');
+        const layout = graph.getAttribute("layout");
+        const wasPaused = graph.getAttribute("layoutPausedByCamera");
         if (layout && wasPaused && !layout.isRunning()) {
           layout.start();
-          graph.removeAttribute('layoutPausedByCamera');
+          graph.removeAttribute("layoutPausedByCamera");
         }
       }, 500);
     };
 
-    camera.on('updated', handleCameraStart);
-    camera.on('updated', handleCameraEnd);
+    camera.on("updated", handleCameraStart);
+    camera.on("updated", handleCameraEnd);
 
     return () => {
-      camera.off('updated', handleCameraStart);
-      camera.off('updated', handleCameraEnd);
+      camera.off("updated", handleCameraStart);
+      camera.off("updated", handleCameraEnd);
       if (resumeTimerRef.current) {
         clearTimeout(resumeTimerRef.current);
       }
@@ -228,12 +226,12 @@ export const App = () => (
 
 **Graph attributes for coordination:**
 
-| Attribute                 | Type             | Purpose                          |
-| ------------------------- | ---------------- | -------------------------------- |
-| `layout`                  | `FA2Layout`      | Layout instance for cross-hook   |
-| `layoutRunning`           | `boolean`        | Is layout currently running      |
-| `layoutPausedByCamera`    | `boolean`        | Layout paused by camera movement |
-| `initialCameraState`      | `CameraState`    | Original camera position         |
+| Attribute              | Type          | Purpose                          |
+| ---------------------- | ------------- | -------------------------------- |
+| `layout`               | `FA2Layout`   | Layout instance for cross-hook   |
+| `layoutRunning`        | `boolean`     | Is layout currently running      |
+| `layoutPausedByCamera` | `boolean`     | Layout paused by camera movement |
+| `initialCameraState`   | `CameraState` | Original camera position         |
 
 ## Lifecycle Sequence
 
@@ -300,11 +298,11 @@ const animateToNode = (nodeId: string) => {
 
 ## Performance Impact
 
-| Coordination Strategy | FPS Impact | Smoothness |
-| --------------------- | ---------- | ---------- |
-| No coordination       | -20 FPS    | Jittery    |
-| Layout pause only     | -5 FPS     | Smooth     |
-| Full coordination     | -2 FPS     | Very smooth|
+| Coordination Strategy | FPS Impact | Smoothness  |
+| --------------------- | ---------- | ----------- |
+| No coordination       | -20 FPS    | Jittery     |
+| Layout pause only     | -5 FPS     | Smooth      |
+| Full coordination     | -2 FPS     | Very smooth |
 
 ## See Also
 

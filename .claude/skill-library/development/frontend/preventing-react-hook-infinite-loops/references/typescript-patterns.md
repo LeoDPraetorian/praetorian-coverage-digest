@@ -8,14 +8,14 @@
 
 ```typescript
 // ✅ Creates readonly tuple
-const STABLE_DEPS = ['value1', 'value2'] as const;
+const STABLE_DEPS = ["value1", "value2"] as const;
 
 useEffect(() => {
   // Effect logic
 }, STABLE_DEPS); // Type: readonly ["value1", "value2"]
 
 // ❌ Prevents accidental mutations
-STABLE_DEPS.push('value3'); // Error: Property 'push' does not exist
+STABLE_DEPS.push("value3"); // Error: Property 'push' does not exist
 ```
 
 ---
@@ -23,10 +23,7 @@ STABLE_DEPS.push('value3'); // Error: Property 'push' does not exist
 ## Pattern 2: Generic Custom Hooks
 
 ```typescript
-function useMemoizedValue<T>(
-  compute: () => T,
-  dependencies: React.DependencyList
-): T {
+function useMemoizedValue<T>(compute: () => T, dependencies: React.DependencyList): T {
   return useMemo(compute, dependencies);
 }
 
@@ -62,10 +59,7 @@ interface Filters {
   minPrice: number;
 }
 
-const filtersKey = useMemo(
-  () => serializeForDeps(filters),
-  [filters]
-);
+const filtersKey = useMemo(() => serializeForDeps(filters), [filters]);
 ```
 
 ---
@@ -74,25 +68,25 @@ const filtersKey = useMemo(
 
 ```typescript
 type Action =
-  | { type: 'SET_USER'; payload: User }
-  | { type: 'CLEAR_USER' }
-  | { type: 'UPDATE_NAME'; payload: string };
+  | { type: "SET_USER"; payload: User }
+  | { type: "CLEAR_USER" }
+  | { type: "UPDATE_NAME"; payload: string };
 
 function reducer(state: State, action: Action): State {
   switch (action.type) {
-    case 'SET_USER':
+    case "SET_USER":
       return { ...state, user: action.payload };
-    case 'CLEAR_USER':
+    case "CLEAR_USER":
       return { ...state, user: null };
-    case 'UPDATE_NAME':
+    case "UPDATE_NAME":
       return { ...state, user: { ...state.user!, name: action.payload } };
   }
 }
 
 // Type-safe dispatch
 const [state, dispatch] = useReducer(reducer, initialState);
-dispatch({ type: 'SET_USER', payload: newUser }); // ✅ Type-safe
-dispatch({ type: 'SET_USER', payload: 'string' }); // ❌ Type error
+dispatch({ type: "SET_USER", payload: newUser }); // ✅ Type-safe
+dispatch({ type: "SET_USER", payload: "string" }); // ❌ Type error
 ```
 
 ---
@@ -121,18 +115,16 @@ function Component({ onUpdate }: { onUpdate: (data: Data) => void }) {
 
 ```typescript
 type UseAsyncResult<T, E = Error> =
-  | { status: 'idle'; data: null; error: null }
-  | { status: 'loading'; data: null; error: null }
-  | { status: 'success'; data: T; error: null }
-  | { status: 'error'; data: null; error: E };
+  | { status: "idle"; data: null; error: null }
+  | { status: "loading"; data: null; error: null }
+  | { status: "success"; data: T; error: null }
+  | { status: "error"; data: null; error: E };
 
-function useAsync<T>(
-  asyncFn: () => Promise<T>
-): UseAsyncResult<T> {
+function useAsync<T>(asyncFn: () => Promise<T>): UseAsyncResult<T> {
   const [state, setState] = useState<UseAsyncResult<T>>({
-    status: 'idle',
+    status: "idle",
     data: null,
-    error: null
+    error: null,
   });
 
   // Hook logic...
@@ -143,7 +135,7 @@ function useAsync<T>(
 // Usage with type narrowing
 const result = useAsync(fetchUser);
 
-if (result.status === 'success') {
+if (result.status === "success") {
   console.log(result.data.name); // ✅ data is T, not null
 }
 ```

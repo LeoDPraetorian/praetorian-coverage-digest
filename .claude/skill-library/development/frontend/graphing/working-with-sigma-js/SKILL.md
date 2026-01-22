@@ -27,14 +27,14 @@ Sigma.js is a WebGL-accelerated graph rendering library. In React, use the `@rea
 
 ## Quick Reference
 
-| Challenge                    | Solution                           | Reference                              |
-| ---------------------------- | ---------------------------------- | -------------------------------------- |
-| Camera infinite loops        | Debounce (100-150ms)               | [Pattern 1](#pattern-1-debounced-camera-handler) |
-| Slow rendering (5k+ nodes)   | Switch icons → circles             | [Node Programs](#node-programs)        |
-| Performance cliff            | Zoom-based LOD                     | [Pattern 2](#pattern-2-zoom-based-lod) |
-| Layout coordination          | Store layout on graph              | [Pattern 3](#pattern-3-layout-integration) |
-| Node visibility              | `hidden` attribute + refresh       | [Visibility Control](#visibility-control) |
-| Runtime appearance changes   | `setSetting()` + refresh           | [Settings Management](#settings-management) |
+| Challenge                  | Solution                     | Reference                                        |
+| -------------------------- | ---------------------------- | ------------------------------------------------ |
+| Camera infinite loops      | Debounce (100-150ms)         | [Pattern 1](#pattern-1-debounced-camera-handler) |
+| Slow rendering (5k+ nodes) | Switch icons → circles       | [Node Programs](#node-programs)                  |
+| Performance cliff          | Zoom-based LOD               | [Pattern 2](#pattern-2-zoom-based-lod)           |
+| Layout coordination        | Store layout on graph        | [Pattern 3](#pattern-3-layout-integration)       |
+| Node visibility            | `hidden` attribute + refresh | [Visibility Control](#visibility-control)        |
+| Runtime appearance changes | `setSetting()` + refresh     | [Settings Management](#settings-management)      |
 
 ## Core Concepts
 
@@ -43,33 +43,33 @@ Sigma.js is a WebGL-accelerated graph rendering library. In React, use the `@rea
 Sigma.js uses [graphology](https://graphology.github.io/) for graph data:
 
 ```typescript
-import Graph from 'graphology';
+import Graph from "graphology";
 
 const graph = new Graph();
 
 // Add nodes
-graph.addNode('node1', {
+graph.addNode("node1", {
   x: 0,
   y: 0,
   size: 10,
-  label: 'Node 1',
-  color: '#ff0000',
-  type: 'circle', // or 'image'
+  label: "Node 1",
+  color: "#ff0000",
+  type: "circle", // or 'image'
   hidden: false,
 });
 
 // Add edges
-graph.addEdge('node1', 'node2', {
+graph.addEdge("node1", "node2", {
   weight: 1,
-  color: '#cccccc',
+  color: "#cccccc",
 });
 
 // Access attributes
-const x = graph.getNodeAttribute('node1', 'x');
-graph.setNodeAttribute('node1', 'hidden', true);
+const x = graph.getNodeAttribute("node1", "x");
+graph.setNodeAttribute("node1", "hidden", true);
 
 // Store arbitrary data on graph itself
-graph.setAttribute('layout', layoutInstance);
+graph.setAttribute("layout", layoutInstance);
 ```
 
 **Key patterns:**
@@ -85,7 +85,7 @@ graph.setAttribute('layout', layoutInstance);
 Camera events fire on zoom, pan, and any camera state change:
 
 ```typescript
-import { useSigma } from '@react-sigma/core';
+import { useSigma } from "@react-sigma/core";
 
 const MyComponent = () => {
   const sigma = useSigma();
@@ -98,11 +98,11 @@ const MyComponent = () => {
       // state.x, state.y: camera center position
       // state.ratio: zoom level (0.1 = zoomed out, 5 = zoomed in)
       // state.angle: rotation
-      console.log('Zoom ratio:', state.ratio);
+      console.log("Zoom ratio:", state.ratio);
     };
 
-    camera.on('updated', handleCameraUpdate);
-    return () => camera.off('updated', handleCameraUpdate);
+    camera.on("updated", handleCameraUpdate);
+    return () => camera.off("updated", handleCameraUpdate);
   }, [sigma]);
 };
 ```
@@ -116,8 +116,8 @@ const MyComponent = () => {
 Node programs define how nodes render:
 
 ```typescript
-import { NodeCircleProgram } from 'sigma/rendering';
-import { NodeImageProgram } from '@sigma/node-image';
+import { NodeCircleProgram } from "sigma/rendering";
+import { NodeImageProgram } from "@sigma/node-image";
 
 // In Sigma settings
 const settings = {
@@ -125,12 +125,12 @@ const settings = {
     circle: NodeCircleProgram,
     image: NodeImageProgram,
   },
-  defaultNodeType: 'circle', // or 'image'
+  defaultNodeType: "circle", // or 'image'
 };
 
 // Per-node type via attribute
-graph.setNodeAttribute('node1', 'type', 'image');
-graph.setNodeAttribute('node1', 'image', '/path/to/icon.png');
+graph.setNodeAttribute("node1", "type", "image");
+graph.setNodeAttribute("node1", "image", "/path/to/icon.png");
 ```
 
 **Performance Note:** Icons are expensive. **5,000 nodes with icons** is harder than **100,000 edges** with default circles.
@@ -143,11 +143,11 @@ Change Sigma rendering settings at runtime:
 
 ```typescript
 // Toggle labels
-sigma.setSetting('renderLabels', false);
+sigma.setSetting("renderLabels", false);
 
 // Change node appearance
-sigma.setSetting('defaultNodeType', 'circle');
-sigma.setSetting('defaultNodeColor', '#666666');
+sigma.setSetting("defaultNodeType", "circle");
+sigma.setSetting("defaultNodeColor", "#666666");
 
 // Force re-render after changes
 sigma.refresh();
@@ -163,12 +163,12 @@ Hide/show nodes without removing from graph:
 
 ```typescript
 // Hide a node
-graph.setNodeAttribute('node1', 'hidden', true);
+graph.setNodeAttribute("node1", "hidden", true);
 
 // Hide all nodes matching condition
 graph.forEachNode((nodeId, attributes) => {
-  if (attributes.type === 'temporary') {
-    graph.setNodeAttribute(nodeId, 'hidden', true);
+  if (attributes.type === "temporary") {
+    graph.setNodeAttribute(nodeId, "hidden", true);
   }
 });
 
@@ -182,21 +182,21 @@ sigma.refresh();
 
 ```typescript
 // Node events
-sigma.on('enterNode', ({ node }) => {
-  console.log('Hovering:', node);
+sigma.on("enterNode", ({ node }) => {
+  console.log("Hovering:", node);
 });
 
-sigma.on('clickNode', ({ node }) => {
-  console.log('Clicked:', node);
+sigma.on("clickNode", ({ node }) => {
+  console.log("Clicked:", node);
 });
 
-sigma.on('leaveNode', ({ node }) => {
-  console.log('Left:', node);
+sigma.on("leaveNode", ({ node }) => {
+  console.log("Left:", node);
 });
 
 // Stage events (background)
-sigma.on('clickStage', () => {
-  console.log('Clicked background');
+sigma.on("clickStage", () => {
+  console.log("Clicked background");
 });
 ```
 
@@ -220,9 +220,9 @@ const useDebouncedCameraState = (sigma: Sigma, delay = 150) => {
       }, delay);
     };
 
-    sigma.getCamera().on('updated', handleUpdate);
+    sigma.getCamera().on("updated", handleUpdate);
     return () => {
-      sigma.getCamera().off('updated', handleUpdate);
+      sigma.getCamera().off("updated", handleUpdate);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [sigma, delay]);
@@ -243,14 +243,14 @@ const useLOD = (sigma: Sigma) => {
 
   useEffect(() => {
     if (ratio < 0.3) {
-      sigma.setSetting('defaultNodeType', 'circle');
-      sigma.setSetting('renderLabels', false);
+      sigma.setSetting("defaultNodeType", "circle");
+      sigma.setSetting("renderLabels", false);
     } else if (ratio < 1.0) {
-      sigma.setSetting('defaultNodeType', 'image');
-      sigma.setSetting('renderLabels', false);
+      sigma.setSetting("defaultNodeType", "image");
+      sigma.setSetting("renderLabels", false);
     } else {
-      sigma.setSetting('defaultNodeType', 'image');
-      sigma.setSetting('renderLabels', true);
+      sigma.setSetting("defaultNodeType", "image");
+      sigma.setSetting("renderLabels", true);
     }
     sigma.refresh();
   }, [sigma, ratio]);
@@ -268,7 +268,7 @@ const useLOD = (sigma: Sigma) => {
 ### Pattern 3: Layout Integration
 
 ```typescript
-import FA2Layout from 'graphology-layout-forceatlas2/worker';
+import FA2Layout from "graphology-layout-forceatlas2/worker";
 
 const useGraphLayout = (graph: Graph) => {
   const layoutRef = useRef<FA2Layout | null>(null);
@@ -280,7 +280,7 @@ const useGraphLayout = (graph: Graph) => {
     layout.start();
 
     // Store on graph for other hooks to check
-    graph.setAttribute('layout', layout);
+    graph.setAttribute("layout", layout);
     layoutRef.current = layout;
 
     // Auto-stop after settling
@@ -303,13 +303,13 @@ const useGraphLayout = (graph: Graph) => {
 
 ## Performance Guidelines
 
-| Nodes       | Edges      | Icons | Expected FPS | Recommendations              |
-| ----------- | ---------- | ----- | ------------ | ---------------------------- |
-| < 1,000     | < 5,000    | Yes   | 60           | No optimization needed       |
-| 1,000-5,000 | < 20,000   | Yes   | 30-60        | Add debouncing               |
-| 5,000-10,000| < 50,000   | No    | 30-60        | Use circles, add LOD         |
-| 5,000-10,000| < 50,000   | Yes   | 15-30        | Add viewport culling         |
-| > 10,000    | > 50,000   | No    | 15-30        | Add all optimizations        |
+| Nodes        | Edges    | Icons | Expected FPS | Recommendations        |
+| ------------ | -------- | ----- | ------------ | ---------------------- |
+| < 1,000      | < 5,000  | Yes   | 60           | No optimization needed |
+| 1,000-5,000  | < 20,000 | Yes   | 30-60        | Add debouncing         |
+| 5,000-10,000 | < 50,000 | No    | 30-60        | Use circles, add LOD   |
+| 5,000-10,000 | < 50,000 | Yes   | 15-30        | Add viewport culling   |
+| > 10,000     | > 50,000 | No    | 15-30        | Add all optimizations  |
 
 **Critical thresholds:**
 
@@ -341,29 +341,21 @@ This research synthesis documents:
 
 ### Requires (invoke before starting)
 
-| Skill                                      | When                  | Purpose                                |
-| ------------------------------------------ | --------------------- | -------------------------------------- |
-| `preventing-react-hook-infinite-loops`     | Camera handler setup  | Ensure stable dependencies, debouncing |
-| `optimizing-large-data-visualization`      | Performance issues    | LOD, culling strategies                |
+- **`preventing-react-hook-infinite-loops`** (LIBRARY) - Camera handler setup
+  - Purpose: Ensure stable dependencies, debouncing
+  - `Read(".claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md")`
 
 ### Calls (during execution)
 
-| Skill                               | Phase/Step                | Purpose                             |
-| ----------------------------------- | ------------------------- | ----------------------------------- |
-| `coordinating-competing-systems`    | Layout + culling          | Prevent layout/culling conflicts    |
+- **`coordinating-competing-systems`** (LIBRARY) - Layout + culling coordination
+  - Purpose: Prevent layout/culling conflicts
+  - `Read(".claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md")`
 
 ### Pairs With (conditional)
 
-| Skill                            | Trigger                          | Purpose                       |
-| -------------------------------- | -------------------------------- | ----------------------------- |
-| `debugging-react-performance`    | FPS drops, profiler shows issues | Root cause React re-renders   |
-
-## Related Skills
-
-- `optimizing-large-data-visualization` - LOD, culling patterns (cross-library)
-- `preventing-react-hook-infinite-loops` - Stable camera event handlers
-- `coordinating-competing-systems` - Layout vs culling coordination
-- `debugging-react-performance` - When camera handlers cause re-render storms
+- **`optimizing-large-data-visualization`** (LIBRARY) - Large graph performance issues (5000+ nodes)
+  - Purpose: General LOD, culling strategies beyond Sigma.js-specific patterns
+  - `Read(".claude/skill-library/development/frontend/graphing/optimizing-large-data-visualization/SKILL.md")`
 
 ## Examples
 

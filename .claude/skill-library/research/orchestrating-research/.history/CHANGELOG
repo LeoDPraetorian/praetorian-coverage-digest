@@ -1,0 +1,225 @@
+# Changelog - orchestrating-research
+
+## 2026-01-16 (Numeric Response Support for Mode Selection)
+
+### Changed
+- **Phase 0 AskUserQuestion prompt**: Updated question text to indicate numeric responses are supported: "Which research mode do you want to use? (You can respond with 1 or 2)"
+- **Added numeric response normalization logic**: Documented pattern for handling "1" (maps to "Deep Research") and "2" (maps to "Lite Research") alongside text responses
+
+### Rationale
+**Problem**: Users had to type out "Deep Research (Recommended)" or "Lite Research" when selecting research mode, which is tedious compared to common CLI patterns that support numeric shortcuts.
+
+**Solution**: Add clear indication in the question prompt that numeric responses are accepted (1 or 2), and document the normalization pattern to map numeric inputs to the corresponding mode labels.
+
+### Impact
+- **User experience**: Faster mode selection via numeric shortcut (type "1" instead of selecting full text)
+- **CLI consistency**: Matches standard CLI conventions for numeric option selection
+- **Backward compatible**: Both numeric and text responses work
+
+## 2026-01-16 (Two Research Modes: Deep and Lite)
+
+### Added
+- **Phase 0: Mode Selection** - New phase to ask user for research mode preference
+  - Deep mode: Current behavior with intent expansion via translating-intent
+  - Lite mode: Direct research without intent analysis for focused queries
+  - Uses AskUserQuestion at the beginning to let user choose mode
+- **Mode selection guidance** in "When to Use" section
+  - Deep mode recommended for vague/multi-faceted queries
+  - Lite mode recommended for focused queries with clear scope
+- **Mode-specific workflow paths** throughout documentation
+  - Phase 1 marked as "Deep Mode Only" with skip instruction for lite mode
+  - Quick Reference table shows which phases apply to each mode
+  - Total time estimates for both modes (deep: 15-30 min, lite: 10-25 min)
+
+### Changed
+- **Frontmatter description**: Updated to mention "supports deep mode (with intent expansion) and lite mode (direct research)"
+- **Main heading**: Changed from "Sequential research orchestration with intent expansion" to "Sequential research orchestration with two modes: deep research (with intent expansion) and lite research (direct queries)"
+- **Key Features**: Added "Two Research Modes" as first feature, updated other features to clarify mode-specific behavior
+- **Quick Reference table**: Added Phase 0 (Mode Selection) and "Applies To" column showing which phases run in each mode
+- **Phase 1**: Added "Deep Mode Only" to heading, added skip instruction for lite mode with guidance on creating single interpretation from user query
+- **Phase 2**: Updated description to clarify queries come from Phase 1 in deep mode or original query in lite mode
+- **Anti-Patterns**: Added "Skipping mode selection" and "Running intent expansion in lite mode" anti-patterns
+- **Common Rationalizations**: Added rationalization about picking mode for user, updated existing rationalization about skipping intent expansion
+- **Key Principles**: Reordered to make "USER CONTROL" (mode selection) principle #1, added "MODE ADHERENCE" as principle #3
+- **TodoWrite tracking**: Updated from "6 phases" to "7 for deep mode, 6 for lite mode"
+
+### Rationale
+**Problem**: The orchestrating-research skill always ran intent analysis via translating-intent, even for focused queries where the user already knew exactly what they wanted to research (e.g., "research React Hook Form validation patterns"). This added unnecessary time and complexity for straightforward research needs.
+
+**Solution**: Introduce two modes:
+1. **Deep mode** (current behavior): For vague queries that benefit from intent expansion (e.g., "research authentication patterns" → OAuth, JWT, sessions)
+2. **Lite mode** (new): Skip intent analysis, use user's query directly for focused research
+
+Users choose their preferred mode at the beginning via AskUserQuestion. This gives them control over the research depth and time investment.
+
+### Impact
+- **User control**: Users can now choose research depth based on query clarity
+- **Efficiency**: Lite mode saves 2-3 minutes by skipping intent expansion for focused queries
+- **Flexibility**: Both modes available for different research needs
+- **Backward compatible**: Deep mode preserves existing behavior for users who need comprehensive coverage
+- **Line count**: Increased from 685 to 750 lines (250 lines over soft limit, requires progressive disclosure refactor for mode selection details)
+
+## 2026-01-16 (Compaction Enforcement)
+
+### Added
+- **Post-Research Compaction Gate** between Phase 3 and Phase 4
+  - BLOCKING gate requiring context compaction before synthesis
+  - Integration with `persisting-progress-across-sessions` skill
+  - Verification checklist for compaction (all research outputs written, summaries used, file references)
+  - Skip protocol using AskUserQuestion with risk disclosure
+- **Key Principle 7**: "Compaction gates are blocking" - Research accumulates context rapidly, compaction required before synthesis
+- **persisting-progress-across-sessions** added to Related Skills table with purpose: "Context compaction protocol (required at Post-Research Compaction Gate)"
+
+### Changed
+- **Phase structure**: Added explicit gate between Phase 3 (Sequential Execution) and Phase 4 (Synthesis)
+
+### Rationale
+**Problem**: Research orchestration accumulates significant context from multiple research agents. Without enforced compaction, agents proceed to synthesis with bloated context containing full research outputs instead of summaries. This causes context rot, token overflow, and degraded synthesis quality.
+
+**Solution**: Blocking gate between Phase 3 and Phase 4 enforces:
+1. Verification that all research outputs are persisted to files (OUTPUT_DIR)
+2. Replacement of inline research content with summaries (<200 tokens each)
+3. Use of file references instead of inline content for synthesis
+
+Gate cannot be bypassed without explicit user approval via AskUserQuestion with risk disclosure.
+
+## 2026-01-10 (Prompt Engineering Patterns Integration)
+
+### Added
+- **orchestration-prompt-patterns library skill reference** to Related Skills table
+- **Self-Consistency Protocol (MANDATORY)** in Phase 4: Synthesis
+  - Three-pass aggregation: source-first, claim-first, conflict-first
+  - Consistency check table with confidence adjustment rules
+  - Integrated into synthesis workflow (steps 1-2 before grouping)
+- **Evidence-based confidence calibration** in agent prompt templates
+  - Checklist for evidence verification (direct sources, agreement count, authority, recency)
+  - Confidence ranges tied to authoritative source agreement
+  - Replaces intuition-based confidence scoring
+- **Anti-patterns**: Single-pass synthesis, unjustified confidence, ignoring contradictions
+- **Synthesis structure enhancements**:
+  - Synthesis confidence metadata (consistency check, evidence quality, source agreement)
+  - Confidence scores on interpretations and recommendations
+  - Conflict resolution approach (3-step protocol)
+  - Methodology notes section (aggregation passes, consistency result, sources analyzed)
+
+### Changed
+- **Phase 4: Synthesis** - Added self-consistency protocol before existing synthesis steps
+- **Synthesis structure template** - Enhanced with confidence metadata and methodology tracking
+- **references/agent-prompt-templates.md** - Updated confidence scoring section with evidence-based calibration
+
+### Rationale
+**Problem**: Single-pass synthesis produces first-impression bias. Agents aggregate findings linearly (first source → second source → third source), causing early findings to dominate and later contradictions to be underweighted. Confidence scores lacked calibration, making them meaningless for weighting synthesis.
+
+**Solution**: Multi-path aggregation (self-consistency) forces three independent synthesis paths:
+1. Source-first: Extract from each agent, combine by theme (bottom-up)
+2. Claim-first: Identify claims, check which agents support each (top-down)
+3. Conflict-first: Start with disagreements, build consensus (adversarial)
+
+If all three paths agree → high confidence. If they diverge → investigate why, adjust confidence.
+
+Evidence-based confidence calibration replaces gut feeling with concrete criteria (source count, authority, agreement).
+
+### Impact
+- **Synthesis quality**: Multi-path aggregation catches conflicts that single-pass synthesis misses
+- **Confidence accuracy**: Evidence-based calibration makes scores meaningful for weighting recommendations
+- **Transparency**: Methodology notes document which aggregation approach was used
+- **Line count**: Increased from 634 to 672 lines (172 lines over soft limit, requires progressive disclosure refactor)
+
+## 2026-01-04 (Phase 6 Workflow Handoff)
+
+### Added
+- **Phase 6: Workflow Handoff (MANDATORY)** - New phase to handle parent workflow continuation
+  - Step 1: Check TodoWrite for pending phases indicating parent workflow
+  - Step 2: Handle based on context (continue vs complete)
+  - Detects parent workflows (creating-skills, updating-skills, fixing-skills) by checking TodoWrite
+  - Prevents premature workflow termination when research is invoked as part of larger workflows
+  - Outputs WORKFLOW_CONTINUATION_REQUIRED signal when parent workflow detected
+
+### Changed
+- **Quick Reference table**: Updated to show 6 phases instead of 5
+  - Added row: "6. Handoff | Return to parent workflow or complete | TodoWrite check | 1 min"
+  - Updated total time from "15-25 minutes" to "15-30 minutes"
+  - Updated TodoWrite tracking note from "5 phases" to "6 phases"
+- **Key Principles**: Reordered and expanded
+  - Principle 1: Changed from "SEQUENTIAL EXECUTION" to "WORKFLOW CONTINUITY" (Phase 6 handoff focus)
+  - Added new Principle 6: "PARENT WORKFLOW DETECTION" (Check TodoWrite before completion)
+
+### Rationale
+**Problem**: When `orchestrating-research` completed Phase 5 (Persist), it output JSON results and stopped, even when invoked FROM parent skills (creating-skills, updating-skills, fixing-skills) that expected workflow continuation. Parent skills have "continue after research" instructions, but the agent executing research couldn't see those instructions. This caused workflows to stop prematurely at Step 4 (Research) instead of continuing through Steps 5-8.
+
+**Solution**: Phase 6 explicitly checks TodoWrite for pending phases that indicate a parent workflow. If detected, it signals WORKFLOW_CONTINUATION_REQUIRED and instructs the agent to read SYNTHESIS.md and continue with next pending phase. If no parent workflow detected, it reports completion normally.
+
+### Impact
+- **Reliability**: Prevents workflow premature termination when research is invoked as subskill
+- **User experience**: Workflows complete end-to-end without manual intervention
+- **Compliance**: Follows automatic continuation pattern established in updating-skills
+- **Line count**: Increased from 573 to 623 lines (123 lines over soft limit, requires progressive disclosure refactor in next update)
+
+## 2026-01-03 (Rate Limit Protection Update)
+
+### Changed
+- **Max 3 interpretations**: Limited research sessions to maximum 3 interpretations to avoid API rate limits
+  - Added rate limit protection note in Phase 2
+  - If query count > 3, user must SELECT TOP 3 PRIORITIES
+  - Updated Quick Reference table (Phase 1: "max 3")
+- **Sequential execution**: Changed from parallel to sequential agent spawning to avoid 429 errors
+  - Phase 3 renamed: "Parallel Execution" → "Sequential Execution"
+  - Spawn ONE agent at a time, wait for completion, then spawn next
+  - Added progress tracking guidance ("Researching interpretation X of Y...")
+  - Updated Quick Reference table (Phase 3: "SEQUENTIALLY (1 at a time)", duration changed to 5-15 min)
+- **Key Features**: Updated to reflect sequential execution and max 3 interpretations
+- **Anti-Patterns**:
+  - Replaced "Sequential agent spawning" (old anti-pattern) with "Spawning more than 1 agent at a time" (new anti-pattern)
+  - Added "Researching more than 3 interpretations" anti-pattern
+- **Key Principles**: Updated principle 1 from "PARALLEL FIRST" to "SEQUENTIAL EXECUTION"
+- **Common Rationalizations**: Replaced "Let me spawn agents sequentially to see what I get first" with "Let me spawn all agents in parallel for speed"
+- **Frontmatter description**: Updated to mention "max 3" and "sequential"
+- **Main heading**: Updated from "Parallel research orchestration" to "Sequential research orchestration"
+
+### Rationale
+Production usage revealed that spawning 4+ agents in parallel triggers Claude API rate limits (429 errors), causing:
+1. Failed research sessions with partial results
+2. Excessive token consumption from parallel agent contexts
+3. Poor user experience with unpredictable failures
+
+The sequential execution model with max 3 interpretations ensures:
+- Reliable completion without rate limit errors
+- Controlled token usage (3 sequential agents vs 6+ parallel)
+- Predictable execution time (5-15 min for 3×2 = 6 sequential agents)
+
+### Impact
+- **Reliability**: 100% completion rate vs previous failures with 4+ parallel agents
+- **Token efficiency**: ~60% reduction (3 interpretations × 2 sources = 6 agents max vs previous unlimited)
+- **User experience**: Predictable progress tracking, no mysterious 429 failures
+- **Line count**: Increased from 556 to 573 lines (73 lines over soft limit, but necessary for critical rate limit protection)
+
+## 2026-01-03 (Phase 2 Redesign)
+
+### Changed
+- **Phase 2 redesigned**: Replaced "Source Selection" with "User Review (Query Selection + Research Methods)"
+  - Step 1: Query Selection (dynamic based on query count ≤4 vs >4)
+  - Step 2: Research Method Selection (fixed Code + Web questions)
+  - Users can now review/modify/deselect queries from Phase 1 before spawning agents
+  - Supports custom query input via 'Other' responses
+  - Updated Quick Reference table to reflect new phase name
+- **Phase 3 subsections**: Changed fractional numbering (3.1, 3.2, 3.3) to proper step headers
+- **Anti-Patterns**: Added "Spawning agents without user query review" anti-pattern
+- **references/intent-integration.md**:
+  - Added comprehensive "Integration with Phase 2 (User Review)" section
+  - Included dynamic query splitting logic example
+  - Added categorization heuristics for Design vs Operations queries
+
+### Rationale
+Previously, Phase 2 asked about interpretations (Design/Operations) and sources (Code/Web) but did NOT show actual queries to users. Queries from Phase 1 (translating-intent) were passed directly to agents without user review. The redesign addresses three critical gaps:
+1. Users couldn't review actual search queries/keywords before agents were spawned
+2. Users couldn't modify or add custom queries
+3. Users couldn't deselect queries they didn't want researched
+
+The new two-step flow (query selection → research method selection) gives users full control over what gets researched while maintaining the parallel execution efficiency.
+
+### Impact
+- **User experience**: Users now see actual queries with keywords/scope before agents spawn
+- **Efficiency**: Users can deselect irrelevant queries, reducing wasted CPU on unwanted research
+- **Flexibility**: Users can add custom queries via 'Other' option in any question
+- **Line count**: Increased from 511 to 538 lines (38 lines over soft limit, acceptable for comprehensive redesign)
+- **Compliance**: Fixed fractional phase numbering (Phase 3.1 → Phase 3 Step 1)

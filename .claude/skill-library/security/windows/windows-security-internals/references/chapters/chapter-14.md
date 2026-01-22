@@ -30,7 +30,7 @@ When the LSA processes a logon request, it first derives the shared encryption k
 
 The LSA then generates an authentication service request (AS-REQ) message and sends it over the network to the authentication server . The authentication server is the part of the KDC that is responsible for issuing an initial ticket to the authentication process. The AS-REQ message contains the username and realm as well as pre-authentication data , which consists of the current time encrypted with the user's shared encryption key. The authentication
 
-458    Chapter 14
+458 Chapter 14
 
 ---
 
@@ -64,7 +64,7 @@ To ensure that the server can verify its request, the LSA will also generate a c
 
 Figure 14-3: The TGS-REQ message format
 
-460    Chapter 14
+460 Chapter 14
 
 ---
 
@@ -105,7 +105,7 @@ One attack that uses this approach involves forging a golden ticket . This is po
 
 Getting the krbqt encryption key usually requires compromising a domain controller and extracting the key from there. Doing this might seem reductive, because if you compromise the domain controller, you can already control ticket issuance, but there are still advantages to gaining the krbqt key. For
 
-462    Chapter 14
+462 Chapter 14
 
 ---
 
@@ -143,7 +143,7 @@ The final step in Figure 15-1 is optional. By default, the server doesn't need t
 
 Kerberos uses the authentication prompt reply (AP-REP) message to send this encrypted value back to the client . The AP-REP message contains an authenticator value like the one sent in the AP-REQ, but it has a slightly
 
-464    Chapter 14
+464 Chapter 14
 
 ---
 
@@ -160,7 +160,6 @@ A more efficient attack, called Kerberosing, takes advantage of the fact that th
 ## Performing Kerberos Authentication in PowerShell
 
 How much of the network service authentication process can we observe
-
 
 from PowerShell? Let's find out. We'll start by getting the credentials han
 
@@ -221,8 +220,7 @@ Table 14-1: Common Kerberos Encryption Types on Windows
 
 <table><tr><td>Name</td><td>Encryption</td><td>Verification</td></tr><tr><td>AES256_CTS_HMAC_SHA1_96</td><td>AES CTS 256-bit</td><td>SHA1 HMAC truncated to 96 bits</td></tr><tr><td>AES128_CTS_HMAC_SHA1_96</td><td>AES CTS 128-bit</td><td>SHA1 HMAC truncated to 96 bits</td></tr><tr><td>DES_CBC_MD5</td><td>DES 56-bit</td><td>MD5 HMAC</td></tr><tr><td>ARCFOUR_HMAC_MD5</td><td>RC4</td><td>MD5 HMAC</td></tr></table>
 
-
-466    Chapter 14
+466 Chapter 14
 
 ---
 
@@ -410,7 +408,6 @@ D8 38 77 27 51 C2 5E C3 88 D8 01 CC AC 0A A9
 
 We can now pass the AP-REQ authentication token and the key to the Unprotect-LSaAuthToken PowerShell command to decrypt the ticket and authorenticator. By passing the decrypted authentication token to the Format -LSaAuthToken command, we can display the unprotected information.
 
-
 As the decrypted ticket is quite large, we'll inspect it in parts, starting in Listing 14-8.
 
 ```bash
@@ -478,7 +475,7 @@ Logon Count      : 26
 Bad Password #  : 0
 ```
 
-472    Chapter 14
+472 Chapter 14
 
 ---
 
@@ -641,7 +638,7 @@ When discussing domain forests in Chapter 10 I mentioned the concept of trust re
 
 Figure 14-6 shows the basic operations of inter-domain Kerberos authentication between the example MINERAL and SALES domains.
 
-Kerberos   477
+Kerberos 477
 
 ---
 
@@ -693,7 +690,7 @@ Figure 14-7 shows three main options for delegation. The first option, the defau
 
 Let's dig into the similarities and differences between the two types of delegation and see how they're implemented. In the following sections, we'll modify some of the delegation settings in the Active Directory server. This means that you must perform these operations from a user account that has SeEnableDelegationPrivilege on the domain controller. Typically, only administrators have this privilege, so you should run these examples as a domain administrator.
 
-480    Chapter 14
+480 Chapter 14
 
 ---
 
@@ -790,7 +787,7 @@ PS> $server = New-LsaServerContext -CreditHandle $credin
 PS> Update-LsaServerContext -Server $server -Client $client
 ```
 
-Kerberos     483
+Kerberos 483
 
 ---
 
@@ -821,16 +818,16 @@ This made any service with unconstrained delegation a good target for attack. If
 
 Microsoft resolved the security weakness by allowing an administrator to specify an explicit list of SPNs that the service could use for delegation. For example, the administrator could limit the HTTP service discussed earlier to delegating only to the database service and nothing else.
 
-484    Chapter 14
+484 Chapter 14
 
 ---
 
 Constrained delegation can work in three modes:
 
-- ●  Kerberos-only delegation
-●  Protocol transition delegation
-●  Resource-based delegation
-We'll cover each mode in turn in the following sections.
+- ● Kerberos-only delegation
+  ● Protocol transition delegation
+  ● Resource-based delegation
+  We'll cover each mode in turn in the following sections.
 
 ## Kerberos-Only Delegation
 
@@ -975,7 +972,6 @@ Table 14-2: SIDs for Asserted Identities
 
 <table><tr><td>Name</td><td>SID</td><td>Description</td></tr><tr><td>Authentication authority asserted identity</td><td>S-1-18-1</td><td>Token generated through authentication</td></tr><tr><td>Service asserted identity</td><td>S-1-18-2</td><td>Token generated through an S4U mechanism</td></tr><tr><td></td><td></td><td>Kerberos 489</td></tr></table>
 
-
 ---
 
 The first SID indicates that the Token object was generated by providing authentication credentials to the KDC . The second SID is assigned for S4U2ref or S4U2proxy tokens. A security descriptor can use these SIDs to limit access to a service configured for resource delegation to either Kerberos-only delegation, which gets the first SID, or authentication protocol transition delegation, which gets the second.
@@ -1014,7 +1010,7 @@ First, we confirm that the alive user has the AccountNotDelegated flag set to Tr
 
 Until now, we've needed an SPN configured for a user or computer in order for the KDC to select the correct shared encryption key. An
 
-490     Chapter 14
+490 Chapter 14
 
 ---
 
@@ -1032,7 +1028,7 @@ In this figure, Alice wants to authenticate to a service running under Bob's acc
 
 The service accepts the TGT-REQ token, and the LSA packages bob's cached TGT into a TGT-REQ message to send back to the client ❸ (Note that the LSA simply takes the caller's cached TGT; it doesn't seem to pay any
 
-Kerberos   491
+Kerberos 491
 
 ---
 
@@ -1078,14 +1074,13 @@ PS> $credin = New-LsaCredentialHandle -Package "Kerberos" -UseFlag Inbound
 
 Listing 14-28: Creating the server authentication context and getting the TGT-REP
 
-492    Chapter 14
+492 Chapter 14
 
 ---
 
 We first create the credentials handle and read the credentials for bob from the shell. It's necessary to specify credentials for bob because otherwise the server authentication would use aier's TGT, which would fail when creating the service ticket for the bob@mineral.local SPN. With the credentials handle, we can create the server authentication context.
 
 By formatting the returned authentication token, we can see it's a
-
 
 TGT-REP with the TGT ticket ❶ . We don't know the hbkbt user's password, so we can't decrypt it, meaning there's no way of knowing whether the ticket is for bob or not. In Listing 14-29, we update the client authentication context with the TGT-REP message and print the new authentication token.
 
@@ -1176,7 +1171,7 @@ SRV_INST - krbtgt/MINERAL_LOCAL  EE 3D D2 F7 6F 5F 7E 06 B6 E2 4E 6C C6 36 59 64
 
 Listing 14-32: Extracting all tickets and session keys
 
-494    Chapter 14
+494 Chapter 14
 
 ---
 
@@ -1262,7 +1257,7 @@ For better performance, you're better off using another tool, such as Rubeus (ht
 
 This chapter contained an in-depth discussion of Kerberos, the protocol used for Windows domain authentication since Windows 2000. We examined the key distribution center implemented on the Windows domain controller, which holds the list of keys associated with all users and computers on a network, and saw how Kerberos uses these keys (typically derived from the account password) to authenticate tickets, which can then authenticate to services on the network.
 
-496    Chapter 14
+496 Chapter 14
 
 ---
 
@@ -1270,15 +1265,11 @@ To support complex authentication scenarios, Kerberos allows for the delegation 
 
 The next (and final) chapter will describe some additional network
 
-
 authentication protocols as well as going into more depth on how the SSPI
-
 
 APIs are used.
 
 ---
-
-
 
 ---
 
@@ -1308,9 +1299,7 @@ PS> $buf = New-LsaSecurityBuffer -Type Data -Byte @(0, 1, 2, 3)
 
 You can specify either a byte array or a string when initializing the data.
 
-
 You also specify a type for the buffer. The following is a short list of the
-
 
 most important buffer types you'll encounter:
 
@@ -1322,15 +1311,15 @@ Token Contains a token; used to pass and return authentication tokens and signat
 
 PkgParams Contains additional configuration parameters for the security package
 
-StreamHeader  Contains the header of a streaming protocol
+StreamHeader Contains the header of a streaming protocol
 
-StreamTrailer  Contains the trailer of a streaming protocol
+StreamTrailer Contains the trailer of a streaming protocol
 
-Stream   Contains the data of a streaming protocol
+Stream Contains the data of a streaming protocol
 
-Extra   Contains extra data generated by the security package
+Extra Contains extra data generated by the security package
 
-ChannelBindings     Contains the channel binding data
+ChannelBindings Contains the channel binding data
 
 You can use security buffers as either input or output, depending on the security package's requirements and the API used. If you want to define an output-only buffer, you can use the Size parameter when creating the buffer:
 
@@ -1387,7 +1376,7 @@ We first create one input buffer of type PkgParams containing a string . The con
 
 The command will add the token as a Token type buffer to the start of the input list, and will also append any channel bindings specified when creating the context. Therefore, the input buffer list passed in this case would contain the Token buffer followed by the PkgParams buffer. Sometimes
 
-Negotiate Authentication and Other Security Packages   501
+Negotiate Authentication and Other Security Packages 501
 
 ---
 
@@ -1422,7 +1411,7 @@ We first create the header buffer, marking it as read-only with a checksum. By m
 
 We then pass the buffers to Protect-LSaContextMessage. This command returns the signature for the encryption operation and updates the encrypted data in place. When dumping the buffers, we can see that the header is still unencrypted even though the data buffer has been encrypted.
 
-502      Chapter 15
+502 Chapter 15
 
 ---
 
@@ -1484,7 +1473,6 @@ Flags        : Unicode, RequestTarget, Signing, NTLM, LocalCall, AlwaysSign,... 
 Listing 15-4: Continuing the Negotiate authentication on the server
 
 We first pass the client authentication token to the server authentication context that we create. In the formatted output, we can see that it's an
-
 
 SPNEGO Response, and that the server has opted to use NTLM. The response has a State flag, which indicates that the negotiation is currently incomplete. Following that is the authentication token, which, as expected, is now an NTLM CHALLENGE token.
 
@@ -1559,7 +1547,7 @@ When setting up the context, you need to specify a target name, which is typical
 
 We then format the authentication token, which displays the TLS protocol’s simple record structure (shown in Figure 15-1).
 
-506   Chapter 15
+506 Chapter 15
 
 ---
 
@@ -1620,7 +1608,7 @@ At this point, we've set up the connection, but we have yet to transfer a single
   PS>$bufs = $header, $data, $trailer, $empty
 ```
 
-508    Chapter 15
+508 Chapter 15
 
 ---
 
@@ -2971,11 +2959,9 @@ Listing 15-9: Encrypting and decrypting application data
 
 Secure channel requires passing four buffers to the Protect-LSaContext
 
-
 Message command . The first buffer is for the TLS record header. It needs to be of type StreamHeader and should be of a size queried from the context using the StreamHeaderSize property.
 
 The second buffer is for the data to encrypt and must be of type Data.
-
 
 There is a maximum allowed size for this buffer, which you can query using the StreamMessageSize property. The maximum size is typically 16KB, so the 4 bytes we use here should fall well within the limit. If the application data to encrypt is larger than the maximum size, you'll need to fragment the data into smaller parts.
 
@@ -2993,7 +2979,7 @@ Now we need to decrypt the data on the server. To do so, we again need four buff
 
 We pass the buffers to the Unprotect-LsaContextMessage command, again specifying the NoSignature parameter, as the signature is part of the protocol ❹. When checking the data buffer, which was originally empty, we now find it's populated with the original unencrypted data.
 
-I've made secure channel look easy to use, but it's much more complex than shown here. For example, you'll have to deal with out-of-band alerts, which indicate problems with the connection. I recommend that you use an existing class (such as $151stream_, which comes with .NET) to add TLS support to your application unless there's a niche feature not exposed that you need to use.
+I've made secure channel look easy to use, but it's much more complex than shown here. For example, you'll have to deal with out-of-band alerts, which indicate problems with the connection. I recommend that you use an existing class (such as $151stream\_, which comes with .NET) to add TLS support to your application unless there's a niche feature not exposed that you need to use.
 
 By default, the TLS protocol verifies only the server in the secure channel connection, using the X.509 certificate; however, the server can request that the client also present a valid certificate for verification purposes. To require the client to send a certificate, specify the MutualAuth request attriute when creating the server authentication context. By default, secure channel will try to find a suitable certificate for the user on the client, but you can override this search by setting an explicit certificate when generating the client's credentials.
 
@@ -3041,7 +3027,7 @@ Because the session key for the authentication is derived from the password, a m
 
 While CredSSP was designed for use with remote desktop connections, you'll also find it's used for other purposes that require credential
 
-512   Chapter 15
+512 Chapter 15
 
 ---
 
@@ -3066,7 +3052,7 @@ PS> mstsc.exe /remoteGuard
 
 The second security feature is Restricted Admin mode . Its big difference from Remote Credential Guard is that when a user authenticates to a server, it creates the logon session without the user's network credentials. Instead, the session is assigned network credentials for the computer account on the server. Therefore, the logon session is primarily useful only if the user wants to perform tasks locally; they won't be able to connect to network resources as themselves unless they explicitly provide their credentials to the remote server. However, this feature ensures that there are no privileged credentials steal if the server is compromised.
 
-Negotiate Authentication and Other Security Packages   513
+Negotiate Authentication and Other Security Packages 513
 
 ---
 
@@ -3086,7 +3072,7 @@ One annoyance of using a remote desktop connection is having to enter your passw
 
 Figure 15-4: Entering and saving your credentials
 
-514      Chapter 15
+514 Chapter 15
 
 ---
 
@@ -3151,7 +3137,7 @@ There are many ways to decrypt the files successfully: for example, you could in
 
 Another approach to decrypting the files was introduced in Windows Vista. A special token privilege, SetTrustedCredManAccessPrivilege, allows a process to be considered trusted by the LSA when accessing select credential manager APIs. The most interesting of these select APIs is CredBackup Credentials, which will back up all of a user's credentials into a file that can later be used to restore the credentials if needed. The backup also contains any protected password values.
 
-516    Chapter 15
+516 Chapter 15
 
 ---
 
@@ -3236,7 +3222,7 @@ Cipher Text    :
   Encryption Type : NULL
 ```
 
-518    Chapter 15
+518 Chapter 15
 
 ---
 
@@ -3280,7 +3266,7 @@ The NTLM AUTHENTICATE token's flags now include an Identity flag 1 . This indica
 
 As with NullSession, the Identity request attribute flag will work with Kerberos as well. Listing 15-19 shows that specifying this flag results in an Identity flag being set in the AP-REQ authenticator's GSSAPI Checksum field.
 
-Negotiate Authentication and Other Security Packages   519
+Negotiate Authentication and Other Security Packages 519
 
 ---
 
@@ -3300,7 +3286,7 @@ When a process is running with a lobox token (described in Chapter 4), the LSA e
 If the lowbox process can create a client authentication context, however, it can generate authentication tokens in only the following three scenarios:
 
 - • Using logon session credentials with the Enterprise Authentication
-capability
+  capability
 
 • Using logon session credentials to a known web proxy
 • Using explicit credentials, such as a username and password
@@ -3319,7 +3305,7 @@ P5> $cred = New-LsaCredentialHandle -Package "Negotiate" -UseFlag Outbound
         Invoke-NtToken $token { New-LsaClientContext -CredHandle $cred}
 ```
 
-520    Chapter 15
+520 Chapter 15
 
 ---
 
@@ -3377,9 +3363,7 @@ Listing 15-21: Testing lowbox web proxy authentication
 
 First, we query for the proxy setting using the WebClient .NET class ❶.
 
-
 We then build the target SPN with an HTTP service class and the proxy
-
 
 address ❷.
 
@@ -3391,9 +3375,7 @@ This proxy authentication is considered secure because the service should check 
 
 The final option, shown in Listing 15-22, is to specify explicit credentials
 
-
 when creating the credentials handle provided to the client authentication
-
 
 context.
 
@@ -3419,7 +3401,7 @@ To initialize the client authentication context, you still need to provide a tar
 
 When in a lobox token sandbox, you can act as a server for network authentication, as it's possible to get a Token object for a different user.
 
-522    Chapter 15
+522 Chapter 15
 
 ---
 
@@ -3470,7 +3452,7 @@ Select-Object -ExpandProperty Message
 An account was successfully logged on.
 ```
 
-524    Chapter 15
+524 Chapter 15
 
 ---
 
@@ -3515,7 +3497,7 @@ This listing shows an example entry for a successful authentication event. On a 
 
 The event records contain a lot of information, some of which might not be populated for certain logon types. Each entry starts with information about the user account that has made the authentication request. For an interactive authentication, you'll likely find this to be a privileged account, such as the SYSTEM computer account. Next comes information about the logon, including the logon type. The 2 indicates interactive. Some other logon types are network (3), batch (4), service (5), and remote interactive (10). This section also indicates whether Restricted Admin
 
-Negotiate Authentication and Other Security Packages  525
+Negotiate Authentication and Other Security Packages 525
 
 ---
 
@@ -3558,13 +3540,13 @@ Failure Information:
 
 Listing 15-25: A failed authentication event log record
 
-526    Chapter 15
+526 Chapter 15
 
 ---
 
 In the output, I've highlighted just one record. It has many of the same sections as for a successful authentication, so I've removed anything that appears in both types of record.
 
-The first of the sections shown here contains details on the user account that failed to authenticate. The SID entry isn't guaranteed to be valid; for example, in this case, the SID does not represent the alive user. Next, we get more details about the failure, starting with a text version of the error, followed by the status, which here is an NT status code of STATUS _LOGON_FAILURE. The sub-status code provides more detail; in this case, it's STATUS_WRONG_PASSWORD, which indicates that the user did not provide a valid password. Other sub-status codes you might encounter include STATUS_NO_SUCH_USER, if the user doesn't exist, and STATUS_ACCOUNT_DISABLED, if the user's account has been disabled.
+The first of the sections shown here contains details on the user account that failed to authenticate. The SID entry isn't guaranteed to be valid; for example, in this case, the SID does not represent the alive user. Next, we get more details about the failure, starting with a text version of the error, followed by the status, which here is an NT status code of STATUS \_LOGON_FAILURE. The sub-status code provides more detail; in this case, it's STATUS_WRONG_PASSWORD, which indicates that the user did not provide a valid password. Other sub-status codes you might encounter include STATUS_NO_SUCH_USER, if the user doesn't exist, and STATUS_ACCOUNT_DISABLED, if the user's account has been disabled.
 
 Finally, we'll look at a log-off event, generated when a logon session is deleted. This typically occurs when no Token objects that reference the logon session remain. Run the command in Listing 15-26 as an administrator.
 
@@ -3592,7 +3574,7 @@ Let's finish with some worked examples using the commands you've learned about i
 
 I noted in the previous section that you'll see two status codes in the event log when an authentication process fails: there's the main status, typically STATUS_LOGON_FAILURE , and a sub-status, such as STATUS_WRONG_PASSWORD . Unfortunately, the event log automatically converts only the main staus code to a string, then typically generates a generic “ The username or password is incorrect ” message that isn't very helpful in diagnosing
 
-Negotiate Authentication and Other Security Packages   527
+Negotiate Authentication and Other Security Packages 527
 
 ---
 
@@ -3639,7 +3621,7 @@ SubjectUserName            : alice
 TimeCreated                : 2/24 1:15:06 PM
 ```
 
-528    Chapter 15
+528 Chapter 15
 
 ---
 
@@ -3713,7 +3695,7 @@ Listing 15-29: Parsing authentication failure properties and converting their su
 
 We start by defining a function that converts the record properties into a simpler authentication failure object ❶ . We pull out only the timestamp, the username, and the domain name, and then convert the Substatus property to its NT status name ❷ .
 
-We then perform two failed authentications to generate some entries in the event log . We filter the log to return only authentication failure records, then convert the records in the pipeline . In the generated output, we can see two entries. The first has STATUS _ WRONG password as the sub-status, indicating that the user was valid but the password was not. The second has STATUS _ NO _ SUCH user , which indicates that the user doesn't exist.
+We then perform two failed authentications to generate some entries in the event log . We filter the log to return only authentication failure records, then convert the records in the pipeline . In the generated output, we can see two entries. The first has STATUS _ WRONG password as the sub-status, indicating that the user was valid but the password was not. The second has STATUS _ NO \_ SUCH user , which indicates that the user doesn't exist.
 
 ## Using a Secure Channel to Extract a Server's TLS Certificate
 
@@ -3783,7 +3765,7 @@ $Socket
 
 Listing 15-30: A script for reading a TLS server certificate
 
-Negotiate Authentication and Other Security Packages   531
+Negotiate Authentication and Other Security Packages 531
 
 ---
 
@@ -3798,7 +3780,6 @@ We now enter the body of the script. We start by making a TCP connection to the 
 We can now loop until the client context has completed authentication ❷ . If there is a token to send to the server, we convert it to bytes and write it to the TCP socket ❸ . As we saw earlier, the TLS client and server can generate more than one TLS record, which the context must handle before generating a new token.
 
 Once we've sent the client authentication token, we can read the next
-
 
 TLS record from the server and update the client ❹. This loop will carry on until either the authentication completes successfully or an exception stops the script. Finally, we can return the server's certificate from the script ❸.
 
@@ -3845,12 +3826,9 @@ Manager module and experimenting with their use. If you perform tests against a 
 
 Following this chapter are some additional reference materials:
 
-
 Appendix A contains a walkthrough for setting up a domain network for testing, and Appendix B contains a list of SDDL aliases.
 
 ---
-
-
 
 ---
 
@@ -3870,9 +3848,7 @@ also isolate network traffic to prevent it from affecting other systems on the s
 
 The domain configuration steps use PowerShell whenever possible.
 
-
 Note that, unless otherwise stated, you must run all of these PowerShell
-
 
 commands as an administrator user.
 
@@ -3932,7 +3908,6 @@ Table A-1 lists the virtual machines we'll set up, along with the operating syst
 Table A-1: Virtual Machine Names and IP Addresses
 
 <table><tr><td>Virtual machine name</td><td>Operating system</td><td>IP address</td></tr><tr><td>PRIMARYDC</td><td>Windows Server</td><td>192.168.99.10</td></tr><tr><td>GRAPHITE</td><td>Windows Professional or Enterprise</td><td>192.168.99.50</td></tr><tr><td>CINNABAR</td><td>Windows Server</td><td>192.168.99.20</td></tr><tr><td>SALESDC</td><td>Windows Server</td><td>192.168.99.110</td></tr><tr><td>GOLD</td><td>Windows Professional or Enterprise</td><td>192.168.99.150</td></tr><tr><td>ENGDCC</td><td>Windows Server</td><td>192.168.99.210</td></tr><tr><td>STEEL</td><td>Windows Professional or Enterprise</td><td>192.168.99.220</td></tr></table>
-
 
 Microsoft provides trial editions of Windows Enterprise and Windows Server as virtual machines. I'd recommend using your favorite search engine to find the latest links on Microsoft's website. For each machine, install the correct Windows version and then use PowerShell to configure it.
 
@@ -4025,7 +4000,7 @@ You'll also need to specify a DNS server address for the network adapter. In Lis
 
 You should now be able to access an external network. At this point, you might need to activate your copy of Windows Server if you're not using a trial version. You'll also want to ensure that the copy of Windows is up to date, including all security patches. While the network will isolate the virtual machines from external networks to a degree, this doesn't mean they can't be compromised, so it's best to be certain.
 
-540    Appendix A
+540 Appendix A
 
 ---
 
@@ -4068,7 +4043,7 @@ When it has finished rebooting you should reauthenticate to the server, but make
 -GivenName "Bob Cordite" -Enabled $true
 ```
 
-Building a Windows Domain Network for Testing  541
+Building a Windows Domain Network for Testing 541
 
 ---
 
@@ -4094,7 +4069,6 @@ We then create two domain users, alive and bob , assigning each of them a passwo
 Table A-2: Default Users for the Root Domain
 
 <table><tr><td>Username</td><td>Given name</td><td>Country</td><td>Password</td></tr><tr><td>alice</td><td>Alice Bombas</td><td>USA</td><td>Password1</td></tr><tr><td>bob</td><td>Bob Cordite</td><td>JP</td><td>Password2</td></tr></table>
-
 
 The final task in Listing A-7 is to create three Active Directory groups ❸ one for each group scope. We also assign the two users to a combination of these groups.
 
@@ -4160,7 +4134,7 @@ The first thing we need are the credentials for a user in the domain. As I expla
 
 Next, we call the Add-Computer command to join the workstation to the MINERAL domain with the user's credentials. If this succeeds, it will print a warning telling you to restart the computer. However, don't restart it just yet; you first need to add a domain user, such as alce , to the local Administrators group using the Add-LocalGroupMember command. If you don't do this step, you'll subsequently have to authenticate to the workstation using either a domain administrator or the original local administrator account. Adding a user to this group allows you to authenticate as that user and be a local administrator. Once this is done, you can reboot.
 
-Building a Windows Domain Network for Testing  543
+Building a Windows Domain Network for Testing 543
 
 ---
 
@@ -4182,7 +4156,6 @@ PS> Start-VM -VmName "SALESDC"
 Listing A-11: Creating and starting the SALESDC virtual machine
 
 Follow the normal installation process, and when asked for the
-
 
 Administrator user's password, set it to anything you like. In this book, I've assumed it will be set to Password.
 
@@ -4211,7 +4184,7 @@ Confirm SafeModeAdministratorPassword: **********
 
 Listing A-13: Installing and configuring the Active Directory domain services for a child domain
 
-544    Appendix A
+544 Appendix A
 
 ---
 
@@ -4238,11 +4211,9 @@ While we've configured every system you'll need for the book, you are free to co
 
 ---
 
-
-
 ---
 
-## B  SDDL SID ALIAS MAPPING
+## B SDDL SID ALIAS MAPPING
 
 ![Figure](figures/WindowsSecurityInternals_page_577_figure_001.png)
 
@@ -4260,17 +4231,13 @@ Table B-1: Supported Mappings of SDDL SID Aliases to SIDs
 
 <table><tr><td>SID alias</td><td>Name</td><td>SDDL SID</td></tr><tr><td>AA</td><td>BUILTIN\Access Control Assistance Operators</td><td>S-1-5-32-579</td></tr><tr><td>AC</td><td>APPLICATION PACKAGE AUTHORITY\ALL APPLICATION PACKAGES</td><td>S-1-15-2-1</td></tr><tr><td>AN</td><td>NT AUTHORITY\ANONYMOUS LOGON</td><td>S-1-5-7</td></tr><tr><td>AO</td><td>BUILTIN\Account Operators</td><td>S-1-5-32-548</td></tr><tr><td>AP</td><td>&lt;DOMAIN&gt;Protected Users</td><td>S-1-5-21-&lt;DOMAIN&gt; -S25</td></tr><tr><td>AS</td><td>Authentication authority asserted identity</td><td>S-1-18-1</td></tr><tr><td>AU</td><td>NT AUTHORITY\Authenticated Users</td><td>S-1-5-11</td></tr><tr><td>BA</td><td>BUILTIN\Administrators</td><td>S-1-5-32-544</td></tr><tr><td>BG</td><td>BUILTIN\Guests</td><td>S-1-5-32-546</td></tr><tr><td>BO</td><td>BUILTIN\Backup Operators</td><td>S-1-5-32-551</td></tr><tr><td>BU</td><td>BUILTIN\Users</td><td>S-1-5-32-545</td></tr><tr><td>CA</td><td>&lt;DOMAIN&gt;Cart Publishers</td><td>S-1-5-21-&lt;DOMAIN&gt; -S17</td></tr><tr><td>CD</td><td>BUILTIN\Certificate Service DCOM Access</td><td>S-1-5-32-574</td></tr><tr><td>CG</td><td>CREATOR GROUP</td><td>S-1-3-1</td></tr><tr><td>CN</td><td>&lt;DOMAIN&gt;Cloneable Domain Controllers</td><td>S-1-5-21-&lt;DOMAIN&gt; -S22</td></tr><tr><td>CO</td><td>CREATOR OWNER</td><td>S-1-1-3-0</td></tr><tr><td>CY</td><td>BUILTIN\Cryptographic Operators</td><td>S-1-5-32-569</td></tr><tr><td>DA</td><td>&lt;DOMAIN&gt;Domain Admins</td><td>S-1-5-21-&lt;DOMAIN&gt; -S12</td></tr><tr><td>DC</td><td>&lt;DOMAIN&gt;Domain Computers</td><td>S-1-5-21-&lt;DOMAIN&gt; -S15</td></tr><tr><td>DD</td><td>&lt;DOMAIN&gt;Domain Controllers</td><td>S-1-5-21-&lt;DOMAIN&gt; -S16</td></tr><tr><td>DG</td><td>&lt;DOMAIN&gt;Domain Guests</td><td>S-1-5-21-&lt;DOMAIN&gt; -S14</td></tr><tr><td>DU</td><td>&lt;DOMAIN&gt;Domain Users</td><td>S-1-5-21-&lt;DOMAIN&gt; -S13</td></tr><tr><td>EA</td><td>&lt;DOMAIN&gt;Enterprise Admins</td><td>S-1-5-21-&lt;DOMAIN&gt; -S19</td></tr><tr><td>ED</td><td>NT AUTHORITY\ENTERPRISE DOMAIN CONTROLLERS</td><td>S-1-5-9</td></tr><tr><td>EK</td><td>&lt;DOMAIN&gt;Enterprise Key Admins</td><td>S-1-5-21-&lt;DOMAIN&gt; -S27</td></tr><tr><td>ER</td><td>BUILTIN\Event Log Readers</td><td>S-1-5-32-573</td></tr><tr><td>ES</td><td>BUILTIN\NDS Endpoint Servers</td><td>S-1-5-32-576</td></tr><tr><td>HA</td><td>BUILTIN\Hyper-V Administrators</td><td>S-1-5-32-578</td></tr><tr><td>HI</td><td>Mandatory Label\High Mandatory Level</td><td>S-1-16-12288</td></tr><tr><td>IS</td><td>BUILTIN\IS_USRS</td><td>S-1-5-32-568</td></tr></table>
 
-
 ---
 
 <table><tr><td>SID alias</td><td>Name</td><td>SDDL SID</td></tr><tr><td>IU</td><td>NT AUTHORITY\INTERACTIVE</td><td>S-1-5-4</td></tr><tr><td>KA</td><td>&lt;DOMAIN&gt;Key Admins</td><td>S-1-5-21-&lt;DOMAIN&gt;-526</td></tr><tr><td>LA</td><td>&lt;DOMAIN&gt;Administrator</td><td>S-1-5-21-&lt;DOMAIN&gt;-500</td></tr><tr><td>LG</td><td>&lt;DOMAIN&gt;Guest</td><td>S-1-5-21-&lt;DOMAIN&gt;-501</td></tr><tr><td>LS</td><td>NT AUTHORITY\LOCAL SERVICE</td><td>S-1-5-19</td></tr><tr><td>LU</td><td>BUILTIN\Performance Log Users</td><td>S-1-5-32-559</td></tr><tr><td>LW</td><td>Mandatory Label\Low Mandatory Level</td><td>S-1-16-4096</td></tr><tr><td>ME</td><td>Mandatory Label\Medium Mandatory Level</td><td>S-1-16-8192</td></tr><tr><td>MP</td><td>Mandatory Label\Medium Plus Mandatory Level</td><td>S-1-16-8448</td></tr><tr><td>MS</td><td>BUILTIN\ARDS Management Servers</td><td>S-1-5-32-577</td></tr><tr><td>MU</td><td>BUILTIN\Performance Monitor Users</td><td>S-1-5-32-558</td></tr><tr><td>NO</td><td>BUILTIN\Network Configuration Operators</td><td>S-1-5-32-556</td></tr><tr><td>NS</td><td>NT AUTHORITY\NETWORK SERVICE</td><td>S-1-5-20</td></tr><tr><td>NU</td><td>NT AUTHORITY\NETWORK</td><td>S-1-5-2</td></tr><tr><td>OW</td><td>OWNER RIGHTS</td><td>S-1-3-4</td></tr><tr><td>PA</td><td>&lt;DOMAIN&gt;Group Policy Creator Owners</td><td>S-1-5-21-&lt;DOMAIN&gt;-520</td></tr><tr><td>PO</td><td>BUILTIN\Print Operators</td><td>S-1-5-32-550</td></tr><tr><td>PS</td><td>NT AUTHORITY\SELF</td><td>S-1-5-10</td></tr><tr><td>PU</td><td>BUILTIN\Power Users</td><td>S-1-5-32-547</td></tr><tr><td>RA</td><td>BUILTIN\RDS Remote Access Servers</td><td>S-1-5-32-575</td></tr><tr><td>RC</td><td>NT AUTHORITY\RESTRICTED</td><td>S-1-5-12</td></tr><tr><td>RD</td><td>BUILTIN\Remote Desktop Users</td><td>S-1-5-32-555</td></tr><tr><td>RE</td><td>BUILTIN\Replicator</td><td>S-1-5-32-552</td></tr><tr><td>RM</td><td>BUILTIN\Remote Management Users</td><td>S-1-5-32-580</td></tr><tr><td>RO</td><td>&lt;DOMAIN&gt;\Enterprise Read-only Domain Controllers</td><td>S-1-5-21-&lt;DOMAIN&gt;-498</td></tr><tr><td>RS</td><td>&lt;DOMAIN&gt;\RAS and IAS Servers</td><td>S-1-5-21-&lt;DOMAIN&gt;-553</td></tr><tr><td>RU</td><td>BUILTIN\Pre-Windows 2000 Compatible Access</td><td>S-1-5-32-554</td></tr><tr><td>SA</td><td>&lt;DOMAIN&gt;\Schema Admins</td><td>S-1-5-21-&lt;DOMAIN&gt;-518</td></tr><tr><td>SI</td><td>Mandatory Label\System Mandatory Level</td><td>S-1-16-16384</td></tr><tr><td>SD</td><td>BUILTIN\Server Operators</td><td>S-1-5-32-549</td></tr><tr><td>SS</td><td>Service asserted identity</td><td>S-1-18-2</td></tr><tr><td>SU</td><td>NT AUTHORITY\SERVICE</td><td>S-1-5-6</td></tr><tr><td>SY</td><td>NT AUTHORITY\SYSTEM</td><td>S-1-5-18</td></tr><tr><td>UD</td><td>NT AUTHORITY\USER MODE DRIVERS</td><td>S-1-5-84-0-0-0-0-0</td></tr><tr><td>WD</td><td>Everyone</td><td>S-1-1-0</td></tr><tr><td>WR</td><td>NT AUTHORITY\WRITE RESTRICTED</td><td>S-1-5-33</td></tr></table>
 
-
 SDDL Sid Alias Mapping 549
 
 ---
-
-
 
 ---
 
@@ -4296,7 +4263,7 @@ Advanced Encryption Standard (AES), 327-332 AES keys, 470-471, 496 advanced loca
 
 AllowedObject ACEs, 154, 167 ALPC (advanced local procedure call) subsystem, 24, 55 Ancillary Function Driver (AFD), 47 Anonymous flag, 518 Anonymous impersonation level, 104, 106, 136 anonymous sessions, 518–519 Anonymous type, 53 Anonymous user token, 214 ANSI strings, 79 APIs AcceptSecurityContext API, 426–427 AcquireCredentialsHandle API, 424 AuthAccessCheck API, 156, 243 AuthZ API, 387, 389–390 Create APIs, 77–79, 87–90, 107, 117, 135, 298, 412–413 Data Protection API (DPAPI), 322, 516 DecryptMessage API, 440–441, 476 EncryptMessage API, 440–442 ExIsRestrictedCaller API, 272 Generic Security Services API, 476 Get APIs, 65–66, 78, 208–209, 212 ImpersonateNamedPipe API, 104 InitializeSecurityContext API, 423–424 LoadLibrary API, 65, 68 LogonUser API, 102, 401 LsaloOnSler API, 399–414 accessing from PowerShell, 410–412 creating user desktops, 398–399 domain authentication, 403–404 local authentication, 401–402 logon and console sessions, 404–406 logon types, 400 protocol transition delegation, 489 security packages, 400–401 token creation, 407–410 LsaManageSidNameMapping API, 323–324
 
-552  Index
+552 Index
 
 ---
 
@@ -4320,13 +4287,11 @@ Boolean operators, 6 bool type, 5 brute-force attacks, 428-429, 465
 
 canonicalization, 84-85, 362 CBC (cipher block chaining), 330 central access policies, 255-260 access checks, 258-259 Active Directory, 382-384 claims, 255-256, 382-384 displaying, 257 enabling, 259-260 information contained in, 257 simple configuration vs., 256 ChangePassword access right, 316, 377 channel binding, 444-445 ChannelBindings buffer flag, 500 Chrome web browser, 117 cipher block chaining (CBC), 330 ciphertext-stealing mode (CTS), 466 Citrix, 77 claims Active Directory, 382-384 device, 255-256 user, 255-256 Class88 category attribute, 354 Client Server Runtime Subsystem (CSRSS), 71 CLI XML format, 20-21 CloudAP security package, 403 code Integrity, 54-55 Authenticode mechanism, 54 kernel, 24 prefix, 25 purpose of, 54 COM (Component Object Model) server processes, 93 command line parsing, 88-89 commands. See also names of specific commands accepting parameters, 9 accessing properties and methods, 9 aliases, 12-13 discovering, 10
 
-
 1
 
 executing, 9-10 line breaks, 9-10 naming conventions, 9 passing output of one to another, 9 usage examples of, 11-12
 
 Commit state value, 50 Compare- commands, 42, 231, 233 Component Object Model (COM) server processes, 93 conditional expressions, 155, 169-171 access filter ACEs, 233-235 central access policy, 255, 257-259 infix operators for, 171 type values, 170 unary operators for, 170 Confidentiality request attribute flag, 440-441, 451 configuration manager. See registry Connect access right, 313 console sessions, 83, 416-417 creating user desktops, 398 impersonation tokens, 137 Remote Desktop Services, 74-75 separation of named objects, 76-77 session ID, 102, 405 Windows logon process, 92 constrained delegation (Service for User), 480, 484-491 Kerberos-only, 485-486, 490 protocol transition, 486-488, 490 resource-based, 489-491 constructors, 8 ContainerInherit ACE flag, 156, 167, 193-194, 202 context tracking mode, 106 ControlAccess access right, 366, 378 control access rights, 376-379, 394 control flags, 144-145, 166, 173, 182, 193-194, 215, 381 Dacl, 144-146, 166, 181-182, 194, 215 RmControlValid, 149 Sacl, 144-145, 166, 181 SelfRelative, 149-151 ServerSecurity, 213-214 TrustedforDelegation, 381, 482 TrustedToAuthenticateFor Delegation, 381
-
 
 1
 
@@ -4362,7 +4327,6 @@ Extended Protection for Authentication (EPA), 444 extended rights, 373–376
 
 ExtendedSessionSecurity NTLM flag, 429-430
 
-
 Extra buffer flag, 500
 
 ## [
@@ -4377,7 +4341,7 @@ GDIJ32 library, 70-71 GenericALL access value, 37, 250-252, 254 GenericExecute a
 
 Get- functions, 140, 242, 339, 393-395, 431-433, 448, 532, 529 GetObject method, 59 GetPrivateInformation access right, 319 global catalog, 303-304, 352-353 Global group scope, 346-347 golden tickets, 462-463 Google Chrome web browser, 117 GrantedAccessMask property, 39 GroupByAddress parameter, 58 Group-Object command, 19, 58 group policies, 256-257, 409
 
-Active Directory, 384-386 authentication to known web proxies, 521 enterprise network domains, 301-302 Group security information flag, 157, 183 GSSAPI (Generic Security Services Application Program Interface), 476 GSS _ functions, 476
+Active Directory, 384-386 authentication to known web proxies, 521 enterprise network domains, 301-302 Group security information flag, 157, 183 GSSAPI (Generic Security Services Application Program Interface), 476 GSS \_ functions, 476
 
 ## H
 
@@ -4425,7 +4389,7 @@ Index 539
 
 locally unique identifiers (LUIDs), 102–103 Local Security Authority (LSA), 305, 309–324 extracting system keys, 327–328 logon account rights, 310–311 privilege account rights, 310 remote services, 311–324 Local Security Authority Subsystem (LSASS), 26, 92 creating tokens, 131–133 enumerating SIDs, 175–176 finding resources with audit ACEs, 295 linked tokens, 128 logon sessions, 102 local security policies, 282 logon account rights, 310–311, 415–416 LogonID attribute, 111, 405 logon types, 400, 402, 408–412 Network logon type, 409–411 NewCredentials logon type, 438 Service logon type, 413–414 LogonUI process, 92, 398 LongPathsEnabled value, 87 long type, 5 Lookup access right, 315 LookupDomain access right, 313–314 LookupNames access right, 319, 323 lowbox tokens, 120–122, 246–249, 273, 520–523 LPACs (Less Privileged AppContainers), 246 lParam parameter, 74 IpMuteAttributes parameter, 78 IpName parameter, 78 LSA. See Local Security Authority LSalogounter API, 399–414 accessing from PowerShell, 410–412 creating user desktops, 398–399 domain authentication, 403–404 local authentication, 401–402 logon and console sessions, 404–406 logon types, 400 protocol transition delegation, 489
 
-_
+\_
 
 security packages, 400-401 token creation, 407-410 LSASS. See Local Security Authority Subsystem
 
@@ -4563,7 +4527,7 @@ software development kit (SDK), 38, 110, 112 Sort-Object command, 18–19 split-
 
 TargetInfo flag, 427 TargetTypeDomain flag, 427 TargetTypeServer flag, 427 Task Scheduler service, 93 TGB (trusted computing base), 116 TCP, 446, 532 TcpClient objects, 452 TCP/IP, 47, 342 TcpListener class, 451 Terminal Services, 77 Test-AccessFilter check, 231 Test- commands, 115–116, 138, 189–190, 240–241, 243, 259, 430, 441–442 Test- functions, 230, 393 Test-MandatoryIntegrityLevel check, 231 Test-ProcessTrustLevel check, 231 TGS-REP message. See ticket granting service reply message TGS-REQ message. See ticket granting service request message TGSs. See ticket granting servers TGT-REP (ticket granting ticket reply) message, 491–493 TGT-REQ (ticket granting ticket request) message, 491–492 TGTs. See ticket granting tickets thread affinity, 73 thread IDs (TIDs), 47–48 Thread objects, 27, 48, 203 ticket granting servers (TGSs) cross-domain authentication, 478–479 decryption API-REQ message, 469 delegation, 479–482, 485 initial user authentication, 459–461 Kerberos authentication in PowerShell, 466 network service authentication, 464 ticket granting service reply (TGS-REP) message initial user authentication, 458, 461–462 Kerberos authentication in PowerShell, 466
 
-Index  |  569
+Index | 569
 
 ---
 
@@ -4628,8 +4592,6 @@ Zerologon (CVE-2020-1472) security issue, 403 Zw (Nt) prefix, 24, 29-30, 224
 Windows Security Internals is set in New Baskerville, Futura, Dogma, and TheSamsMono Condensed.
 
 ---
-
-
 
 ---
 
@@ -4699,8 +4661,6 @@ EMAIL: SALES@NOSTARCH.COM WEB: WWW.NOSTARCH.COM
 
 ---
 
-
-
 ---
 
 ![Figure](figures/WindowsSecurityInternals_page_607_figure_000.png)
@@ -4723,15 +4683,9 @@ LEARN MORE AND JOIN EFF AT EFF.ORG/NO-STARCH-PRESS
 
 ---
 
-
-
 ---
 
-
-
 ---
-
-
 
 ---
 
@@ -4743,20 +4697,21 @@ Author James Forshaw teaches through meticulously crafted PowerShell examples th
 
 You'll also explore a wide range of topics, such as:
 
-- * Windows security architecture, including
-both the kernel and user-mode applications
+- - Windows security architecture, including
+    both the kernel and user-mode applications
 
 * The Windows Security Reference Monitor
-(SRM), including access tokens, querying
-and setting a resource's security descriptor,
-and access checking and auditing
-- * Interactive Windows authentication and
-credential storage in the Security Account
-Manager (SAM) and Active Directory
+  (SRM), including access tokens, querying
+  and setting a resource's security descriptor,
+  and access checking and auditing
+
+- - Interactive Windows authentication and
+    credential storage in the Security Account
+    Manager (SAM) and Active Directory
 
 * Mechanisms of network authentication
-protocols, including NTLM and Kerberos
-In an era of sophisticated cyberattacks on Windows networks, mastering the operating system's complex security mechanisms is more crucial than ever. Whether you're defending against the latest cyber threats or delving into the intricacies of Windows security architecture, you'll find Windows Security Internals indispensable in your efforts to navigate the complexities of today's cybersecurity landscape.
+  protocols, including NTLM and Kerberos
+  In an era of sophisticated cyberattacks on Windows networks, mastering the operating system's complex security mechanisms is more crucial than ever. Whether you're defending against the latest cyber threats or delving into the intricacies of Windows security architecture, you'll find Windows Security Internals indispensable in your efforts to navigate the complexities of today's cybersecurity landscape.
 
 About the Author
 
@@ -4767,4 +4722,3 @@ Covers Windows 10 and higher and Windows Server 2016 and higher
 ![Figure](figures/WindowsSecurityInternals_page_611_figure_010.png)
 
 THE FINEST IN GEE ENTEINARTS™ www.nostarch.com
-

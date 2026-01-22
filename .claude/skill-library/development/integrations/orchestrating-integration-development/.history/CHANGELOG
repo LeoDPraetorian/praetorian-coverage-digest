@@ -1,0 +1,92 @@
+# Changelog
+
+## 2026-01-21 - Initial Skill Creation (16-Phase OMAW-Aligned Structure)
+
+**Change**: Created orchestrating-integration-development2 skill with full 16-phase structure aligned with orchestrating-multi-agent-workflows (OMAW)
+
+**Motivation**: The original orchestrating-integration-development used a 13-phase structure. OID2 aligns with OMAW's 16-phase template for consistency across all orchestration skills while preserving integration-specific content (P0 compliance, vendor skills, CheckAffiliation).
+
+### Files Created
+
+**Core Skill:**
+- SKILL.md (234 lines) - Main orchestration guide with 16-phase structure
+
+**Phase Reference Files:**
+- phase-1-setup.md (227 lines) - Worktree creation, output directory, MANIFEST.yaml
+- phase-2-triage.md (221 lines) - Work type classification (SMALL/MEDIUM/LARGE)
+- phase-3-codebase-discovery.md (293 lines) - Integration pattern discovery
+- phase-4-skill-discovery.md (294 lines) - Vendor skill check/creation
+- phase-5-complexity.md (260 lines) - Technical complexity assessment
+- phase-6-brainstorming.md (237 lines) - Design refinement (LARGE only)
+- phase-7-architecture-plan.md (336 lines) - Architecture + task decomposition
+- phase-8-implementation.md (311 lines) - Code development with P0 patterns
+- phase-9-design-verification.md (313 lines) - Plan verification
+- phase-10-domain-compliance.md (344 lines) - P0 validation (7 requirements)
+- phase-11-code-quality.md (378 lines) - Two-stage gated review
+- phase-12-test-planning.md (316 lines) - Test strategy with test-lead
+- phase-13-testing.md (396 lines) - Test implementation and execution
+- phase-14-coverage-verification.md (288 lines) - Coverage check (≥80%)
+- phase-15-test-quality.md (351 lines) - Test quality validation
+- phase-16-completion.md (231 lines) - PR, cleanup, frontend (conditional)
+
+**Supporting References:**
+- compaction-gates.md (193 lines) - Integration-specific compaction protocol
+- checkpoint-configuration.md (207 lines) - Human checkpoint strategy
+- rationalization-table.md (103 lines) - P0 rationalization prevention
+
+**Total: 20 files, ~5,500 lines**
+
+### Key Integration-Specific Content
+
+**P0 Compliance (Phase 10):**
+| # | Requirement | Purpose |
+|---|-------------|---------|
+| 1 | VMFilter | Asset filtering before Job.Send() |
+| 2 | CheckAffiliation | Real API query, not stub |
+| 3 | ValidateCredentials | First call in Invoke() |
+| 4 | errgroup Safety | SetLimit + captured loop variables |
+| 5 | Pagination Safety | maxPages OR API-provided limit |
+| 6 | Error Handling | No ignored errors, wrapped context |
+| 7 | File Size | ≤400 lines per file |
+
+**Compaction Gates:**
+- Gate 1: After Phase 3 (Codebase Discovery)
+- Gate 2: After Phase 8 (Implementation)
+- Gate 3: After Phase 13 (Testing)
+
+**Human Checkpoints:**
+- Phase 4: Vendor skill creation decision
+- Phase 7: Architecture approval
+- Phase 10: P0 violations
+- Phase 16: Final approval
+
+### Phase Skip Matrix
+
+| Work Type | Skipped Phases |
+|-----------|----------------|
+| SMALL | 6, 7, 9, 12 |
+| MEDIUM | 6 |
+| LARGE | None (all 16) |
+
+### Compliance
+
+- ✅ SKILL.md: 234 lines (under 500-line limit)
+- ✅ All reference files under 400-line limit
+- ✅ All 16 phases have reference files
+- ✅ Foundational references point to OMAW
+- ✅ Integration-specific content preserved from OID
+
+### Architecture Decisions
+
+1. **16-Phase Structure**: Matches OMAW for consistency, not OID's 13-phase
+2. **Phase 10 = Domain Compliance**: P0 validation is integration-specific domain compliance
+3. **Two-Stage Code Quality**: Stage 1 (spec compliance) blocking, Stage 2 (quality + security) parallel
+4. **Conditional Frontend**: Phase 16 asks about UI needs, spawns frontend-developer if needed
+
+### Verification
+
+- ✅ All phase files created (16/16)
+- ✅ All files under line limits
+- ✅ SKILL.md references all phase files
+- ✅ Foundational references point to OMAW equivalents
+- ✅ P0 requirements documented in Phase 10

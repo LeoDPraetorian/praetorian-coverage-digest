@@ -4,14 +4,14 @@ Reference for implementing semantic zoom in the Chariot Graph Explorer.
 
 ## File Locations
 
-| Component | Path |
-|-----------|------|
-| Query construction | `modules/chariot/ui/src/components/nodeGraph/hooks/data/useGraphData/queries.ts` |
+| Component             | Path                                                                                      |
+| --------------------- | ----------------------------------------------------------------------------------------- |
+| Query construction    | `modules/chariot/ui/src/components/nodeGraph/hooks/data/useGraphData/queries.ts`          |
 | Relationship fetching | `modules/chariot/ui/src/components/nodeGraph/hooks/data/useGraphData/useRelationships.ts` |
-| Graph state | `modules/chariot/ui/src/components/nodeGraph/core/GraphStateProvider.tsx` |
-| Graph loader | `modules/chariot/ui/src/components/nodeGraph/GraphLoader.tsx` |
-| LOD hook | `modules/chariot/ui/src/components/nodeGraph/hooks/useGraphLOD.ts` |
-| Viewport culling | `modules/chariot/ui/src/components/nodeGraph/hooks/useViewportCulling.ts` |
+| Graph state           | `modules/chariot/ui/src/components/nodeGraph/core/GraphStateProvider.tsx`                 |
+| Graph loader          | `modules/chariot/ui/src/components/nodeGraph/GraphLoader.tsx`                             |
+| LOD hook              | `modules/chariot/ui/src/components/nodeGraph/hooks/useGraphLOD.ts`                        |
+| Viewport culling      | `modules/chariot/ui/src/components/nodeGraph/hooks/useViewportCulling.ts`                 |
 
 ## Immediate Fix: IN Clause
 
@@ -23,20 +23,20 @@ Reference for implementing semantic zoom in the Chariot Graph Explorer.
 // BEFORE
 export const createAssetToRiskQuery = (assetKeys: string[]): GraphQuery => ({
   node: {
-    labels: ['Risk'],
+    labels: ["Risk"],
     filters: [],
     relationships: [
       {
-        label: 'HAS_VULNERABILITY',
+        label: "HAS_VULNERABILITY",
         source: {
-          labels: ['Asset'],
+          labels: ["Asset"],
           filters: [
             {
-              field: '',
-              operator: 'OR',
+              field: "",
+              operator: "OR",
               value: assetKeys.map((key: string) => ({
-                field: 'key',
-                operator: '=',
+                field: "key",
+                operator: "=",
                 value: key,
               })) as any,
             },
@@ -52,25 +52,25 @@ export const createAssetToRiskQuery = (assetKeys: string[]): GraphQuery => ({
 // AFTER
 export const createAssetToRiskQuery = (assetKeys: string[]): GraphQuery => ({
   node: {
-    labels: ['Risk'],
+    labels: ["Risk"],
     filters: [],
     relationships: [
       {
-        label: 'HAS_VULNERABILITY',
+        label: "HAS_VULNERABILITY",
         source: {
-          labels: ['Asset'],
+          labels: ["Asset"],
           filters: [
             {
-              field: 'key',
-              operator: 'IN',
-              value: [assetKeys],  // Double-bracket syntax required
+              field: "key",
+              operator: "IN",
+              value: [assetKeys], // Double-bracket syntax required
             },
           ],
         },
       },
     ],
   },
-  limit: assetKeys.length * 5,  // Dynamic limit based on input
+  limit: assetKeys.length * 5, // Dynamic limit based on input
   page: 0,
 });
 ```
@@ -109,7 +109,7 @@ zoom: {
 // Add zoom level check to each query
 const { data: assetToRiskData } = useGraphQuery({
   query: assetToRiskQuery,
-  enabled: assetKeys.length > 0 && zoomLevel === 'detail',  // Only in detail view
+  enabled: assetKeys.length > 0 && zoomLevel === "detail", // Only in detail view
   staleTime: 60000,
 });
 ```
@@ -120,10 +120,10 @@ Chariot uses `surface[0]` attribute for clustering:
 
 ```typescript
 interface ClusterMetadata {
-  id: string;          // surface[0] value (e.g., "GOOGLE", "AKAMAI-ASN1")
-  nodeCount: number;   // count of assets in cluster
-  centroidX: number;   // average X position
-  centroidY: number;   // average Y position
+  id: string; // surface[0] value (e.g., "GOOGLE", "AKAMAI-ASN1")
+  nodeCount: number; // count of assets in cluster
+  centroidX: number; // average X position
+  centroidY: number; // average Y position
   sampleKeys: string[]; // 5 representative asset keys
 }
 ```
@@ -135,10 +135,8 @@ Use with `/my` endpoint:
 ```typescript
 const clusterOverviewQuery: GraphQuery = {
   node: {
-    labels: ['Asset'],
-    filters: [
-      { field: 'status', operator: 'STARTS WITH', value: 'A' },
-    ],
+    labels: ["Asset"],
+    filters: [{ field: "status", operator: "STARTS WITH", value: "A" }],
   },
   // Note: Aggregation not directly supported
   // Must use raw Cypher via backend endpoint or compute client-side
@@ -176,9 +174,9 @@ npm test -- --grep "createAssetToRiskQuery"
 
 Before/after metrics to capture:
 
-| Metric | Before | After Target |
-|--------|--------|--------------|
-| Initial load (5k nodes) | Never completes | < 3s |
-| Relationship query time | Timeout | < 500ms |
-| Memory usage | Grows unbounded | < 500MB |
-| FPS during zoom | < 5 | > 30 |
+| Metric                  | Before          | After Target |
+| ----------------------- | --------------- | ------------ |
+| Initial load (5k nodes) | Never completes | < 3s         |
+| Relationship query time | Timeout         | < 500ms      |
+| Memory usage            | Grows unbounded | < 500MB      |
+| FPS during zoom         | < 5             | > 30         |

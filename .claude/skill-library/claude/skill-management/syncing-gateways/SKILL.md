@@ -1,6 +1,6 @@
 ---
 name: syncing-gateways
-description: Use when library skills are added, renamed, or deleted - synchronizes gateway routing tables with library skills, detects orphaned skills and broken paths using automated CLI tools
+description: Use when library skills are added, renamed, or deleted - synchronizes gateway routing tables with library skills, detects orphaned skills and broken paths using instruction-based workflows
 allowed-tools: Glob, Read, Edit, Bash, TodoWrite
 ---
 
@@ -29,7 +29,7 @@ Use this skill when:
 | **Full Sync**      | Sync all gateways with library   | 5-10 min |
 | **Single Gateway** | Sync specific gateway only       | 2-3 min  |
 
-> **Note:** This skill uses the gateway CLI (`npm run gateway`). Follow the workflows below.
+> **Note:** This skill uses instruction-based workflows with native tools (Bash, Read, Edit). Follow the phases below.
 
 ---
 
@@ -64,7 +64,7 @@ Each gateway contains:
 
 ---
 
-## Step 0: Navigate to Repository Root (MANDATORY)
+## Step 1: Navigate to Repository Root (MANDATORY)
 
 **Execute BEFORE any sync operation:**
 
@@ -72,7 +72,7 @@ Each gateway contains:
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
@@ -83,9 +83,9 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 **Skill Registry format:**
 
 ```markdown
-| Skill          | Path                                                                                | Triggers               |
-| -------------- | ----------------------------------------------------------------------------------- | ---------------------- |
-| TanStack Query | `.claude/skill-library/development/frontend/state/frontend-tanstack-query/SKILL.md` | TanStack, cache, fetch |
+| Skill          | Path                                                                       | Triggers               |
+| -------------- | -------------------------------------------------------------------------- | ---------------------- |
+| TanStack Query | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md` | TanStack, cache, fetch |
 ```
 
 ### What Can Go Stale
@@ -98,95 +98,146 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Sync Operations
 
-### 1. Dry Run (Preview Changes)
+Follow these phases to manually sync gateway routing tables with library skills. This instruction-based approach uses native tools (Bash, Glob, Grep, Read, Edit).
 
-**Purpose**: See what changes would be made without applying them
+### Phase 1: Discovery
 
-**Use the gateway CLI with --dry-run flag:**
+**Purpose**: Find all library skills and determine which gateway each belongs to.
 
-```bash
-# Navigate to repository root
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
-
-# Preview changes without applying
-npm run -w @chariot/auditing-skills gateway -- sync --dry-run
-```
-
-**What the CLI does:**
-
-1. Discovers all library skills
-2. Maps to gateways based on path patterns
-3. Reads current gateway routing tables for all 8 gateways
-4. Compares discovered vs current state
-5. Reports what would be added/removed (does NOT modify files)
-
-**Output format:**
-
-```plaintext
-Gateway: gateway-frontend
-  Would ADD 2 skills:
-    - Optimizing React Performance
-    - Frontend Accessibility
-
-  Would REMOVE 1 broken paths:
-    - old-skill-name
-
-Gateway: gateway-backend
-  No changes needed
-```
-
-### 2. Full Sync (Apply Changes)
-
-**Purpose**: Synchronize all gateways with current library structure
-
-**Use the gateway CLI:**
+#### Step 1.1: Find All Library Skills
 
 ```bash
-# Navigate to repository root
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
-
-# Apply changes
-npm run -w @chariot/auditing-skills gateway -- sync
+find .claude/skill-library -name "SKILL.md" -type f
 ```
 
-**What the CLI does automatically:**
+This returns paths like:
 
-1. Discovers all library skills
-2. Maps each skill to gateway using path patterns
-3. For each gateway:
-   - Reads current routing table
-   - Identifies additions (skills in library, not in gateway)
-   - Identifies removals (skills in gateway, path doesn't exist)
-   - Updates routing table with proper formatting
-   - Verifies changes applied correctly
-4. Reports summary of changes made
+```
+.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md
+.claude/skill-library/testing/backend/implementing-golang-tests/SKILL.md
+```
 
-**Critical rules enforced by CLI:**
+#### Step 1.2: Map Skills to Gateways
 
-- Preserves gateway header and explanation sections
-- Only modifies Skill Registry table rows
-- Uses full paths (`.claude/skill-library/...`) not skill names
-- Includes Triggers column with keywords
-- Sorts Skill Registry alphabetically by skill name
-- Never removes skills if path exists (only removes broken paths)
+For each discovered skill path, determine the appropriate gateway using path patterns:
 
-### 3. Gateway-Specific Sync
+| Path Pattern                 | Gateway                |
+| ---------------------------- | ---------------------- |
+| `development/frontend/*`     | `gateway-frontend`     |
+| `development/backend/*`      | `gateway-backend`      |
+| `development/capabilities/*` | `gateway-capabilities` |
+| `development/integrations/*` | `gateway-integrations` |
+| `testing/*`                  | `gateway-testing`      |
+| `security/*`                 | `gateway-security`     |
+| `claude/skill-management/*`  | `gateway-claude`       |
+| `claude/mcp-*/*`             | `gateway-mcp-tools`    |
 
-**Purpose**: Sync only one gateway (faster, more targeted)
+**See:** [references/gateway-mapping.md](references/gateway-mapping.md) for complete mapping rules.
 
-**Use the validate command to check a specific gateway:**
+Extract skill name from directory name (parent of SKILL.md):
 
 ```bash
-# Navigate to repository root
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude"
-
-# Validate specific gateway
-npm run -w @chariot/auditing-skills gateway -- validate --gateway gateway-frontend
+# Example: .claude/skill-library/development/frontend/using-tanstack-query/SKILL.md
+# Skill name: using-tanstack-query
+# Gateway: gateway-frontend
 ```
 
-**Then run full sync to fix any issues found.**
+### Phase 2: Comparison
 
-Note: The CLI currently syncs all gateways at once for consistency. Gateway-specific operations are primarily for validation.
+**Purpose**: Compare discovered skills with current gateway routing tables to identify changes.
+
+#### Step 2.1: For Each Gateway, Read Current State
+
+Read the gateway's SKILL.md and extract the Skill Registry table:
+
+```bash
+# Example for gateway-frontend
+grep -A 100 "## Skill Registry" .claude/skills/gateway-frontend/SKILL.md
+```
+
+Parse table rows to extract:
+
+- Skill name (column 1)
+- Path (column 2)
+- Triggers (column 3)
+
+#### Step 2.2: Identify Additions
+
+**Additions** = Skills discovered in Phase 1 for this gateway that are NOT in the current routing table.
+
+Algorithm:
+
+```
+FOR each skill mapped to this gateway (from Step 1.2):
+  IF skill.path NOT IN current routing table paths:
+    ADD to additions list
+```
+
+#### Step 2.3: Identify Removals
+
+**Removals** = Routing table entries whose paths NO LONGER EXIST in filesystem.
+
+Algorithm:
+
+```bash
+FOR each entry in current routing table:
+  test -f "{entry.path}"  # Check if file exists
+  IF exit code != 0:
+    ADD to removals list
+```
+
+**IMPORTANT**: Only remove if path verification fails. Never remove based on "seems wrong".
+
+### Phase 3: Application
+
+**Purpose**: Apply changes to gateway routing tables.
+
+#### Step 3.1: For Each Gateway with Changes
+
+Build new routing table:
+
+1. Start with current entries
+2. Remove entries in removals list
+3. Add entries in additions list
+4. Sort alphabetically by skill name
+
+#### Step 3.2: Format Table
+
+Convert to markdown table format:
+
+```markdown
+| Skill      | Path                                 | Triggers           |
+| ---------- | ------------------------------------ | ------------------ |
+| Skill Name | `.claude/skill-library/.../SKILL.md` | keyword1, keyword2 |
+```
+
+**Critical formatting rules:**
+
+- Full paths starting with `.claude/skill-library/`
+- Paths ending with `/SKILL.md`
+- Alphabetically sorted by skill name
+- Triggers separated by commas
+
+#### Step 3.3: Apply Edit
+
+Use Edit tool to replace old table with new table:
+
+```
+Edit({
+  file_path: ".claude/skills/{gateway-name}/SKILL.md",
+  old_string: "{current_table_content}",
+  new_string: "{new_table_content}"
+})
+```
+
+**Preserve all content outside the Skill Registry table** - only modify table rows.
+
+#### Step 3.4: Verify Changes
+
+1. Read updated gateway file
+2. Verify table format is correct
+3. Verify all paths are valid
+4. Verify alphabetical sorting
 
 ---
 
@@ -232,15 +283,15 @@ Note: The CLI currently syncs all gateways at once for consistency. Gateway-spec
 **✅ Correct:**
 
 ```plaintext
-.claude/skill-library/development/frontend/state/frontend-tanstack-query/SKILL.md
+.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md
 ```
 
 **❌ Wrong:**
 
 ```plaintext
-frontend-tanstack-query                          # Missing full path
-skill-library/frontend-tanstack-query/SKILL.md   # Missing .claude prefix
-.claude/skill-library/frontend-tanstack-query    # Missing /SKILL.md suffix
+using-tanstack-query                             # Missing full path
+skill-library/using-tanstack-query/SKILL.md      # Missing .claude prefix
+.claude/skill-library/using-tanstack-query       # Missing /SKILL.md suffix
 ```
 
 ### Edit Preservation
@@ -283,6 +334,37 @@ After any changes:
 
 - Include in "removals" list for dry-run
 - Remove from routing table during full-sync
+
+---
+
+## Integration
+
+### Called By
+
+- **`managing-skills`** (CORE) - Routes sync operations when user invokes `/skill-manager sync`
+- **`creating-skills`** (LIBRARY) - After creating new library skill, sync gateway routing tables - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`
+- **`deleting-skills`** (LIBRARY) - After deleting library skill, remove from routing tables - `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")`
+- **`renaming-skills`** (LIBRARY) - After renaming library skill, update routing table references - `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")`
+- **`migrating-skills`** (LIBRARY) - After migrating skill between locations, sync affected gateways - `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")`
+
+### Requires (invoke before starting)
+
+None - Entry point skill for gateway synchronization
+
+### Calls (during execution)
+
+None - Uses npm CLI commands (`npm run -w @chariot/auditing-skills gateway -- sync`), not skill invocations
+
+### Pairs With (conditional)
+
+| Skill                        | Trigger                         | Purpose                                                                                                                             |
+| ---------------------------- | ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `creating-skills` (LIBRARY)  | After creating library skill    | Sync gateway routing tables to include new skill - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` |
+| `deleting-skills` (LIBRARY)  | After deleting library skill    | Remove deleted skill from routing tables - `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")`         |
+| `renaming-skills` (LIBRARY)  | After renaming library skill    | Update routing table path references - `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")`             |
+| `migrating-skills` (LIBRARY) | After location migration        | Sync gateways affected by skill relocation - `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")`      |
+| `auditing-skills` (LIBRARY)  | Gateway structure validation    | Validates gateway structure (phases 20-23) - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`       |
+| `fixing-skills` (LIBRARY)    | Gateway compliance issues found | Fixes gateway phase violations - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`                     |
 
 ---
 

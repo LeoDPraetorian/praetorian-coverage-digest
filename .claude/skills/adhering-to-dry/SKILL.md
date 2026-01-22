@@ -96,3 +96,29 @@ class AdminUser extends BaseUser {}
 - Name for intent not implementation
 - Consider performance
 - Review abstractions with team
+
+## Integration
+
+### Called By
+
+- `orchestrating-capability-development` - Phase 4 (architecture), Phase 5 (development), Phase 7 (review)
+- `orchestrating-integration-development` - Phase 6 (review)
+- `orchestrating-multi-agent-workflows` - Agent output validation for lead agents
+- Code review workflows and refactoring orchestrators
+
+### Requires (invoke before starting)
+
+None - Standalone pattern skill
+
+### Calls (during execution)
+
+None - This skill provides guidance without invoking other skills
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                       | Purpose                                              |
+| ----------------------------- | ----------------------------- | ---------------------------------------------------- |
+| `adhering-to-yagni`           | When considering new features | Balance DRY with YAGNI - don't abstract too early    |
+| `preferring-simple-solutions` | When evaluating abstractions  | Balance DRY with simplicity - avoid over-engineering |
+| `developing-with-tdd`         | During refactor phase         | Apply DRY after tests pass (refactor safely)         |
+| `discovering-reusable-code`   | Before writing new code       | Find existing implementations before creating new    |

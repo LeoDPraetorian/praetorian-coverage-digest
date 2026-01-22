@@ -199,10 +199,10 @@ When parent skill provides `OUTPUT_DIR`:
 
 ## Related Skills
 
-| Skill                      | Access Method                                                                                    | Purpose                                  |
-| -------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
-| **orchestrating-research** | `skill: "orchestrating-research"` (CORE)                                                         | Research orchestrator (router)           |
-| **researching-context7**   | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)                 | npm/library documentation via Context7   |
-| **researching-arxiv**      | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)                    | Academic paper research                  |
-| **researching-codebase**   | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)                 | Codebase pattern discovery               |
-| **researching-protocols**  | `Read(".claude/skill-library/claude/skill-management/researching-protocols/SKILL.md")` (LIBRARY) | Protocol fingerprinting for fingerprintx |
+| Skill                              | Access Method                                                                                    | Purpose                                  |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------ | ---------------------------------------- |
+| `orchestrating-research` (LIBRARY) | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`                         | Research orchestrator (router)           |
+| **researching-context7**           | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)                 | npm/library documentation via Context7   |
+| **researching-arxiv**              | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)                    | Academic paper research                  |
+| **researching-codebase**           | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)                 | Codebase pattern discovery               |
+| **researching-protocols**          | `Read(".claude/skill-library/claude/skill-management/researching-protocols/SKILL.md")` (LIBRARY) | Protocol fingerprinting for fingerprintx |

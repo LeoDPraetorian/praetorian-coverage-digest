@@ -30,8 +30,8 @@ Verify infrastructure exists before starting:
 
 ## Quick Reference
 
-| Phase  | Agent              | Purpose             | Duration  |
-| ------ | ------------------ | ------------------- | --------- |
+| Phase  | Agent          | Purpose             | Duration  |
+| ------ | -------------- | ------------------- | --------- |
 | RED    | tool-tester    | Write failing tests | 10-15 min |
 | GREEN  | tool-developer | Implement wrapper   | 15-20 min |
 | REVIEW | tool-reviewer  | Code review         | 5-10 min  |

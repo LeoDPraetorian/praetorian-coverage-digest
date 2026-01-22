@@ -1,4 +1,4 @@
-## 9  SECURITY AUDITING
+## 9 SECURITY AUDITING
 
 ![Figure](figures/WindowsSecurityInternals_page_311_figure_001.png)
 
@@ -19,11 +19,11 @@ Windows generates log events whenever an access check succeeds or fails. The ker
 When performing access checks on kernel resources, Windows will generate the following types of audit events. The security event log represents these by using the event ID included in parentheses:
 
 - ● Object handle opened (4656)
-● Object handle closed (4658)
-● Object deleted (4660)
-● Object handle duplicated (4690)
-● SACL changed (4717)
-When we access resources via kernel system calls such as ΩtCreateUrant, the auditing mechanism generates these events automatically. But for the object-related audit events, we must first configure two aspects of the system: we must set the system policy to generate audit events, and we must enable audit ACEs in the resource's SACL. Let's discuss each of these configuration requirements in turn.
+  ● Object handle closed (4658)
+  ● Object deleted (4660)
+  ● Object handle duplicated (4690)
+  ● SACL changed (4717)
+  When we access resources via kernel system calls such as ΩtCreateUrant, the auditing mechanism generates these events automatically. But for the object-related audit events, we must first configure two aspects of the system: we must set the system policy to generate audit events, and we must enable audit ACEs in the resource's SACL. Let's discuss each of these configuration requirements in turn.
 
 ### Configuring the System Audit Policy
 
@@ -42,7 +42,6 @@ Figure 9-1: The security policy editor showing the advanced audit policy
 As you can see, the categories in the audit policy aren't currently configured. To explore how audit events are generated, we'll use PowerShell to enable the required audit policy temporarily and run some example code. Any changes you make with PowerShell won't be reflected in the local security policy, which will revert the next time it synchronizes (for example, during a reboot or when the group policy is updated on an enterprise network). You can force the settings to synchronize by running the command gpupdate.exe /force as an administrator in PowerShell or at the command prompt.
 
 Advanced audit policies have two levels: a top-level category and multiple subcategories. You can query for the top-level categories using
-
 
 Get-NtAuditPolicy, as in Listing 9-1.
 
@@ -63,7 +62,7 @@ Account Logon      4
 
 Listing 9-1: The top-level audit policy categories
 
-Security Auditing     283
+Security Auditing 283
 
 ---
 
@@ -118,12 +117,11 @@ File System            Success, Failure
 Registry               Success, Failure
 ```
 
-284    Chapter 9
+284 Chapter 9
 
 ---
 
 <table><tr><td>Kernel Object</td><td>Success, Failure</td></tr><tr><td>SAM</td><td>Success, Failure</td></tr><tr><td>Certification Services</td><td>Success, Failure</td></tr><tr><td>Application Generated</td><td>Success, Failure</td></tr><tr><td>Handle Manipulation</td><td>Success, Failure</td></tr><tr><td>File Share</td><td>Success, Failure</td></tr><tr><td>Filtering Platform Packet Drop</td><td>Success, Failure</td></tr><tr><td>Filtering Platform Connection</td><td>Success, Failure</td></tr><tr><td>Other Object Access Events</td><td>Success, Failure</td></tr><tr><td>Detailed File Share</td><td>Success, Failure</td></tr><tr><td>Removable Storage</td><td>Success, Failure</td></tr><tr><td>Central Policy Staging</td><td>Success, Failure</td></tr></table>
-
 
 Listing 9-4: Setting the policy and viewing the resulting ObjectAccess audit policy list
 
@@ -131,9 +129,7 @@ Here, we've enabled the Success and Failure audit policies for all subcategories
 
 We confirm that the audit policy has been configured correctly by specifying the PassThru parameter, which lists the modified SubCategory objects.
 
-
 The output displays some important audit policies, including File System,
-
 
 Registry, and Kernel Object, which enable auditing on files, registry keys, and other kernel objects, respectively.
 
@@ -288,14 +284,13 @@ Listing 9-9: Creating a Mutant object with a SACL
 
 We start by creating an empty security descriptor, then add a single
 
-
 Audit ACE to the SACL. Other ACE types we could add include AuditObject and AuditCallback.
 
 The processing of Audit ACEs looks a lot like the discretionary access check described in Chapter 7. The SID must match a group in the calling token (including any Deny@Nly SIDs), and the access mask must match one or more bits of the granted access. The Everyone group's SID is a special case; it will always match, regardless of whether the SID is available in the token.
 
 In addition to any of the usual inheritance ACE flags, such as InheritOnly the Audit ACE must specify one or both of the SuccessfulAccess and Failed Access flags, which provide the auditing code with the conditions in which it should generate the audit entry.
 
-288    Chapter 9
+288 Chapter 9
 
 ---
 
@@ -536,7 +531,7 @@ PSP $Enable-NtTokenPrivilege SeDebugPrivilege, SeSecurityPrivilege
    - Mask   : 0x00000010
 ```
 
-294    Chapter 9
+294 Chapter 9
 
 ---
 
@@ -572,8 +567,6 @@ We've now covered all aspects of the SRM: security access tokens, security descr
 
 ---
 
-
-
 ---
 
 PART III
@@ -582,7 +575,4 @@ THE LOCAL SECURITY AUTHORITY AND AUTHENTICATION
 
 ---
 
-
-
 ---
-

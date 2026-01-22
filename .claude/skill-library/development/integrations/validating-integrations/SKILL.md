@@ -23,15 +23,15 @@ Use this skill when:
 
 ## Quick Reference
 
-| Requirement         | Verification Command                                | Pass Criteria                                      |
-| ------------------- | --------------------------------------------------- | -------------------------------------------------- |
-| VMFilter            | `grep -n 'Filter:.*NewVMFilter\|Filter.Asset'`      | Initialized in struct AND called before Job.Send() |
-| CheckAffiliation    | `grep -A 20 'func.*CheckAffiliation'`               | HTTP call present (not stub)                       |
-| ValidateCredentials | `grep -n 'ValidateCredentials'`                     | Called in Invoke() before enumeration              |
-| errgroup Safety     | `grep -n 'SetLimit\|:= item'`                       | SetLimit(10-25) + loop capture present             |
-| Error Handling      | `grep -n '_, _ ='`                                  | Zero results (no ignored errors)                   |
+| Requirement         | Verification Command                                     | Pass Criteria                                      |
+| ------------------- | -------------------------------------------------------- | -------------------------------------------------- |
+| VMFilter            | `grep -n 'Filter:.*NewVMFilter\|Filter.Asset'`           | Initialized in struct AND called before Job.Send() |
+| CheckAffiliation    | `grep -A 20 'func.*CheckAffiliation'`                    | HTTP call present (not stub)                       |
+| ValidateCredentials | `grep -n 'ValidateCredentials'`                          | Called in Invoke() before enumeration              |
+| errgroup Safety     | `grep -n 'SetLimit\|:= item'`                            | SetLimit(10-25) + loop capture present             |
+| Error Handling      | `grep -n '_, _ ='`                                       | Zero results (no ignored errors)                   |
 | Pagination Safety   | `grep -n 'maxPages\|LastPage\|HasMore\|NextToken.*==""'` | Termination guarantee present                      |
-| File Size           | `wc -l integrations/vendor.go`                      | <400 lines (or split into \_types.go, \_client.go) |
+| File Size           | `wc -l integrations/vendor.go`                           | <400 lines (or split into \_types.go, \_client.go) |
 
 ---
 
@@ -185,15 +185,15 @@ Report must include:
 
 ## Requirements Summary
 
-| Requirement         | Status | Evidence                  |
-| ------------------- | ------ | ------------------------- |
-| VMFilter            | ✅ / ❌ | file.go:123 - description |
+| Requirement         | Status  | Evidence                                     |
+| ------------------- | ------- | -------------------------------------------- |
+| VMFilter            | ✅ / ❌ | file.go:123 - description                    |
 | CheckAffiliation    | ✅ / ❌ | file.go:456 - Pattern A/B/C or stub detected |
-| ValidateCredentials | ✅ / ❌ | file.go:789 - description |
-| errgroup Safety     | ✅ / ❌ | file.go:234 - description |
-| Error Handling      | ✅ / ❌ | file.go:567 - description |
-| Pagination Safety   | ✅ / ❌ | file.go:890 - {maxPages OR API signal} used |
-| File Size           | ✅ / ❌ | {line-count} lines        |
+| ValidateCredentials | ✅ / ❌ | file.go:789 - description                    |
+| errgroup Safety     | ✅ / ❌ | file.go:234 - description                    |
+| Error Handling      | ✅ / ❌ | file.go:567 - description                    |
+| Pagination Safety   | ✅ / ❌ | file.go:890 - {maxPages OR API signal} used  |
+| File Size           | ✅ / ❌ | {line-count} lines                           |
 
 ## Violations
 
@@ -259,10 +259,10 @@ None - terminal skill that produces compliance reports
 
 ### Pairs With (conditional)
 
-| Skill                   | Trigger                           | Purpose                                  |
-| ----------------------- | --------------------------------- | ---------------------------------------- |
-| `developing-integrations` | When fixing violations            | Reference implementation patterns        |
-| `testing-integrations`    | After achieving P0 compliance     | Write tests for verified requirements    |
+| Skill                     | Trigger                             | Purpose                                  |
+| ------------------------- | ----------------------------------- | ---------------------------------------- |
+| `developing-integrations` | When fixing violations              | Reference implementation patterns        |
+| `testing-integrations`    | After achieving P0 compliance       | Write tests for verified requirements    |
 | `gateway-integrations`    | When discovering integration skills | Routes to integration development skills |
 
 ---

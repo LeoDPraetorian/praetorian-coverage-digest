@@ -1,6 +1,6 @@
 ---
-description: Tool wrapper management - create, update, audit, fix, test MCP and REST API wrappers with TDD enforcement
-argument-hint: <create|update|audit|fix|test> [service] [tool]
+description: Tool wrapper management - create, update, audit, fix, test, list MCP and REST API wrappers with TDD enforcement
+argument-hint: <create|update|audit|fix|test|list> [service] [tool]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion
 skills: managing-tool-wrappers
@@ -12,7 +12,7 @@ skills: managing-tool-wrappers
 
 **Arguments:**
 
-- `$1` - Subcommand (create, verify-red, generate-wrapper, verify-green, update, audit, fix, test, generate-skill)
+- `$1` - Subcommand (create, verify-red, generate-wrapper, verify-green, update, audit, fix, test, generate-skill, list)
 - `$2` - Service name or service/tool (e.g., zen, linear, context7, linear/get-issue)
 - `$3` - Tool name or options (e.g., get-document, --all, --dry-run, --phase N)
 
@@ -24,6 +24,7 @@ ALL subcommands → Invoke managing-tool-wrappers skill with all arguments
                     - create → AskUserQuestion (MCP or API?) then:
                         - MCP Server → orchestrating-mcp-development
                         - REST API → orchestrating-api-tool-development
+                    - list → listing-tools skill
                     - audit, fix, test, etc. → CLI scripts
 ```
 

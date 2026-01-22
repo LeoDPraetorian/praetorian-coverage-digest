@@ -5,6 +5,7 @@
 ## Never Use Real Credentials in Tests
 
 ❌ **NEVER DO THIS**:
+
 ```go
 job.Secret = map[string]string{
     "api_key": "sk-prod-abc123xyz",  // Real production key!
@@ -12,6 +13,7 @@ job.Secret = map[string]string{
 ```
 
 ✅ **DO THIS**:
+
 ```go
 job.Secret = map[string]string{
     "api_key": "test-api-key",  // Fake test key
@@ -24,7 +26,7 @@ job.Secret = map[string]string{
 func TestIntegration_ValidateCredentials(t *testing.T) {
     integration := model.NewIntegration("service", "test.example.com")
     job := model.NewJob("service", &integration)
-    
+
     // Set test credentials (never real secrets)
     job.Secret = map[string]string{
         "client_id":     "test-client-id",
@@ -59,9 +61,9 @@ func TestOAuth_TokenExchange(t *testing.T) {
 
     authServer := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         r.ParseForm()
-        
+
         // Verify test credentials
-        if r.Form.Get("client_id") == clientID && 
+        if r.Form.Get("client_id") == clientID &&
            r.Form.Get("client_secret") == clientSecret {
             w.WriteHeader(http.StatusOK)
             json.NewEncoder(w).Encode(map[string]interface{}{
@@ -91,7 +93,7 @@ func TestOAuth_TokenExchange(t *testing.T) {
 func TestAPI_HeaderAuthentication(t *testing.T) {
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         apiKey := r.Header.Get("Authorization")
-        
+
         if apiKey == "Bearer test-token" {
             w.WriteHeader(http.StatusOK)
             json.NewEncoder(w).Encode(map[string]string{"status": "authenticated"})
@@ -115,7 +117,7 @@ func TestAPI_HeaderAuthentication(t *testing.T) {
 func TestAPI_QueryParamAuthentication(t *testing.T) {
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         apiKey := r.URL.Query().Get("api_key")
-        
+
         if apiKey == "test-api-key" {
             w.WriteHeader(http.StatusOK)
             return
@@ -137,7 +139,7 @@ func TestAPI_QueryParamAuthentication(t *testing.T) {
 func TestIntegration_MultipleSecrets(t *testing.T) {
     integration := model.NewIntegration("aws", "test-account")
     job := model.NewJob("aws", &integration)
-    
+
     // Multiple test credentials
     job.Secret = map[string]string{
         "access_key_id":     "AKIATEST123456",
@@ -188,7 +190,7 @@ func TestAPI_ExpiredToken(t *testing.T) {
         t.Run(tt.name, func(t *testing.T) {
             server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
                 token := r.Header.Get("Authorization")
-                
+
                 switch token {
                 case "Bearer valid-token":
                     w.WriteHeader(http.StatusOK)

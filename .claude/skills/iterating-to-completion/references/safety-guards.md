@@ -5,6 +5,7 @@ Configuration details for all safety mechanisms preventing runaway loops.
 ## Overview
 
 Safety guards are **MANDATORY**. A loop without guards risks:
+
 - Infinite iterations (cost, time)
 - Stuck agents repeating same errors
 - Context window exhaustion
@@ -17,19 +18,21 @@ Safety guards are **MANDATORY**. A loop without guards risks:
 **Default**: 10
 **Purpose**: Hard limit on number of loop iterations.
 
-| Task Type | Recommended | Rationale |
-|-----------|-------------|-----------|
-| Test fixing | 5-8 | Most test issues resolve quickly |
-| Implementation | 10-15 | May need multiple attempts |
-| Research | 6-10 | Diminishing returns after ~6 |
-| Validation | 5 | Should pass or need different approach |
+| Task Type      | Recommended | Rationale                              |
+| -------------- | ----------- | -------------------------------------- |
+| Test fixing    | 5-8         | Most test issues resolve quickly       |
+| Implementation | 10-15       | May need multiple attempts             |
+| Research       | 6-10        | Diminishing returns after ~6           |
+| Validation     | 5           | Should pass or need different approach |
 
 **When to increase**:
+
 - Complex multi-file refactoring
 - Flaky external dependencies
 - Tasks with many independent sub-steps
 
 **When to decrease**:
+
 - Simple targeted fixes
 - Well-defined single-file changes
 - Time-sensitive tasks
@@ -39,12 +42,12 @@ Safety guards are **MANDATORY**. A loop without guards risks:
 **Default**: 15 minutes
 **Purpose**: Time limit regardless of iteration count.
 
-| Task Type | Recommended | Rationale |
-|-----------|-------------|-----------|
-| Test fixing | 10-15 | Quick feedback loops |
-| Implementation | 15-30 | Allow time for complex changes |
-| Research | 20-30 | Research can take time |
-| Build fixes | 10 | Builds should be fast |
+| Task Type      | Recommended | Rationale                      |
+| -------------- | ----------- | ------------------------------ |
+| Test fixing    | 10-15       | Quick feedback loops           |
+| Implementation | 15-30       | Allow time for complex changes |
+| Research       | 20-30       | Research can take time         |
+| Build fixes    | 10          | Builds should be fast          |
 
 **Calculation**: Track `start_time` at loop init, check `elapsed = now - start_time` each iteration.
 
@@ -54,19 +57,21 @@ Safety guards are **MANDATORY**. A loop without guards risks:
 **Purpose**: Stop after N consecutive errors (same error type).
 
 **Error tracking**:
+
 ```markdown
 error_count = 0
 
 After each iteration:
-  IF iteration_failed:
-    error_count += 1
-    IF error_count >= consecutive_error_limit:
-      BREAK → escalate
-  ELSE:
-    error_count = 0  # Reset on success
+IF iteration_failed:
+error_count += 1
+IF error_count >= consecutive_error_limit:
+BREAK → escalate
+ELSE:
+error_count = 0 # Reset on success
 ```
 
 **When to increase**:
+
 - Network-dependent tasks (retries expected)
 - Flaky CI environments
 - External service integration
@@ -113,7 +118,6 @@ function checkSafetyGuards(
   recentOutputs: string[],
   config: SafetyConfig
 ): { safe: boolean; reason?: string } {
-
   // Check iteration limit
   if (iteration >= config.max_iterations) {
     return { safe: false, reason: `max_iterations (${config.max_iterations}) exceeded` };
@@ -127,12 +131,15 @@ function checkSafetyGuards(
 
   // Check consecutive errors
   if (consecutiveErrors >= config.consecutive_error_limit) {
-    return { safe: false, reason: `consecutive_error_limit (${config.consecutive_error_limit}) exceeded` };
+    return {
+      safe: false,
+      reason: `consecutive_error_limit (${config.consecutive_error_limit}) exceeded`,
+    };
   }
 
   // Check loop detection
   if (detectLoop(recentOutputs, config.loop_threshold)) {
-    return { safe: false, reason: 'Loop detected - same output repeated' };
+    return { safe: false, reason: "Loop detected - same output repeated" };
   }
 
   return { safe: true };
@@ -154,6 +161,7 @@ When any guard triggers, escalate with context:
 {brief summary of last iteration output}
 
 **Options**:
+
 1. Continue with {N} more iterations
 2. Accept current state
 3. Review iteration history
@@ -167,12 +175,13 @@ When any guard triggers, escalate with context:
 ```markdown
 INVOKE: iterating-to-completion
 WITH:
-  completion_promise: 'ALL_TESTS_PASSING'
-  max_iterations: 15  # Override default 10
-  max_runtime_minutes: 30  # Override default 15
+completion_promise: 'ALL_TESTS_PASSING'
+max_iterations: 15 # Override default 10
+max_runtime_minutes: 30 # Override default 15
 ```
 
 **Never override**:
+
 - `loop_threshold` - Keep at 3
 - Cannot set `max_iterations` > 50 or `max_runtime_minutes` > 60
 
@@ -180,18 +189,18 @@ WITH:
 
 Track metrics for tuning:
 
-| Metric | Purpose |
-|--------|---------|
-| Average iterations to completion | Tune defaults |
-| Guard trigger frequency | Identify problematic task types |
-| Loop detection rate | Verify algorithm effectiveness |
-| Time per iteration | Identify slow tasks |
+| Metric                           | Purpose                         |
+| -------------------------------- | ------------------------------- |
+| Average iterations to completion | Tune defaults                   |
+| Guard trigger frequency          | Identify problematic task types |
+| Loop detection rate              | Verify algorithm effectiveness  |
+| Time per iteration               | Identify slow tasks             |
 
 ## Common Issues
 
-| Issue | Likely Cause | Solution |
-|-------|--------------|----------|
-| Always hits max_iterations | Task too complex for iteration | Break into smaller tasks |
-| Loop detected too often | Agent stuck on same approach | Add more context to prompt |
-| Consecutive errors trigger | Fundamental blocker | Debug root cause before continuing |
-| Runtime exceeded | Slow iterations | Optimize per-iteration work |
+| Issue                      | Likely Cause                   | Solution                           |
+| -------------------------- | ------------------------------ | ---------------------------------- |
+| Always hits max_iterations | Task too complex for iteration | Break into smaller tasks           |
+| Loop detected too often    | Agent stuck on same approach   | Add more context to prompt         |
+| Consecutive errors trigger | Fundamental blocker            | Debug root cause before continuing |
+| Runtime exceeded           | Slow iterations                | Optimize per-iteration work        |

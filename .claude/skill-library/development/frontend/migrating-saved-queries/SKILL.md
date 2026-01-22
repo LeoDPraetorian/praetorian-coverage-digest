@@ -205,6 +205,7 @@ const setting: Setting = {
 ```
 
 **CRITICAL**: The final output must be wrapped in a `Setting` structure where:
+
 - `Setting.name` = `"saved_query#" + query.id`
 - `Setting.value` = the entire SavedQuery object
 
@@ -297,6 +298,7 @@ interface SavedQuery {
 ```
 
 **CRITICAL**: Ensure `Setting.name` ID matches `SavedQuery.id`:
+
 - ✅ Correct: `name: "saved_query#550e8400-..."` and `value.id: "550e8400-..."`
 - ❌ Wrong: Mismatched IDs between Setting.name and value.id
 

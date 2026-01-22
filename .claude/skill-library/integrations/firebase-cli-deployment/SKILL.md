@@ -50,12 +50,14 @@ firebase projects:list
 ```
 
 **Why this workflow:**
+
 - Firebase CLI automatically uses gcloud application-default credentials
 - `gcloud auth list` shows which account is active
 - `firebase projects:list` confirms Firebase CLI can access projects with those credentials
 - No separate `firebase login` needed if gcloud is authenticated
 
 **If gcloud authentication is needed:**
+
 ```bash
 # Authenticate gcloud for application-default credentials
 gcloud auth application-default login
@@ -63,6 +65,7 @@ gcloud auth application-default login
 ```
 
 **If `firebase projects:list` fails:**
+
 - Check Google Cloud API enablement (Firebase Management API)
 - Verify IAM permissions in Google Cloud Console
 - Check for expired service account keys
@@ -102,6 +105,7 @@ firebase database:instances:list
 ```
 
 **Database instance naming:**
+
 - Default: `<project-id>-default-rtdb`
 - Custom: `<project-id>-<custom-name>-rtdb`
 - Location: us-central1, europe-west1, asia-southeast1
@@ -143,6 +147,7 @@ cat auth-config.json | grep -i anonymous
 ### Manual Process (REQUIRED)
 
 1. **Provide Console link to user:**
+
    ```
    https://console.firebase.google.com/project/<project-id>/authentication/providers
    ```
@@ -157,6 +162,7 @@ cat auth-config.json | grep -i anonymous
 3. **Wait for user confirmation** before proceeding
 
 4. **Verify enablement:**
+
    ```bash
    firebase auth:export --format=json auth-config.json
    cat auth-config.json | grep -i anonymous
@@ -165,6 +171,7 @@ cat auth-config.json | grep -i anonymous
 5. **Only proceed** after verification confirms anonymous auth is enabled
 
 **Why manual setup required:**
+
 - Firebase CLI lacks `firebase auth:enable` command
 - Google security policy requires console confirmation
 - Prevents accidental auth method enablement
@@ -179,6 +186,7 @@ cat auth-config.json | grep -i anonymous
 ### Manual Process (REQUIRED for new projects)
 
 1. **Provide Console link to user:**
+
    ```
    https://console.firebase.google.com/project/<project-id>/database
    ```
@@ -193,6 +201,7 @@ cat auth-config.json | grep -i anonymous
 3. **Wait for user confirmation** before proceeding
 
 4. **Verify database created:**
+
    ```bash
    firebase database:instances:list
    # Should show: <project-id>-default-rtdb
@@ -201,12 +210,14 @@ cat auth-config.json | grep -i anonymous
 5. **Only proceed** after verification confirms database exists
 
 **Why manual creation required:**
+
 - First database instance creation requires Firebase Console interaction
 - Console ensures proper region selection and security mode configuration
 - After first database created, CLI commands work for subsequent operations
 - Security rules deployment (via CLI) can proceed after database exists
 
 **Alternative (for existing projects):**
+
 ```bash
 # If project already has billing/APIs enabled:
 firebase database:instances:create <project-id>-default-rtdb --location=us-central1
@@ -221,6 +232,7 @@ firebase database:instances:create <project-id>-default-rtdb --location=us-centr
 **Cause:** Firebase Management API not enabled in Google Cloud
 
 **Solution:**
+
 ```bash
 # Enable Firebase Management API
 gcloud services enable firebase.googleapis.com --project=<gcloud-project-id>
@@ -234,6 +246,7 @@ gcloud services enable firebase.googleapis.com --project=<gcloud-project-id>
 **Cause:** Firebase project ID must be globally unique
 
 **Solution:**
+
 - Generate unique project ID with random suffix
 - Check availability: `firebase projects:list | grep <project-id>`
 - Use timestamp or random numbers in project ID
@@ -243,6 +256,7 @@ gcloud services enable firebase.googleapis.com --project=<gcloud-project-id>
 **Cause:** Stale gcloud credentials or wrong account active
 
 **Solution:**
+
 ```bash
 # Check active account
 gcloud auth list
@@ -259,6 +273,7 @@ firebase projects:list
 **Cause:** Wrong location or instance already exists
 
 **Solution:**
+
 ```bash
 # Check existing instances first
 firebase database:instances:list
@@ -339,7 +354,7 @@ firebase database:rules:get
 ```markdown
 ### Step 1: Always Invoke First
 
-| Skill | Why |
-|-------|-----|
+| Skill                   | Why                                          |
+| ----------------------- | -------------------------------------------- |
 | firebase-cli-deployment | CLI commands, auth workflow, troubleshooting |
 ```

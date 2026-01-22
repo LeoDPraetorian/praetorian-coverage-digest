@@ -21,12 +21,14 @@ When you suspect an infinite loop:
 ### Symptoms of Infinite Loops
 
 **Browser Symptoms**:
+
 - Browser tab freezes or becomes unresponsive
 - CPU usage spikes to 100%
 - Browser shows "Page Unresponsive" warning
 - DevTools console flooded with identical logs
 
 **React Error Messages**:
+
 ```
 Warning: Maximum update depth exceeded. This can happen when a component
 calls setState inside useEffect, but useEffect either doesn't have a
@@ -49,6 +51,7 @@ function Component({ items }) {
 ```
 
 **What to look for**:
+
 - "Component render" appearing rapidly (>10 times/second)
 - "Effect running" appearing after each render
 - Logs continuing indefinitely
@@ -62,14 +65,14 @@ function Component({ items }) {
 ```typescript
 function Component({ user, items, config }) {
   useEffect(() => {
-    console.log('Effect running with:', {
+    console.log("Effect running with:", {
       user,
       items,
       config,
       // Log reference identity to see if objects are new
       userRef: user,
       itemsRef: items,
-      configRef: config
+      configRef: config,
     });
 
     // Your effect logic
@@ -85,11 +88,9 @@ function Component({ user, items }) {
   const prevItemsRef = useRef();
 
   useEffect(() => {
-    console.log('User changed:', prevUserRef.current !== user);
-    console.log('Items changed:', prevItemsRef.current !== items);
-    console.log('User same content?',
-      JSON.stringify(prevUserRef.current) === JSON.stringify(user)
-    );
+    console.log("User changed:", prevUserRef.current !== user);
+    console.log("Items changed:", prevItemsRef.current !== items);
+    console.log("User same content?", JSON.stringify(prevUserRef.current) === JSON.stringify(user));
 
     prevUserRef.current = user;
     prevItemsRef.current = items;
@@ -98,6 +99,7 @@ function Component({ user, items }) {
 ```
 
 **Output example**:
+
 ```
 User changed: true
 Items changed: true
@@ -117,6 +119,7 @@ User same content? true  ← Same values, different reference!
 ### Recording a Profiling Session
 
 **Workflow**:
+
 1. Click "Record" button (red circle)
 2. Interact with the component (trigger the suspected loop)
 3. Click "Stop" button after 2-3 seconds
@@ -125,15 +128,18 @@ User same content? true  ← Same values, different reference!
 **What to look for**:
 
 **Flame Chart Analysis**:
+
 - **Wide bars**: Components that rendered for a long time
 - **Yellow bars**: Slow renders (>12ms)
 - **Repeated renders**: Same component stacked vertically
 
 **Ranked Chart**:
+
 - Components sorted by total render time
 - Identify components rendering most frequently
 
 **Component Details**:
+
 - Click on a component in the flame chart
 - Right sidebar shows:
   - Why component rendered ("Hooks changed", "Props changed", "State changed")
@@ -152,7 +158,7 @@ Why: Hooks changed
 
 **Interpretation**: Hooks at index 3 and 5 (likely useState or useEffect) are changing on every render.
 
-**Limitation**: React DevTools shows hook *index*, not semantic name. You must count hooks in your component to identify which one.
+**Limitation**: React DevTools shows hook _index_, not semantic name. You must count hooks in your component to identify which one.
 
 ---
 
@@ -168,23 +174,23 @@ npm install --save-dev @welldone-software/why-did-you-render
 
 ```javascript
 // src/wdyr.js
-import React from 'react';
+import React from "react";
 
-if (process.env.NODE_ENV === 'development') {
-  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+if (process.env.NODE_ENV === "development") {
+  const whyDidYouRender = require("@welldone-software/why-did-you-render");
   whyDidYouRender(React, {
     trackAllPureComponents: true,
     trackHooks: true,
-    trackExtraHooks: [[require('react-redux/lib'), 'useSelector']]
+    trackExtraHooks: [[require("react-redux/lib"), "useSelector"]],
   });
 }
 ```
 
 ```javascript
 // src/index.js (import at very top)
-import './wdyr'; // Must be first import
-import React from 'react';
-import ReactDOM from 'react-dom';
+import "./wdyr"; // Must be first import
+import React from "react";
+import ReactDOM from "react-dom";
 // ... rest of imports
 ```
 
@@ -206,6 +212,7 @@ UserProfile.whyDidYouRender = true;
 ### Reading why-did-you-render Output
 
 **Example Output**:
+
 ```
 UserProfile:
   Re-rendered because of hook changes:
@@ -229,12 +236,14 @@ UserProfile:
 ### Pattern 1: Object Reference Instability
 
 **Diagnosis**:
+
 ```typescript
 // why-did-you-render output:
 // "different objects that are equal by value"
 ```
 
 **Fix**:
+
 ```typescript
 // Before (unstable)
 function Parent() {
@@ -254,6 +263,7 @@ function Parent() {
 ### Pattern 2: Array Reference Instability
 
 **Diagnosis**:
+
 ```typescript
 // Console log shows:
 // Items changed: true
@@ -261,6 +271,7 @@ function Parent() {
 ```
 
 **Fix**:
+
 ```typescript
 // Before (unstable)
 function Component({ items }) {
@@ -272,7 +283,11 @@ function Component({ items }) {
 // After (stable with serialization)
 function Component({ items }) {
   const itemsKey = useMemo(
-    () => items.map(i => i.id).sort().join(','),
+    () =>
+      items
+        .map((i) => i.id)
+        .sort()
+        .join(","),
     [items]
   );
 
@@ -287,12 +302,14 @@ function Component({ items }) {
 ### Pattern 3: Callback Instability
 
 **Diagnosis**:
+
 ```typescript
 // React DevTools: "Hook 2 changed" every render
 // Hook 2 is your useCallback
 ```
 
 **Fix**:
+
 ```typescript
 // Before (unstable callback in deps)
 function Component({ onUpdate }) {
@@ -339,12 +356,12 @@ function Component({ items }) {
   const renderCount = useRef(0);
   renderCount.current++;
 
-  if (process.env.NODE_ENV === 'development') {
+  if (process.env.NODE_ENV === "development") {
     console.log(`Component rendered ${renderCount.current} times`);
 
     // Alert if renders exceed threshold
     if (renderCount.current > 50) {
-      console.error('WARNING: Excessive renders detected!');
+      console.error("WARNING: Excessive renders detected!");
     }
   }
 
@@ -369,14 +386,14 @@ function useTraceUpdate(props) {
       if (prev.current[key] !== val) {
         acc[key] = {
           from: prev.current[key],
-          to: val
+          to: val,
         };
       }
       return acc;
     }, {});
 
     if (Object.keys(changedProps).length > 0) {
-      console.log('Changed props:', changedProps);
+      console.log("Changed props:", changedProps);
     }
 
     prev.current = props;
@@ -411,7 +428,7 @@ function useRenderAlert(componentName, threshold = 50) {
 
 // Usage
 function Component() {
-  useRenderAlert('Component', 50);
+  useRenderAlert("Component", 50);
   // Component logic...
 }
 ```
@@ -421,7 +438,7 @@ function Component() {
 ### Technique 3: Dependency Deep Comparison
 
 ```typescript
-import fastDeepEqual from 'fast-deep-equal';
+import fastDeepEqual from "fast-deep-equal";
 
 function useDeepCompareEffect(callback, dependencies) {
   const currentDependenciesRef = useRef();
@@ -436,7 +453,7 @@ function useDeepCompareEffect(callback, dependencies) {
 // Usage: Deep compare objects instead of reference compare
 function Component({ complexObject }) {
   useDeepCompareEffect(() => {
-    console.log('Complex object actually changed');
+    console.log("Complex object actually changed");
   }, [complexObject]);
 }
 ```
@@ -445,12 +462,12 @@ function Component({ complexObject }) {
 
 ## Tooling Comparison
 
-| Tool | Best For | Limitations | Setup Time |
-|------|----------|-------------|------------|
-| **Console.log** | Quick diagnosis, initial investigation | Manual, clutters console | 1 minute |
-| **React DevTools** | Visual profiling, render tree analysis | Doesn't show semantic hook names | 5 minutes |
-| **why-did-you-render** | Deep hook analysis, exact change identification | Development-only, adds overhead | 15 minutes |
-| **Custom hooks** | Automated monitoring, CI integration | Requires maintenance | 30 minutes |
+| Tool                   | Best For                                        | Limitations                      | Setup Time |
+| ---------------------- | ----------------------------------------------- | -------------------------------- | ---------- |
+| **Console.log**        | Quick diagnosis, initial investigation          | Manual, clutters console         | 1 minute   |
+| **React DevTools**     | Visual profiling, render tree analysis          | Doesn't show semantic hook names | 5 minutes  |
+| **why-did-you-render** | Deep hook analysis, exact change identification | Development-only, adds overhead  | 15 minutes |
+| **Custom hooks**       | Automated monitoring, CI integration            | Requires maintenance             | 30 minutes |
 
 ---
 
@@ -459,27 +476,29 @@ function Component({ complexObject }) {
 **Scenario**: UserProfile component re-rendering infinitely
 
 **Initial Symptoms**:
+
 - Browser freezes when navigating to profile page
 - Console flooded with "Effect running" logs
 
 **Debugging Steps**:
 
 1. **Console logging confirmed loop**:
+
    ```typescript
    useEffect(() => {
-     console.log('Effect running'); // Appeared 1000+ times
+     console.log("Effect running"); // Appeared 1000+ times
    }, [user]);
    ```
 
 2. **Reference check revealed problem**:
+
    ```typescript
-   console.log('User changed:', prevUser !== user); // Always true
-   console.log('User values same?',
-     JSON.stringify(prevUser) === JSON.stringify(user)
-   ); // Always true
+   console.log("User changed:", prevUser !== user); // Always true
+   console.log("User values same?", JSON.stringify(prevUser) === JSON.stringify(user)); // Always true
    ```
 
 3. **Traced to parent component**:
+
    ```typescript
    function App() {
      const user = { id: 123, name: 'Alice' }; // New object each render!
@@ -488,6 +507,7 @@ function Component({ complexObject }) {
    ```
 
 4. **Applied fix**:
+
    ```typescript
    function App() {
      const user = useMemo(() => ({ id: 123, name: 'Alice' }), []);

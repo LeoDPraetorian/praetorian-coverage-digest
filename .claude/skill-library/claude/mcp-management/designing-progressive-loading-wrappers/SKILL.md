@@ -461,12 +461,12 @@ Research from production wrapper deployments:
 
 ## Related Skills
 
-| Skill                     | Access Method                                                                                  | Purpose                                    |
-| ------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------ |
-| **orchestrating-mcp-development** | `Read(".claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md")` (LIBRARY) | Multi-agent workflow for MCP wrappers |
-| **managing-tool-wrappers** | `Read(".claude/skill-library/.../managing-tool-wrappers/SKILL.md")` (LIBRARY)                   | Lifecycle management for existing wrappers |
-| **gateway-mcp-tools**     | `skill: "gateway-mcp-tools"` (CORE)                                                            | Router for MCP tool discovery              |
-| **developing-with-tdd**   | `skill: "developing-with-tdd"` (CORE)                                                          | TDD methodology for implementation         |
+| Skill                             | Access Method                                                                                          | Purpose                                    |
+| --------------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------ |
+| **orchestrating-mcp-development** | `Read(".claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md")` (LIBRARY) | Multi-agent workflow for MCP wrappers      |
+| **managing-tool-wrappers**        | `Read(".claude/skill-library/.../managing-tool-wrappers/SKILL.md")` (LIBRARY)                          | Lifecycle management for existing wrappers |
+| **gateway-mcp-tools**             | `skill: "gateway-mcp-tools"` (CORE)                                                                    | Router for MCP tool discovery              |
+| **developing-with-tdd**           | `skill: "developing-with-tdd"` (CORE)                                                                  | TDD methodology for implementation         |
 
 ## Changelog
 

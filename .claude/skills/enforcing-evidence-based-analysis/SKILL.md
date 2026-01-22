@@ -99,6 +99,33 @@ Agents claim to know file contents, API shapes, and interface definitions WITHOU
 
 ---
 
+## Integration
+
+### Called By
+
+- `orchestrating-integration-development` (architect, developer, and reviewer phases)
+- `preferring-simple-solutions` - Verify stdlib capabilities before claiming dependencies needed
+- Any agent or skill creating implementation plans or analyzing existing code
+
+### Requires (invoke before starting)
+
+None - This is a foundational workflow skill that can be invoked directly.
+
+### Calls (during execution)
+
+None - This skill provides a protocol/workflow. It does not invoke other skills during execution.
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                      | Purpose                                  |
+| ----------------------------- | ---------------------------- | ---------------------------------------- |
+| `verifying-before-completion` | After implementation         | Verify outputs after evidence-based work |
+| `writing-plans`               | Creating implementation plan | Structure plan with verified APIs        |
+| `developing-with-tdd`         | TDD workflow                 | Verify test/code uses actual APIs        |
+| `debugging-systematically`    | Debugging                    | Verify hypotheses against actual code    |
+
+---
+
 ## Related Skills
 
 - **verifying-before-completion** - Verifies outputs at end (complementary)

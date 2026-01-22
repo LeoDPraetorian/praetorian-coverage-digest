@@ -83,9 +83,7 @@ const useDependencyQueue = () => {
   const canExecute = (op: OperationWithDeps) => {
     // Check if any blocking operations are still running
     if (op.blockedBy) {
-      return op.blockedBy.every(
-        (id) => !running.current.has(id) && completed.current.has(id)
-      );
+      return op.blockedBy.every((id) => !running.current.has(id) && completed.current.has(id));
     }
     return true;
   };
@@ -149,13 +147,13 @@ type QueuedOperation = {
 
 // Usage
 queue.enqueue({
-  id: 'user-click',
+  id: "user-click",
   priority: Priority.CRITICAL,
   execute: handleUserClick,
 });
 
 queue.enqueue({
-  id: 'auto-save',
+  id: "auto-save",
   priority: Priority.LOW,
   execute: autoSave,
 });
@@ -221,8 +219,7 @@ const useParallelQueue = (concurrency: number = 3) => {
       running.current.add(op.id);
 
       // Execute without awaiting (parallel)
-      op
-        .execute()
+      op.execute()
         .catch((error) => {
           console.error(`Operation ${op.id} failed`, error);
         })
@@ -302,9 +299,7 @@ Merge duplicate operations instead of queuing both.
 ```typescript
 const enqueueWithCoalescence = (op: Operation) => {
   // Check if similar operation already queued
-  const existing = queue.current.find(
-    (qOp) => qOp.type === op.type && qOp.target === op.target
-  );
+  const existing = queue.current.find((qOp) => qOp.type === op.type && qOp.target === op.target);
 
   if (existing) {
     // Merge operations instead of adding new one
@@ -325,29 +320,29 @@ const enqueueWithCoalescence = (op: Operation) => {
 Verify highest priority executes first.
 
 ```typescript
-test('executes operations in priority order', async () => {
+test("executes operations in priority order", async () => {
   const order: string[] = [];
   const queue = useOperationQueue();
 
   queue.enqueue({
-    id: 'low',
+    id: "low",
     priority: 1,
-    execute: () => order.push('low'),
+    execute: () => order.push("low"),
   });
   queue.enqueue({
-    id: 'high',
+    id: "high",
     priority: 100,
-    execute: () => order.push('high'),
+    execute: () => order.push("high"),
   });
   queue.enqueue({
-    id: 'medium',
+    id: "medium",
     priority: 50,
-    execute: () => order.push('medium'),
+    execute: () => order.push("medium"),
   });
 
   await waitForQueue(queue);
 
-  expect(order).toEqual(['high', 'medium', 'low']);
+  expect(order).toEqual(["high", "medium", "low"]);
 });
 ```
 
@@ -356,26 +351,26 @@ test('executes operations in priority order', async () => {
 Verify operations wait for dependencies.
 
 ```typescript
-test('waits for dependencies', async () => {
+test("waits for dependencies", async () => {
   const order: string[] = [];
   const queue = useDependencyQueue();
 
   queue.enqueue({
-    id: 'B',
+    id: "B",
     priority: 100, // Higher priority
-    execute: () => order.push('B'),
-    blockedBy: ['A'], // But blocked by A
+    execute: () => order.push("B"),
+    blockedBy: ["A"], // But blocked by A
   });
 
   queue.enqueue({
-    id: 'A',
+    id: "A",
     priority: 1, // Lower priority
-    execute: () => order.push('A'),
+    execute: () => order.push("A"),
   });
 
   await waitForQueue(queue);
 
-  expect(order).toEqual(['A', 'B']); // A runs first despite lower priority
+  expect(order).toEqual(["A", "B"]); // A runs first despite lower priority
 });
 ```
 
@@ -384,14 +379,12 @@ test('waits for dependencies', async () => {
 Verify queue rejects when full.
 
 ```typescript
-test('rejects operations when full', () => {
+test("rejects operations when full", () => {
   const queue = useBackpressureQueue(2);
 
-  expect(queue.enqueue({ id: '1', priority: 1, execute: () => {} })).toBe(true);
-  expect(queue.enqueue({ id: '2', priority: 1, execute: () => {} })).toBe(true);
-  expect(queue.enqueue({ id: '3', priority: 1, execute: () => {} })).toBe(
-    false
-  ); // Rejected
+  expect(queue.enqueue({ id: "1", priority: 1, execute: () => {} })).toBe(true);
+  expect(queue.enqueue({ id: "2", priority: 1, execute: () => {} })).toBe(true);
+  expect(queue.enqueue({ id: "3", priority: 1, execute: () => {} })).toBe(false); // Rejected
 });
 ```
 
@@ -414,7 +407,7 @@ const processQueue = () => {
 ✅ **Cheap**: Use priority queue data structure
 
 ```typescript
-import { MinPriorityQueue } from '@datastructures-js/priority-queue';
+import { MinPriorityQueue } from "@datastructures-js/priority-queue";
 
 const queue = new MinPriorityQueue<Operation>({
   compare: (a, b) => b.priority - a.priority,
@@ -454,11 +447,11 @@ Low priority operation blocks high priority.
 
 ```typescript
 // High priority B blocked by low priority A
-enqueue({ id: 'A', priority: 1, execute: longRunningTask });
+enqueue({ id: "A", priority: 1, execute: longRunningTask });
 enqueue({
-  id: 'B',
+  id: "B",
   priority: 100,
-  blockedBy: ['A'],
+  blockedBy: ["A"],
   execute: importantTask,
 });
 ```
@@ -496,7 +489,7 @@ await op.execute(); // Might hang forever
 ```typescript
 const executeWithTimeout = async (op: Operation, timeout: number = 5000) => {
   const timeoutPromise = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('Operation timeout')), timeout)
+    setTimeout(() => reject(new Error("Operation timeout")), timeout)
   );
 
   await Promise.race([op.execute(), timeoutPromise]);
@@ -536,7 +529,7 @@ Guard before queuing to avoid unnecessary work.
 const enqueueWithGuard = (op: Operation) => {
   // Guard: Check if operation is valid
   if (!systemReady()) {
-    console.debug('System not ready, skipping enqueue');
+    console.debug("System not ready, skipping enqueue");
     return;
   }
 
@@ -584,7 +577,7 @@ const useGraphUpdateQueue = (graph: Graph) => {
 
   const queueUpdate = useCallback(
     (update: GraphUpdate) => {
-      const layout = graph.getAttribute('layout');
+      const layout = graph.getAttribute("layout");
 
       queue.enqueue({
         id: `update-${Date.now()}`,
@@ -597,7 +590,7 @@ const useGraphUpdateQueue = (graph: Graph) => {
 
           applyUpdate(graph, update);
         },
-        blockedBy: layout?.isRunning() ? ['layout'] : undefined,
+        blockedBy: layout?.isRunning() ? ["layout"] : undefined,
       });
     },
     [graph]

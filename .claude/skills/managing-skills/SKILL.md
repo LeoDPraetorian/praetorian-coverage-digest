@@ -1,6 +1,6 @@
 ---
 name: managing-skills
-description: Use when managing skills (create, update, audit, fix, delete, rename, migrate, search, list, sync) - routes to specialized library skills
+description: Use when managing skills (create, update, audit, fix, delete, rename, migrate, search, list, compare, sync) - routes to specialized library skills
 allowed-tools: Read, Bash, Grep, Glob, TodoWrite, Skill, AskUserQuestion
 ---
 
@@ -10,19 +10,20 @@ allowed-tools: Read, Bash, Grep, Glob, TodoWrite, Skill, AskUserQuestion
 
 ## Quick Reference
 
-| Operation         | Delegated To             | Implementation    | Time      |
-| ----------------- | ------------------------ | ----------------- | --------- |
-| **Create**        | `creating-skills`        | Instruction-based | 15-30 min |
-| **Update**        | `updating-skills`        | Instruction-based | 10-20 min |
-| **Delete**        | `deleting-skills`        | Instruction-based | 10-15 min |
-| **Audit**         | `auditing-skills`        | Instruction-based | 2-5 min   |
-| **Fix**           | `fixing-skills`          | Instruction-based | 5-15 min  |
-| **Search**        | `searching-skills`       | Instruction-based | 1-2 min   |
-| **List**          | `listing-skills`         | Instruction-based | 1 min     |
-| **Research**      | `orchestrating-research` | Instruction-based | 5-10 min  |
-| **Rename**        | `renaming-skills`        | Instruction-based | 5-10 min  |
-| **Migrate**       | `migrating-skills`       | Instruction-based | 5-10 min  |
-| **Sync Gateways** | `syncing-gateways`       | Instruction-based | 10-20 min |
+| Operation         | Delegated To              | Implementation    | Complexity |
+| ----------------- | ------------------------- | ----------------- | ---------- |
+| **Create**        | `creating-skills`         | Instruction-based | Medium     |
+| **Update**        | `updating-skills`         | Instruction-based | Low-Medium |
+| **Delete**        | `deleting-skills`         | Instruction-based | Medium     |
+| **Audit**         | `auditing-skills`         | Instruction-based | Low        |
+| **Fix**           | `fixing-skills`           | Instruction-based | Low-Medium |
+| **Search**        | `searching-skills`        | Instruction-based | Low        |
+| **List**          | `listing-skills`          | Instruction-based | Low        |
+| **Compare**       | `processing-large-skills` | Instruction-based | Low        |
+| **Research**      | `orchestrating-research`  | Instruction-based | Low-Medium |
+| **Rename**        | `renaming-skills`         | Instruction-based | Medium     |
+| **Migrate**       | `migrating-skills`        | Instruction-based | Medium     |
+| **Sync Gateways** | `syncing-gateways`        | Instruction-based | Medium     |
 
 **For detailed operation workflows, see:** [references/operations.md](references/operations.md)
 
@@ -38,18 +39,19 @@ skill: "managing-skills"
 
 **Critical: Two-Tier Skill Access**
 
-| Skill                | Location                                      | How to Invoke                                                                               |
-| -------------------- | --------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| **creating-skills**  | `.claude/skill-library/.../creating-skills/`  | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY)  |
-| **updating-skills**  | `.claude/skill-library/.../updating-skills/`  | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY)  |
-| **auditing-skills**  | `.claude/skill-library/.../auditing-skills/`  | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)  |
-| **fixing-skills**    | `.claude/skill-library/.../fixing-skills/`    | `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` (LIBRARY)    |
-| **deleting-skills**  | `.claude/skill-library/.../deleting-skills/`  | `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")` (LIBRARY)  |
-| **renaming-skills**  | `.claude/skill-library/.../renaming-skills/`  | `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` (LIBRARY)  |
-| **migrating-skills** | `.claude/skill-library/.../migrating-skills/` | `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")` (LIBRARY) |
-| **searching-skills** | `.claude/skill-library/.../searching-skills/` | `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` (LIBRARY) |
-| **listing-skills**   | `.claude/skill-library/.../listing-skills/`   | `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")` (LIBRARY)   |
-| **syncing-gateways** | `.claude/skill-library/.../syncing-gateways/` | `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` (LIBRARY) |
+| Skill                       | Location                                             | How to Invoke                                                                                      |
+| --------------------------- | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| **creating-skills**         | `.claude/skill-library/.../creating-skills/`         | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY)         |
+| **updating-skills**         | `.claude/skill-library/.../updating-skills/`         | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY)         |
+| **auditing-skills**         | `.claude/skill-library/.../auditing-skills/`         | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)         |
+| **fixing-skills**           | `.claude/skill-library/.../fixing-skills/`           | `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` (LIBRARY)           |
+| **deleting-skills**         | `.claude/skill-library/.../deleting-skills/`         | `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")` (LIBRARY)         |
+| **renaming-skills**         | `.claude/skill-library/.../renaming-skills/`         | `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` (LIBRARY)         |
+| **migrating-skills**        | `.claude/skill-library/.../migrating-skills/`        | `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")` (LIBRARY)        |
+| **searching-skills**        | `.claude/skill-library/.../searching-skills/`        | `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` (LIBRARY)        |
+| **listing-skills**          | `.claude/skill-library/.../listing-skills/`          | `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")` (LIBRARY)          |
+| **processing-large-skills** | `.claude/skill-library/.../processing-large-skills/` | `Read(".claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md")` (LIBRARY) |
+| **syncing-gateways**        | `.claude/skill-library/.../syncing-gateways/`        | `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` (LIBRARY)        |
 
 <IMPORTANT>
 Library skills listed above are NOT available via Skill tool.
@@ -65,22 +67,23 @@ You MUST use Read tool to load them.
 
 ### Delegation Map
 
-| When user says...                 | Delegate to...           | Implementation                          |
-| --------------------------------- | ------------------------ | --------------------------------------- |
-| "create a skill"                  | `creating-skills`        | Instruction-based workflow              |
-| "create gateway-X --type gateway" | `creating-skills`        | Uses gateway template                   |
-| "update X skill"                  | `updating-skills`        | Instruction-based TDD workflow          |
-| "delete X skill"                  | `deleting-skills`        | Instruction-based workflow              |
-| "audit X skill"                   | `auditing-skills`        | Instruction-based                       |
-| "audit gateway-X"                 | `auditing-skills`        | Validates against compliance contract   |
-| "fix X skill"                     | `fixing-skills`          | Instruction-based                       |
-| "fix gateway-X --phase N"         | `fixing-skills`          | Gateway-specific fixes                  |
-| "search for skills"               | `searching-skills`       | Instruction-based (manual grep/find)    |
-| "list all skills"                 | `listing-skills`         | Instruction-based                       |
-| "research X"                      | `orchestrating-research` | Parallel research with intent expansion |
-| "rename X to Y"                   | `renaming-skills`        | Instruction-based                       |
-| "migrate X to library"            | `migrating-skills`       | Instruction-based                       |
-| "sync gateways"                   | `syncing-gateways`       | Instruction-based                       |
+| When user says...                 | Delegate to...            | Implementation                          |
+| --------------------------------- | ------------------------- | --------------------------------------- |
+| "create a skill"                  | `creating-skills`         | Instruction-based workflow              |
+| "create gateway-X --type gateway" | `creating-skills`         | Uses gateway template                   |
+| "update X skill"                  | `updating-skills`         | Instruction-based TDD workflow          |
+| "delete X skill"                  | `deleting-skills`         | Instruction-based workflow              |
+| "audit X skill"                   | `auditing-skills`         | Instruction-based                       |
+| "audit gateway-X"                 | `auditing-skills`         | Validates against compliance contract   |
+| "fix X skill"                     | `fixing-skills`           | Instruction-based                       |
+| "fix gateway-X --phase N"         | `fixing-skills`           | Gateway-specific fixes                  |
+| "search for skills"               | `searching-skills`        | Instruction-based (manual grep/find)    |
+| "list all skills"                 | `listing-skills`          | Instruction-based                       |
+| "compare X to Y"                  | `processing-large-skills` | Uses compare mode for symmetry analysis |
+| "research X"                      | `orchestrating-research`  | Parallel research with intent expansion |
+| "rename X to Y"                   | `renaming-skills`         | Instruction-based                       |
+| "migrate X to library"            | `migrating-skills`        | Instruction-based                       |
+| "sync gateways"                   | `syncing-gateways`        | Instruction-based                       |
 
 **Note on Research**: Use `orchestrating-research` for complex, multi-source research. It provides:
 
@@ -130,7 +133,7 @@ You MUST use Read tool to load them.
 
 ## Operations
 
-This skill routes to 10 specialized operations. Each operation has comprehensive workflows, CLI commands, and safety protocols.
+This skill routes to 12 specialized operations. Each operation has comprehensive workflows, CLI commands, and safety protocols.
 
 **For complete operation details, see:** [references/operations.md](references/operations.md)
 
@@ -201,26 +204,67 @@ This skill consolidates:
 7. **TodoWrite Tracking** - You MUST use TodoWrite before starting to track all workflow steps
 8. **Research Delegation** - Use `orchestrating-research` for content population
 
+## Integration
+
+### Called By
+
+- `/skill-manager` command - All skill management operations (create, update, audit, fix, delete, rename, migrate, search, list, sync)
+- User direct invocation via `skill: "managing-skills"`
+
+### Requires (invoke before starting)
+
+None - This is an entry point router skill
+
+### Calls (during execution)
+
+| Skill                               | Phase/Step           | Purpose                                                                                                               |
+| ----------------------------------- | -------------------- | --------------------------------------------------------------------------------------------------------------------- |
+| `creating-skills` (LIBRARY)         | When user creates    | Delegates skill creation - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`           |
+| `updating-skills` (LIBRARY)         | When user updates    | Delegates skill updates - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")`            |
+| `auditing-skills` (LIBRARY)         | When user audits     | Delegates compliance audit - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`         |
+| `fixing-skills` (LIBRARY)           | When user fixes      | Delegates compliance fixes - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`           |
+| `deleting-skills` (LIBRARY)         | When user deletes    | Delegates safe deletion - `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")`            |
+| `renaming-skills` (LIBRARY)         | When user renames    | Delegates safe renaming - `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")`            |
+| `migrating-skills` (LIBRARY)        | When user migrates   | Delegates location migration - `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")`      |
+| `searching-skills` (LIBRARY)        | When user searches   | Delegates skill discovery - `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")`         |
+| `listing-skills` (LIBRARY)          | When user lists      | Delegates skill enumeration - `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")`         |
+| `processing-large-skills` (LIBRARY) | When user compares   | Delegates skill comparison - `Read(".claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md")` |
+| `syncing-gateways` (LIBRARY)        | When user syncs      | Delegates gateway validation - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")`      |
+| `orchestrating-research` (LIBRARY)  | When user researches | Delegates research orchestration - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`           |
+
+### Pairs With (conditional)
+
+| Skill                                         | Trigger               | Purpose                                     |
+| --------------------------------------------- | --------------------- | ------------------------------------------- |
+| `pressure-testing-skill-content` (LIBRARY)    | Testing operations    | Meta-testing skills with pressure scenarios |
+| `closing-rationalization-loopholes` (LIBRARY) | TDD operations        | TDD methodology for fixing loopholes        |
+| `using-skills` (CORE)                         | Discovery operations  | Navigator/librarian for skill discovery     |
+| `developing-with-tdd` (CORE)                  | Creation operations   | TDD methodology and best practices          |
+| `debugging-systematically` (CORE)             | Fix operations        | When skills fail in production              |
+| `verifying-before-completion` (CORE)          | Completion validation | Final validation checklist                  |
+
 ## Related Skills
 
-| Skill                              | Access Method                                                                                             | Purpose                                               |
-| ---------------------------------- | --------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
-| **creating-skills**                | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY)                | Instruction-driven skill creation workflow            |
-| **updating-skills**                | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY)                | Test-guarded skill updates with TDD                   |
-| **auditing-skills**                | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)                | Compliance contract validation                        |
-| **fixing-skills**                  | `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` (LIBRARY)                  | Automated compliance remediation                      |
-| **deleting-skills**                | `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")` (LIBRARY)                | Safe skill deletion with reference cleanup            |
-| **renaming-skills**                | `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` (LIBRARY)                | Safe skill renaming with reference updates            |
-| **migrating-skills**               | `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")` (LIBRARY)               | Move skills between core and library                  |
-| **searching-skills**               | `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` (LIBRARY)               | Dual-location skill discovery                         |
-| **listing-skills**                 | `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")` (LIBRARY)                 | Display all skills with locations                     |
-| **syncing-gateways**               | `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` (LIBRARY)               | Validate gateway consistency                          |
-| **orchestrating-research**         | `skill: "orchestrating-research"` (CORE)                                                                  | Parallel research orchestration with intent expansion |
-| **pressure-testing-skill-content** | `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` (LIBRARY) | Meta-testing skills with pressure scenarios           |
-| **using-skills**                   | `skill: "using-skills"` (CORE)                                                                            | Navigator/librarian for skill discovery               |
-| **developing-with-tdd**            | `skill: "developing-with-tdd"` (CORE)                                                                     | TDD methodology and best practices                    |
-| **debugging-systematically**       | `skill: "debugging-systematically"` (CORE)                                                                | When skills fail in production                        |
-| **verifying-before-completion**    | `skill: "verifying-before-completion"` (CORE)                                                             | Final validation checklist                            |
+| Skill                                 | Access Method                                                                                                | Purpose                                                            |
+| ------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------ |
+| **creating-skills**                   | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY)                   | Instruction-driven skill creation workflow                         |
+| **updating-skills**                   | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY)                   | Test-guarded skill updates with TDD                                |
+| **auditing-skills**                   | `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` (LIBRARY)                   | Compliance contract validation                                     |
+| **fixing-skills**                     | `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` (LIBRARY)                     | Automated compliance remediation                                   |
+| **deleting-skills**                   | `Read(".claude/skill-library/claude/skill-management/deleting-skills/SKILL.md")` (LIBRARY)                   | Safe skill deletion with reference cleanup                         |
+| **renaming-skills**                   | `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` (LIBRARY)                   | Safe skill renaming with reference updates                         |
+| **migrating-skills**                  | `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")` (LIBRARY)                  | Move skills between core and library                               |
+| **searching-skills**                  | `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` (LIBRARY)                  | Dual-location skill discovery                                      |
+| **listing-skills**                    | `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")` (LIBRARY)                    | Display all skills with locations                                  |
+| **processing-large-skills**           | `Read(".claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md")` (LIBRARY)           | Side-by-side skill comparison with symmetry analysis               |
+| **syncing-gateways**                  | `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` (LIBRARY)                  | Validate gateway consistency                                       |
+| `orchestrating-research` (LIBRARY)    | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`                                     | Parallel research orchestration with intent expansion              |
+| **pressure-testing-skill-content**    | `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` (LIBRARY)    | Meta-testing skills with pressure scenarios                        |
+| **closing-rationalization-loopholes** | `Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")` (LIBRARY) | TDD methodology for fixing loopholes found during pressure testing |
+| **using-skills**                      | `skill: "using-skills"` (CORE)                                                                               | Navigator/librarian for skill discovery                            |
+| **developing-with-tdd**               | `skill: "developing-with-tdd"` (CORE)                                                                        | TDD methodology and best practices                                 |
+| **debugging-systematically**          | `skill: "debugging-systematically"` (CORE)                                                                   | When skills fail in production                                     |
+| **verifying-before-completion**       | `skill: "verifying-before-completion"` (CORE)                                                                | Final validation checklist                                         |
 
 ## Changelog
 

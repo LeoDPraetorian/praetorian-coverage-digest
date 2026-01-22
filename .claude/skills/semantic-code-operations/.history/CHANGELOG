@@ -1,68 +1,34 @@
-## [2026-01-01] REFACTOR Phase - Add Red Flags and Explicit Counters
+# Changelog: semantic-code-operations
 
-**Pressure Test Results (RED Phase):**
+## 2026-01-19 - Compliance Fixes (Claude-Automated)
 
-Spawned 3 baseline test agents WITHOUT skill:
-1. **Time Pressure (find function):** Used Grep (text search), rationalized "Grep is fast and familiar"
-2. **Sunk Cost (edit with line numbers):** Would have used Edit (line-based), rationalized "already have line numbers"
-3. **Habit Pressure (list functions):** Used Read (full file), rationalized "Read is most direct"
+**Method:** Claude-Automated + fixing-skills workflow
 
-**Pattern Discovered:** Agents default to text-based tools (Grep/Edit/Read) without considering semantic alternatives
+**Issues Fixed:**
 
-**REFACTOR Additions:**
-- Added "Red Flags - STOP and Use Serena" section with 5 discovered rationalizations
-- Added explicit counters for each rationalization:
-  - "Grep is faster" → Reality: Text search misses semantic context
-  - "Already have line numbers" → Reality: Sunk cost fallacy, line numbers drift
-  - "Read is most direct" → Reality: Loads entire file, wastes 1000s of tokens
-  - "No time to learn" → Reality: Investment pays off on 2nd usage
-  - "One-off task" → Reality: Code operations are never one-off
-- Added "NOT EVEN WHEN" section with 4 pressure scenarios
-- Formatted tables with prettier
+1. **Phase 1: Description Format** (WARNING → PASS)
+   - Enhanced description with discoverability keywords
+   - Added "LSP-based" and "token-efficient" to description
+   - Improves search discoverability for developers looking for language server tools
 
-**Line Count:** 164 lines (within <500 limit)
+2. **Phase 28: Integration Section** (WARNING → PASS)
+   - Added complete Integration section with four required subsections:
+     - Called By: Developer agents (frontend/backend/capability/python)
+     - Requires: None (entry point router)
+     - Calls: mcp-tools-serena (LIBRARY) with full path
+     - Pairs With: gateway-mcp-tools, debugging-systematically
+   - Migrated "Related Skills and Tools" to structured Integration format
+   - Created separate "Related Documentation" section for non-skill resources
 
----
+3. **Phase 30: Skill Reference Invocation** (WARNING → PASS)
+   - Added (LIBRARY) annotation to mcp-tools-serena in Integration section
+   - Ensures correct invocation method documented
+   - Prevents token waste from incorrect skill reference patterns
 
-## [2026-01-01] Initial Creation
+**Verification:**
+- Line count: 291 lines (well within 500 line limit)
+- All structural phases: PASS
+- Semantic review: PASS
 
-**RED Phase - Gap Documented:**
-
-Without this core skill, developers:
-1. Must go through gateway-mcp-tools (generic external API router) to find Serena
-2. Don't understand Serena's semantic advantages over text-based tools (grep, Edit, Read)
-3. Miss opportunities for token-efficient symbol operations (70% savings)
-4. Don't utilize cross-session project memory (write_memory/read_memory)
-5. Load entire files instead of just symbol overviews
-
-**Skill Type:** Tool wrapper (Serena MCP integration)
-
-**Location:** Core (.claude/skills/semantic-code-operations/)
-
-**Rationale for Core:**
-- Used constantly by developers (every code read/edit operation)
-- NOT an occasional external API (like Linear, Context7, Perplexity)
-- Lightweight router (143 lines) to library skill
-- Should be in "first actions" protocol for code-focused agents
-
-**Target Agents:**
-- frontend-developer
-- backend-developer
-- code-pattern-analyzer
-- capability-developer
-- python-developer
-- integration-developer
-
-**Key Features:**
-- Semantic symbol operations (find_symbol, replace_symbol_body, get_symbols_overview)
-- Cross-session project memory (write_memory, read_memory)
-- 4 operational modes (planning, editing, one-shot, interactive)
-- 23 TypeScript wrappers with 119 tests passing
-- Token efficiency: ~70% savings vs full-file reading
-
-**Research Sources:**
-- arxiv MarsCode Agent paper (validates LSP-based semantic operations)
-- GitHub Discussion #219 (multi-phase workflow patterns)
-- Serena official integration docs (adapter pattern validation)
-- Internal architecture: .claude/tools/serena/ (23 wrappers)
-- Internal architecture: docs/mcps/MCP-TOOLS-ARCHITECTURE.md
+**Backup:**
+- Pre-fix backup: .history/2026-01-19-05-53-03-pre-fix.bak

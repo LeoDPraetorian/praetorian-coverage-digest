@@ -1,5 +1,30 @@
 # Changelog - using-skills
 
+## 2026-01-19 - Compliance Audit Fixes
+
+**Type**: Compliance (audit-driven)
+
+**Changes**:
+- **Phase 2 Fix (Deterministic)**: Added missing `allowed-tools` field to frontmatter
+  - Tools: Read, Skill, TodoWrite, AskUserQuestion
+  - Rationale: Required field per Phase 2 validation, matches skill's actual tool usage
+- **Phase 28 Fix (Claude-Automated)**: Generated complete Integration section
+  - Called By: Session hooks, CLAUDE.md, all agents
+  - Requires: None (entry point skill)
+  - Calls: Provides framework for calling other skills
+  - Pairs With: All skills, gateways, verifying-before-completion, brainstorming, debugging-systematically
+- **Description Fix**: Corrected typo "Read Tool innovation" → "Read tool invocation"
+
+**Audit Results**:
+- Before: 2 CRITICAL issues (Phase 2, Phase 28), 1 WARNING (typo)
+- After: All phases PASS
+
+**Impact**: +31 lines (117 → 148 lines, well under 500-line limit)
+
+**Method**: fixing-skills workflow (automated)
+
+---
+
 ## 2026-01-10 - Add Completion Skills Section
 
 **Type**: Enhancement (structural)

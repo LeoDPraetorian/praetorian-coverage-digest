@@ -31,6 +31,7 @@ grep -n "slog\\.Error\\|slog\\.Warn" modules/chariot/backend/pkg/tasks/integrati
 ## Violation Patterns
 
 ### JSON Marshal Errors (Most Common)
+
 ```go
 // VIOLATION - Error ignored
 payload, _ := json.Marshal(reqBody)
@@ -45,6 +46,7 @@ resp, err := api.Request(url, payload, ...)
 ```
 
 ### JSON Unmarshal Errors
+
 ```go
 // VIOLATION - Error ignored
 json.Unmarshal(body, &result)
@@ -57,6 +59,7 @@ if err := json.Unmarshal(body, &result); err != nil {
 ```
 
 ### Double Underscore Pattern
+
 ```go
 // VIOLATION - Both return values ignored
 appBytes, _ := json.Marshal(app)
@@ -73,6 +76,7 @@ if err := json.Unmarshal(appBytes, &appData); err != nil {
 ```
 
 ### Temp Directory Creation
+
 ```go
 // VIOLATION - Error ignored
 dir, _ := os.MkdirTemp("", "prefix")
@@ -88,6 +92,7 @@ defer os.RemoveAll(dir)
 ## Correct Error Wrapping Patterns
 
 ### Pattern 1: Simple Operation
+
 ```go
 data, err := json.Marshal(payload)
 if err != nil {
@@ -96,6 +101,7 @@ if err != nil {
 ```
 
 ### Pattern 2: Context-Rich Wrapping
+
 ```go
 items, err := api.ListAssets(pageToken)
 if err != nil {
@@ -104,6 +110,7 @@ if err != nil {
 ```
 
 ### Pattern 3: Type Assertion with Validation
+
 ```go
 secret, ok := job.Secret["api_token"]
 if !ok {
@@ -112,6 +119,7 @@ if !ok {
 ```
 
 ### Pattern 4: Partial Error Tolerance (Log and Continue)
+
 ```go
 // Only acceptable when single item failure shouldn't stop processing
 var result Response
@@ -124,6 +132,7 @@ if err := json.Unmarshal(body, &result); err != nil {
 ```
 
 ### Pattern 5: Status Code Handling
+
 ```go
 resp, err := client.Request("GET", url, nil, headers...)
 if err != nil {
@@ -142,6 +151,7 @@ if resp.StatusCode < 200 || resp.StatusCode >= 300 {
 ## Evidence Format
 
 **PASS Example**:
+
 ```
 ✅ Error Handling
 Evidence: vendor.go - No "_, _ =" or ", _ :=" patterns found
@@ -151,6 +161,7 @@ Pattern: All errors checked and wrapped with context
 ```
 
 **FAIL Example**:
+
 ```
 ❌ Error Handling
 Evidence: vendor.go:158 - payload, _ := json.Marshal(reqBody)
@@ -177,6 +188,7 @@ Required: Add error checking for all json.Marshal calls
 ## Why JSON Marshaling Errors Matter
 
 JSON marshaling can fail when:
+
 - Circular references exist
 - Unsupported types (channels, functions)
 - Numeric overflow
@@ -187,6 +199,7 @@ JSON marshaling can fail when:
 ## Error Wrapping Best Practices
 
 ### Use `%w` for Error Chains
+
 ```go
 // RIGHT - Preserves error chain for errors.Unwrap()
 return fmt.Errorf("context: %w", err)
@@ -196,6 +209,7 @@ return fmt.Errorf("context: %v", err)
 ```
 
 ### Include Actionable Context
+
 ```go
 // GOOD - Tells you what was being done
 return fmt.Errorf("fetching page %d of assets: %w", page, err)
@@ -205,6 +219,7 @@ return fmt.Errorf("error: %w", err)
 ```
 
 ### Don't Double-Wrap
+
 ```go
 // WRONG - Redundant wrapping
 if err != nil {

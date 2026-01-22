@@ -23,7 +23,7 @@ Use this skill when:
 - Integrating tables with TanStack Query for server-paginated data
 - Migrating from React Table v7 to v8
 
-**NOT for:** TanStack Query (see `frontend-tanstack-query`) or TanStack Router (see `using-tanstack-router`). For simple static tables, use native HTML `<table>` elements.
+**NOT for:** TanStack Query (see `using-tanstack-query`) or TanStack Router (see `using-tanstack-router`). For simple static tables, use native HTML `<table>` elements.
 
 ## Quick Reference
 
@@ -457,12 +457,24 @@ const assetColumns = [
 ]
 ```
 
-## Related Skills
+## Integration
 
-- `frontend-tanstack-query` - Query + Table server pagination integration
-- `using-tanstack-router` - URL state synchronization for table filters/sorting
-- `using-zustand-state-management` - Managing table state with Zustand
-- `frontend-testing-patterns` - Testing table components
+### Called By
+
+- `gateway-frontend` (discovered via gateway routing)
+
+### Requires / Calls
+
+None - standalone reference skill.
+
+### Pairs With
+
+| Skill                            | When                      | Purpose                               |
+| -------------------------------- | ------------------------- | ------------------------------------- |
+| `using-tanstack-query`           | Server-side data fetching | Query + Table cached data integration |
+| `using-tanstack-router`          | URL state persistence     | Shareable table state via URL params  |
+| `using-zustand-state-management` | Complex table state       | External state management             |
+| `frontend-testing-patterns`      | Testing components        | Vitest patterns for table tests       |
 
 ## Progressive Disclosure
 

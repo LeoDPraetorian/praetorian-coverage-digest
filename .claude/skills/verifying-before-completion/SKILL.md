@@ -1,6 +1,6 @@
 ---
 name: verifying-before-completion
-description: Use when about to claim work is complete, fixed, or passing, before committing or creating PRs - requires running verification commands and confirming output before making any success claims; evidence before assertions always.
+description: Use when claiming completion before commits/PRs - run verification commands first; evidence before assertions always
 allowed-tools: Read, Write, Bash
 ---
 
@@ -54,12 +54,12 @@ Skip any step = lying, not verifying
 
 When verifying against a plan's exit criteria, interpret the metric LITERALLY:
 
-| Exit Criteria Says      | You Must Count              | NOT This                      |
-| ----------------------- | --------------------------- | ----------------------------- |
-| '118 files updated'     | 118 FILES with changes      | Function calls, import stmts  |
-| '45 tests passing'      | 45 TEST FUNCTIONS passing   | Assertions within tests       |
-| '12 components migrated' | 12 COMPONENT FILES migrated | JSX elements                  |
-| 'All endpoints updated' | Each ENDPOINT (route)       | Handler functions             |
+| Exit Criteria Says       | You Must Count              | NOT This                     |
+| ------------------------ | --------------------------- | ---------------------------- |
+| '118 files updated'      | 118 FILES with changes      | Function calls, import stmts |
+| '45 tests passing'       | 45 TEST FUNCTIONS passing   | Assertions within tests      |
+| '12 components migrated' | 12 COMPONENT FILES migrated | JSX elements                 |
+| 'All endpoints updated'  | Each ENDPOINT (route)       | Handler functions            |
 
 **The Ambiguity Trap:**
 
@@ -76,6 +76,7 @@ Real failure: Agent claimed '118 navigation calls updated' when exit criteria sa
 **If Ambiguous:**
 
 If exit criteria doesn't specify the unit clearly (e.g., 'update navigation'), ASK before claiming completion:
+
 - 'Exit criteria says update navigation. Does this mean files with navigation imports, or individual useNavigate calls?'
 
 **Never assume the favorable interpretation.**
@@ -168,6 +169,34 @@ From 24 failure memories:
 - Paraphrases and synonyms
 - Implications of success
 - ANY communication suggesting completion/correctness
+
+## Integration
+
+### Called By
+
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 8 - before completion)
+- `orchestrating-capability-development` (Phase 8 - before completion)
+- `orchestrating-integration-development` (Phase 8 - before completion)
+- `orchestrating-fingerprintx-development` (Phase 8 - before completion)
+- `developing-with-subagents` (after batch completion, before moving to next batch)
+- All developer agents: `frontend-developer`, `backend-developer`, `capability-developer`, `integration-developer`, `tool-developer`, `python-developer` (Step 1 mandatory skill, before returning from Task)
+- All tester agents: `frontend-tester`, `backend-tester`, `capability-tester`, `tool-tester` (Step 1 mandatory skill, before claiming tests pass)
+- All reviewer agents: `frontend-reviewer`, `backend-reviewer`, `capability-reviewer`, `tool-reviewer` (before completion claims)
+- All security agents: `frontend-security`, `backend-security` (before security assessment completion)
+- Analysis agents: `codebase-mapper`, `codebase-sizer`, `security-controls-mapper`, `security-test-planner`, `debugger`, `threat-modeler` (before analysis completion)
+- User manually when about to make completion claims
+
+### Requires (invoke before starting)
+
+None - standalone verification skill with no prerequisites
+
+### Calls (during execution)
+
+None - terminal verification skill (runs verification commands directly via Bash, doesn't delegate to other skills)
+
+### Pairs With (conditional)
+
+None - This skill is invoked as a mandatory gate, not conditionally paired
 
 ## The Bottom Line
 

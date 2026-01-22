@@ -320,13 +320,13 @@ Complexity = 1 (entry)
 
 ## Tool Comparison
 
-| Tool      | Boolean Operators      | Ternary | Exception Handling  | Switch Cases   |
-| --------- | ---------------------- | ------- | ------------------- | -------------- | ---------- | -------------- |
-| Lizard    | Counts each `&&`/`     |         | `                   | +1             | catch = +1 | Each case = +1 |
-| ESLint    | Single condition       | +1      | catch = +1          | Each case = +1 |
-| gocyclo   | Single condition       | +1      | Not applicable (Go) | Each case = +1 |
-| radon     | Counts each `and`/`or` | +1      | except = +1         | Each case = +1 |
-| SonarQube | Configurable           | +1      | catch = +1          | Each case = +1 |
+| Tool      | Boolean Operators       | Ternary | Exception Handling  | Switch Cases   |
+| --------- | ----------------------- | ------- | ------------------- | -------------- |
+| Lizard    | Counts each `&&`/`\|\|` | +1      | catch = +1          | Each case = +1 |
+| ESLint    | Single condition        | +1      | catch = +1          | Each case = +1 |
+| gocyclo   | Single condition        | +1      | Not applicable (Go) | Each case = +1 |
+| radon     | Counts each `and`/`or`  | +1      | except = +1         | Each case = +1 |
+| SonarQube | Configurable            | +1      | catch = +1          | Each case = +1 |
 
 **Recommendation**: Use the same tool consistently. Don't compare absolute values across tools.
 

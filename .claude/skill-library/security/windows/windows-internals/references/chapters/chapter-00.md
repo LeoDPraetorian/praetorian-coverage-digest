@@ -188,20 +188,17 @@ Large and small pages 303
 
 Contents v
 
-
 ---
 
 Examining memory usage......305 Internal synchronization......308 Services provided by the memory manager......309 Page states and memory allocations......310 Commit charge and commit limit......313 Locking memory......314 Allocation granularity......314 Shared memory and mapped files......315 Protecting memory......317 Data Execution Prevention......319 Copy-on-write......321 Address Windowing Extensions......323 Kernel-mode heaps (system memory pools)......324 Pool sizes......325 Monitoring pool usage......327 Look-aside lists......331 Heap manager......332 Process heaps......333 Heap types......334 The NT heap......334 Heap synchronization......334 The low-fragmentation heap......335 The segment heap......336 Heap security features......341 Heap debugging features......342 Pageheap......343 Fault-tolerant heap......347 Virtual address space layouts......348 x86 address space layouts......349 x86 system address space layout......352 x86 session space......353 System page table entries......355 ARM address space layout......356 64-bit address space layout......357 x64 virtual addressing limitations......359 Dynamic system virtual address space management......359 System virtual address space quotas......364 User address space layout......365 Address translation......371 x86 virtual address translation......371 Translation look-aside buffer......377 x64 virtual address translation......380 ARM virtual address translation......381 Page fault handling......383 Invalid PTEs......384 Prototype PTEs......385
 
-ⅵ     Contents
-
+ⅵ Contents
 
 ---
 
 In-paging I/O. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
 
-Contents   vii
-
+Contents vii
 
 ---
 
@@ -211,7 +208,6 @@ Chapter 6 I/O system I/O system components......483 The I/O manager......485 Typ
 
 viii Contents
 
-
 ---
 
 The Windows Driver Foundation......578 Kernel-Mode Driver Framework......579 User-Mode Driver Framework......587 The power manager......590 Connected Standby and Modern Standby......594 Power manager operation......595 Driver power operation......596 Driver and application control of device power......599 Power management framework......600 Power availability requests......602 Conclusion......603
@@ -220,15 +216,13 @@ Chapter 7 Security Security ratings......605 Trusted Computer System Evaluation 
 
 Contents ix
 
-
 ---
 
 User Account Control and virtualization......722 File system and registry virtualization......722 Elevation......729 Exploit mitigations......735 Process-mitigation policies......735 Control Flow Integrity......740 Security assertions......752 Application identification......756 AppLocker......757 Software Restriction Policies......762 Kernel Patch Protection......764 PatchGuard......765 HyperGuard......768 Conclusion......770
 
 Index......771
 
-X      Contents
-
+X Contents
 
 ---
 
@@ -313,43 +307,44 @@ pointers, and similar C programming language constructs is beneficial in some se
 The book is divided into two parts (as was the sixth edition), the first of which you're holding in your hands.
 
 - ● Chapter 1, "Concepts and tools," provides a general introduction to Windows
-internals concepts and introduces the main tools used throughout the book. It's
-critical to read this chapter first, as it provides the necessary background needed
-for the rest of the book.
-● Chapter 2, "System architecture," shows the architecture and main components
-that comprise Windows and discusses them in some depth. Several of these con-
-cepts are dealt with in greater detail in subsequent chapters.
-● Chapter 3, "Processes and jobs," details how processes are implemented in
-Windows and the various ways of manipulating them. Jobs are also discussed
-as a means for controlling a set of processes and enabling Windows Container
-support.
-● Chapter 4, "Threads," details how threads are managed, scheduled, and other-
-wise manipulated in Windows.
-● Chapter 5, "Memory management," shows how the memory manager uses physi-
-cal and virtual memory, and the various ways that memory can be manipulated
-and used by processes and drivers alike.
-● Chapter 6, "I/O system," shows how the I/O system in Windows works and
-integrates with device drivers to provide the mechanisms for working with I/O
-peripherals.
-● Chapter 7, "Security," details the various security mechanisms built into Windows,
-including mitigations that are now part of the system to combat exploits.
+  internals concepts and introduces the main tools used throughout the book. It's
+  critical to read this chapter first, as it provides the necessary background needed
+  for the rest of the book.
+  ● Chapter 2, "System architecture," shows the architecture and main components
+  that comprise Windows and discusses them in some depth. Several of these con-
+  cepts are dealt with in greater detail in subsequent chapters.
+  ● Chapter 3, "Processes and jobs," details how processes are implemented in
+  Windows and the various ways of manipulating them. Jobs are also discussed
+  as a means for controlling a set of processes and enabling Windows Container
+  support.
+  ● Chapter 4, "Threads," details how threads are managed, scheduled, and other-
+  wise manipulated in Windows.
+  ● Chapter 5, "Memory management," shows how the memory manager uses physi-
+  cal and virtual memory, and the various ways that memory can be manipulated
+  and used by processes and drivers alike.
+  ● Chapter 6, "I/O system," shows how the I/O system in Windows works and
+  integrates with device drivers to provide the mechanisms for working with I/O
+  peripherals.
+  ● Chapter 7, "Security," details the various security mechanisms built into Windows,
+  including mitigations that are now part of the system to combat exploits.
+
 ## Conventions
 
 The following conventions are used in this book:
 
 - ■ Boldface type is used to indicate text that you type as well as interface items that
-you are instructed to click or buttons that you are instructed to press.
+  you are instructed to click or buttons that you are instructed to press.
 
 ■ Italic type is used to indicate new terms.
 
-■ Code elements appear in a monospaced font.
----
+## ■ Code elements appear in a monospaced font.
 
 - ■ The first letters of the names of dialog boxes and dialog box elements are
-capitalized—for example, the Save As dialog box.
-■ Keyboard shortcuts are indicated by a plus sign (+) separating the key names.
-For example, Ctrl+Alt+Delete mean that you press Ctrl, Alt, and Delete keys at
-the same time.
+  capitalized—for example, the Save As dialog box.
+  ■ Keyboard shortcuts are indicated by a plus sign (+) separating the key names.
+  For example, Ctrl+Alt+Delete mean that you press Ctrl, Alt, and Delete keys at
+  the same time.
+
 ## About the companion content
 
 We have included companion content to enrich your learning experience. The companion
@@ -413,4 +408,3 @@ The survey is short, and we read every one of your comments and ideas. Thanks in
 Let's keep the conversation going! We're on Twitter: @MicrosoftPress.
 
 ---
-

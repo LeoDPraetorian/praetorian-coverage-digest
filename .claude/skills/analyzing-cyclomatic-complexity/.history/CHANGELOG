@@ -1,0 +1,14 @@
+# Changelog - analyzing-cyclomatic-complexity
+
+## 2026-01-19 - Compliance Fix (Deterministic)
+
+**Phase 14: Table Formatting**
+- Fixed malformed table structure in references/calculation-methods.md:323-329
+- Issue: Header row had extra pipe characters creating phantom columns
+- Fix: Corrected table to proper 5-column structure with escaped pipe characters
+- Method: Deterministic (direct Edit tool application)
+- Status: ✅ RESOLVED
+
+**Audit Status:**
+- Before: PASSED WITH WARNINGS (1 issue)
+- After: PASSED (0 issues)

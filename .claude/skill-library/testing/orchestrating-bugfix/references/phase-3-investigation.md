@@ -18,11 +18,13 @@ The debugger agent MUST invoke these skills before completing:
 ## Inputs
 
 From Phase 1-2:
+
 - `candidate-locations.md` - Potential bug locations with confidence scores
 - `bug-symptoms.md` - Original user report
 - `bug-scoping-report.json` - Symptom analysis and grep results
 
 **OR** if location known:
+
 - Direct file:line from error stack trace
 - Specific component/function name from symptoms
 
@@ -69,20 +71,24 @@ The debugger agent follows this systematic approach:
 Generate hypotheses ranked by likelihood:
 
 **Example:**
+
 ```markdown
 # Hypotheses (Ranked)
 
 ## H1: Missing null check before regex test
+
 - Probability: High (80%)
 - Evidence needed: Check validateEmail() implementation
 - Test: Does email field accept empty strings?
 
 ## H2: Incorrect regex pattern
+
 - Probability: Medium (40%)
 - Evidence needed: Verify email regex
 - Test: What strings does regex reject?
 
 ## H3: Server-side validation mismatch
+
 - Probability: Low (20%)
 - Evidence needed: Compare client/server validation
 - Test: Does server have different validation rules?
@@ -93,16 +99,19 @@ Generate hypotheses ranked by likelihood:
 For each hypothesis (starting with highest probability):
 
 **Read code at candidate locations:**
+
 ```
 Read("src/components/LoginForm.tsx")
 ```
 
 **Search for related patterns:**
+
 ```
 Grep(pattern: "validateEmail", output_mode: "content")
 ```
 
 **Trace data flow:**
+
 - Where does email value come from?
 - What transformations applied?
 - Where is ValidationError thrown?
@@ -112,7 +121,8 @@ Grep(pattern: "validateEmail", output_mode: "content")
 When evidence confirms hypothesis:
 
 **Document in root-cause-report.md:**
-```markdown
+
+````markdown
 # Root Cause Report
 
 ## Verdict: Confirmed
@@ -128,11 +138,13 @@ The validateEmail() function in LoginForm.tsx:123 calls regex.test(email) withou
 ```typescript
 function validateEmail(email) {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return regex.test(email);  // ❌ No null check
+  return regex.test(email); // ❌ No null check
 }
 ```
+````
 
 **Stack trace confirms:**
+
 - ValidationError thrown from LoginForm.tsx:125
 - Triggered by onBlur event handler
 - Occurs when field value is empty string or undefined
@@ -143,7 +155,7 @@ Add null check before regex test:
 
 ```typescript
 function validateEmail(email) {
-  if (!email) return false;  // ✅ Handle null/undefined/empty
+  if (!email) return false; // ✅ Handle null/undefined/empty
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 }
@@ -152,16 +164,19 @@ function validateEmail(email) {
 ## Affected Tests
 
 Tests that should cover this fix:
+
 - `LoginForm.test.tsx` - Add test for empty email validation
 - `LoginForm.test.tsx` - Add test for undefined email validation
 
 ## Confidence: 95%
 
 Evidence is strong:
+
 - Error message matches code location
 - Stack trace confirms call path
 - Null check fix directly addresses symptom
-```
+
+````
 
 ### 4. Inconclusive Investigation
 
@@ -188,7 +203,7 @@ H2: Error thrown from upstream caller
 ## Next Step
 
 Investigate LoginForm component line 85-90 (onBlur handler)
-```
+````
 
 ## Output Format
 
@@ -216,17 +231,21 @@ See example in "Inconclusive Investigation" section above.
 After debugger agent returns:
 
 **IF verdict = confirmed:**
+
 - ✅ Proceed to Phase 4 (Implementation)
 - Pass root-cause-report.md to developer agent
 
 **IF verdict = inconclusive:**
+
 - Re-spawn debugger agent with next_step from report
 - Maximum 3 attempts
 - If still inconclusive after 3 attempts → Ask user for help
 
 **IF 3 attempts inconclusive:**
+
 - STOP workflow
 - Ask user via AskUserQuestion:
+
   ```
   After 3 investigation attempts, root cause remains unclear.
 

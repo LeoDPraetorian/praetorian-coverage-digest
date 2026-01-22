@@ -1,292 +1,43 @@
-## [2025-12-31] - Simplify Repository Root Navigation Pattern
+# Changelog - updating-skills
 
-### Changed
-- **Step 0: Navigate to repo root** in SKILL.md - Replaced complex 3-line pattern with industry-standard single-line approach
-- Old pattern: `REPO_ROOT=$(git rev-parse --show-superproject-working-tree 2>/dev/null); test -z "$REPO_ROOT" && REPO_ROOT=$(git rev-parse --show-toplevel); cd "$REPO_ROOT"`
-- New pattern: `ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"`
-- Variable name: `REPO_ROOT` → `ROOT` for consistency with commands and MCP tools
+All notable changes to this skill will be documented in this file.
 
-### Reason
-- **RED failure**: Old pattern uses unnecessary complexity (stderr redirect, conditional test, 3 separate commands)
-- Can cause parsing errors in Claude Code's Bash tool when combined with other operators
-- Inconsistent with updated patterns across codebase (commands, MCP skills, CLAUDE.md)
-- More verbose and harder to maintain than necessary
+## [2026-01-21] - Compliance Fixes from Audit
 
-### Technical Details
-- Single git command with both `--show-superproject-working-tree` and `--show-toplevel` flags
-- Pipe to `head -1` automatically selects first non-empty result (super-repo root when in submodule)
-- Simpler: 2 commands instead of 3, one line instead of three
-- No stderr redirect needed, no conditional test needed
-- Proper quoting prevents bash parsing errors
-- Works identically from any directory depth (tested from super-repo and submodule)
+### Fixed
 
-### Files Changed
-- `SKILL.md` lines 47-50 - Replaced navigation pattern with simplified approach
-- Line count: 188 → 185 lines (3 lines removed due to consolidation)
+- **Phase 4 (Broken Links)**: Fixed 5 broken cross-skill reference links
+  - Line 64: `.claude/skills/managing-skills/references/skill-compliance-contract.md` → `../../../../skills/managing-skills/references/skill-compliance-contract.md`
+  - Line 82: `.claude/skills/using-skills/references/rationalization-prevention.md` → `../../../../skills/using-skills/references/rationalization-prevention.md`
+  - Lines 137, 363: `.claude/skills/managing-skills/references/tdd-methodology.md` → `../../../../skills/managing-skills/references/tdd-methodology.md` (2 instances)
+  - Line 472: `.claude/skills/managing-skills/references/tdd-methodology.md` → `../../../../skills/managing-skills/references/tdd-methodology.md`
+  - Line 474: `.claude/skills/managing-skills/references/patterns/line-count-limits.md` → `../../../../skills/managing-skills/references/patterns/line-count-limits.md`
+  - Line 475: `.claude/skills/managing-skills/references/progressive-disclosure.md` → `../../../../skills/managing-skills/references/progressive-disclosure.md`
 
-### Verification
-- ✅ Tested from submodule directory (`modules/chariot/ui/src/`) → Returns super-repo root
-- ✅ Tested from super-repo root → Returns super-repo root
-- ✅ No old pattern examples remain in `references/` subdirectory
+- **Phase 5 (File Organization)**: Created `.history/CHANGELOG` to track skill evolution
 
-## [2025-12-30] - Add Phase Numbering Rule
+- **Phase 27 (Relative Path Depth)**: Fixed cross-skill links that used `.claude/` repo-root format by converting to proper relative paths with correct depth (`../../../../skills/...`)
 
-### Added
-- **Step 3.6: Phase Numbering Rule (MANDATORY)** in SKILL.md - Prevents fractional phase numbering
-- Detailed phase numbering guidance in `references/update-workflow.md` Phase 4b
-- Explicit rule: NEVER use fractional phases (Phase 3.5, 5.4), ALWAYS renumber sequentially
-- Example workflow showing renumbering process (Phase 4→5, 5→6, etc.)
-- Guidance on updating ALL references to renumbered phases throughout skill
-
-### Changed
-- SKILL.md: Added Step 3.6 between Research (3.5) and Edit (4)
-- `references/update-workflow.md`: Added Phase Numbering Rule as Step 2 in Phase 4b workflow
-- Line count: 176 → 192 lines (still well under 500 limit)
+- **Phase 30 (Logical Coherence)**: Added clarifying note to Success Criteria item "Changelog updated" pointing to update-workflow.md Phase 5 where detailed procedure lives
 
 ### Reason
-- **RED failure**: Claude has tendency to insert fractional phases (3.5, 5.4) instead of renumbering
-- Existing instances found: `creating-skills` CHANGELOG references Phase 5.3, 5.4, 2.3
-- `managing-skills/references/patterns/changelog-format.md` line 7 references Phase 5.4
-- Fractional phases create maintenance debt and numbering confusion
-- No explicit guidance existed to prevent this anti-pattern
 
-### Technical Details
-- Distinguishes between fractional MAJOR phases (bad) and sub-steps (acceptable)
-- Sub-steps like Step 7.1, 7.2, 7.3 represent decomposition, not insertion
-- Mandates updating cross-references when renumbering (search SKILL.md + references/)
-- Position: After Research, before Edit (where phase additions would occur)
-
-### Files Changed
-- `SKILL.md` - Added Step 3.6 Phase Numbering Rule (~10 lines)
-- `references/update-workflow.md` - Added Phase Numbering Rule in Phase 4b (~30 lines)
-
-### Impact
-- Prevents future fractional phase numbering in all skill updates
-- Will require fixing existing fractional phases in creating-skills
-- Coordinated with pending updates to auditing-skills and fixing-skills
-
-### Method
-- Manual edit via Edit tool
-- Backup created: `.local/2025-12-30-*-updating-skills-pre-phase-numbering.bak`
-
----
-
-## [2025-12-27] - Add Optional Research Integration
-
-### Added
-- **Research Integration (Optional)** section - Between Step 3 (Backup) and Step 4 (Edit)
-- AskUserQuestion pattern to ask user if they want to invoke researching-skills
-- Clear guidance on when to suggest research vs skip research
-- Read() invocation path for researching-skills with what it provides
-
-### Changed
-- Added Step 3.5 to workflow (Research - Optional)
-- Updated Related Skills to include researching-skills
-- Line count: 99 → 155 lines (still well under 500 limit)
-
-### Reason
-- **RED failure**: No research guidance when updating library/framework skills (TanStack Query, Zustand, etc.)
-- Updates often based on outdated knowledge (agent training data 12+ months old)
-- Inconsistent with creating-skills (which mandates researching-skills in Phase 6)
-- Phantom context7 feature documented in operations.md (`--refresh-context7`) that doesn't exist
-
-### Technical Details
-- Optional, not mandatory (unlike creating-skills where research is required)
-- User-driven via AskUserQuestion (respects user judgment)
-- Same skill, same patterns (leverages researching-skills exactly like creating-skills)
-- Position: Between backup (protect file) and edit (make changes)
-
-### Files Changed
-- `SKILL.md` - Added Research Integration section (~56 lines)
-- Fixed code block language tag (typescript) for compliance
-
-### Method
-- Manual update via Edit tool
-- Backup created: `.local/2025-12-27-*-pre-research-integration.bak`
-
----
-
-## [2024-12-26] - Initial Creation
-
-### Created
-- Skill created via manual process (pre-creating-skills TDD workflow)
-- Category: claude/skill-management
-- Type: process
-- Purpose: Test-guarded skill updates with compliance validation
-
-### Structure
-- 7-phase workflow (RED, Locate, Size Check, Backup, Edit, GREEN, Compliance)
-- Progressive disclosure (main workflow + detailed references)
-- CLI integration with auditing-skills and fixing-skills
-
-### Verification
-- Audit: PASSED
-- Line count: 99 lines (well under 500 limit)
-## 2026-01-02 - Prevent Placeholder/TODO Generation
-
-**Problem**: Skill updates with detailed prompts produced placeholders instead of real content.
-
-**Changes**:
-1. Updated Step 4 (line 74) to explicitly require real content, not placeholders/TODOs
-2. Added explicit instructions for "No research" path (lines 130-136)
-3. Added explicit instructions for post-research content incorporation (lines 150-155)
-
-**Impact**: Both research paths now have clear directives to populate content from available sources.
-
-**Quality Gate**: Phrase "not placeholders or TODOs" now appears in Step 4.
-
-## 2026-01-03 - Replace researching-skills with orchestrating-research
-
-**Problem**: The skill referenced the older `researching-skills` which provides sequential research. The new `orchestrating-research` skill is superior with parallel execution and intent expansion.
-
-**Changes**:
-1. Line 60: Changed "consider using researching-skills" to "consider using orchestrating-research"
-2. Line 86: Changed "using `researching-skills` before editing" to "using `orchestrating-research` before editing"
-3. Line 120: Updated AskUserQuestion label from "Yes, invoke researching-skills" to "Yes, invoke orchestrating-research"
-4. Line 141: Changed skill invocation from `skill: "researching-skills"` to `skill: "orchestrating-research"`
-5. Lines 144-149: Updated skill capabilities description to reflect:
-   - Intent expansion (handles vague update topics)
-   - Parallel research across 6 sources (vs sequential)
-   - Cross-source conflict detection
-   - Comprehensive SYNTHESIS.md with actionable findings
-6. Lines 151-154: Added explicit instruction to read ${OUTPUT_DIR}/SYNTHESIS.md after research completes
-7. Line 191: Updated Related Skills section to reference `orchestrating-research` instead of `researching-skills`
-
-**Rationale**: orchestrating-research provides parallel execution and intent expansion, making research faster and more comprehensive for skill updates.
-
-**Impact**: Users now get better research results with parallel source execution and vague query handling.
-
-**Quality Gate**: All references to `researching-skills` have been replaced with `orchestrating-research`.
-
-## 2026-01-03 - Add Workflow Continuation Safeguards
-
-**Problem** (RED): Workflow could stop after Step 3.5 (orchestrating-research) due to ambiguous continuation instructions. When updating-skills invokes orchestrating-research, the assistant may interpret "Then proceed to Step 4 with this content" as "tell the user about the content, then proceed when they confirm" rather than "immediately continue without user interaction".
-
-**Root Cause**: Lines 151-157 told what TO DO after research but lacked explicit "DO NOT" warnings to prevent the assistant from reporting results and waiting for user continuation.
-
-**Changes** (GREEN):
-1. **Added new section "Workflow Continuation Rules"** (lines 53-61) AFTER Step 0 and BEFORE Step 1:
-   - Explicit rule: "7 steps run automatically Step 1 → 7. ONLY stop for: AskUserQuestion (research decision), Step 5 GREEN verification approval, Step 7 REFACTOR pressure tests"
-   - Visual WRONG ❌ vs RIGHT ✅ example showing the premature stop pattern
-   - Key principle: "Subskills are steps, not endpoints. Parent workflow continues automatically after child returns"
-
-2. **Replaced "After orchestrating-research completes" section** (lines 164-180) with explicit DO/DO NOT checklist:
-   - ✅ DO (immediately, without user input): Read SYNTHESIS.md, extract patterns, incorporate findings, proceed directly to Step 4, continue through Steps 5-7 automatically
-   - ❌ DO NOT: Report "Research complete!", summarize and wait for user, stop workflow execution, update todo list showing all tasks completed
-   - Added reminder: "Research is Step 3.5 of a 7-step workflow, not the final step"
-
-3. **Updated Success Criteria section** (line 198): Added note "Automatic Completion: All success criteria should be achieved in a single continuous workflow without stopping for user continuation prompts between steps"
-
-**Impact**: Prevents premature workflow termination after research. Ensures automatic continuation from Step 3.5 → 4 → 5 → 6 → 7 without user intervention.
-
-**Verification**: Test by running `/skill-manager update some-existing-skill 'Add new section about X - research the latest patterns first'` and selecting "Yes, invoke orchestrating-research". Workflow should continue automatically through all steps without stopping after research.
-
-**Quality Gate**: Explicit DO/DO NOT continuation rules now present at lines 166-178 with visual examples at lines 57-58.
-
-
-## [2026-01-03] - Delete Orphaned TypeScript Infrastructure
-
-### Context
-
-The updating-skills TypeScript (scripts/) was orphaned and unused:
-- SKILL.md already instruction-based (no npm/CLI references)
-- Actual CHANGELOGs use complex format with sections (## [date] - title, ### Changed, ### Reason)
-- TypeScript created simple format (`- **date**: desc`) that doesn't match reality
-- Workflows operate instruction-based via update-workflow.md
-
-### Changed
-
-**Deleted scripts/ directory:**
-- package.json, package-lock.json
-- tsconfig.json
-- src/update.ts (~500 lines TypeScript)
-- node_modules/
-- All TypeScript infrastructure
-
-**No SKILL.md changes needed:**
-- Already instruction-based (no npm/CLI refs)
-- References update-workflow.md which documents actual changelog format
-- References context7-refresh.md which documents staleness detection
-
-### Preserved
-
-**All documentation:**
-- SKILL.md - Complete TDD update workflow
-- references/update-workflow.md - Actual changelog format documented
-- references/context7-refresh.md - Context7 staleness logic documented
-- references/backup-strategy.md, tdd-methodology.md, etc.
-
-**Supporting directories:**
-- .history/ - Changelog preserved
-- .local/ - Backups preserved
-
-### Verification
-
-Evidence TypeScript was unused:
-1. SKILL.md has 0 npm/CLI references (already instruction-based)
-2. Actual CHANGELOGs (auditing-skills, fixing-skills, updating-skills) all use complex format
-3. TypeScript format doesn't match any real CHANGELOG in the codebase
-4. Workflows reference update-workflow.md, not TypeScript
-
-### Impact
-
-**Positive:**
-- Removed unused code (~30KB)
-- Simpler architecture (markdown documentation only)
-- No maintenance burden
-- update-workflow.md is source of truth
-
-**No breaking changes:**
-- Workflows already operated instruction-based
-- Documentation already captured all logic
-- No CLI commands to migrate
+- Audit revealed broken links that prevented proper cross-skill reference resolution
+- Links used `.claude/` repo-root format which doesn't resolve from skill subdirectories
+- Missing changelog prevented tracking skill evolution per compliance contract
 
 ### Method
 
-- Updated via updating-skills workflow (self-update)
-- No backup needed (no SKILL.md changes)
-- Deleted orphaned scripts/ directory
-- Changelog documents migration
-
-## [2026-01-12] - Research incorporation verification gate
-
-### Changed
-
-- Step 5 expanded into sub-steps (5.1-5.5) with TodoWrite tracking for each file
-- Added verification gate (Step 5.5) requiring explicit confirmation before Step 6 (GREEN)
-- Added research-to-update-target mapping tables in update-workflow.md Phase 4c
-- Added guidance for updating existing reference files with staleness checks
-- Added 5 rationalization counters for partial update patterns
-- Integrated Context7 staleness check into Step 4 research decision flow
-- Removed separate Context7 Documentation Refresh section (now integrated)
-
-### Reason
-
-- RED failure: Agents marked 'Edit skill with research findings' complete after superficial SKILL.md changes
-- References/ files remained stale with outdated information
-- No verification that research was actually incorporated
-- No mapping from SYNTHESIS.md sections to update targets
-- Step 5 was too vague - didn't enumerate which files to update
+- Hybrid fix (Phase 4): Deterministic path correction with verification
+- Deterministic fix (Phase 5): File creation
+- Auto-fix (Phase 27): Path pattern normalization
 
 ### Impact
 
-- Forces granular per-file tracking in TodoWrite (prevents bulk completion)
-- Blocks progression to GREEN until verification checklist passes
-- Provides explicit mapping: SYNTHESIS.md sections → SKILL.md/references/ targets
-- Enables comprehensive research incorporation across entire skill directory
-- Prevents "SKILL.md only" updates that leave references stale
-- Improves research workflow continuity with clear post-research resume point
+- All cross-skill reference links now resolve correctly
+- Skill evolution history is now tracked
+- Compliance with skill-compliance-contract.md achieved
 
-### Files Modified
+### Not Fixed (By User Request)
 
-1. SKILL.md - Quick Reference table (added Steps 5.1-5.5), Step 5 expansion with verification gate
-2. references/update-workflow.md - Added Phase 4c with mapping tables and reference update procedures
-3. references/rationalization-table.md - Added 5 research incorporation rationalization counters
-
-### Compliance
-
-- SKILL.md: 318 lines (under 500 limit ✅)
-- update-workflow.md: 498 lines
-- All reference files exist and resolve
-- All external links valid
-- Tables formatted with prettier
+- **Phase 3 (Line Count)**: references/update-workflow.md at 517 lines (17 over limit) - User declined file splitting

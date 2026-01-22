@@ -6,7 +6,7 @@ argument-hint: <bug-description-and-symptoms>
 
 # Bug Fix Command
 
-**Invoke the `orchestrating-bugfix` skill and follow it exactly.**
+Read and follow `.claude/skill-library/testing/orchestrating-bugfix/SKILL.md` exactly as it is written.
 
 **Bug Report:** $ARGUMENTS
 

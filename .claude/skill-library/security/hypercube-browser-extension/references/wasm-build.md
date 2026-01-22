@@ -7,6 +7,7 @@
 ## Overview
 
 Hypercube-ng uses Go compiled to WebAssembly for core logic. Two-stage architecture:
+
 1. **loader-wasm** - Initial loader, decrypts main payload
 2. **hypercube-wasm** - Main payload with C2 and proxy capabilities
 
@@ -86,6 +87,7 @@ go build -o builder ./cmd/builder/
 ```
 
 **Flags:**
+
 - `-regenerate-keys`: Generate new encryption keys (default: reuse existing)
 - `-os`: Target OS (darwin, linux, windows)
 - `-arch`: Target architecture (amd64, arm64)
@@ -125,6 +127,7 @@ output/<timestamp>/
 2. **Key Material** (Curve25519): Keypair for C2 encryption
 
 **Storage:**
+
 - Keys stored in `loader-wasm/key-material.json`
 - Reused across builds unless `-regenerate-keys` specified
 - Embedded in both extension and proxy binaries
@@ -136,6 +139,7 @@ output/<timestamp>/
 **Required files:**
 
 1. **client.json** - Firebase web app credentials
+
    ```json
    {
      "apiKey": "...",
@@ -152,6 +156,7 @@ output/<timestamp>/
    - Downloaded from Firebase Console → Project Settings → Service Accounts
 
 **Embedding:**
+
 - `client.json` → embedded in extension WASM
 - `serviceAccountKey.json` → embedded in proxy binary
 
@@ -164,6 +169,7 @@ output/<timestamp>/
 **Symptom**: Go can't find module dependencies
 
 **Fix:**
+
 ```bash
 cd modules/hypercube-ng
 go mod tidy
@@ -188,6 +194,7 @@ go version  # Check current version
 **Checks:**
 
 1. **CSP configuration** in manifest.json:
+
    ```json
    "content_security_policy": {
      "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
@@ -195,6 +202,7 @@ go version  # Check current version
    ```
 
 2. **wasm_exec.js version match**: Must match Go version used to compile
+
    ```bash
    # Copy correct wasm_exec.js
    cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" extension/
@@ -211,16 +219,20 @@ go version  # Check current version
 **Optimizations:**
 
 1. **Build with optimization:**
+
    ```bash
    GOOS=js GOARCH=wasm go build -ldflags="-s -w" -o extension/main.wasm ./loader-wasm/
    ```
+
    - `-s`: Strip symbol table
    - `-w`: Strip DWARF debugging info
 
 2. **TinyGo** (alternative compiler):
+
    ```bash
    tinygo build -o extension/main.wasm -target wasm ./loader-wasm/
    ```
+
    - Smaller binaries (2-3MB vs 8-10MB)
    - Limited standard library support
    - May require code modifications
@@ -239,6 +251,7 @@ go version  # Check current version
 **Modify before building:**
 
 1. **Extension name** in `extension/manifest.json`:
+
    ```json
    "name": "Your Custom Extension Name"
    ```
@@ -266,11 +279,13 @@ GOOS=js GOARCH=wasm go build -gcflags="all=-N -l" -o extension/main.wasm ./loade
 ```
 
 **Benefits:**
+
 - Better error messages
 - Source maps for debugging
 - Stacktraces with line numbers
 
 **Drawbacks:**
+
 - Larger file size
 - Slower execution
 - Not recommended for production
@@ -317,6 +332,7 @@ zip -r ../extension.zip .
 **Result**: `extension.zip` ready for Chrome Web Store upload
 
 **⚠️ Before packaging:**
+
 - Update `manifest.json` name and description
 - Verify all assets are present
 - Test locally first

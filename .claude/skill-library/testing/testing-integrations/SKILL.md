@@ -20,17 +20,17 @@ Use this skill when:
 
 ## Quick Reference
 
-| Test Type                | Pattern                   | Reference                                   |
-| ------------------------ | ------------------------- | ------------------------------------------- |
-| Mock HTTP servers        | httptest.NewServer        | [mock-server-patterns.md]                   |
-| Mock Chariot collectors  | mock.NewCollector()       | [mock-collector-patterns.md]                |
-| Credentials              | In-memory test creds      | [credential-mocking.md]                     |
-| Pagination               | Multi-page responses      | [pagination-testing.md]                     |
-| Rate limits              | 429 + Retry-After         | [rate-limit-testing.md]                     |
-| Concurrency              | errgroup with -race       | [errgroup-testing.md]                       |
-| Test structure           | Table-driven tests        | [table-driven-patterns.md]                  |
-| P0 compliance            | Mandatory test cases      | [required-test-cases.md]                    |
-| Build tags               | `//go:build integration`  | See Integration Tests section               |
+| Test Type               | Pattern                  | Reference                     |
+| ----------------------- | ------------------------ | ----------------------------- |
+| Mock HTTP servers       | httptest.NewServer       | [mock-server-patterns.md]     |
+| Mock Chariot collectors | mock.NewCollector()      | [mock-collector-patterns.md]  |
+| Credentials             | In-memory test creds     | [credential-mocking.md]       |
+| Pagination              | Multi-page responses     | [pagination-testing.md]       |
+| Rate limits             | 429 + Retry-After        | [rate-limit-testing.md]       |
+| Concurrency             | errgroup with -race      | [errgroup-testing.md]         |
+| Test structure          | Table-driven tests       | [table-driven-patterns.md]    |
+| P0 compliance           | Mandatory test cases     | [required-test-cases.md]      |
+| Build tags              | `//go:build integration` | See Integration Tests section |
 
 ## Required Test Cases for Every Integration
 
@@ -41,6 +41,7 @@ Every Chariot integration MUST have test coverage for these P0 requirements:
 **Purpose**: Verify credential validation logic
 
 **Required scenarios**:
+
 - ✅ Success case (valid credentials return nil error)
 - ✅ Failure case (401 Unauthorized returns error)
 - ✅ Expired token case (if applicable, return error)
@@ -52,6 +53,7 @@ Every Chariot integration MUST have test coverage for these P0 requirements:
 **Purpose**: Verify asset discovery and Tabularium mapping
 
 **Required scenarios**:
+
 - ✅ Returns assets with correct Tabularium class/attributes
 - ✅ Handles empty response gracefully (no panic)
 - ✅ Handles pagination (fetches multiple pages)
@@ -65,6 +67,7 @@ Every Chariot integration MUST have test coverage for these P0 requirements:
 **Purpose**: Verify asset ownership validation
 
 **Required scenarios**:
+
 - ✅ Returns true for affiliated asset
 - ✅ Returns false for unaffiliated asset
 - ✅ Handles 404 (asset not found) gracefully
@@ -76,6 +79,7 @@ Every Chariot integration MUST have test coverage for these P0 requirements:
 **Purpose**: Verify resilience to API failures
 
 **Required scenarios**:
+
 - ✅ Rate limit (429) triggers exponential backoff
 - ✅ Server error (5xx) triggers retry logic
 - ✅ Network timeout handled gracefully
@@ -88,6 +92,7 @@ Every Chariot integration MUST have test coverage for these P0 requirements:
 **Purpose**: Verify thread-safety and concurrency correctness
 
 **Required scenarios**:
+
 - ✅ errgroup.SetLimit() respected (no goroutine explosion)
 - ✅ Loop variable capture correct (no race conditions)
 - ✅ Run with `-race` flag to detect data races
@@ -116,6 +121,7 @@ defer server.Close()
 ```
 
 **See**: [mock-server-patterns.md](references/mock-server-patterns.md) for complete patterns including:
+
 - Status code simulation (200, 401, 403, 404, 429, 500)
 - Paginated responses
 - Rate limiting with Retry-After headers
@@ -139,6 +145,7 @@ assert.Equal(t, "ipv4", collector.Assets[0].Class)
 ```
 
 **See**: [mock-collector-patterns.md](references/mock-collector-patterns.md) for:
+
 - Creating mock collectors
 - Capturing Job.Send() calls
 - Asserting on assets/risks/attributes
@@ -156,12 +163,14 @@ integrations/vendor/
 ```
 
 **Unit tests** (`vendor_test.go`):
+
 - Fast, no external dependencies
 - Use httptest for HTTP mocking
 - Use mock.Collector for Chariot backend
 - Run with: `go test`
 
 **Integration tests** (`vendor_integration_test.go`):
+
 - May call real sandbox APIs (if available)
 - Use build tag: `//go:build integration`
 - Run with: `go test -tags=integration`
@@ -224,6 +233,7 @@ func TestIntegration_Discover(t *testing.T) {
 ```
 
 **See**: [table-driven-patterns.md](references/table-driven-patterns.md) for:
+
 - Test case structure
 - Subtests with t.Run()
 - Parallel execution (when safe)
@@ -292,10 +302,12 @@ For detailed patterns and examples, see:
 ## Reference Existing Code
 
 **Integration examples**:
+
 - `modules/chariot/backend/pkg/tasks/integrations/` - Existing integration implementations and tests
 - `modules/chariot/backend/pkg/tasks/integrations/mock/` - Mock patterns and utilities
 
 **Related skills**:
+
 - `developing-integrations` - P0 requirements that tests must verify
 - `gateway-backend` - Go testing patterns
 - `writing-integration-tests-first` - TDD approach for integrations
@@ -310,19 +322,19 @@ For detailed patterns and examples, see:
 
 ### Requires (invoke before starting)
 
-| Skill                     | When  | Purpose                             |
-| ------------------------- | ----- | ----------------------------------- |
-| `developing-integrations` | Start | Understand P0 requirements to test  |
+| Skill                     | When  | Purpose                            |
+| ------------------------- | ----- | ---------------------------------- |
+| `developing-integrations` | Start | Understand P0 requirements to test |
 
 ### Calls (during execution)
 
-| Skill                              | Phase/Step | Purpose                    |
-| ---------------------------------- | ---------- | -------------------------- |
-| `writing-integration-tests-first`  | Optional   | TDD workflow if applicable |
+| Skill                             | Phase/Step | Purpose                    |
+| --------------------------------- | ---------- | -------------------------- |
+| `writing-integration-tests-first` | Optional   | TDD workflow if applicable |
 
 ### Pairs With (conditional)
 
-| Skill                     | Trigger                      | Purpose                    |
-| ------------------------- | ---------------------------- | -------------------------- |
-| `gateway-backend`         | Need Go testing patterns     | General Go test best practices |
-| `developing-with-tdd`     | TDD workflow                 | Test-first development     |
+| Skill                 | Trigger                  | Purpose                        |
+| --------------------- | ------------------------ | ------------------------------ |
+| `gateway-backend`     | Need Go testing patterns | General Go test best practices |
+| `developing-with-tdd` | TDD workflow             | Test-first development         |

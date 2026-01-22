@@ -9,11 +9,13 @@
 Target these authoritative sources for attribution:
 
 ### Tier 1 (Official)
+
 - CISA advisories and alerts
 - US-CERT notifications
 - CISA KEV "Notes" field (already captured in Phase 1)
 
 ### Tier 2 (Vendor Threat Intelligence)
+
 - Unit 42 (Palo Alto Networks)
 - Mandiant/Google TAG
 - Microsoft Threat Intelligence Center
@@ -23,6 +25,7 @@ Target these authoritative sources for attribution:
 - Recorded Future
 
 ### Tier 3 (Community)
+
 - Security researcher blogs
 - Exploit POC repositories (GitHub)
 - CVE write-ups
@@ -34,6 +37,7 @@ Target these authoritative sources for attribution:
 For each CVE, execute these targeted searches:
 
 ### Query 1: Direct Attribution
+
 ```
 "{CVE-ID} threat actor attribution"
 ```
@@ -41,11 +45,13 @@ For each CVE, execute these targeted searches:
 **Purpose:** Find explicit attribution statements
 
 **Example:**
+
 ```
 "CVE-2025-55182 threat actor attribution"
 ```
 
 ### Query 2: Campaign Context
+
 ```
 "{CVE-ID} APT ransomware campaign"
 ```
@@ -53,11 +59,13 @@ For each CVE, execute these targeted searches:
 **Purpose:** Discover named campaigns and actor types
 
 **Example:**
+
 ```
 "CVE-2025-55182 APT ransomware campaign"
 ```
 
 ### Query 3: Product-Specific Exploitation
+
 ```
 "{Product} {CVE-ID} exploitation {current-year}"
 ```
@@ -65,6 +73,7 @@ For each CVE, execute these targeted searches:
 **Purpose:** Find recent exploitation reports
 
 **Example:**
+
 ```
 "React Server Components CVE-2025-55182 exploitation 2025"
 ```
@@ -75,15 +84,15 @@ For each CVE, execute these targeted searches:
 
 For each CVE, extract and document:
 
-| Attribution Field | What to Capture | Example |
-|------------------|-----------------|---------|
-| **Primary Actor** | Nation-state APT or ransomware group | APT28, LockBit 3.0 |
-| **Actor Type** | Nation-state, Ransomware, Opportunistic | Nation-state |
-| **Country Attribution** | If nation-state | Russia, China, North Korea, Iran |
-| **Campaign Name** | If named campaign | "Winter Vivern", "Operation XYZ" |
-| **Exploitation Timeline** | When exploitation first observed | "Within 48 hours of disclosure" |
-| **Target Sectors** | Industries/sectors targeted | Financial, Healthcare, Government |
-| **Source Citations** | URL + publication date | [Unit 42 Blog](url) - Jan 5, 2025 |
+| Attribution Field         | What to Capture                         | Example                           |
+| ------------------------- | --------------------------------------- | --------------------------------- |
+| **Primary Actor**         | Nation-state APT or ransomware group    | APT28, LockBit 3.0                |
+| **Actor Type**            | Nation-state, Ransomware, Opportunistic | Nation-state                      |
+| **Country Attribution**   | If nation-state                         | Russia, China, North Korea, Iran  |
+| **Campaign Name**         | If named campaign                       | "Winter Vivern", "Operation XYZ"  |
+| **Exploitation Timeline** | When exploitation first observed        | "Within 48 hours of disclosure"   |
+| **Target Sectors**        | Industries/sectors targeted             | Financial, Healthcare, Government |
+| **Source Citations**      | URL + publication date                  | [Unit 42 Blog](url) - Jan 5, 2025 |
 
 ---
 
@@ -99,6 +108,7 @@ Always cite sources for transparency and verification:
 ```
 
 **Why citations matter:**
+
 - Enables customer verification
 - Tracks attribution over time
 - Supports confidence scoring
@@ -110,12 +120,12 @@ Always cite sources for transparency and verification:
 
 Assign confidence to each attribution based on source quality:
 
-| Confidence | Criteria | Examples | Impact on Priority |
-|------------|----------|----------|-------------------|
-| **HIGH** | Multiple Tier 1/2 sources confirm | CISA + Microsoft TI both attribute to APT28 | Full weight in scoring |
-| **MEDIUM** | Single Tier 2 source OR multiple Tier 3 | Only Unit 42 report OR 3+ researcher blogs | Partial weight (0.7x) |
-| **LOW** | Only Tier 3 OR speculation | Single blog post, no official confirmation | Minimal weight (0.3x) |
-| **UNKNOWN** | No public attribution found | No results from any tier | Flag for investigation |
+| Confidence  | Criteria                                | Examples                                    | Impact on Priority     |
+| ----------- | --------------------------------------- | ------------------------------------------- | ---------------------- |
+| **HIGH**    | Multiple Tier 1/2 sources confirm       | CISA + Microsoft TI both attribute to APT28 | Full weight in scoring |
+| **MEDIUM**  | Single Tier 2 source OR multiple Tier 3 | Only Unit 42 report OR 3+ researcher blogs  | Partial weight (0.7x)  |
+| **LOW**     | Only Tier 3 OR speculation              | Single blog post, no official confirmation  | Minimal weight (0.3x)  |
+| **UNKNOWN** | No public attribution found             | No results from any tier                    | Flag for investigation |
 
 ### Confidence Scoring Logic
 
@@ -139,11 +149,13 @@ If no attribution found after WebSearch:
 ### Option 1: Search for Exploitation Indicators
 
 Look for:
+
 - Public exploit POCs (GitHub, Exploit-DB)
 - Scanning activity reports (Shodan, Censys)
 - Honeypot data (SANS ISC)
 
 **Query pattern:**
+
 ```
 "{CVE-ID} exploit POC public"
 "{CVE-ID} mass scanning activity"
@@ -182,8 +194,9 @@ When multiple threat actors exploit the same CVE:
 ```markdown
 **Primary Actor:** APT28 (Russia) - First observed Jan 1, 2025
 **Secondary Actors:**
-  - LockBit 3.0 (Ransomware) - Observed Jan 5, 2025
-  - Opportunistic actors - Mass exploitation Jan 10+
+
+- LockBit 3.0 (Ransomware) - Observed Jan 5, 2025
+- Opportunistic actors - Mass exploitation Jan 10+
 
 **Convergence:** Multiple threat groups leveraging same vulnerability indicates high value target
 ```
@@ -191,6 +204,7 @@ When multiple threat actors exploit the same CVE:
 ### Priority Impact
 
 Multi-actor scenarios **increase priority**:
+
 - Indicates valuable/easy-to-exploit vulnerability
 - Wider threat landscape
 - Higher likelihood of customer exposure
@@ -202,6 +216,7 @@ Multi-actor scenarios **increase priority**:
 High-quality attribution includes:
 
 ✅ **Good Attribution:**
+
 - Specific group name (APT28, not "Russian hackers")
 - Country attribution for nation-states
 - Named campaign if available
@@ -210,6 +225,7 @@ High-quality attribution includes:
 - Multiple source citations (Tier 1 + Tier 2)
 
 ❌ **Poor Attribution:**
+
 - Vague ("hackers", "bad actors")
 - No source citations
 - Speculation without evidence
@@ -228,10 +244,11 @@ If CVE was a zero-day:
 **Attribution:** APT41 (China)
 **Exploitation Type:** Zero-day (exploited before public disclosure)
 **Timeline:**
-  - First exploitation: Dec 2024 (estimated from forensics)
-  - Public disclosure: Jan 15, 2025
-  - KEV addition: Jan 20, 2025
-**Implication:** Sophisticated actor with vulnerability research capability
+
+- First exploitation: Dec 2024 (estimated from forensics)
+- Public disclosure: Jan 15, 2025
+- KEV addition: Jan 20, 2025
+  **Implication:** Sophisticated actor with vulnerability research capability
 ```
 
 ### Supply Chain Attacks
@@ -260,6 +277,7 @@ If ransomware affiliate model:
 ## Time Efficiency
 
 Expected time per CVE:
+
 - **WebSearch (3 queries):** 1-2 minutes
 - **Parse results:** 2-3 minutes
 - **Document attribution:** 1-2 minutes
@@ -273,13 +291,13 @@ For 5 CVEs: 20-35 minutes total attribution research
 
 ## Common Pitfalls
 
-| Pitfall | Why It's Wrong | Solution |
-|---------|----------------|----------|
-| Using old attribution | Actors change TTPs over time | Filter results to past 90 days |
-| Trusting Tier 3 only | Low confidence, may be speculation | Require Tier 2 confirmation |
-| Skipping citations | Cannot verify, low trust | Always cite primary sources |
-| Generic attribution | "Hackers" not actionable | Find specific group names |
-| No confidence level | All attribution treated equally | Apply confidence scoring |
+| Pitfall               | Why It's Wrong                     | Solution                       |
+| --------------------- | ---------------------------------- | ------------------------------ |
+| Using old attribution | Actors change TTPs over time       | Filter results to past 90 days |
+| Trusting Tier 3 only  | Low confidence, may be speculation | Require Tier 2 confirmation    |
+| Skipping citations    | Cannot verify, low trust           | Always cite primary sources    |
+| Generic attribution   | "Hackers" not actionable           | Find specific group names      |
+| No confidence level   | All attribution treated equally    | Apply confidence scoring       |
 
 ---
 
@@ -299,6 +317,7 @@ For each CVE, produce attribution card:
 **Target Geographies:** {Countries/regions}
 
 **Evidence:**
+
 1. [{Source 1 Name}]({URL}) - {Date} - "{Relevant Quote}"
 2. [{Source 2 Name}]({URL}) - {Date} - "{Relevant Quote}"
 

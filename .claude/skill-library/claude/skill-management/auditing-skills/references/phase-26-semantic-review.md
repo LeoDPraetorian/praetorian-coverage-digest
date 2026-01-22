@@ -297,6 +297,7 @@ Phase 26 requires **semantic reasoning** to distinguish:
 When reporting Phase 26 findings, format for fixing-skills consumption:
 
 **Per-File Finding Format:**
+
 ```
 [{SEVERITY}] Phase 26: {Classification} - {filename}
 Location: references/{filename}
@@ -306,11 +307,13 @@ Recommendation: {specific action}
 ```
 
 **Classification values:**
+
 - `Genuine stub` - Empty or placeholder, needs full population
 - `Near-stub` - Has structure but lacks substance, needs expansion
 - `False positive` - Template/example/redirect, no action needed (still report for transparency)
 
 **DO NOT aggregate:**
+
 ```
 # ❌ WRONG
 [CRITICAL] Phase 26: 3 stub files need population

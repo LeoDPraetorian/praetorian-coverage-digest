@@ -400,6 +400,7 @@ func TestServer_Concurrent(t *testing.T) {
 ### 4. Test Both Success and Failure Paths
 
 Always test:
+
 - ✅ Success case (200 OK)
 - ✅ Client errors (400, 401, 403, 404)
 - ✅ Server errors (500, 503)

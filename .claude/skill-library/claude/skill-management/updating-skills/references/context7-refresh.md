@@ -1,18 +1,30 @@
 # Context7 Documentation Refresh
 
-Skills created from context7 data (library/framework documentation) can become stale as upstream libraries evolve. This document explains automatic staleness detection and refresh workflows.
+Skills created from context7 data (library/framework documentation) can become stale as upstream libraries evolve. This document explains staleness detection and refresh workflows.
 
-## Automatic Staleness Detection
+## Staleness Detection
 
-The update CLI automatically detects when context7 documentation is more than 30 days old:
+Before updating a context7-based skill, check if documentation is stale:
 
-1. When running `npm run update -- <skill> "changes"`, the CLI checks for `.local/context7-source.json`
-2. If found and `fetchedAt` date is >30 days old, shows yellow warning: `⚠️ Context7 docs are {N} days old`
-3. Prompts: `Check for documentation updates first?`
-4. If you select "Yes", displays refresh instructions and exits (preventing outdated skill updates)
-5. If you select "No", proceeds with regular update workflow
+### Check for context7 source file
 
-This prevents accidentally updating skills with stale library documentation.
+```bash
+cat {skill-path}/.local/context7-source.json 2>/dev/null
+```
+
+If found, check the `fetchedAt` date. If >30 days old, refresh before updating.
+
+### Example metadata
+
+```json
+{
+  "libraryName": "tanstack-query",
+  "libraryId": "...",
+  "fetchedAt": "2024-12-28T10:30:00.000Z",
+  "version": "5.0.0",
+  "docsHash": "abc123..."
+}
+```
 
 ## Manual Refresh Workflow
 
@@ -22,28 +34,34 @@ To refresh context7 documentation for a skill:
 
 Use the context7 MCP server to fetch updated documentation:
 
-```bash
-# Use context7 resolve-library-id and get-library-docs tools
-# Save results to a JSON file
+```typescript
+// 1. Use context7 resolve-library-id tool to get library ID
+// 2. Use context7 get-library-docs tool to fetch documentation
+// 3. Save results for comparison
 ```
 
-### Step 2: Run refresh command
+### Step 2: Compare with existing docs
 
-```bash
-npm run update -- <skill-name> --refresh-context7 --context7-data /path/to/new-docs.json
-```
+Read current reference files and compare with new context7 data:
 
-### Step 3: Review changes
+- `references/api-reference.md` - API function documentation
+- `references/patterns.md` - Common usage patterns
+- `examples/basic-usage.md` - Code examples
 
-The CLI will:
+### Step 3: Update files using Edit tool
 
-- Compare old and new documentation (hash-based diff)
-- Display summary: new APIs, deprecated APIs, changed signatures
-- Update these files automatically:
-  - `references/api-reference.md` - API function documentation
-  - `references/patterns.md` - Common usage patterns
-  - `examples/basic-usage.md` - Code examples
-  - `.local/context7-source.json` - Metadata (fetchedAt, version, hash)
+Update each file with new information:
+
+1. **API reference** - Update function signatures, parameters, return types
+2. **Patterns** - Update usage patterns and best practices
+3. **Examples** - Update code examples with current syntax
+4. **Metadata** - Update `.local/context7-source.json` with new `fetchedAt` timestamp
+
+### Step 4: Review and validate
+
+- Verify updated content is accurate
+- Check for breaking changes
+- Update SKILL.md if core guidance changed
 
 ## What Gets Updated
 
@@ -58,17 +76,7 @@ The CLI will:
 
 ## Context7-Enabled Skills
 
-Skills with context7 documentation have a `.local/context7-source.json` file containing:
-
-```json
-{
-  "libraryName": "tanstack-query",
-  "libraryId": "...",
-  "fetchedAt": "2024-12-28T10:30:00.000Z",
-  "version": "5.0.0",
-  "docsHash": "abc123..."
-}
-```
+Skills with context7 documentation have a `.local/context7-source.json` file.
 
 Examples of context7-enabled skills:
 

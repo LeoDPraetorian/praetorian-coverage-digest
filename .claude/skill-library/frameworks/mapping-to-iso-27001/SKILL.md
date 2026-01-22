@@ -27,14 +27,14 @@ Use this skill when:
 
 **DO NOT use 2013 control numbering** (A.9.x, A.12.x, etc.). The 2022 revision reorganized all controls.
 
-| ❌ Avoid (2013)       | ✅ Use Instead (2022)   | Control Name             |
-| --------------------- | ----------------------- | ------------------------ |
-| A.9.1.1               | A.5.15                  | Access Control           |
-| A.9.2.1               | A.5.16                  | Identity Management      |
-| A.12.6.1              | A.8.24                  | Cryptography             |
-| A.18.1.5              | A.5.31                  | Legal Requirements       |
-| A.12.4.1              | A.8.15                  | Logging                  |
-| A.9.4.1               | A.8.3                   | Privileged Access        |
+| ❌ Avoid (2013) | ✅ Use Instead (2022) | Control Name        |
+| --------------- | --------------------- | ------------------- |
+| A.9.1.1         | A.5.15                | Access Control      |
+| A.9.2.1         | A.5.16                | Identity Management |
+| A.12.6.1        | A.8.24                | Cryptography        |
+| A.18.1.5        | A.5.31                | Legal Requirements  |
+| A.12.4.1        | A.8.15                | Logging             |
+| A.9.4.1         | A.8.3                 | Privileged Access   |
 
 **See:** [references/2013-to-2022-migration.md](references/2013-to-2022-migration.md) for complete mapping table.
 
@@ -42,17 +42,18 @@ Use this skill when:
 
 Use specific control numbers (A.5.15) not theme categories alone (Organizational Controls).
 
-| ❌ Too Generic       | ✅ Specific Control    | When                       |
-| -------------------- | ---------------------- | -------------------------- |
-| Organizational       | A.5.15, A.5.16, A.5.18 | Access management          |
-| Technological        | A.8.1, A.8.2, A.8.3    | User endpoint devices      |
-| People               | A.6.1, A.6.2           | Screening, training        |
+| ❌ Too Generic | ✅ Specific Control    | When                  |
+| -------------- | ---------------------- | --------------------- |
+| Organizational | A.5.15, A.5.16, A.5.18 | Access management     |
+| Technological  | A.8.1, A.8.2, A.8.3    | User endpoint devices |
+| People         | A.6.1, A.6.2           | Screening, training   |
 
 ### 3. Multiple Controls May Apply
 
 A single finding can satisfy multiple control objectives. Tag all applicable controls.
 
 **Example:** "Exposed admin panel without authentication"
+
 - A.5.15 (Access control)
 - A.5.16 (Identity management)
 - A.8.5 (Secure authentication)
@@ -64,70 +65,70 @@ A single finding can satisfy multiple control objectives. Tag all applicable con
 
 ### Cloud Security (AWS/Azure/GCP)
 
-| Vulnerability Pattern                  | ISO 27001:2022 Control | Control Name                              | Evidence Type              |
-| -------------------------------------- | ---------------------- | ----------------------------------------- | -------------------------- |
-| Public S3/Storage bucket               | A.8.11                 | Data masking                              | Encryption status scan     |
-| IMDSv1 enabled (metadata SSRF)         | A.8.9                  | Configuration management                  | Instance metadata check    |
-| Overly permissive IAM policy           | A.5.15                 | Access control                            | IAM policy review          |
-| Missing MFA on privileged account      | A.5.17                 | Authentication information                | MFA status report          |
-| Exposed secrets in environment vars    | A.5.17                 | Authentication information                | Secret scanner results     |
-| Security group allows 0.0.0.0/0        | A.8.20                 | Networks security                         | Network ACL audit          |
-| CloudTrail/logging disabled            | A.8.15                 | Logging                                   | Logging configuration scan |
-| Snapshot shared publicly               | A.5.13                 | Labelling of information                  | Snapshot permissions audit |
-| Unencrypted storage                    | A.8.24                 | Use of cryptography                       | Encryption status scan     |
-| Lambda with admin privileges           | A.8.2                  | Privileged access rights                  | Function role audit        |
+| Vulnerability Pattern               | ISO 27001:2022 Control | Control Name               | Evidence Type              |
+| ----------------------------------- | ---------------------- | -------------------------- | -------------------------- |
+| Public S3/Storage bucket            | A.8.11                 | Data masking               | Encryption status scan     |
+| IMDSv1 enabled (metadata SSRF)      | A.8.9                  | Configuration management   | Instance metadata check    |
+| Overly permissive IAM policy        | A.5.15                 | Access control             | IAM policy review          |
+| Missing MFA on privileged account   | A.5.17                 | Authentication information | MFA status report          |
+| Exposed secrets in environment vars | A.5.17                 | Authentication information | Secret scanner results     |
+| Security group allows 0.0.0.0/0     | A.8.20                 | Networks security          | Network ACL audit          |
+| CloudTrail/logging disabled         | A.8.15                 | Logging                    | Logging configuration scan |
+| Snapshot shared publicly            | A.5.13                 | Labelling of information   | Snapshot permissions audit |
+| Unencrypted storage                 | A.8.24                 | Use of cryptography        | Encryption status scan     |
+| Lambda with admin privileges        | A.8.2                  | Privileged access rights   | Function role audit        |
 
 ### Network Security
 
-| Vulnerability Pattern          | ISO 27001:2022 Control | Control Name                | Evidence Type              |
-| ------------------------------ | ---------------------- | --------------------------- | -------------------------- |
-| SSH with password auth enabled | A.5.17                 | Authentication information  | SSH configuration scan     |
-| Telnet enabled                 | A.8.22                 | Segregation in networks     | Service discovery scan     |
-| Weak TLS version (< 1.2)       | A.8.24                 | Use of cryptography         | TLS version enumeration    |
-| Open DNS resolver              | A.8.20                 | Networks security           | DNS configuration check    |
-| Exposed RDP to internet        | A.8.20                 | Networks security           | Port scan results          |
-| Default SNMP community string  | A.5.17                 | Authentication information  | SNMP configuration audit   |
-| Missing HSTS                   | A.8.20                 | Networks security           | HTTP header analysis       |
-| Self-signed certificate        | A.8.24                 | Use of cryptography         | Certificate validation     |
+| Vulnerability Pattern          | ISO 27001:2022 Control | Control Name               | Evidence Type            |
+| ------------------------------ | ---------------------- | -------------------------- | ------------------------ |
+| SSH with password auth enabled | A.5.17                 | Authentication information | SSH configuration scan   |
+| Telnet enabled                 | A.8.22                 | Segregation in networks    | Service discovery scan   |
+| Weak TLS version (< 1.2)       | A.8.24                 | Use of cryptography        | TLS version enumeration  |
+| Open DNS resolver              | A.8.20                 | Networks security          | DNS configuration check  |
+| Exposed RDP to internet        | A.8.20                 | Networks security          | Port scan results        |
+| Default SNMP community string  | A.5.17                 | Authentication information | SNMP configuration audit |
+| Missing HSTS                   | A.8.20                 | Networks security          | HTTP header analysis     |
+| Self-signed certificate        | A.8.24                 | Use of cryptography        | Certificate validation   |
 
 ### Web Application Security
 
-| Vulnerability Pattern        | ISO 27001:2022 Control | Control Name                   | Evidence Type              |
-| ---------------------------- | ---------------------- | ------------------------------ | -------------------------- |
-| SQL Injection                | A.8.16                 | Monitoring activities          | DAST/penetration test      |
+| Vulnerability Pattern        | ISO 27001:2022 Control | Control Name                            | Evidence Type              |
+| ---------------------------- | ---------------------- | --------------------------------------- | -------------------------- |
+| SQL Injection                | A.8.16                 | Monitoring activities                   | DAST/penetration test      |
 | Cross-Site Scripting (XSS)   | A.8.8                  | Management of technical vulnerabilities | Web app scan results       |
 | Command Injection            | A.8.8                  | Management of technical vulnerabilities | Code analysis              |
-| Path Traversal               | A.5.33                 | Protection of records          | Input validation review    |
+| Path Traversal               | A.5.33                 | Protection of records                   | Input validation review    |
 | SSRF                         | A.8.8                  | Management of technical vulnerabilities | Application security test  |
 | Insecure Deserialization     | A.8.8                  | Management of technical vulnerabilities | Code review                |
-| Missing Authentication       | A.5.15                 | Access control                 | API endpoint audit         |
-| Missing Authorization (IDOR) | A.5.15                 | Access control                 | Authorization test results |
+| Missing Authentication       | A.5.15                 | Access control                          | API endpoint audit         |
+| Missing Authorization (IDOR) | A.5.15                 | Access control                          | Authorization test results |
 | Open Redirect                | A.8.8                  | Management of technical vulnerabilities | Web security scan          |
 | XXE                          | A.8.8                  | Management of technical vulnerabilities | SAST results               |
 
 ### Secrets and Credentials
 
-| Vulnerability Pattern         | ISO 27001:2022 Control | Control Name               | Evidence Type              |
-| ----------------------------- | ---------------------- | -------------------------- | -------------------------- |
-| Hardcoded password in code    | A.5.17                 | Authentication information | Secret scanner results     |
-| Hardcoded API key             | A.5.17                 | Authentication information | Code repository scan       |
-| Exposed .env file             | A.5.33                 | Protection of records      | Web scan results           |
-| Secrets in Git history        | A.5.33                 | Protection of records      | Git history analysis       |
-| Plaintext password storage    | A.8.24                 | Use of cryptography        | Database audit             |
-| Weak password policy          | A.5.17                 | Authentication information | Policy configuration       |
-| Default credentials unchanged | A.5.17                 | Authentication information | Credential audit           |
-| Credentials in logs           | A.8.15                 | Logging                    | Log file analysis          |
+| Vulnerability Pattern         | ISO 27001:2022 Control | Control Name               | Evidence Type          |
+| ----------------------------- | ---------------------- | -------------------------- | ---------------------- |
+| Hardcoded password in code    | A.5.17                 | Authentication information | Secret scanner results |
+| Hardcoded API key             | A.5.17                 | Authentication information | Code repository scan   |
+| Exposed .env file             | A.5.33                 | Protection of records      | Web scan results       |
+| Secrets in Git history        | A.5.33                 | Protection of records      | Git history analysis   |
+| Plaintext password storage    | A.8.24                 | Use of cryptography        | Database audit         |
+| Weak password policy          | A.5.17                 | Authentication information | Policy configuration   |
+| Default credentials unchanged | A.5.17                 | Authentication information | Credential audit       |
+| Credentials in logs           | A.8.15                 | Logging                    | Log file analysis      |
 
 ### Container & Kubernetes
 
-| Vulnerability Pattern  | ISO 27001:2022 Control | Control Name                   | Evidence Type              |
-| ---------------------- | ---------------------- | ------------------------------ | -------------------------- |
-| Privileged container   | A.8.2                  | Privileged access rights       | Container config audit     |
-| hostPath volume mount  | A.8.19                 | Secure system architecture     | Pod spec review            |
-| Exposed Kubernetes API | A.8.20                 | Networks security              | API exposure scan          |
-| Pod with hostNetwork   | A.8.22                 | Segregation in networks        | Pod configuration audit    |
-| Docker socket mounted  | A.8.2                  | Privileged access rights       | Container runtime audit    |
-| No resource limits     | A.8.6                  | Capacity management            | Resource quota review      |
+| Vulnerability Pattern  | ISO 27001:2022 Control | Control Name               | Evidence Type           |
+| ---------------------- | ---------------------- | -------------------------- | ----------------------- |
+| Privileged container   | A.8.2                  | Privileged access rights   | Container config audit  |
+| hostPath volume mount  | A.8.19                 | Secure system architecture | Pod spec review         |
+| Exposed Kubernetes API | A.8.20                 | Networks security          | API exposure scan       |
+| Pod with hostNetwork   | A.8.22                 | Segregation in networks    | Pod configuration audit |
+| Docker socket mounted  | A.8.2                  | Privileged access rights   | Container runtime audit |
+| No resource limits     | A.8.6                  | Capacity management        | Resource quota review   |
 
 ---
 
@@ -139,21 +140,21 @@ Management frameworks, policies, governance, risk management, and organizational
 
 **Key controls for security findings:**
 
-| Control | Name                                      | Common Finding Types                    |
-| ------- | ----------------------------------------- | --------------------------------------- |
-| A.5.7   | Threat intelligence                       | Vulnerability intelligence feeds        |
-| A.5.8   | Information security in project management | Secure development practices            |
-| A.5.9   | Inventory of information and assets       | Asset discovery, classification         |
-| A.5.10  | Acceptable use of information             | Data handling violations                |
-| A.5.13  | Labelling of information                  | Missing classification labels           |
-| A.5.15  | Access control                            | Authentication, authorization findings  |
-| A.5.16  | Identity management                       | User account issues                     |
-| A.5.17  | Authentication information                | Credential management findings          |
-| A.5.18  | Access rights                             | Excessive permissions                   |
-| A.5.23  | Information security for cloud services   | Cloud misconfigurations                 |
-| A.5.30  | ICT readiness for business continuity     | Backup, disaster recovery               |
-| A.5.33  | Protection of records                     | Data exposure, retention violations     |
-| A.5.34  | Privacy and PII protection                | PII exposure, GDPR violations           |
+| Control | Name                                       | Common Finding Types                   |
+| ------- | ------------------------------------------ | -------------------------------------- |
+| A.5.7   | Threat intelligence                        | Vulnerability intelligence feeds       |
+| A.5.8   | Information security in project management | Secure development practices           |
+| A.5.9   | Inventory of information and assets        | Asset discovery, classification        |
+| A.5.10  | Acceptable use of information              | Data handling violations               |
+| A.5.13  | Labelling of information                   | Missing classification labels          |
+| A.5.15  | Access control                             | Authentication, authorization findings |
+| A.5.16  | Identity management                        | User account issues                    |
+| A.5.17  | Authentication information                 | Credential management findings         |
+| A.5.18  | Access rights                              | Excessive permissions                  |
+| A.5.23  | Information security for cloud services    | Cloud misconfigurations                |
+| A.5.30  | ICT readiness for business continuity      | Backup, disaster recovery              |
+| A.5.33  | Protection of records                      | Data exposure, retention violations    |
+| A.5.34  | Privacy and PII protection                 | PII exposure, GDPR violations          |
 
 ### Theme 2: People Controls (A.6.1 - A.6.8)
 
@@ -161,11 +162,11 @@ Human resources security, screening, awareness, training, and responsibilities.
 
 **Key controls for security findings:**
 
-| Control | Name                         | Common Finding Types                    |
-| ------- | ---------------------------- | --------------------------------------- |
-| A.6.3   | Awareness training           | Phishing simulation results             |
-| A.6.5   | Responsibilities after employment | Access revocation findings              |
-| A.6.8   | Information security event reporting | Incident response metrics               |
+| Control | Name                                 | Common Finding Types        |
+| ------- | ------------------------------------ | --------------------------- |
+| A.6.3   | Awareness training                   | Phishing simulation results |
+| A.6.5   | Responsibilities after employment    | Access revocation findings  |
+| A.6.8   | Information security event reporting | Incident response metrics   |
 
 **Note:** People controls rarely map directly to technical findings. They provide context for policy violations.
 
@@ -175,11 +176,11 @@ Physical security of premises, equipment, and supporting utilities.
 
 **Key controls for security findings:**
 
-| Control | Name                         | Common Finding Types                    |
-| ------- | ---------------------------- | --------------------------------------- |
-| A.7.4   | Physical security monitoring | Badge access logs, camera coverage      |
-| A.7.10  | Storage media                | Unencrypted backup media                |
-| A.7.13  | Equipment maintenance        | Unpatched hardware                      |
+| Control | Name                         | Common Finding Types               |
+| ------- | ---------------------------- | ---------------------------------- |
+| A.7.4   | Physical security monitoring | Badge access logs, camera coverage |
+| A.7.10  | Storage media                | Unencrypted backup media           |
+| A.7.13  | Equipment maintenance        | Unpatched hardware                 |
 
 **Note:** Physical controls are rarely applicable to cloud/software security findings.
 
@@ -189,30 +190,30 @@ Technical security measures, system hardening, monitoring, and cryptography.
 
 **Key controls for security findings:**
 
-| Control | Name                                      | Common Finding Types                    |
-| ------- | ----------------------------------------- | --------------------------------------- |
-| A.8.1   | User endpoint devices                     | Unmanaged devices, MDM violations       |
-| A.8.2   | Privileged access rights                  | Excessive admin permissions             |
-| A.8.3   | Information access restriction            | Unauthorized data access                |
-| A.8.5   | Secure authentication                     | Weak authentication mechanisms          |
-| A.8.8   | Management of technical vulnerabilities   | CVEs, unpatched systems                 |
-| A.8.9   | Configuration management                  | Insecure configurations                 |
-| A.8.10  | Information deletion                      | Data retention violations               |
-| A.8.11  | Data masking                              | Exposed sensitive data                  |
-| A.8.15  | Logging                                   | Missing or disabled logging             |
-| A.8.16  | Monitoring activities                     | SIEM alerts, anomaly detection          |
-| A.8.19  | Secure system architecture                | Architecture flaws                      |
-| A.8.20  | Networks security                         | Firewall rules, network segmentation    |
-| A.8.21  | Security of network services              | Unencrypted protocols                   |
-| A.8.22  | Segregation in networks                   | Flat networks, VLAN issues              |
-| A.8.23  | Web filtering                             | Content filtering failures              |
-| A.8.24  | Use of cryptography                       | Encryption findings                     |
-| A.8.25  | Secure development lifecycle              | SAST/DAST findings                      |
-| A.8.26  | Application security requirements         | Missing security controls               |
-| A.8.28  | Secure coding                             | Code quality, injection vulnerabilities |
-| A.8.29  | Security testing                          | Penetration test findings               |
-| A.8.31  | Separation of environments                | Dev/prod separation violations          |
-| A.8.32  | Change management                         | Unapproved changes                      |
+| Control | Name                                           | Common Finding Types                    |
+| ------- | ---------------------------------------------- | --------------------------------------- |
+| A.8.1   | User endpoint devices                          | Unmanaged devices, MDM violations       |
+| A.8.2   | Privileged access rights                       | Excessive admin permissions             |
+| A.8.3   | Information access restriction                 | Unauthorized data access                |
+| A.8.5   | Secure authentication                          | Weak authentication mechanisms          |
+| A.8.8   | Management of technical vulnerabilities        | CVEs, unpatched systems                 |
+| A.8.9   | Configuration management                       | Insecure configurations                 |
+| A.8.10  | Information deletion                           | Data retention violations               |
+| A.8.11  | Data masking                                   | Exposed sensitive data                  |
+| A.8.15  | Logging                                        | Missing or disabled logging             |
+| A.8.16  | Monitoring activities                          | SIEM alerts, anomaly detection          |
+| A.8.19  | Secure system architecture                     | Architecture flaws                      |
+| A.8.20  | Networks security                              | Firewall rules, network segmentation    |
+| A.8.21  | Security of network services                   | Unencrypted protocols                   |
+| A.8.22  | Segregation in networks                        | Flat networks, VLAN issues              |
+| A.8.23  | Web filtering                                  | Content filtering failures              |
+| A.8.24  | Use of cryptography                            | Encryption findings                     |
+| A.8.25  | Secure development lifecycle                   | SAST/DAST findings                      |
+| A.8.26  | Application security requirements              | Missing security controls               |
+| A.8.28  | Secure coding                                  | Code quality, injection vulnerabilities |
+| A.8.29  | Security testing                               | Penetration test findings               |
+| A.8.31  | Separation of environments                     | Dev/prod separation violations          |
+| A.8.32  | Change management                              | Unapproved changes                      |
 | A.8.34  | Protection of information systems during audit | Production access during audits         |
 
 ---
@@ -292,12 +293,12 @@ For each finding mapped to a control, auditors require:
 
 ### Evidence by Control Type
 
-| Control Type          | Required Evidence                          | Chariot Capabilities            |
-| --------------------- | ------------------------------------------ | ------------------------------- |
+| Control Type           | Required Evidence                          | Chariot Capabilities            |
+| ---------------------- | ------------------------------------------ | ------------------------------- |
 | A.5.x (Organizational) | Policies, procedures, risk assessments     | Asset inventory, classification |
-| A.6.x (People)        | Training records, HR processes             | Security awareness metrics      |
-| A.7.x (Physical)      | Access logs, facility assessments          | Physical security audits        |
-| A.8.x (Technological) | Scan results, configs, monitoring evidence | VQL, Nuclei, Nebula, Janus      |
+| A.6.x (People)         | Training records, HR processes             | Security awareness metrics      |
+| A.7.x (Physical)       | Access logs, facility assessments          | Physical security audits        |
+| A.8.x (Technological)  | Scan results, configs, monitoring evidence | VQL, Nuclei, Nebula, Janus      |
 
 **See:** [references/audit-evidence.md](references/audit-evidence.md) for detailed evidence requirements per control.
 
@@ -321,11 +322,11 @@ None - terminal reference skill
 
 ### Pairs With (conditional)
 
-| Skill                      | Trigger                       | Purpose                      |
-| -------------------------- | ----------------------------- | ---------------------------- |
-| `mapping-to-mitre-attack`  | When threat intel needed      | Add ATT&CK technique context |
-| `mapping-to-cwe`           | When weakness classification  | Add CWE weakness IDs         |
-| `mapping-to-mitre-d3fend`  | When defensive measures       | Add D3FEND countermeasures   |
+| Skill                     | Trigger                      | Purpose                      |
+| ------------------------- | ---------------------------- | ---------------------------- |
+| `mapping-to-mitre-attack` | When threat intel needed     | Add ATT&CK technique context |
+| `mapping-to-cwe`          | When weakness classification | Add CWE weakness IDs         |
+| `mapping-to-mitre-d3fend` | When defensive measures      | Add D3FEND countermeasures   |
 
 ---
 

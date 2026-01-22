@@ -46,11 +46,11 @@ The Skill Manager uses a simple delegation model where operations flow through p
 
 ### Workflow Categories
 
-| Category           | Operations                                         | Characteristics                  |
-| ------------------ | -------------------------------------------------- | -------------------------------- |
-| Instruction-Based  | CREATE, DELETE, RENAME, MIGRATE, LIST, SYNC-GATEWAYS | Interactive, human-guided        |
-| CLI-Based          | AUDIT, FIX, UPDATE, SEARCH                         | Deterministic, automated         |
-| Delegated          | RESEARCH, PRESSURE-TESTING                         | Sub-skill invocation             |
+| Category          | Operations                                           | Characteristics           |
+| ----------------- | ---------------------------------------------------- | ------------------------- |
+| Instruction-Based | CREATE, DELETE, RENAME, MIGRATE, LIST, SYNC-GATEWAYS | Interactive, human-guided |
+| CLI-Based         | AUDIT, FIX, UPDATE, SEARCH                           | Deterministic, automated  |
+| Delegated         | RESEARCH, PRESSURE-TESTING                           | Sub-skill invocation      |
 
 ### Operation Flow Patterns
 
@@ -252,11 +252,11 @@ The system is organized in three distinct tiers, each with clear responsibilitie
 
 **Tier Responsibilities:**
 
-| Tier              | Responsibility                              | Implementation              | Tools Used                   |
-| ----------------- | ------------------------------------------- | --------------------------- | ---------------------------- |
-| **1. Command**    | User entry point, operation validation      | Markdown command file       | Skill tool                   |
-| **2. Router**     | Request routing and workflow coordination   | Markdown skill file         | Read, Skill, AskUserQuestion |
-| **3. Library**    | Operation-specific workflows and automation | Markdown skills + TypeScript| All tools (varies by skill)  |
+| Tier           | Responsibility                              | Implementation               | Tools Used                   |
+| -------------- | ------------------------------------------- | ---------------------------- | ---------------------------- |
+| **1. Command** | User entry point, operation validation      | Markdown command file        | Skill tool                   |
+| **2. Router**  | Request routing and workflow coordination   | Markdown skill file          | Read, Skill, AskUserQuestion |
+| **3. Library** | Operation-specific workflows and automation | Markdown skills + TypeScript | All tools (varies by skill)  |
 
 ---
 
@@ -316,19 +316,19 @@ When a user invokes `/skill-manager <operation>`, the system routes through this
 
 **Complete Delegation Table:**
 
-| Operation              | Target Skill             | CLI Used?    |
-| ---------------------- | ------------------------ | ------------ |
-| `create <name>`        | `creating-skills`        | ✓ Audit      |
-| `update <name>`        | `updating-skills`        | ✓ Update     |
-| `audit <name>`         | `auditing-skills`        | ✓ Audit      |
-| `fix <name>`           | `fixing-skills`          | ✓ Fix        |
-| `search <query>`       | `searching-skills`       | ✓ Search     |
-| `delete <name>`        | `deleting-skills`        | —            |
-| `rename <old> <new>`   | `renaming-skills`        | —            |
-| `list`                 | `listing-skills`         | —            |
-| `migrate <name>`       | `migrating-skills`       | —            |
-| `sync-gateways`        | `syncing-gateways`       | —            |
-| `research <topic>`     | `orchestrating-research` | ✓ (Task)     |
+| Operation            | Target Skill             | CLI Used? |
+| -------------------- | ------------------------ | --------- |
+| `create <name>`      | `creating-skills`        | ✓ Audit   |
+| `update <name>`      | `updating-skills`        | ✓ Update  |
+| `audit <name>`       | `auditing-skills`        | ✓ Audit   |
+| `fix <name>`         | `fixing-skills`          | ✓ Fix     |
+| `search <query>`     | `searching-skills`       | ✓ Search  |
+| `delete <name>`      | `deleting-skills`        | —         |
+| `rename <old> <new>` | `renaming-skills`        | —         |
+| `list`               | `listing-skills`         | —         |
+| `migrate <name>`     | `migrating-skills`       | —         |
+| `sync-gateways`      | `syncing-gateways`       | —         |
+| `research <topic>`   | `orchestrating-research` | ✓ (Task)  |
 
 ---
 
@@ -386,8 +386,12 @@ The audit engine is the foundation for multiple CLIs, enabling code reuse and co
 // auditing-skills/scripts/src/lib/audit-engine.ts
 export class SkillAuditor {
   // Phase validation logic
-  validatePhase1(skill: Skill): PhaseResult { /* ... */ }
-  validatePhase2(skill: Skill): PhaseResult { /* ... */ }
+  validatePhase1(skill: Skill): PhaseResult {
+    /* ... */
+  }
+  validatePhase2(skill: Skill): PhaseResult {
+    /* ... */
+  }
   // ... all 28 phases
 
   runAudit(skillPath: string, phase?: number): AuditResult {

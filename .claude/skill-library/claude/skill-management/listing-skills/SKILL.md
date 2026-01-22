@@ -31,8 +31,8 @@ Lists all skills with:
 
 **NOT for:**
 
-- Searching for specific skills (use `searching-skills`)
-- Auditing individual skills (use `auditing-skills`)
+- Searching for specific skills (use `searching-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")`)
+- Auditing individual skills (use `auditing-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`)
 
 ---
 
@@ -55,7 +55,7 @@ find .claude/skill-library -name "SKILL.md" -type f | \
 
 ---
 
-## Step 0: Navigate to Repository Root (MANDATORY)
+## Step 1: Navigate to Repository Root (MANDATORY)
 
 **Execute BEFORE any list operation:**
 
@@ -71,7 +71,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Workflow
 
-### Step 1: List Core Skills
+### Step 2: List Core Skills
 
 ```bash
 # Get all core skill directories
@@ -87,7 +87,7 @@ Read .claude/skills/{skill-name}/SKILL.md | head -10
 - Description
 - Line count (`wc -l`)
 
-### Step 2: List Library Skills
+### Step 3: List Library Skills
 
 ```bash
 # Get all library skills organized by category
@@ -99,7 +99,7 @@ find .claude/skill-library -name "SKILL.md" | sort
 - Parse path to extract category
 - Group skills under category headers
 
-### Step 3: Check Status (Optional)
+### Step 4: Check Status (Optional)
 
 For each skill, check if it has issues:
 
@@ -116,7 +116,7 @@ Mark as:
 - ⚠️ Has warnings
 - ❌ Has errors
 
-### Step 4: Format Output
+### Step 5: Format Output
 
 **Organized by location:**
 
@@ -146,8 +146,8 @@ skill-manager (312 lines) ✅
 ...
 
 ## development/frontend (20 skills)
-- frontend-tanstack-query (421 lines) ✅
-- frontend-zustand (312 lines) ✅
+- using-tanstack-query (421 lines) ✅
+- using-zustand-state-management (312 lines) ✅
 ...
 
 TOTAL: 135 skills (15 core, 120 library)
@@ -220,7 +220,31 @@ Options:
 
 ---
 
+## Integration
+
+### Called By
+
+- `managing-skills` (list operation)
+- `/skill-manager list` command
+
+### Requires (invoke before starting)
+
+None - standalone skill
+
+### Calls (during execution)
+
+None - terminal skill (displays output only)
+
+### Pairs With (conditional)
+
+| Skill                        | Trigger                         | Purpose                                                                                                      |
+| ---------------------------- | ------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| `searching-skills` (LIBRARY) | Need filtered skill discovery   | Find specific skills - `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")`     |
+| `auditing-skills` (LIBRARY)  | Need compliance status for list | Validate each skill shown - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` |
+
+---
+
 ## Related Skills
 
-- `searching-skills` - Find skills by keyword
-- `auditing-skills` - Validate skill compliance
+- `searching-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/searching-skills/SKILL.md")` - Find skills by keyword
+- `auditing-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` - Validate skill compliance

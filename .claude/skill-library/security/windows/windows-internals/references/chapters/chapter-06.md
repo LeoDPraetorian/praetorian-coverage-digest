@@ -7,19 +7,18 @@ The Windows I/O system consists of several executive components that, together, 
 The design goals for the Windows I/O system are to provide an abstraction of devices, both hardware (physical) and software (virtual or logical), to applications with the following features:
 
 - <table><tr><td>Uniform security and naming across devices to protect shareable resources. (See Chapter 7, “Security,” for a description of the Windows security model.)</td></tr><tr><td>High-performance asynchronous packet-based I/O to allow for the implementation of scalable applications.</td></tr><tr><td>Services that allow drivers to be written in a high-level language and easily ported between different machine architectures.</td></tr><tr><td>Layering and extensibility to allow for the addition of drivers that transparently modify the behavior of other drivers or devices, without requiring any changes to the driver whose behavior or device is modified.</td></tr><tr><td>Dynamic loading and unloading of device drivers so that drivers can be loaded on demand and not consume system resources when unneeded.</td></tr><tr><td>Support for Plug and Play, where the system locates and installs drivers for newly detected hardware, assigns them hardware resources they require, and allows applications to discover and activate device interfaces.</td></tr><tr><td>Support for power management so that the system or individual devices can enter low-power states.</td></tr></table>
-483
-
+  483
 
 ---
 
 - ● Support for multiple installable file systems, including FAT (and its variants, FAT32 and exFAT),
-the CD-ROM file system (CDFS), the Universal Disk Format (UDF) file system, the Resilient File
-System (RefS), and the Windows file system (NTFS). (See Chapter 13, “File systems,” in Part 2 of
-this book for more specific information on file system types and architecture.)
-● Windows Management Instrumentation (WMI) support and diagnosability so that drivers can
-be managed and monitored through WMI applications and scripts. (WMI is described in Chap-
-ter 9, “Management mechanisms,” in Part 2.)
-To implement these features, the Windows I/O system consists of several executive components as
+  the CD-ROM file system (CDFS), the Universal Disk Format (UDF) file system, the Resilient File
+  System (RefS), and the Windows file system (NTFS). (See Chapter 13, “File systems,” in Part 2 of
+  this book for more specific information on file system types and architecture.)
+  ● Windows Management Instrumentation (WMI) support and diagnosability so that drivers can
+  be managed and monitored through WMI applications and scripts. (WMI is described in Chap-
+  ter 9, “Management mechanisms,” in Part 2.)
+  To implement these features, the Windows I/O system consists of several executive components as
 
 well as device drivers, which are shown in Figure 6-1.
 
@@ -28,53 +27,52 @@ well as device drivers, which are shown in Figure 6-1.
 FIGURE 6-1 I/O system components.
 
 - ■ The I/O manager is the heart of the I/O system. It connects applications and system compo-
-nents to virtual, logical, and physical devices, and it defines the infrastructure that supports
-device drivers.
-■ A device driver typically provides an I/O interface for a particular type of device. A driver is a
-software module that interprets high-level commands, such as read or write commands, and
-issues low-level, device-specific commands, such as writing to control registers. Device drivers
-receive commands routed to them by the I/O manager that are directed at the devices they
-manage, and they inform the I/O manager when those commands are complete. Device drivers
-often use the I/O manager to forward I/O commands to other device drivers that share in the
-implementation of a device's interface or control.
-484 CHAPTER 6 I/O system
-
+  nents to virtual, logical, and physical devices, and it defines the infrastructure that supports
+  device drivers.
+  ■ A device driver typically provides an I/O interface for a particular type of device. A driver is a
+  software module that interprets high-level commands, such as read or write commands, and
+  issues low-level, device-specific commands, such as writing to control registers. Device drivers
+  receive commands routed to them by the I/O manager that are directed at the devices they
+  manage, and they inform the I/O manager when those commands are complete. Device drivers
+  often use the I/O manager to forward I/O commands to other device drivers that share in the
+  implementation of a device's interface or control.
+  484 CHAPTER 6 I/O system
 
 ---
 
 - The PnP manager works closely with the I/O manager and a type of device driver called a bus
-driver to guide the allocation of hardware resources as well as to detect and respond to the
-arrival and removal of hardware devices. The PnP manager and bus drivers are responsible for
-loading a device's driver when the device is detected. When a device is added to a system that
-doesn't have an appropriate device driver, the executive Plug and Play component calls on the
-device-installation services of the user-mode PnP manager.
-The power manager also works closely with the I/O manager and the PnP manager to guide the
-system, as well as individual device drivers, through power-state transitions.
-WMI support routines, called the Windows Driver Model (WDM) WMI provider, allow device
-drivers to indirectly act as providers, using the WDM WMI provider as an intermediary to com-
-municate with the WMI service in user mode.
-The registry serves as a database that stores a description of basic hardware devices attached
-to the system as well as driver initialization and configuration settings. (See the section "The
-registry" in Chapter 9 in Part 2 for more information.)
-INF files, which are designated by the .inf extension, are driver-installation files. INF files are the
-link between a particular hardware device and the driver that assumes primary control of that
-device. They are made up of script-like instructions describing the device they correspond to,
-the source and target locations of driver files, required driver-installation registry modifications,
-and driver-dependency information. Digital signatures that Windows uses to verify that a driver
-file has passed testing by the Microsoft Windows Hardware Quality Labs (WHQL) are stored in
-.cat files. Digital signatures are also used to prevent tampering of the driver or its INF file.
-The hardware abstraction layer (HAL) insulates drivers from the specifics of the processor and
-interrupt controller by providing APIs that hide differences between platforms. In essence, the
-HAL is the bus driver for all the devices soldered onto the computer's motherboard that aren't
-controlled by other drivers.
+  driver to guide the allocation of hardware resources as well as to detect and respond to the
+  arrival and removal of hardware devices. The PnP manager and bus drivers are responsible for
+  loading a device's driver when the device is detected. When a device is added to a system that
+  doesn't have an appropriate device driver, the executive Plug and Play component calls on the
+  device-installation services of the user-mode PnP manager.
+  The power manager also works closely with the I/O manager and the PnP manager to guide the
+  system, as well as individual device drivers, through power-state transitions.
+  WMI support routines, called the Windows Driver Model (WDM) WMI provider, allow device
+  drivers to indirectly act as providers, using the WDM WMI provider as an intermediary to com-
+  municate with the WMI service in user mode.
+  The registry serves as a database that stores a description of basic hardware devices attached
+  to the system as well as driver initialization and configuration settings. (See the section "The
+  registry" in Chapter 9 in Part 2 for more information.)
+  INF files, which are designated by the .inf extension, are driver-installation files. INF files are the
+  link between a particular hardware device and the driver that assumes primary control of that
+  device. They are made up of script-like instructions describing the device they correspond to,
+  the source and target locations of driver files, required driver-installation registry modifications,
+  and driver-dependency information. Digital signatures that Windows uses to verify that a driver
+  file has passed testing by the Microsoft Windows Hardware Quality Labs (WHQL) are stored in
+  .cat files. Digital signatures are also used to prevent tampering of the driver or its INF file.
+  The hardware abstraction layer (HAL) insulates drivers from the specifics of the processor and
+  interrupt controller by providing APIs that hide differences between platforms. In essence, the
+  HAL is the bus driver for all the devices soldered onto the computer's motherboard that aren't
+  controlled by other drivers.
+
 ## The I/O manager
 
 The I/O manager is the core of the I/O system. It defines the orderly framework, or model, within which I/O requests are delivered to device drivers. The I/O system is packet driven. Most I/O requests are represented by an I/O request packet (IRP), which is a data structure that contains information completely describing an I/O request. The IRP travels from one I/O system component to another. (As you'll discover in the section "Fast I/O," fast I/O is the exception; it doesn't use IRPs.) The design allows an individual application thread to manage multiple I/O requests concurrently. (For more information on IRPs, see the section "I/O request packets" later in this chapter.)
 
 The I/O manager creates an IRP in memory to represent an I/O operation, passing a pointer to the IRP to the correct driver and disposing of the packet when the I/O operation is complete. In contrast, a driver receives an IRP, performs the operation the IRP specifies, and passes the IRP back to the I/O manager, either because the requested I/O operation has been completed or because it must be passed on to another driver for further processing.
 
-CHAPTER 6 I/O system     485
-
+CHAPTER 6 I/O system 485
 
 ---
 
@@ -94,7 +92,7 @@ Besides providing the normal open, close, read, and write functions, the Windows
 
 Most I/O operations don't involve all the components of the I/O system. A typical I/O request starts with an application executing an I/O-related function (for example, reading data from a device) that is processed by the I/O manager, one or more device drivers, and the HAL.
 
-As mentioned, in Windows, threads perform I/O on virtual files. A virtual file refers to any source or destination for I/O that is treated as if it were a file (such as devices, files, directories, pipes, and mailslots). A typical user mode client calls the CreateFile or CreateFile2 functions to get a handle to a virtual file. The function name is a little misleading—it's not just about files, it's anything that is known as a symbolic link within the object manager's directory called GLOBAL?. The suffix "File" in the CreateFile* functions really means a virtual file object (FILE_OBJECT) that is the entity created by the executive as a result of these functions. Figure 6-2 shows a screenshot of the WinObj Sysinternals tool for the GLOBAL? directory.
+As mentioned, in Windows, threads perform I/O on virtual files. A virtual file refers to any source or destination for I/O that is treated as if it were a file (such as devices, files, directories, pipes, and mailslots). A typical user mode client calls the CreateFile or CreateFile2 functions to get a handle to a virtual file. The function name is a little misleading—it's not just about files, it's anything that is known as a symbolic link within the object manager's directory called GLOBAL?. The suffix "File" in the CreateFile\* functions really means a virtual file object (FILE_OBJECT) that is the entity created by the executive as a result of these functions. Figure 6-2 shows a screenshot of the WinObj Sysinternals tool for the GLOBAL? directory.
 
 As shown in Figure 6-2, a name such as C: is just a symbolic link to an internal name under the Device object manager directory (in this case, \Device\HarddiskVolume7). (See Chapter 8, "System mechanisms," in Part 2 for more on the object manager and the object manager namespace.) All the names in the GLOBAL?? directory are candidates for arguments to CreateFile(2). Kernel mode clients such as device drivers can use the similar ZwCreateFile to obtain a handle to a virtual file.
 
@@ -122,8 +120,7 @@ reference the GLOBAL?? directory.
 
 The operating system abstracts all I/O requests as operations on a virtual file because the I/O manager has no knowledge of anything but files, therefore making it the responsibility of the driver to translate file-oriented comments (open, close, read, write) into device-specific commands. This abstraction thereby generalizes an application's interface to devices. User-mode applications call documented functions, which in turn call internal I/O system functions to read from a file, write to a file, and perform other operations. The I/O manager dynamically directs these virtual file requests to the appropriate device driver. Figure 6-3 illustrates the basic structure of a typical I/O read request flow. (Other types of I/O requests, such as write, are similar; they just use different APIs.)
 
-CHAPTER 6 I/O system     487
-
+CHAPTER 6 I/O system 487
 
 ---
 
@@ -146,8 +143,8 @@ Before we proceed, we must introduce two very important concepts of the Windows 
 The IRQL has two somewhat distinct meanings, but they converge in certain situations:
 
 - ■ An IRQL is a priority assigned to an interrupt source from a hardware device This num-
-ber is set by the HAL (in conjunction with the interrupt controller to which devices that require
-interrupt servicing are connected).
+  ber is set by the HAL (in conjunction with the interrupt controller to which devices that require
+  interrupt servicing are connected).
 
 ■ Each CPU has its own IRQL value It should be considered a register of the CPU (even though
 current CPUs do not implement it as such).
@@ -176,7 +173,8 @@ Kernel-mode code can raise and lower the current CPU IRQL with the KeRainsIrql a
 The most important IRQLs for this I/O-related discussions are the following:
 
 - ■ Passive(). This is defined by the PASSIVE_LEVEL macro in the WDR header wdm.h. It is the
-normal IRQL where the kernel scheduler is working normally, as described at length in Chapter 4.
+  normal IRQL where the kernel scheduler is working normally, as described at length in Chapter 4.
+
 ---
 
 ■ Dispatch/DPC (2) (DISPATCH_LEVEL) This is the IRQL the kernel's scheduler works at. This
@@ -188,11 +186,11 @@ quantum and will not be preempted by another thread. Effectively, the scheduler 
 up on the current CPU until the IRQL drops below 2. This implies a few things:
 
 - ● With the IRQL at level 2 or above, any waiting on kernel dispatcher objects (such as mutexes,
-semaphores, and events) would crash the system. This is because waiting implies that the
-thread might enter a wait state and another should be scheduled on the same CPU. How-
-ever, because the scheduler is not around at this level, this cannot happen; instead, the
-system will bug-check (the only exception is if the wait timeout is zero, meaning no waiting
-is requested, just getting back the signaled state of the object).
+  semaphores, and events) would crash the system. This is because waiting implies that the
+  thread might enter a wait state and another should be scheduled on the same CPU. How-
+  ever, because the scheduler is not around at this level, this cannot happen; instead, the
+  system will bug-check (the only exception is if the wait timeout is zero, meaning no waiting
+  is requested, just getting back the signaled state of the object).
 
 ● No page faults can be handled. This is because a page fault would require a context switch
 to one of the modified page writers. However, context switches are not allowed, so the
@@ -215,27 +213,26 @@ Here is a rundown of the sequence events shown in Figure 6-5:
 
 1. Some user-mode or kernel-mode code is executing while the CPU is at IRQL 0, which is the case most of the time. 2. A hardware interrupt with an IRQL of 5 (remember that Device IRQLs have a minimum value of 3). Because 5 is greater than zero (the current IRQL) the CPU state is saved. The IRQL is raised to 5, and the ISR associated with that interrupt is called. Note that there is no context switch; it's the same thread that now happens to execute the ISR code. (If the thread was in user mode, it switches to kernel mode whenever an interrupt arrives.) 3. ISR 1 starts executing while the CPU IRQL is 5. At this point, any interrupt with IRQL 5 or lower cannot interrupt. 4. Suppose another interrupt with an IRQL of 8. Assume the system decides that the same CPU should handle it. Because 8 is greater than 5, the code is interrupted again, the CPU state is saved, the IRQL is raised to 8, and the CPU jumps to ISR 2. Note again that it's the same thread. No context switch can happen because the thread scheduler cannot wake up if the IRQL is 2 or higher. 5. ISR 2 is executing. Before it's done, ISR 2 would like to do some more processing at a lower IRQL so that interrupts with IRQLs less than 8 could be services as well. 6. As its final act, ISR 2 inserts a DPC initialized properly to point to a driver routine that does processing after the interrupt is dismissed by calling the KeInsertQueueDpc function. (We'll discuss what this post-processing typically includes in the next section.) Then the ISR returns, restoring the CPU state saved before entering ISR 2. 7. At this point, the IRQL drops to its previous level (5) and the CPU continues execution of ISR 1 that was interrupted before.
 
-CHAPTER 6  I/O system    491
-
+CHAPTER 6 I/O system 491
 
 ---
 
 - 8. Just before ISR 1 finishes, it queues a DPC of its own to do its required post-processing. These
-DPCs are collected in a DPC queue that has not been examined yet. Then ISR 1 returns, restor-
-ing the CPU state saved before ISR 1 started execution.
+     DPCs are collected in a DPC queue that has not been examined yet. Then ISR 1 returns, restor-
+     ing the CPU state saved before ISR 1 started execution.
 
 9. At this point, the IRQL would want to drop to the old value of zero before all the interrupt han-
-dling began. However, the kernel notices that there are DPCs pending and so drops the IRQL to
-level 2 (DPC_LEVEL) and enters a DPC processing loop that iterates over the accumulated DPCs
-and calls each DPC routine in sequence. When the DPC queue is empty, DPC processing ends.
+   dling began. However, the kernel notices that there are DPCs pending and so drops the IRQL to
+   level 2 (DPC_LEVEL) and enters a DPC processing loop that iterates over the accumulated DPCs
+   and calls each DPC routine in sequence. When the DPC queue is empty, DPC processing ends.
 
 10. Finally, the IRQL can drop back to zero, restore the state of the CPU again, and resume execu-
-tion of the original user or kernel code that got interrupted in the first place. Again, notice that
-all the processing described was done by the same thread (whichever one that may be). This
-fact implies that ISRs and DPC routines should not rely on any particular thread (and hence part
-of a particular process) to execute their code. It could be any thread, the significance of which
-will be discussed in the next section.
-The preceding description is a bit simplified. It doesn't mention DPC importance, other CPUs that
+    tion of the original user or kernel code that got interrupted in the first place. Again, notice that
+    all the processing described was done by the same thread (whichever one that may be). This
+    fact implies that ISRs and DPC routines should not rely on any particular thread (and hence part
+    of a particular process) to execute their code. It could be any thread, the significance of which
+    will be discussed in the next section.
+    The preceding description is a bit simplified. It doesn't mention DPC importance, other CPUs that
 
 may handle DPCs for quicker DPC processing, and more. These details are not important for the discus sion in this chapter. However, they are described fully in Chapter 8 in Part 2.
 
@@ -259,53 +256,51 @@ Windows supports a wide range of device-driver types and programming environment
 
 The broadest classification is a driver is whether it is a user-mode or kernel-mode driver. Windows supports a couple of types of user-mode drivers:
 
-492    CHAPTER 6  I/O system
-
+492 CHAPTER 6 I/O system
 
 ---
 
 - ■ Windows subsystem printer drivers These translate device-independent graphics requests
-to printer-specific commands. These commands are then typically forwarded to a kernel-mode
-port driver such as the universal serial bus (USB) printer port driver (Usbprint.sys).
-■ User-Mode Driver Framework (UMDF) drivers These are hardware device drivers that run
-in user mode. They communicate to the kernel-mode UMDF support library through advanced
-local procedure calls (ALPC). See the "User-Mode Driver Framework" section later in this chap-
-ter for more information.
-In this chapter, the focus is on kernel-mode device drivers. There are many types of kernel-mode drivers, which can be divided into the following basic categories:
+  to printer-specific commands. These commands are then typically forwarded to a kernel-mode
+  port driver such as the universal serial bus (USB) printer port driver (Usbprint.sys).
+  ■ User-Mode Driver Framework (UMDF) drivers These are hardware device drivers that run
+  in user mode. They communicate to the kernel-mode UMDF support library through advanced
+  local procedure calls (ALPC). See the "User-Mode Driver Framework" section later in this chap-
+  ter for more information.
+  In this chapter, the focus is on kernel-mode device drivers. There are many types of kernel-mode drivers, which can be divided into the following basic categories:
 
 - ■ File-system drivers These accept I/O requests to files and satisfy the requests by issuing their
-own more explicit requests to mass storage or network device drivers.
-■ Plug and Play drivers These work with hardware and integrate with the Windows power
-manager and PnP manager. They include drivers for mass storage devices, video adapters, input
-devices, and network adapters.
-■ Non-Plug and Play drivers These include kernel extensions, which are drivers or modules
-that extend the functionality of the system. They do not typically integrate with the PnP
-manager or power manager because they usually do not manage an actual piece of hardware.
-Examples include network API and protocol drivers. The Sysinternals tool Process Monitor has a
-driver, and is an example of a non-PnP driver.
-Within the category of kernel-mode drivers are further classifications based on the driver model to which the driver adheres and its role in servicing device requests.
+  own more explicit requests to mass storage or network device drivers.
+  ■ Plug and Play drivers These work with hardware and integrate with the Windows power
+  manager and PnP manager. They include drivers for mass storage devices, video adapters, input
+  devices, and network adapters.
+  ■ Non-Plug and Play drivers These include kernel extensions, which are drivers or modules
+  that extend the functionality of the system. They do not typically integrate with the PnP
+  manager or power manager because they usually do not manage an actual piece of hardware.
+  Examples include network API and protocol drivers. The Sysinternals tool Process Monitor has a
+  driver, and is an example of a non-PnP driver.
+  Within the category of kernel-mode drivers are further classifications based on the driver model to which the driver adheres and its role in servicing device requests.
 
 ## WDM drivers
 
 WDM drivers are device drivers that adhere to the Windows Driver Model (WDM). WDM includes support for Windows power management, Plug and Play, and WMI, and most Plug and Play drivers adhere to WDM. There are three types of WDM drivers:
 
 - ■ Bus drivers These manage a logical or physical bus. Examples of buses include PMCIA, PCI,
-USB, and IEEE 1394. A bus driver is responsible for detecting and informing the PnP manager of
-devices attached to the bus it controls and for managing the power setting of the bus. These are
-typically provided by Microsoft out of the box.
-■ Function drivers These manage a particular type of device. Bus drivers present devices to
-function drivers via the PnP manager. The function driver is the driver that exports the opera-
-tional interface of the device to the operating system. In general, it's the driver with the most
-knowledge about the operation of the device.
-■ Filter drivers These logically layer either above function drivers (these are called upper filters or
-function filters) or above the bus driver (these are called lower filters or bus filters), augmenting or
-changing the behavior of a device or another driver. For example, a keyboard-capture utility could
-be implemented with a keyboard filter driver that layers above the keyboard function driver.
+  USB, and IEEE 1394. A bus driver is responsible for detecting and informing the PnP manager of
+  devices attached to the bus it controls and for managing the power setting of the bus. These are
+  typically provided by Microsoft out of the box.
+  ■ Function drivers These manage a particular type of device. Bus drivers present devices to
+  function drivers via the PnP manager. The function driver is the driver that exports the opera-
+  tional interface of the device to the operating system. In general, it's the driver with the most
+  knowledge about the operation of the device.
+  ■ Filter drivers These logically layer either above function drivers (these are called upper filters or
+  function filters) or above the bus driver (these are called lower filters or bus filters), augmenting or
+  changing the behavior of a device or another driver. For example, a keyboard-capture utility could
+  be implemented with a keyboard filter driver that layers above the keyboard function driver.
 
 CHAPTER 6 I/O system 493
 
-From the Library of Micha
----
+## From the Library of Micha
 
 Figure 6-6 shows a device node (also called a devnode ) with a bus driver that creates a physical device object (PDO), lower filters, a function driver that creates a functional device object (FDO), and upper filters. The only required layers are the PDO and FDO. The various filters may or may not exist.
 
@@ -324,23 +319,22 @@ part of the functionality required to make the device work properly. In addition
 function drivers, and filter drivers, hardware support might be split between the following components:
 
 - ■ Class drivers These implement the I/O processing for a particular class of devices, such as
-disk, keyboard, or CD-ROM, where the hardware interfaces have been standardized so one
-driver can serve devices from a wide variety of manufacturers.
-■ Miniclass drivers These implement I/O processing that is vendor-defined for a particular
-class of devices. For example, although Microsoft has written a standardized battery class driver,
-both interruptible power supplies (UPS) and laptop batteries have highly specific interfaces
-that differ wildly between manufacturers, such that a miniclass is required from the vendor.
-Miniclass drivers are essentially kernel-mode DLLs and do not perform IRP processing directly.
-Instead, the class driver calls into them and they import functions from the class driver.
-■ Port drivers These implement the processing of an I/O request specific to a type of I/O port,
-such as SATA, and are implemented as kernel-mode libraries of functions rather than actual
-device drivers. Port drivers are almost always written by Microsoft because the interfaces are
-typically standardized in such a way that different vendors can still share the same port driver.
+  disk, keyboard, or CD-ROM, where the hardware interfaces have been standardized so one
+  driver can serve devices from a wide variety of manufacturers.
+  ■ Miniclass drivers These implement I/O processing that is vendor-defined for a particular
+  class of devices. For example, although Microsoft has written a standardized battery class driver,
+  both interruptible power supplies (UPS) and laptop batteries have highly specific interfaces
+  that differ wildly between manufacturers, such that a miniclass is required from the vendor.
+  Miniclass drivers are essentially kernel-mode DLLs and do not perform IRP processing directly.
+  Instead, the class driver calls into them and they import functions from the class driver.
+  ■ Port drivers These implement the processing of an I/O request specific to a type of I/O port,
+  such as SATA, and are implemented as kernel-mode libraries of functions rather than actual
+  device drivers. Port drivers are almost always written by Microsoft because the interfaces are
+  typically standardized in such a way that different vendors can still share the same port driver.
 
 CHAPTER 6 I/O system
 
-From the Library of
----
+## From the Library of
 
 However, in certain cases, third parties may need to write their own for specialized hardware.
 
@@ -349,11 +343,11 @@ In some cases, the concept of I/O port extends to cover logical ports as well. F
 Network Driver Interface Specification (NDIS) is the network "port" driver.
 
 - ■ Miniport drivers These map a generic I/O request to a type of port into an adapter type,
-such as a specific network adapter. Miniport drivers are actual device drivers that import the
-functions supplied by a port driver. Miniport drivers are written by third parties, and they pro-
-vide the interface for the port driver. Like miniclass drivers, they are kernel-mode DLLs and do
-not perform IRP processing directly.
-Figure 6-7 shows a simplified example for illustrative purposes that will help demonstrate how device drivers and layering work at a high level. As you can see, a file-system driver accepts a request to write data to a certain location within a particular file. It translates the request into a request to write a certain number of bytes to the disk at a particular (that is, the logical) location. It then passes this request (via the I/O manager) to a simple disk driver. The disk driver, in turn, translates the request into a physical location on the disk and communicates with the disk to write the data.
+  such as a specific network adapter. Miniport drivers are actual device drivers that import the
+  functions supplied by a port driver. Miniport drivers are written by third parties, and they pro-
+  vide the interface for the port driver. Like miniclass drivers, they are kernel-mode DLLs and do
+  not perform IRP processing directly.
+  Figure 6-7 shows a simplified example for illustrative purposes that will help demonstrate how device drivers and layering work at a high level. As you can see, a file-system driver accepts a request to write data to a certain location within a particular file. It translates the request into a request to write a certain number of bytes to the disk at a particular (that is, the logical) location. It then passes this request (via the I/O manager) to a simple disk driver. The disk driver, in turn, translates the request into a physical location on the disk and communicates with the disk to write the data.
 
 ![Figure](figures/Winternals7thPt1_page_512_figure_003.png)
 
@@ -362,7 +356,6 @@ FIGURE 6-7 Layering of a file-system driver and a disk driver.
 This figure illustrates the division of labor between two layered drivers. The I/O manager receives a write request that is relative to the beginning of a particular file. The I/O manager passes the request to the file-system driver, which translates the write operation from a file-relative operation to a starting location (a sector boundary on the disk) and a number of bytes to write. The file-system driver calls the I/O manager to pass the request to the disk driver, which translates the request to a physical disk location and transfers the data.
 
 CHAPTER 6 I/O system 495
-
 
 ---
 
@@ -396,7 +389,6 @@ The list of drivers comes from the registry subkeys under HKLM\System\CurrentCon
 
 You can also view the list of loaded kernel-mode drivers with Process Explorer. Run Process
 
-
 Explorer, select the System process, and select DLLs from the Lower Pane View menu entry in
 
 the View menu:
@@ -421,7 +413,6 @@ start   end     module name
 ```
 
 CHAPTER 6 I/O system 497
-
 
 ---
 
@@ -473,8 +464,7 @@ routines, which are described next.
 
 FIGURE 6-9 Primary device driver routines.
 
-498    CHAPTER 6  I/O system
-
+498 CHAPTER 6 I/O system
 
 ---
 
@@ -484,32 +474,32 @@ FIGURE 6-9 Primary device driver routines.
 
 CHAPTER 6 I/O system 499
 
-
 ---
 
 routine can change or outright disappear if the current operation is not cancellable. If a thread that issues an I/O request exits before the request is completed or the operation is cancelled (for example, with the Cancel I/O or Cancel IoEx Windows functions), the I/O manager executes the IRP's cancel routine if one is assigned to it. A cancel routine is responsible for performing whatever steps are necessary to release any resources acquired during the processing that has already taken place for the IRP as well as for completing the IRP with a canceled status.
 
-- ■ Fast-dispatch routines  Drivers that make use of the cache manager, such as file-system driv-
-ers, typically provide these routines to allow the kernel to bypass typical I/O processing when
-accessing the driver. (See Chapter 14, "Cache manager," in Part 2, for more information on the
-cache manager.) For example, operations such as reading or writing can be quickly performed by
-accessing the cached data directly instead of taking the I/O manager's usual path that generates
-discrete I/O operations. Fast dispatch routines are also used as a mechanism for callbacks from the
-memory manager and cache manager to file-system drivers. For instance, when creating a sec-
-tion, the memory manager calls back into the file-system driver to acquire the file exclusively.
+- ■ Fast-dispatch routines Drivers that make use of the cache manager, such as file-system driv-
+  ers, typically provide these routines to allow the kernel to bypass typical I/O processing when
+  accessing the driver. (See Chapter 14, "Cache manager," in Part 2, for more information on the
+  cache manager.) For example, operations such as reading or writing can be quickly performed by
+  accessing the cached data directly instead of taking the I/O manager's usual path that generates
+  discrete I/O operations. Fast dispatch routines are also used as a mechanism for callbacks from the
+  memory manager and cache manager to file-system drivers. For instance, when creating a sec-
+  tion, the memory manager calls back into the file-system driver to acquire the file exclusively.
 
-■ An unload routine  An unload routine releases any system resources a driver is using so that
+■ An unload routine An unload routine releases any system resources a driver is using so that
 the I/O manager can remove the driver from memory. Any resources acquired in the initializa-
 tion routine (DriverEntry) are usually released in the unload routine. A driver can be loaded
 and unloaded while the system is running if the driver supports it, but the unload routine will be
 called only after all file handles to the device are closed.
 
-■ A system shutdown notification routine  This routine allows driver cleanup on system
+■ A system shutdown notification routine This routine allows driver cleanup on system
 shutdown.
 
-■ Error-logging routines  When unexpected errors occur (for example, when a disk block goes
+■ Error-logging routines When unexpected errors occur (for example, when a disk block goes
 bad), a driver's error-logging routines note the occurrence and notify the I/O manager. The I/O
 manager then writes this information to an error log file.
+
 ## Driver objects and device objects
 
 When a thread opens a handle to a file object (described in the "I/O processing" section later in this
@@ -521,16 +511,15 @@ process the request. Furthermore, the I/O manager must be able to locate this in
 time a thread uses the same file handle. The following system objects fill this need:
 
 - ■ A driver object This represents an individual driver in the system (DRIVER_OBJECT structure).
-The I/O manager obtains the address of each of the driver's dispatch routines (entry points)
-from the driver object.
-■ A device object This represents a physical or logical device on the system and describes its
-characteristics (DEVICE_OBJECT structure), such as the alignment it requires for buffers and the
-location of its device queue to hold incoming IRPs. It is the target for all I/O operations because
-this object is what the handle communicates with.
-The I/O manager creates a driver object when a driver is loaded into the system. It then calls the driver's initialization routine (DriverEntryRty), which fills in the object attributes with the driver's entry points.
+  The I/O manager obtains the address of each of the driver's dispatch routines (entry points)
+  from the driver object.
+  ■ A device object This represents a physical or logical device on the system and describes its
+  characteristics (DEVICE_OBJECT structure), such as the alignment it requires for buffers and the
+  location of its device queue to hold incoming IRPs. It is the target for all I/O operations because
+  this object is what the handle communicates with.
+  The I/O manager creates a driver object when a driver is loaded into the system. It then calls the driver's initialization routine (DriverEntryRty), which fills in the object attributes with the driver's entry points.
 
 500 CHAPTER 6 I/O system
-
 
 ---
 
@@ -556,8 +545,7 @@ or let the I/O manager auto-generate one. By convention, device objects are plac
 
 directory in the namespace, which is inaccessible by applications using the Windows API.
 
-CHAPTER 6   I/O system     501
-
+CHAPTER 6 I/O system 501
 
 ---
 
@@ -567,7 +555,7 @@ Note Some drivers place device objects in directories other than \Device. For ex
 
 If a driver needs to make it possible for applications to open the device object, it must create a symbolic link in the [GLOBAL]? directory to the device object's name in the \Device directory. (The IoCreateSymbolLink function accomplishes this.) Non-Plug and Play and file-system drivers typically create a symbolic link with a well-known name (for example, \Device\HarddiskVolume2). Because well-known names don't work well in an environment in which hardware appears and disappears dynamically, PnP drivers expose one or more interfaces by calling the IoRegisterDeviceInterface function, specifying a globally unique identifier (GUID) that represents the type of functionality exposed. GUIDs are 128-bit values that can be generated by using tools such as ui dgen and gui dgen, which are included with the WDK and the Windows SDK. Given the range of values that 128 bits represents (and the formula used to generate them), it's statistically almost certain that each GUID generated will be forever and globally unique.
 
-IoRegisterDevice Interface generates the symbolic link associated with a device instance. However, a driver must call IoSetDeviceInterfaceState to enable the interface to the device before the I/O manager actually creates the link. Drivers usually do this when the PnP manager starts the device by sending the driver a start-device IRP—in this case, IRP_M1_PNP (major function code) with IRP_MN_ START_DEVICE (minor function code). IRPs are discussed in the "I/O request packets" section later in this chapter.
+IoRegisterDevice Interface generates the symbolic link associated with a device instance. However, a driver must call IoSetDeviceInterfaceState to enable the interface to the device before the I/O manager actually creates the link. Drivers usually do this when the PnP manager starts the device by sending the driver a start-device IRP—in this case, IRP*M1_PNP (major function code) with IRP_MN* START_DEVICE (minor function code). IRPs are discussed in the "I/O request packets" section later in this chapter.
 
 An application that wants to open a device object whose interfaces are represented with a GUID can call Plug and Play setup functions in user space, such as SetupDi1enumDeviceInterfaces, to enumerate the interfaces present for a particular GUID and to obtain names of the symbolic links it can use to open the device objects. For each device reported by SetupDi1enumDeviceInterfaces, the application executes SetupDiGetDeviceInterfaceDetail to obtain additional information about the device, such as its auto-generated name. After obtaining a device's name from SetupDiGetDeviceInterfaceDetail, the application can execute the Windows function CreateFile or CreateFile2 to open the device and obtain a handle.
 
@@ -576,7 +564,6 @@ An application that wants to open a device object whose interfaces are represent
 You can use the WinObj tool from Systemrains or the Object kernel debugger command to view the device names under \Device in the object manager namespace. The following screenshot shows an I/O manager—assigned symbolic link that points to a device object in \Device with an auto-generated name:
 
 502 CHAPTER 6 I/O system
-
 
 ---
 
@@ -623,7 +610,6 @@ Object: 820c530    Type: (8542b188) Directory
 
 CHAPTER 6 I/O system 503
 
-
 ---
 
 ```bash
@@ -666,8 +652,7 @@ Dac1 82090960 Devext 9f509700 DevObjExt 9f5097f0
 ExtensionFlags {0x000000c0} DOE_SESSENCE_DEVICE, DOE_DEFAULT_SO_PRESENT
 ```
 
-504    CHAPTER 6  I/O system
-
+504 CHAPTER 6 I/O system
 
 ---
 
@@ -720,7 +705,7 @@ show. Here is an example with the most information to show:
   Control
 ```
 
-CHAPTER 6 I/O system     505
+CHAPTER 6 I/O system 505
 
 ---
 
@@ -733,9 +718,7 @@ CHAPTER 6 I/O system     505
 
 The dispatch routines array is clearly shown, and will be discussed in the next section.
 
-
 Note that operations that are not supported by the driver point to an I/O manager's routine
-
 
 IopInvalidDeviceRequest.
 
@@ -789,8 +772,7 @@ DESCRIPTION\SYSTEM\
 
 There are some interesting fields in these structures, which we'll discuss in the next section.
 
-506    CHAPTER 6  I/O system
-
+506 CHAPTER 6 I/O system
 
 ---
 
@@ -810,25 +792,21 @@ TABLE 6-1 File object attributes
 
 <table><tr><td>Attribute</td><td>Purpose</td></tr><tr><td>File name</td><td>This identifies the virtual file that the file object refers to, which was passed in to the CreateFile or CreateFile2 APIs.</td></tr><tr><td>Current byte offset</td><td>This identifies the current location in the file (valid only for synchronous I/O).</td></tr><tr><td>Share modes</td><td>These indicate whether other callers can open the file for read, write, or delete operations while the current caller is using it.</td></tr><tr><td>Open mode flags</td><td>These indicate whether I/O will be synchronous or asynchronous, cached or non-cached, sequential or random, and so on.</td></tr><tr><td>Pointer to device object</td><td>This indicates the type of device the file resides on.</td></tr><tr><td>Pointer to the volume parameter block (VPB)</td><td>This indicates the volume, or partition, that the file resides on (in the case of file system files).</td></tr><tr><td>Pointer to section object pointers</td><td>This indicates a root structure that describes a mapped/cached file. This structure also contains the shared cache map, which identifies which parts of the file are cached (or rather, mapped) by the cache manager and where they reside in the cache.</td></tr><tr><td>Pointer to private cache map</td><td>This is used to store per-handle caching information such as the read patterns for this handle or the page priority for the process. See Chapter 5, &quot;Memory management,&quot; for more information on page priority.</td></tr><tr><td>List of I/O request packets (IRPs)</td><td>If thread-agnostic I/O (described in the section &quot;Thread-agnostic I/O&quot; later in this chapter) is used and the file object is associated with a completion port (described in the section &quot;I/O completion ports&quot;), this is a list of all the I/O operations that are associated with this file object.</td></tr><tr><td>I/O completion context</td><td>This is context information for the current I/O completion port, if one is active.</td></tr><tr><td>File object extension</td><td>This stores the I/O priority (explained later in this chapter) for the file and whether share-access checks should be performed on the file object, and contains optional file object extensions that store context-specific information.</td></tr></table>
 
-
 To maintain some level of opacity toward driver code that uses the file object, and to enable extending
 
 the file object functionality without enlarging the structure, the file object also contains an extension
 
 field, which allows for up to six different kinds of additional attributes, described in Table 6-2.
 
-CHAPTER 6 I/O system     507
-
+CHAPTER 6 I/O system 507
 
 ---
 
-TABLE 6-2    File object extensions
+TABLE 6-2 File object extensions
 
 <table><tr><td>Extension</td><td>Purpose</td></tr><tr><td>Transaction parameters</td><td>This contains the transaction parameter block, which contains information about a transacted file operation. It&#x27;s returned by IoGetTransactionParameterBlock.</td></tr><tr><td>Device object hint</td><td>This identifies the device object of the filter driver with which this file should be associated. It&#x27;s set with IoCreateFileEx or IoCreateFileSpecifyDeviceObjectHint.</td></tr><tr><td>I/O status block range</td><td>This allows applications to lock a user-mode buffer into kernel-mode memory to optimize asynchronous I/Os. It&#x27;s set with SetFileIOverlappedRange.</td></tr><tr><td>Generic</td><td>This contains filter driver-specific information, as well as extended create parameters (ECPs) that were added by the caller. It&#x27;s set with IoCreateFileEx.</td></tr><tr><td>Scheduled file I/O</td><td>This stores a file&#x27;s bandwidth reservation information, which is used by the storage system to optimize and guarantee throughput for multimedia applications. (See the section &quot;Bandwidth reservation (scheduled file I/O)&quot; later in this chapter.) It&#x27;s set with SetFileBandwidthReservation.</td></tr><tr><td>Symbolic link</td><td>This is added to the file object upon creation, when a mount point or directory junction is traversed (or a filter explicitly repares the path). It stores the caller-supplied path, including information about any intermediate junctions, so that if a relative symbolic link is hit, it can walk back through the junctions. See Chapter 13 in Part 2 for more information on NTFS symbolic links, mount points, and directory junctions.</td></tr></table>
 
-
 When a caller opens a file or a simple device, the I/O manager returns a handle to a file object.
-
 
 Before that happens, the driver responsible for the device in question is asked via its Create dispatch
 
@@ -844,8 +822,7 @@ Similar to executive objects, files are protected by a security descriptor that 
 
 Any process that has an open handle to a device will have a file object in its handle table corresponding to the open instance. You can view these handles with Process Explorer by selecting a process and checking Handles in the LowerPane View submenu of the View menu. Sort by the Type column and scroll to where you see the handles that represent file objects, which are labeled as File.
 
-508   CHAPTER 6  I/O system
-
+508 CHAPTER 6 I/O system
 
 ---
 
@@ -877,7 +854,6 @@ CurrentByteOffset: 0
 ```
 
 CHAPTER 6 I/O system 509
-
 
 ---
 
@@ -1017,14 +993,14 @@ An I/O request packet (IRP) is where the I/O system stores information it needs 
 ---
 
 - ■ The small-IRP look-aside list This stores IRPs with one stack location. (IRP stack locations are
-described shortly.)
-■ The medium-IRP look-aside list This contains IRPs with four stack locations (which can also
-be used for IRPs that require only two or three stack locations).
-■ The large-IRP look-aside list This contains IRPs with more than four stack locations. By
-default, the system stores IRPs with 14 stack locations on the large-IRP look-aside list, but once
-per minute, the system adjusts the number of stack locations allocated and can increase it up to
-a maximum of 20, based on how many stack locations have been recently required.
-These lists are also backed by global look-aside lists as well, allowing efficient cross-CPU IRP flow. If an IRP requires more stack locations than are contained in the IRPs on the large-IRP look-aside list, the I/O manager allocates IRPs from non-paged pool. The I/O manager allocates IRPs with the IoA1locateIrp function, which is also available for device-driver developers, because in some cases a driver may want to initiate an I/O request directly by creating and initializing its own IRPs. After allocating and initializing an IRP, the I/O manager stores a pointer to the caller's file object in the IRP.
+  described shortly.)
+  ■ The medium-IRP look-aside list This contains IRPs with four stack locations (which can also
+  be used for IRPs that require only two or three stack locations).
+  ■ The large-IRP look-aside list This contains IRPs with more than four stack locations. By
+  default, the system stores IRPs with 14 stack locations on the large-IRP look-aside list, but once
+  per minute, the system adjusts the number of stack locations allocated and can increase it up to
+  a maximum of 20, based on how many stack locations have been recently required.
+  These lists are also backed by global look-aside lists as well, allowing efficient cross-CPU IRP flow. If an IRP requires more stack locations than are contained in the IRPs on the large-IRP look-aside list, the I/O manager allocates IRPs from non-paged pool. The I/O manager allocates IRPs with the IoA1locateIrp function, which is also available for device-driver developers, because in some cases a driver may want to initiate an I/O request directly by creating and initializing its own IRPs. After allocating and initializing an IRP, the I/O manager stores a pointer to the caller's file object in the IRP.
 
 ![Figure](figures/Winternals7thPt1_page_531_figure_002.png)
 
@@ -1042,41 +1018,41 @@ Figure 6-11 shows some of the important members of the IRP structure. It is alwa
 
 FIGURE 6-11 Important members of the IRP structure.
 
-514   CHAPTER 6  I/O system
-
+514 CHAPTER 6 I/O system
 
 ---
 
 Here is a quick rundown of the members:
 
-- ■   IoStatus  This is the status of the IRP, consisting of two members: Status, which is the actual
-code itself and Information, a polymorphic value that has meaning in some cases. For ex-
-ample, for a read or write operation, this value (set by the driver) indicates the number of bytes
-read or written. This same value is the one reported as an output value from the functions
-ReadFile and WriteFile.
+- ■ IoStatus This is the status of the IRP, consisting of two members: Status, which is the actual
+  code itself and Information, a polymorphic value that has meaning in some cases. For ex-
+  ample, for a read or write operation, this value (set by the driver) indicates the number of bytes
+  read or written. This same value is the one reported as an output value from the functions
+  ReadFile and WriteFile.
 
-■   MdlAddress  This is an optional pointer to a memory descriptor list (MDL). An MDL is a struc-
+■ MdlAddress This is an optional pointer to a memory descriptor list (MDL). An MDL is a struc-
 ture that represents information for a buffer in physical memory. We'll discuss its main usage in
 device drivers in the next section. If an MDL was not requested, the value is NULL.
 
-■   I/O stack locations count and current stack location  These store the total number of trail-
+■ I/O stack locations count and current stack location These store the total number of trail-
 ing I/O stack location objects and point to the current one that this driver layer should look at,
 respectively. The next section discusses I/O stack locations in detail.
 
-■   User buffer  This is the pointer to the buffer provided by the client that initiated the I/O op-
+■ User buffer This is the pointer to the buffer provided by the client that initiated the I/O op-
 eration. For example, it is the buffer provided to the ReadFile or WriteFile functions.
 
-■   User event  This is the kernel event object that was used with an overlapped (asynchronous)
+■ User event This is the kernel event object that was used with an overlapped (asynchronous)
 I/O operation (if any). An event is one way to be notified when the I/O operation completes.
 
-■   Cancel routine  This is the function to be called by the I/O manager in case the IRP is can-
+■ Cancel routine This is the function to be called by the I/O manager in case the IRP is can-
 celled.
 
-■   AssociatedIrp  This is a union of one of three fields. The SystemBuffer member is used in case
+■ AssociatedIrp This is a union of one of three fields. The SystemBuffer member is used in case
 the I/O manager used the buffered I/O technique for passing the user's buffer to the driver. The
 next section discusses buffered I/O, as well as other options for passing user mode buffers to
 drivers. The MasterIrp member provides a way to create a "master IRP" that splits its work into
 sub-IRPs, where the master is considered complete only when all its sub-IRPs have completed.
+
 ## I/O stack locations
 
 An IRP is always followed by one or more I/O stack locations. The number of stack locations is equal to the number of layered devices in the device node the IRP is destined for. The I/O operation information is split between the IRP body (the main structure) and the current I/O stack location, where current means the one set up for the particular layer of devices. Figure 6-12 shows the important fields of an I/O stack location. When an IRP is created, the number of requested I/O stack locations is passed to IoAllocateIrp. The I/O manager then initializes the IRP body and the first I/O stack location only, destined for the topmost device in the device node. Each layer in the device node is responsible for initializing the next I/O stack location if it decides to pass the IRP down to the next device.
@@ -1089,29 +1065,28 @@ Plug and Play, and so on), also known as dispatch routine code. It's one of 28 c
 
 starting with IRP_M3_in wdm.h. This index is used by the I/O manager into the MajorFunction
 
-array of function pointers in the driver object to jump to the appropriate routine within a driver.
----
+## array of function pointers in the driver object to jump to the appropriate routine within a driver.
 
 Most drivers specify dispatch routines to handle only a subset of possible major function codes, including create (open), read, write, device I/O control, power, Plug and Play, system control (for WMI commands), cleanup, and close. File-system drivers are an example of a driver type that often fills in most or all of its dispatch entry points with functions. In contrast, a driver for a simple USB device would probably fill in only the routines needed for open, close, read, write, and sending I/O control codes. The I/O manager sets any dispatch entry points that a driver doesn’t fill to point to its own TopInv11Dev1cRequest, which completes the IRP with an error status indicating that the major function specified in the IRP is invalid for that device.
 
 - ■ Minor function This is used to augment the major function code for some functions. For
-example, IRP_MJ_READ (read) and IRP_MJ_WRITE (write) have no minor functions. But Plug and
-Play and Power IRPs always have a minor IRP code that specializes the general major code. For
-example, the Plug and Play IRP_MJ_PNP major code is too generic; the exact instruction is given
-by the minor IRP, such as IRP_MN_START_DEVICE, IRP_MN_REMOVE_DEVICE, and so on.
+  example, IRP_MJ_READ (read) and IRP_MJ_WRITE (write) have no minor functions. But Plug and
+  Play and Power IRPs always have a minor IRP code that specializes the general major code. For
+  example, the Plug and Play IRP_MJ_PNP major code is too generic; the exact instruction is given
+  by the minor IRP, such as IRP_MN_START_DEVICE, IRP_MN_REMOVE_DEVICE, and so on.
 
 ■ Parameters This is a monstrous union of structures, each of which valid for a particular
 major function code or a combination of major/minor codes. For example, for a read operation
 (IRP_MJ_READ), the Parameters.Read structure holds information on the read request, such as
 the buffer size.
 
-■ File object and Device object These point to the associated FILE_OBJECT and DEVICE_
+■ File object and Device object These point to the associated FILE*OBJECT and DEVICE*
 OBJECT for this I/O request.
 
 ■ Completion routine This is an optional function that a driver can register with the
 IoSetCompletionRoutine(Ex) IDI, to be called when the IRP is completed by a lower layer
 driver. At that point, the driver can look at the completion status of the IRP and do any needed
-post-processing. It can even undo the completion (by returning the special value STATUS_MORE_
+post-processing. It can even undo the completion (by returning the special value STATUS*MORE*
 PROCESSING_REQUIRED from the function) and resend the IRP (perhaps with modified param-
 eters) to the device node—or even a different device node—again.
 
@@ -1121,7 +1096,7 @@ passed, as is, to the completion routine.
 
 FIGURE 6-12 Important members of the IO_STACK_LOCATION structure.
 
-516   CHAPTER 6  I/O system
+516 CHAPTER 6 I/O system
 
 ---
 
@@ -1169,8 +1144,7 @@ You can obtain a list of the functions a driver has defined for its dispatch rou
   [18] IRP_MI_DEVICE_CHANGE             fFFFFF802dc762c80    nt!IopInvalidDeviceRequest
 ```
 
-CHAPTER 6   I/O system     517
-
+CHAPTER 6 I/O system 517
 
 ---
 
@@ -1219,8 +1193,7 @@ Accessible>
  ffffc404b6a83910 WAIT: (UserRequest) UserMode Non-Alertable
 ```
 
-518   CHAPTER 6  I/O system
-
+518 CHAPTER 6 I/O system
 
 ---
 
@@ -1264,16 +1237,15 @@ node. Figure 6-13 shows a typical IRP flow for hardware-based device drivers.
 
 ![Figure](figures/Winternals7thPt1_page_536_figure_006.png)
 
-FIGURE 6-13  IRP flow.
+FIGURE 6-13 IRP flow.
 
-CHAPTER 6   I/O system     519
-
+CHAPTER 6 I/O system 519
 
 ---
 
 The I/O manager is not the only entity that creates IRPs. The Plug and Play manager and the Power
 
-manager are also responsible for creating IRPs with major function code TRP_MJ_PNP and IRP_MJ_
+manager are also responsible for creating IRPs with major function code TRP*MJ_PNP and IRP_MJ*
 
 POWER, respectively.
 
@@ -1282,34 +1254,33 @@ Figure 6-13 shows an example device node with six layered device objects: two up
 A driver that receives an IRP can do one of the following:
 
 - ■ It can complete the IRP then and there by calling IoCompleteRequest. This could be because
-the IRP has some invalid parameters (for example, insufficient buffer size or bad I/O control
-code), or because the operation requested is quick and can be accomplished immediately, such
-as getting some status from the device or reading a value from the registry. The driver calls
-IoGetCurrentIrpStackLocation to get a pointer to the stack location that it should refer to.
-■ The driver can forward the IRP to the next layer after optionally doing some processing. For
-example, an upper filter can do some logging of the operation and send the IRP down to be
-executed normally. Before sending the request down, the driver must prepare the next I/O stack
-location that would be looked at by the next driver in line. It can use the IoSkipCurrentIrp-
-StackLocation macro if it does not wish to make changes, or it can make a copy with IoCopy-
-IrpStackLocationToNext and make changes to the copied stack location by getting a pointer
-with IoGetNextIrpStackLocation and making appropriate changes. Once the next I/O stack
-location is prepared, the driver calls IoCallDriver to do the actual IRP forwarding.
-■ As an extension of the previous point, the driver can also register for a completion routine
-by calling IoSetCompletionRoutine(Ex) before passing down the IRP. Any layer except the
-bottom-most one can register a completion routine (there is no point in registering for the
-bottom-most layer since that driver must complete the IRP, so no callback is needed). After
-IoCompleteRequest is called by a lower-layer driver, the IRP travels up (refer to Figure 6-13),
-calling any completion routines on the way up in reverse order of registration. In fact, the IRP
-originator (I/O manager, PnP manager, or power manager) use this mechanism to do any post-
-IRP processing and finally free the IRP.
-![Figure](figures/Winternals7thPt1_page_537_figure_004.png)
+  the IRP has some invalid parameters (for example, insufficient buffer size or bad I/O control
+  code), or because the operation requested is quick and can be accomplished immediately, such
+  as getting some status from the device or reading a value from the registry. The driver calls
+  IoGetCurrentIrpStackLocation to get a pointer to the stack location that it should refer to.
+  ■ The driver can forward the IRP to the next layer after optionally doing some processing. For
+  example, an upper filter can do some logging of the operation and send the IRP down to be
+  executed normally. Before sending the request down, the driver must prepare the next I/O stack
+  location that would be looked at by the next driver in line. It can use the IoSkipCurrentIrp-
+  StackLocation macro if it does not wish to make changes, or it can make a copy with IoCopy-
+  IrpStackLocationToNext and make changes to the copied stack location by getting a pointer
+  with IoGetNextIrpStackLocation and making appropriate changes. Once the next I/O stack
+  location is prepared, the driver calls IoCallDriver to do the actual IRP forwarding.
+  ■ As an extension of the previous point, the driver can also register for a completion routine
+  by calling IoSetCompletionRoutine(Ex) before passing down the IRP. Any layer except the
+  bottom-most one can register a completion routine (there is no point in registering for the
+  bottom-most layer since that driver must complete the IRP, so no callback is needed). After
+  IoCompleteRequest is called by a lower-layer driver, the IRP travels up (refer to Figure 6-13),
+  calling any completion routines on the way up in reverse order of registration. In fact, the IRP
+  originator (I/O manager, PnP manager, or power manager) use this mechanism to do any post-
+  IRP processing and finally free the IRP.
+  ![Figure](figures/Winternals7thPt1_page_537_figure_004.png)
 
 Note Because the number of devices on a given stack is known in advance, the I/O manager allocates one stack location per device driver on the stack. However, there are situations in which an IRP might be directed into a new driver stack. This can happen in scenarios involving the filter manager, which allows one filter to redirect an IRP to another filter (for example, going from a local file system to a network file system). The I/O manager exposes an API,
 
 IAdjustStackSizeForRedirection, that enables this functionality by adding the required stack locations because of devices present on the redirected stack.
 
 520 CHAPTER 6 I/O system
-
 
 ---
 
@@ -1468,8 +1439,7 @@ From the Library of
                 Args: 0004b000 00000000 2bea0000 00000002
 ```
 
-CHAPTER 6 I/O system     523
-
+CHAPTER 6 I/O system 523
 
 ---
 
@@ -1529,8 +1499,7 @@ Stack Int 89aec09 Current 89aebeb4 Base 89aed00 Limit 89aae00 0000000
 Priority 13 BasePriority 13 PriorityDecrement 0 IoPriority 2 PagePriority 5
 ```
 
-524    CHAPTER 6  I/O system
-
+524 CHAPTER 6 I/O system
 
 ---
 
@@ -1547,72 +1516,70 @@ Before we dig into the various steps outlined in Figure 6-14, some general comme
 ■ There are two types of horizontal divider lines. The first (solid line) is the usual user-mode/ kernel-mode divider. The second (dotted line) separates code that runs in the requesting thread context versus the arbitrary thread context. These contexts are defined as follows:
 
 - • The requesting thread context region indicates that the executing thread is the original one
-that requested the I/O operation. This is important because if the thread is the one that made
-the original call, it means the process context is the original process, and so the user-mode ad-
-dress space that contains the user's buffer supplied to the I/O operation is directly accessible.
-• The arbitrary thread context region indicates that the thread running those functions
-can be any thread. More specifically, it's most likely not the requesting thread, and so the
-user-mode process address space visible is not likely to be the original one. In this context,
-accessing the user's buffer with a user-mode address can be disastrous. You'll see in the next
-section how this issue is handled.
-![Figure](figures/Winternals7thPt1_page_542_figure_007.png)
+  that requested the I/O operation. This is important because if the thread is the one that made
+  the original call, it means the process context is the original process, and so the user-mode ad-
+  dress space that contains the user's buffer supplied to the I/O operation is directly accessible.
+  • The arbitrary thread context region indicates that the thread running those functions
+  can be any thread. More specifically, it's most likely not the requesting thread, and so the
+  user-mode process address space visible is not likely to be the original one. In this context,
+  accessing the user's buffer with a user-mode address can be disastrous. You'll see in the next
+  section how this issue is handled.
+  ![Figure](figures/Winternals7thPt1_page_542_figure_007.png)
 
 Note The explanations for the steps outlined in Figure 6-14 will prove why the divider lines reside where they are.
 
-CHAPTER 6   I/O system     525
-
+CHAPTER 6 I/O system 525
 
 ---
 
 - ■ The large rectangle consisting of the four blocks (labeled Dispatch Routine, Start I/O Routine,
-ISR, and DPC Routine) represents the driver-provided code. All other blocks are provided by the
-system.
-■ The figure assumes the hardware device can handle one operation at a time, which is true of
-many types of devices. Even if the device can handle multiple requests, the basic flow of opera-
-tions is still the same.
-Here is the sequence of events as outlined in Figure 6-14:
+  ISR, and DPC Routine) represents the driver-provided code. All other blocks are provided by the
+  system.
+  ■ The figure assumes the hardware device can handle one operation at a time, which is true of
+  many types of devices. Even if the device can handle multiple requests, the basic flow of opera-
+  tions is still the same.
+  Here is the sequence of events as outlined in Figure 6-14:
 
 - 1. A client application calls a Windows API such as ReadFile. ReadFile calls the native NtReadFile
-(in Ntdll.dll), which makes the thread transition to kernel mode to the executive NtReadFile
-(these steps have already been discussed earlier in this chapter).
+     (in Ntdll.dll), which makes the thread transition to kernel mode to the executive NtReadFile
+     (these steps have already been discussed earlier in this chapter).
 
 2. The I/O manager, in its NtReadFile implementation, performs some sanity checks on the
-request, such as whether the buffer provided by the client is accessible with the right page
-protection. Next, the I/O manager locates the associated driver (using the file handle provided),
-allocates and initializes an IRP, and calls the driver into the appropriate dispatch routine (in this
-case, corresponding to the IRP_MJ_READ index) using IoCallDriver with the IRP.
+   request, such as whether the buffer provided by the client is accessible with the right page
+   protection. Next, the I/O manager locates the associated driver (using the file handle provided),
+   allocates and initializes an IRP, and calls the driver into the appropriate dispatch routine (in this
+   case, corresponding to the IRP_MJ_READ index) using IoCallDriver with the IRP.
 
 3. This is the first time the driver sees the IRP. This call is usually invoked using the requesting
-thread; the only way for that not to happen is if an upper filter held on to the IRP and called
-IoCallDriver later from a different thread. For the sake of this discussion, we'll assume this
-is not the case (and in most cases involving hardware devices, this does not happen; even if
-there are upper filters, they do some processing and call the lower driver immediately from the
-same thread). The dispatch read callback in the driver has two tasks on its hand: first, it should
-perform more checking that the I/O manager can't do because it has no idea what the request
-really means. For example, the driver could check if the buffer provided to a read or write op-
-eration is large enough; or for a DeviceIoControl operation, the driver would check whether
-the I/O control code provided is a supported one. If any such check fails, the driver completes
-the IRP (IoCompleteRequest) with the failed status and returns immediately. If the checks turn
-up OK, the driver calls its Start I/O routine to initiate the operation. However, if the hardware
-device is currently busy (handling a previous IRP), then the IRP should be inserted into a queue
-managed by the driver and a STATUS_PENDING is returned without completing the IRP. The I/O
-manager caters for such a scenario with the IoStartPacket function, that checks a busy bit in
-the device object and, if the device is busy, inserts the IRP into a queue (also part of the device
-object structure). If the device is not busy, it sets the device bit as busy and calls the registered
-Start I/O routine (recall that there is such a member in the driver object that would have been
-initialized in DriverEntry). Even if a driver chooses not to use IoStartPacket, it would still
-follow similar logic.
+   thread; the only way for that not to happen is if an upper filter held on to the IRP and called
+   IoCallDriver later from a different thread. For the sake of this discussion, we'll assume this
+   is not the case (and in most cases involving hardware devices, this does not happen; even if
+   there are upper filters, they do some processing and call the lower driver immediately from the
+   same thread). The dispatch read callback in the driver has two tasks on its hand: first, it should
+   perform more checking that the I/O manager can't do because it has no idea what the request
+   really means. For example, the driver could check if the buffer provided to a read or write op-
+   eration is large enough; or for a DeviceIoControl operation, the driver would check whether
+   the I/O control code provided is a supported one. If any such check fails, the driver completes
+   the IRP (IoCompleteRequest) with the failed status and returns immediately. If the checks turn
+   up OK, the driver calls its Start I/O routine to initiate the operation. However, if the hardware
+   device is currently busy (handling a previous IRP), then the IRP should be inserted into a queue
+   managed by the driver and a STATUS_PENDING is returned without completing the IRP. The I/O
+   manager caters for such a scenario with the IoStartPacket function, that checks a busy bit in
+   the device object and, if the device is busy, inserts the IRP into a queue (also part of the device
+   object structure). If the device is not busy, it sets the device bit as busy and calls the registered
+   Start I/O routine (recall that there is such a member in the driver object that would have been
+   initialized in DriverEntry). Even if a driver chooses not to use IoStartPacket, it would still
+   follow similar logic.
 
 4. If the device is not busy, the Start I/O routine is called from the dispatch routine directly—
-meaning it's still the requesting thread that is making the call. Figure 6-14, however, shows that
-the Start I/O routine is called in an arbitrary thread context; this will be proven to be true in the
-general case when we look at the DPC routine in step 8. The purpose of the Start I/O routine is
-to take the IRP relevant parameters and use them to program the hardware device (for example,
+   meaning it's still the requesting thread that is making the call. Figure 6-14, however, shows that
+   the Start I/O routine is called in an arbitrary thread context; this will be proven to be true in the
+   general case when we look at the DPC routine in step 8. The purpose of the Start I/O routine is
+   to take the IRP relevant parameters and use them to program the hardware device (for example,
 
 CHAPTER 6 1/O system
 
-From the Library of
----
+## From the Library of
 
 by writing to its ports or registers using HAL hardware access routines such as WRITE_PORT_UCHAR, WRITE_REGISTER_ULONG, etc.). After the Start /O completes, the call returns, and no particular code is running in the driver; the hardware is working and "does its thing." While the hardware device is working, more requests can come in to the device by the same thread (if using asynchronous operations) or other threads that also opened handles to the device. In this case the dispatch routine would realize the device is busy and insert the IRP into the IRP queue (as mentioned, one way to achieve this is with a call to IoStartPacket).
 
@@ -1631,16 +1598,17 @@ to handle the interrupt, raises the IRQL of that CPU to the IRQL associated with
 8. Eventually, the DPC is de-queued and executes at IRQL 2, typically performing two main operations:
 
 - • It gets the next IRP in the queue (if any) and starts the new operation for the device. This is done
-first to prevent the device from being idle for too long. If the dispatch routine used IoStart-
-Packet, then the DPC routine would call its counterpart, IoStartNextPacket, which does
-just that. If an IRP is available, the Start I/O routine is called from the DPC. This is why in the
-general case, the Start I/O routine is called in an arbitrary thread context. If there are no IRPs
-in the queue, the device is marked not busy—that is, ready for the next request that comes in.
-• It completes the IRP, whose operation has just finished by the driver by calling IoCompleteIe-
-Request. From that point, the driver is no longer responsible for the IRP and it shouldn't
-be touched, as it can be freed at any moment after the call. IoCompleteRequest calls any
-completion routines that have been registered. Finally, the I/O manager frees the IRP (it's
-actually using a completion routine of its own to do that).
+  first to prevent the device from being idle for too long. If the dispatch routine used IoStart-
+  Packet, then the DPC routine would call its counterpart, IoStartNextPacket, which does
+  just that. If an IRP is available, the Start I/O routine is called from the DPC. This is why in the
+  general case, the Start I/O routine is called in an arbitrary thread context. If there are no IRPs
+  in the queue, the device is marked not busy—that is, ready for the next request that comes in.
+  • It completes the IRP, whose operation has just finished by the driver by calling IoCompleteIe-
+  Request. From that point, the driver is no longer responsible for the IRP and it shouldn't
+  be touched, as it can be freed at any moment after the call. IoCompleteRequest calls any
+  completion routines that have been registered. Finally, the I/O manager frees the IRP (it's
+  actually using a completion routine of its own to do that).
+
 9. The original requesting thread needs to be notified of the completion. Because the current
 
 thread executing the DPC is arbitrary, it's not the original thread with its original process ad dress space. To execute code in the context of the requesting thread, a special kernel APC is
@@ -1684,37 +1652,38 @@ using a different thread, and could even be done when the CPU IRQL is 2 or highe
 The other three functions (Start /O, ISR, DPC) clearly run on an arbitrary thread (could be any thread), and with IRQL 2 (DIRQL for the ISR). Accessing the user's buffer directly from any of these routine is mostly fatal. Here's why:
 
 - ■ Because the IROL is 2 or higher, paging is not allowed. Since the user's buffer (or part of it) may
-be paged out, accessing the non-resident memory would crash the system.
-■ Because the thread executing these functions could be any thread, and thus a random process
-address space would be visible, the original user's address has no meaning and would likely lead
-to an access violation, or worse—accessing data from some random process (the parent process
-of whatever thread was running at the time).
-Clearly, there must be a safe way to access the user's buffer in any of these routines. The I/O manager provides two options, for which it does the heavy lifting. These are known as Buffered I/O and Direct I/O. A third option, which is not really an option, is called Neither I/O, in which the I/O manager does nothing special and lets the driver handle the problem on its own.
+  be paged out, accessing the non-resident memory would crash the system.
+  ■ Because the thread executing these functions could be any thread, and thus a random process
+  address space would be visible, the original user's address has no meaning and would likely lead
+  to an access violation, or worse—accessing data from some random process (the parent process
+  of whatever thread was running at the time).
+  Clearly, there must be a safe way to access the user's buffer in any of these routines. The I/O manager provides two options, for which it does the heavy lifting. These are known as Buffered I/O and Direct I/O. A third option, which is not really an option, is called Neither I/O, in which the I/O manager does nothing special and lets the driver handle the problem on its own.
 
 A driver selects the method in the following way:
 
 - ■ For read and write requests (IRP_M_READ and IRP_M_WRITE), it sets the Flags member (with
-an OR boolean operation so as not to disturb other flags) of the device object (DEVICE_OBJECT)
-to DO_BUFFERED_IO (for buffered I/O) or DO_DIRECT_IO (for direct I/O). If neither flag is set,
-neither I/O is implied. (DO is short for device object.)
+  an OR boolean operation so as not to disturb other flags) of the device object (DEVICE_OBJECT)
+  to DO_BUFFERED_IO (for buffered I/O) or DO_DIRECT_IO (for direct I/O). If neither flag is set,
+  neither I/O is implied. (DO is short for device object.)
+
 ---
 
 - ■ For device I/O control requests (IRP_MJ_DEVICE_CONTROL), each control code is constructed
-using the CTL_CODE macro, where some of the bits indicate the buffering method. This means
-the buffering method can be set on a control code-by-control code basis, which is very useful.
-The following sections describe each buffering method in detail.
+  using the CTL_CODE macro, where some of the bits indicate the buffering method. This means
+  the buffering method can be set on a control code-by-control code basis, which is very useful.
+  The following sections describe each buffering method in detail.
 
 Buffered I/O With buffered I/O, the I/O manager allocates a mirror buffer that is the same size as the user's buffer in non-paged pool and stores the pointer to the new buffer in the AssociatedIrp. SystemBuffer member of the IRP body. Figure 6-15 shows the main stages in buffered I/O for a read operation (write is similar).
 
 ![Figure](figures/Winternals7thPt1_page_546_figure_003.png)
 
-FIGURE 6-15   Buffered I/O.
+FIGURE 6-15 Buffered I/O.
 
 The driver can access the system buffer (address q in Figure 6-15) from any thread and any IRQ:
 
 - The address is in system space, meaning it's valid in any process context.
-The buffer is allocated from non-paged pool, so a page fault will not happen.
-For write operations, the I/O manager copies the caller's buffer data into the allocated buffer when creating the IRP. For read operations, the I/O manager copies data from the allocated buffer to the user's buffer when the IRP completes (using a special kernel APC) and then frees the allocated buffer.
+  The buffer is allocated from non-paged pool, so a page fault will not happen.
+  For write operations, the I/O manager copies the caller's buffer data into the allocated buffer when creating the IRP. For read operations, the I/O manager copies data from the allocated buffer to the user's buffer when the IRP completes (using a special kernel APC) and then frees the allocated buffer.
 
 Buffered I/O clearly is very simple to use because the I/O manager does practically everything. Its
 
@@ -1722,8 +1691,7 @@ main downside is that it always requires copying, which is inefficient for large
 
 commonly used when the buffer size is no larger than one page (4 KB) and when the device does not
 
-CHAPTER 6 I/O system   529
-
+CHAPTER 6 I/O system 529
 
 ---
 
@@ -1733,14 +1701,13 @@ Direct I/O Direct I/O provides a way for a driver to access the user's buffer di
 
 ![Figure](figures/Winternals7thPt1_page_547_figure_002.png)
 
-FIGURE 6-16   Direct I/O.
+FIGURE 6-16 Direct I/O.
 
 When the I/O manager creates the IRP, it locks the user's buffer into memory (that is, makes it nonpageable) by calling the MmProbeAndLockPages function (documented in the WDK). The I/O manager stores a description of the memory in the form of a memory descriptor list (MDL), which is a structure that describes the physical memory occupied by a buffer. Its address is stored in the MdlAddress member of the IRP body. Devices that perform DMA require only physical descriptions of buffers, so an MDL is sufficient for the operation of such devices. If a driver must access the contents of a buffer, however, it can map the buffer into the system's address space using the MmGetSys temAddressFunMdlSafe function, passing in the provided MDL. The resulting pointer (p in Figure 6-16) is safe to use in any thread context (it's a system address) and in any IRQL (the buffer cannot be paged out). The user's buffer is effectively double-mapped, where the user's direct address (p in Figure 6-16) is usable only from the original process context, but the second mapping into system space is usable in any context. Once the IRP is complete, the I/O manager unlocks the buffer (making it pageable again) by calling MnlUnlockPages (documented in the WDK).
 
 Direct I/O is useful for large buffers (more than one page) because no copying is done, especially for DMA transfers (for the same reason).
 
 530 CHAPTER 6 I/O system
-
 
 ---
 
@@ -1758,7 +1725,7 @@ kernel-mode memory or can inject code into the kernel. The ProbeForRead and Prob
 
 portion of the address space. To avoid a crash from referencing an invalid user-mode address, drivers
 
-can access user-mode buffers protected with structured exception handling (SEH), expressed with __try/__except blocks in C/C++. that catch any invalid memory faults and translate them into error
+can access user-mode buffers protected with structured exception handling (SEH), expressed with **try/**except blocks in C/C++. that catch any invalid memory faults and translate them into error
 
 codes to return to the application. (See Chapter 8 in Part 2 for more information on SEH.) Additionally,
 
@@ -1773,10 +1740,10 @@ itself is still valid.
 Drivers must synchronize their access to global driver data and hardware registers for two reasons:
 
 - ■ The execution of a driver can be preempted by higher-priority threads and time-slice (or quan-
-tum) expiration or can be interrupted by higher IRQL interrupts.
-■ On multiprocessor systems (the norm), Windows can run driver code simultaneously on more
-than one processor.
-Without synchronization, corruption could occur—for example, device-driver code running at passive IRQ 0 (say, a dispatch routine) when a caller initiates an I/O operation can be interrupted by a device interrupt, causing the device driver's ISR to execute while its own device driver is already running. If the device driver was modifying data that its ISR also modifies—such as device registers, heap storage, or static data—the data can become corrupted when the ISR executes.
+  tum) expiration or can be interrupted by higher IRQL interrupts.
+  ■ On multiprocessor systems (the norm), Windows can run driver code simultaneously on more
+  than one processor.
+  Without synchronization, corruption could occur—for example, device-driver code running at passive IRQ 0 (say, a dispatch routine) when a caller initiates an I/O operation can be interrupted by a device interrupt, causing the device driver's ISR to execute while its own device driver is already running. If the device driver was modifying data that its ISR also modifies—such as device registers, heap storage, or static data—the data can become corrupted when the ISR executes.
 
 To avoid this situation, a device driver written for Windows must synchronize its access to any data
 
@@ -1789,7 +1756,6 @@ from updating the same data structure.
 On a single-CPU system, synchronizing between two or more functions that run at different IRQs is easy enough. Such function just needs to raise the IRQ (keRaiseIrQ1) to the highest IRQ these functions execute in. For example, to synchronize between a dispatch routine (IRQI 0) and a DPC routine (IRQL 2), the dispatch routine needs to raise IRQI to 2 before accessing the shared data. If synchronization between a DPC and ISR is required, the DPC would raise IRQI to the Device IRQI (this information is provided to the driver when the PnP manager informs the driver of the hardware resources a device
 
 CHAPTER 6 I/O system 531
-
 
 ---
 
@@ -1811,7 +1777,6 @@ TABLE 6-3 Mutexes versus spinlocks
 
 <table><tr><td></td><td>Mutex</td><td>Spinlock</td></tr><tr><td>Synchronization nature</td><td>One thread out of any number of threads that is allowed enters a critical region and accesses shared data.</td><td>One CPU out of any number of CPUs that is allowed enters a critical region and accesses shared data.</td></tr><tr><td>Usable at IRQL</td><td>&lt; DISPATCH_LEVEL (2)</td><td>&gt;= DISPATCH_LEVEL (2)</td></tr><tr><td>Wait kind</td><td>Normal. That is, it does not waste CPU cycles while waiting.</td><td>Busy. That is, the CPU is constantly testing the spinlock bit until it&#x27;s free.</td></tr><tr><td>Ownership</td><td>The owner thread is tracked, and recursive acquisition is allowed.</td><td>The CPU owner is not tracked, and recursive acquisition will cause a deadlock.</td></tr></table>
 
-
 A spinlock is just a bit in memory that is accessed by an atomic test and modify operation. A spinlock may be owned by a CPU or free (unowned). As shown in Table 6-3, spinlocks are necessary when synchronization is needed in high IRLQIs (>=2), because a mutex can't be used in these cases as a scheduler is needed, but as we've seen the scheduler cannot wake up on a CPU whose IRLQI is 2 or higher. This is why waiting for a spinlock is a busy wait operation: The thread cannot go to a normal wait state because that implies the scheduler waking up and switching to another thread on that CPU.
 
 Acquiring a spinlock by a CPU is always a two-step operation. First, the IRQL is raised to the associated IRQL on which synchronization is to occur—that is, the highest IRQL on which the function that needs to synchronize executes. For example, synchronizing between a dispatch routine (IRQL 0) and a DPC (2) would need to raise IRQL to 2; synchronizing between DPC (2) and ISR (DIRQL) would need to raise IRQL to DIRQL (the IRQL for that particular interrupt). Second, the spinlock is attempted acquisition by atomically testing and setting the spinlock bit.
@@ -1825,7 +1790,6 @@ The functions that acquire spinlocks determine the IRQL on which to synchronize,
 Figure 6-17 shows a simplified view of the two-step process of acquiring a spinlock.
 
 532 CHAPTER 6 I/O system
-
 
 ---
 
@@ -1879,7 +1843,6 @@ FIGURE 6-20 Queuing associated IRPs
 
 CHAPTER 6 I/O system 535
 
-
 ---
 
 The file-system driver delivers the associated IRPs to the volume manager, which in turn sends them
@@ -1907,16 +1870,14 @@ In the I/O models described thus far, IRPs are queued to the thread that initiat
 ---
 
 - ■ I/O completion ports, which are described at length in the section "I/O completion ports" later
-in this chapter
+  in this chapter
 
 ■ Locking the user buffer into memory and mapping it into the system address space
 With I/O completion ports, the application decides when it wants to check for the completion of I/O.
 
-
 Therefore, the thread that happens to have issued an I/O request is not necessarily relevant because any
 
 other thread can perform the completion request. As such, instead of completing the IRP inside the specific
-
 
 thread's context, it can be completed in the context of any thread that has access to the completion port.
 
@@ -1956,22 +1917,21 @@ transfers or network operations—Windows provides support for cancelling both s
 
 asynchronous operations.
 
-CHAPTER 6 I/O system     537
-
+CHAPTER 6 I/O system 537
 
 ---
 
 - ■ Cancelling synchronous I/Os A thread can call Cancel SynchronousIO. This enables even
-create (open) operations to be cancelled when supported by a device driver. Several drivers in
-Windows support this functionality. These include drivers that manage network file systems (for
-example, MUP, DFS, and SMB), which can cancel open operations to network paths.
-■ Cancelling asynchronous I/Os A thread can cancel its own outstanding asynchronous I/Os
-by calling Cancel I/O. It can cancel all asynchronous I/Os issued to a specific file handle, regard-
-less of which thread initiated them, in the same process with Cancel I/Oex. Cancel I/Oex also
-works on operations associated with I/O completion ports through the aforementioned thread-
-agnostic support in Windows. This is because the I/O system keeps track of a completion port's
-outstanding I/Os by linking them with the completion port.
-Figure 6-22 and Figure 6-23 show synchronous and asynchronous I/O cancellation. (To a driver, all cancel processing looks the same.)
+  create (open) operations to be cancelled when supported by a device driver. Several drivers in
+  Windows support this functionality. These include drivers that manage network file systems (for
+  example, MUP, DFS, and SMB), which can cancel open operations to network paths.
+  ■ Cancelling asynchronous I/Os A thread can cancel its own outstanding asynchronous I/Os
+  by calling Cancel I/O. It can cancel all asynchronous I/Os issued to a specific file handle, regard-
+  less of which thread initiated them, in the same process with Cancel I/Oex. Cancel I/Oex also
+  works on operations associated with I/O completion ports through the aforementioned thread-
+  agnostic support in Windows. This is because the I/O system keeps track of a completion port's
+  outstanding I/Os by linking them with the completion port.
+  Figure 6-22 and Figure 6-23 show synchronous and asynchronous I/O cancellation. (To a driver, all cancel processing looks the same.)
 
 ![Figure](figures/Winternals7thPt1_page_555_figure_002.png)
 
@@ -1981,8 +1941,7 @@ FIGURE 6-22 Synchronous I/O cancellation.
 
 FIGURE 6-23 Asynchronous I/O cancellation.
 
-538    CHAPTER 6  I/O system
-
+538 CHAPTER 6 I/O system
 
 ---
 
@@ -2023,7 +1982,6 @@ Process Explorer. Attempts to terminate the process will fail because Windows wi
 forever for the IRP to complete given that the Myfault driver doesn't register a cancel routine.
 
 CHAPTER 6 I/O system 539
-
 
 ---
 
@@ -2126,7 +2084,6 @@ The goal of a server is to incur as few context switches as possible by having i
 
 CHAPTER 6 I/O system 541
 
-
 ---
 
 not to block when they complete a request if additional requests are waiting. For this optimal process to work correctly, however, the application must have a way to activate another thread when a thread processing a client request blocks I/O (such as when it reads from a file as part of the processing).
@@ -2143,7 +2100,7 @@ Figure 6-24 shows a high-level illustration of completion-port operation. A comp
 
 A server application will usually receive client requests via network endpoints that are identified by file handles. Examples include Windows Sockets 2 (Winsock2) sockets or named pipes. As the server creates its communications endpoints, it associates them with a completion port and its threads wait for incoming requests by calling GetQueuedCompletionStatus(Ex) on the port. When a thread is given a packet from the completion port, it will go off and start processing the request, becoming an active thread. A thread will block many times during its processing, such as when it needs to read or write data to a file on disk or when it synchronizes with other threads. Windows detects this activity and recognizes that the completion port has one less active thread. Therefore, when a thread becomes inactive because it blocks, a thread waiting on the completion port will be awakened if there is a packet in the queue.
 
-542    CHAPTER 6  I/O system
+542 CHAPTER 6 I/O system
 
 ---
 
@@ -2224,7 +2181,6 @@ As you can see, KeRemoveQueueEx and KeInsertQueue are the engine behind completi
 
 544 CHAPTER 6 I/O system
 
-
 ---
 
 Windows keeps track of threads that become inactive because they block on something other than the completion port by relying on the queue pointer in a thread's control block. The scheduler routines that possibly result in a thread blocking (such as KeWaitForSingleObject, KeDelayExecutionThread, and so on) check the thread's queue pointer. If the pointer isn't NULL, the functions call KiActivateWaiterQueue, a queue-related function that decrements the count of active threads associated with the queue. If the resulting number is less than the maximum and at least one completion packet is in the queue, the thread at the front of the queue's thread list is awakened and given the oldest packet. Conversely, whenever a thread that is associated with a queue wakes up after blocking, the scheduler executes the KiUnwaitThread function, which increments the queue's active count.
@@ -2247,7 +2203,6 @@ TABLE 6-4 I/O completion port notification modes
 
 <table><tr><td>Notification Mode</td><td>Meaning</td></tr><tr><td>Skip completion port on success (FILE_SKIP_COMPLETION_PORT_ON_SUCCESS=1)</td><td>If the following three conditions are true, the I/O manager does not queue a completion entry to the port when it would ordinarily do so. First, a completion port must be associated with the file handle. Second, the file must be opened for asynchronous I/O. Third, the request must return success immediately without returning ERROR_PENDING.</td></tr></table>
 
-
 Continues...
 
 ---
@@ -2255,7 +2210,6 @@ Continues...
 TABLE 6-4 I/O completion port notification modes (continued)
 
 <table><tr><td>Notification Mode</td><td>Meaning</td></tr><tr><td>Skip set event on handle (FILE_SKIP_SET_EVENT_ON_HANDLE=2)</td><td>The I/O manager does not set the event for the file object if a request returns with a success code or the error returned is ERROR_PENDING and the function that is called is not a synchronous function. If an explicit event is provided for the request, it is still signaled.</td></tr><tr><td>Skip set user event on fast I/O (FILE_SKIP_SET_USER_EVENT_ON_FAST_IO=4)</td><td>The I/O manager does not set the explicit event provided for the request if a request takes the fast I/O path and returns with a success code or the error returned is ERROR_PENDING and the function that is called is not a synchronous function.</td></tr></table>
-
 
 ## I/O prioritization
 
@@ -2269,10 +2223,9 @@ priority on individual I/O operations and I/O bandwidth reservations.
 
 The Windows I/O manager internally includes support for five I/O priorities, as shown in Table 6-5, but only three of the priorities are used. (Future versions of Windows may support High and Low.)
 
-TABLE 6-5   I/O priorities
+TABLE 6-5 I/O priorities
 
 <table><tr><td>I/O Priority</td><td>Usage</td></tr><tr><td>Critical</td><td>Memory manager</td></tr><tr><td>High</td><td>Not used</td></tr><tr><td>Normal</td><td>Normal application I/O</td></tr><tr><td>Low</td><td>Not used</td></tr><tr><td>Very Low</td><td>Scheduled tasks, SuperFetch, defragmenting, content indexing, background activities</td></tr></table>
-
 
 I/O has a default priority of Normal, and the memory manager uses Critical when it wants to write dirty memory data out to disk under low-memory situations to make room in RAM for other data and code. The Windows Task Scheduler sets the I/O priority for tasks that have the default task priority to Very Low. The priority specified by applications that perform background processing is Very Low. All the Windows background operations, including Windows Defender scanning and desktop search indexing, use Very Low I/O priority.
 
@@ -2283,13 +2236,12 @@ I/O has a default priority of Normal, and the memory manager uses Critical when 
 Internally, the five I/O priorities are divided into two I/O prioritization modes, called strategies. These are the hierarchy exception and the idle prioritization strategies. Hierarchy prioritization deals with all the I/O priorities except Very Low. It implements the following strategy:
 
 - ■ All critical-priority I/O must be processed before any high-priority I/O.
-■ All high-priority I/O must be processed before any normal-priority I/O.
-■ All normal-priority I/O must be processed before any low-priority I/O.
-■ All low-priority I/O is processed after any higher-priority I/O.
-As each application generates I/Os, IRPs are put on different I/O queues based on their priority, and the hierarchy strategy decides the ordering of the operations.
+  ■ All high-priority I/O must be processed before any normal-priority I/O.
+  ■ All normal-priority I/O must be processed before any low-priority I/O.
+  ■ All low-priority I/O is processed after any higher-priority I/O.
+  As each application generates I/Os, IRPs are put on different I/O queues based on their priority, and the hierarchy strategy decides the ordering of the operations.
 
 The idle prioritization strategy, on the other hand, uses a separate queue for non-idle priority I/O.
-
 
 Because the system processes all hierarchy prioritized I/O before idle I/O, it’s possible for the I/Os in this
 
@@ -2309,7 +2261,7 @@ first-out (FIFO). The order in the figure is shown only as an example.
 
 FIGURE 6-26 Sample entries in a global I/O queue.
 
-User-mode applications can set I/O priority on three different objects. The functions SetPriorityClass (with the PROCESS_MODE_BACKGROUND_BEGIN value) and SetThreadPriority (with the THREAD_ MODE_BACKGROUND_BEGIN value), set the priority for all the I/Os that are generated by either the entire process or specific threads (the priority is stored in the IRP of each request). These functions work only on the current process or thread and lower the I/O priority to Very Low. In addition, these also lower the scheduling priority to 4 and the memory priority to 1. The function SetFileInformationByHandle can set the priority for a specific file object (the priority is stored in the file object). Drivers can also set I/O priority directly on an IRP by using the IoSetIoPriorityItnt API.
+User-mode applications can set I/O priority on three different objects. The functions SetPriorityClass (with the PROCESS*MODE_BACKGROUND_BEGIN value) and SetThreadPriority (with the THREAD* MODE_BACKGROUND_BEGIN value), set the priority for all the I/Os that are generated by either the entire process or specific threads (the priority is stored in the IRP of each request). These functions work only on the current process or thread and lower the I/O priority to Very Low. In addition, these also lower the scheduling priority to 4 and the memory priority to 1. The function SetFileInformationByHandle can set the priority for a specific file object (the priority is stored in the file object). Drivers can also set I/O priority directly on an IRP by using the IoSetIoPriorityItnt API.
 
 ---
 
@@ -2349,7 +2301,6 @@ FIGURE 6-27 Implementation of I/O prioritization across the storage stack.
 
 548 CHAPTER 6 |/O system
 
-
 ---
 
 ## I/O priority inversion avoidance
@@ -2377,20 +2328,19 @@ boost. Finally, if no matching IRPs were found, but the thread has at least some
 Windows uses a few other subtle modifications to normal I/O paths to avoid starvation, inversion, or otherwise unwanted scenarios when I/O priority is being used. T ypically, these modifications are done by boosting I/O priority when needed. The following scenarios exhibit this behavior:
 
 - When a driver is being called with an IRP targeted to a particular file object, Windows makes
-sure that if the request comes from kernel mode, the IRP uses normal priority even if the file
-object has a lower I/O priority hint. This is called a kernel bump.
-When reads or writes to the paging file are occurring (through IoPageRead and IoPageWrite),
-Windows checks whether the request comes from kernel mode and is not being performed on
-behalf of Superfetch (which always uses idle I/O). In this case, the IRP uses normal priority even if
-the current thread has a lower I/O priority. This is called a paging bump.
-The following experiment will show you an example of Very Low I/O priority and how you can use Process Monitor to look at I/O priorities on different requests.
+  sure that if the request comes from kernel mode, the IRP uses normal priority even if the file
+  object has a lower I/O priority hint. This is called a kernel bump.
+  When reads or writes to the paging file are occurring (through IoPageRead and IoPageWrite),
+  Windows checks whether the request comes from kernel mode and is not being performed on
+  behalf of Superfetch (which always uses idle I/O). In this case, the IRP uses normal priority even if
+  the current thread has a lower I/O priority. This is called a paging bump.
+  The following experiment will show you an example of Very Low I/O priority and how you can use Process Monitor to look at I/O priorities on different requests.
 
 EXPERIMENT: Very low versus normal I/O throughput
 
 You can use the I/O Priority sample application (included in this book's utilities) to look at the throughput difference between two threads with different I/O priorities. Follow these steps:
 
-CHAPTER 6 I/O system     549
-
+CHAPTER 6 I/O system 549
 
 ---
 
@@ -2418,8 +2368,7 @@ Note If both threads run at low priority and the system is relatively idle, thei
 
 ![Figure](figures/Winternals7thPt1_page_568_figure_001.png)
 
-7. Notice that I/Os directed at _File_7920 in the screenshot have a priority of very low.
-
+7. Notice that I/Os directed at \_File_7920 in the screenshot have a priority of very low.
 
 Looking at the Time of Day and Relative Time columns, you'll also notice that the I/Os
 
@@ -2464,8 +2413,7 @@ device can deliver data at the requested rate and existing reservations allow it
 
 application guidance as to how fast it should issue I/Os and how large the I/O should be.
 
-CHAPTER 6   I/O system   551
-
+CHAPTER 6 I/O system 551
 
 ---
 
@@ -2478,7 +2426,6 @@ issued on the same file. The shaded regions are the only ones that will be avail
 If I/O bandwidth is already taken, new I/Os will have to wait until the next cycle.
 
 <table><tr><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>Groove Music</td><td></td><td>Groove Music</td><td>Groove Music</td><td></td><td>Groove Music</td></tr><tr><td>Reserved I/O</td><td>Walk-in I/O</td><td>Reserved I/O</td><td>Reserved I/O</td><td>Walk-in I/O</td><td>Reserved I/O</td></tr></table>
-
 
 FIGURE 6-28 Effect of I/O requests during bandwidth reservation.
 
@@ -2537,8 +2484,7 @@ main wizard's page shows all options with a column indicating which is standard 
 
 Regardless of which options are selected, Driver Verifier always monitors drivers selected for verification, looking for a number of illegal and boundary operations, including calling kernel-memory pool functions at invalid IRQL, double-freeing memory, releasing spinlocks inappropriately, not freeing timers, referencing a freed object, delaying shutdown for longer than 20 minutes, and requesting a zero-size memory allocation.
 
-CHAPTER 6   I/O system    553
-
+CHAPTER 6 I/O system 553
 
 ---
 
@@ -2546,18 +2492,18 @@ CHAPTER 6   I/O system    553
 
 FIGURE 6-30 Driver Verifier settings.
 
-Driver Verifier settings are stored in the registry under the HKLM\SYSTEM\CurrentControlSet\ Control\SessionManager\Memory Management key. The VerifyDriverLevel value contains a bitmask that represents the verification options that are enabled. The VerifyDrivers value contains the names of the drivers to monitor. (These values won't exist in the registry until you select drivers to verify in the Driver Verifier Manager.) If you choose to verify all drivers (which you should never do, since this will cause considerable system slowdown), VerifyDrivers is set to an asterisk (*) character. Depending on the settings you have made, you might need to reboot the system for the selected verification to occur.
+Driver Verifier settings are stored in the registry under the HKLM\SYSTEM\CurrentControlSet\ Control\SessionManager\Memory Management key. The VerifyDriverLevel value contains a bitmask that represents the verification options that are enabled. The VerifyDrivers value contains the names of the drivers to monitor. (These values won't exist in the registry until you select drivers to verify in the Driver Verifier Manager.) If you choose to verify all drivers (which you should never do, since this will cause considerable system slowdown), VerifyDrivers is set to an asterisk (\*) character. Depending on the settings you have made, you might need to reboot the system for the selected verification to occur.
 
-Early in the boot process, the memory manager reads the Driver Verifier registry values to determine which drivers to verify and which Driver Verifier options you enabled. (Note that if you boot in safe mode, any Driver Verifier settings are ignored.) Subsequently, if you've selected at least one driver for verification, the kernel checks the name of every device driver it loads into memory against the list of drivers you've selected for verification. For every device driver that appears in both places, the kernel invokes the VFLoadDriver function, which calls other internal VF* functions to replace the driver's references to a number of kernel functions with references to Driver Verifier-equivalent versions of those functions. For example, ExA1ToaclePool is replaced with a call to VeriFilerA1locatePool. The windowing system driver (Win32k.sys) also makes similar changes to use Driver Verifier-equivalent functions.
+Early in the boot process, the memory manager reads the Driver Verifier registry values to determine which drivers to verify and which Driver Verifier options you enabled. (Note that if you boot in safe mode, any Driver Verifier settings are ignored.) Subsequently, if you've selected at least one driver for verification, the kernel checks the name of every device driver it loads into memory against the list of drivers you've selected for verification. For every device driver that appears in both places, the kernel invokes the VFLoadDriver function, which calls other internal VF\* functions to replace the driver's references to a number of kernel functions with references to Driver Verifier-equivalent versions of those functions. For example, ExA1ToaclePool is replaced with a call to VeriFilerA1locatePool. The windowing system driver (Win32k.sys) also makes similar changes to use Driver Verifier-equivalent functions.
 
 ## I/O-related verification options
 
 The various I/O-related verification options are as follows:
 
 - ■ I/O Verification When this option is selected, the I/O manager allocates IRPs for verified
-drivers from a special pool and their usage is tracked. In addition, the Driver Verifier crashes
-the system when an IRP is completed that contains an invalid status or when an invalid device
-554    CHAPTER 6  I/O system
+  drivers from a special pool and their usage is tracked. In addition, the Driver Verifier crashes
+  the system when an IRP is completed that contains an invalid status or when an invalid device
+  554 CHAPTER 6 I/O system
 
 ---
 
@@ -2577,8 +2523,7 @@ The following are memory-related verification options supported by Driver Verifi
 
 Selecting the Special Pool option causes the pool allocation routines to bracket pool allocations with an invalid page so that references before or after the allocation will result in a kernel-mode access violation, thus crashing the system with the finger pointed at the buggy driver. Special pool also causes some additional validation checks to be performed when a driver allocates or frees memory. With special pool enabled, the pool allocation routines allocate a region of kernel memory for Driver Verifier to use. Driver Verifier redirects memory allocation requests that drivers under verification make to the special pool area rather than to the standard kernel-mode memory pools. When a device driver allocates memory from special pool, Driver Verifier rounds up the allocation to an even-page bound-ary. Because Driver Verifier brackets the allocated page with invalid pages, if a device driver attempts to read or write past the end of the buffer, the driver will access an invalid page, and the memory manager will raise a kernel-mode access violation.
 
-CHAPTER 6   I/O system     555
-
+CHAPTER 6 I/O system 555
 
 ---
 
@@ -2612,14 +2557,13 @@ buffer and written to memory outside the buffer.
 
 Special pool allocations also check to ensure that the processor IRQL at the time of an allocation and dealloc is legal. This check catches an error that some device drivers make: allocating pageable memory from an IRQL at DPC/dispatch level or above.
 
-You can also configure special pool manually by adding the DWORD registry value PooITag in the HLM\SYSTEM\CurrentControlSet\Control\SessionManager\Memory Management key, which represents the allocation tags the system uses for special pool. Thus, even if Driver Verifier isn’t configured to verify a particular device driver, if the tag the driver associates with the memory it allocates matches what is specified in the PooITag registry value, the pool allocation routines will allocate the memory from special pool. If you set the value of PooTag to 0x2a or to the wildcard (*), all memory that drivers allocate will be from special pool, provided there’s enough virtual and physical memory (drivers will revert to allocating from regular pool if there aren’t enough free pages).
+You can also configure special pool manually by adding the DWORD registry value PooITag in the HLM\SYSTEM\CurrentControlSet\Control\SessionManager\Memory Management key, which represents the allocation tags the system uses for special pool. Thus, even if Driver Verifier isn’t configured to verify a particular device driver, if the tag the driver associates with the memory it allocates matches what is specified in the PooITag registry value, the pool allocation routines will allocate the memory from special pool. If you set the value of PooTag to 0x2a or to the wildcard (\*), all memory that drivers allocate will be from special pool, provided there’s enough virtual and physical memory (drivers will revert to allocating from regular pool if there aren’t enough free pages).
 
 ## Pool tracking
 
 If pool tracking is enabled, the memory manager checks at driver unload time whether the driver freed all the memory allocations it made. If it didn’t, it crashes the system, indicating the buggy driver. Driver Verifier also shows general pool statistics on the Driver Verifier Manager’s Pool Tracking tab (accessible from the main wizard UI by selecting Display Information About the Currently Verifiedd Drivers
 
 556 CHAPTER 6 I/O system
-
 
 ---
 
@@ -2633,7 +2577,7 @@ Another driver verified function enabled by the Pool Tracking option pertains to
 
 Driver Verifier can also perform locked memory page tracking, which additionally checks for pages
 
-that have been left locked after an I/O operation completes and generates a DRIVER_LEFT_LOCKED_
+that have been left locked after an I/O operation completes and generates a DRIVER*LEFT_LOCKED*
 
 PAGES_IN_PROCESS crash code instead of PROCESS_HAS_LOCKED_PAGES—the former indicates the
 
@@ -2669,26 +2613,25 @@ Enabling Low Resources Simulation causes Driver Verifier to randomly fail memory
 
 verified device drivers perform. In the past, developers wrote many device drivers under the assump tion that kernel memory would always be available, and that if memory ran out, the device driver
 
-CHAPTER 6   I/O system   557
-
+CHAPTER 6 I/O system 557
 
 ---
 
 didn't have to worry about it because the system would crash anyway. However, because low-memory conditions can occur temporarily, and today's mobile devices are not as powerful as larger machines, it's important that device drivers properly handle allocation failures that indicate kernel memory is exhausted.
 
-The driver calls that will be injected with random failures include the functions ExAllocatePool*,
+The driver calls that will be injected with random failures include the functions ExAllocatePool\*,
 
 MmProbeAndLockPages, MmMapLockedPagesSpecifyCache,MmMapIoSpace, MmAllocateContiguous Memory, MmAllocatePagesForMd1,IoAllocateIrp, IoAllocateMd1, IoAllocateWorkItem, IoAllo cateErrorLogEntry, IOSetCompletionRoutineEx, and various Rtl string APIs that allocate from the
 
 pool. Driver Verifier also fails some allocations made by kernel GDI functions (see the WDK documenta tion for a complete list). Additionally, you can specify the following:
 
 - ■ The probability that allocation will fail This is 6 percent by default.
-■ Which applications should be subject to the simulation All are by default.
-■ Which pool tags should be affected All are by default.
-■ What delay should be used before fault injection starts The default is 7 minutes after the
-system boots, which is enough time to get past the critical initialization period in which a low-
-memory condition might prevent a device driver from loading.
-You can change these customizations with command line options to verifier.exe.
+  ■ Which applications should be subject to the simulation All are by default.
+  ■ Which pool tags should be affected All are by default.
+  ■ What delay should be used before fault injection starts The default is 7 minutes after the
+  system boots, which is enough time to get past the critical initialization period in which a low-
+  memory condition might prevent a device driver from loading.
+  You can change these customizations with command line options to verifier.exe.
 
 After the delay period, Driver Verifier starts randomly fading allocation calls for device drivers it is verifying. If a driver doesn't correctly handle allocation failures, this will likely show up as a system crash.
 
@@ -2712,14 +2655,13 @@ Resource to destroy an ERESOURCE object.
 
 ■ Active look-aside lists in freed memory A driver calls ExFreePool before calling ExDelete-
 
-NPagedLookasideList or ExDeletePagedLookasideList to delete the look-aside list.
----
+## NPagedLookasideList or ExDeletePagedLookasideList to delete the look-aside list.
 
 Finally, when verification is enabled, Driver Verifier performs certain automatic checks that cannot be individually enabled or disabled. These include the following:
 
 - ● Calling MmProbeAndLockPages or MmProbeAndLockProcessPages on an MDL having incorrect
-flags. For example, it is incorrect to call MmProbeAndLockPages for an MDL that was set up by
-calling MmBuildMdlForNonPagedPool.
+  flags. For example, it is incorrect to call MmProbeAndLockPages for an MDL that was set up by
+  calling MmBuildMdlForNonPagedPool.
 
 ● Calling MmMapLockedPages on an MDL having incorrect flags. For example, it is incorrect to call
 MmMapLockedPages for an MDL that is already mapped to a system address. Another example
@@ -2741,34 +2683,34 @@ The PnP manager is the primary component involved in supporting the ability of W
 Plug and Play support requires cooperation at the hardware, device driver, and operating system levels. Industry standards for the enumeration and identification of devices attached to buses are the foundation of Windows Plug and Play support. For example, the USB standard defines the way that devices on a USB bus identify themselves. With this foundation in place, Windows Plug and Play support provides the following capabilities:
 
 - ■ The PnP manager automatically recognizes installed devices, a process that includes enumerat-
-ing devices attached to the system during a boot and detecting the addition and removal of
-devices as the system executes.
-■ Hardware resource allocation is a role the PnP manager fills by gathering the hardware resource
-requirements (interrupts, I/O memory, I/O registers, or bus-specific resources) of the devices at-
-tached to a system and, in a process called resource arbitration, optimally assigning resources so
-that each device meets the requirements necessary for its operation. Because hardware devices
-can be added to the system after boot-time resource assignment, the PnP manager must also
-be able to reassign resources to accommodate the needs of dynamically added devices.
+  ing devices attached to the system during a boot and detecting the addition and removal of
+  devices as the system executes.
+  ■ Hardware resource allocation is a role the PnP manager fills by gathering the hardware resource
+  requirements (interrupts, I/O memory, I/O registers, or bus-specific resources) of the devices at-
+  tached to a system and, in a process called resource arbitration, optimally assigning resources so
+  that each device meets the requirements necessary for its operation. Because hardware devices
+  can be added to the system after boot-time resource assignment, the PnP manager must also
+  be able to reassign resources to accommodate the needs of dynamically added devices.
 
-CHAPTER 6   I/O system    559
+CHAPTER 6 I/O system 559
 
-From the Library of Mich
----
+## From the Library of Mich
 
 - ■ Loading appropriate drivers is another responsibility of the PnP manager. The PnP manager de-
-termines, based on the identification of a device, whether a driver capable of managing the device
-is installed on the system, and if one is, it instructs the I/O manager to load it. If a suitable driver
-isn't installed, the kernel-mode PnP manager communicates with the user-mode PnP manager to
-install the device, possibly requesting the user's assistance in locating a suitable driver.
-■ The PnP manager also implements application and driver mechanisms for the detection of
-hardware configuration changes. Applications or drivers sometimes require a specific hardware
-device to function, so Windows includes a means for them to request notification of the presence,
-addition, or removal of devices.
-■ It provides a place for storing device state, and it participates in system setup, upgrade, migra-
-tion, and offline image management.
-■ It supports network connected devices, such as network projectors and printers, by allowing
-specialized bus drivers to detect the network as a bus and create device nodes for the devices
-running on it.
+  termines, based on the identification of a device, whether a driver capable of managing the device
+  is installed on the system, and if one is, it instructs the I/O manager to load it. If a suitable driver
+  isn't installed, the kernel-mode PnP manager communicates with the user-mode PnP manager to
+  install the device, possibly requesting the user's assistance in locating a suitable driver.
+  ■ The PnP manager also implements application and driver mechanisms for the detection of
+  hardware configuration changes. Applications or drivers sometimes require a specific hardware
+  device to function, so Windows includes a means for them to request notification of the presence,
+  addition, or removal of devices.
+  ■ It provides a place for storing device state, and it participates in system setup, upgrade, migra-
+  tion, and offline image management.
+  ■ It supports network connected devices, such as network projectors and printers, by allowing
+  specialized bus drivers to detect the network as a bus and create device nodes for the devices
+  running on it.
+
 ## Level of Plug and Play support
 
 Windows aims to provide full support for Plug and Play, but the level of support possible depends on the attached devices and installed drivers. If a single device or driver doesn't support Plug and Play, the extent of Plug and Play support for the system can be compromised. In addition, a driver that doesn't support Plug and Play might prevent other devices from being usable by the system. Table 6-6 shows the outcome of various combinations of devices and drivers that can and can't support Plug and Play.
@@ -2777,14 +2719,11 @@ TABLE 6-6 Device and driver plug-and-play capability
 
 <table><tr><td>Type of Device</td><td>Plug-and-Play Driver</td><td>Non-Plug and Play Driver</td></tr><tr><td>Plug and play</td><td>Full plug and play</td><td>No plug and play</td></tr><tr><td>Non-plug and play</td><td>Possible partial plug and play</td><td>No plug and play</td></tr></table>
 
-
 A device that isn't Plug and Play-compatible is one that doesn't support automatic detection, such as a legacy ISA sound card. Because the operating system doesn't know where the hardware physically lies, certain operations—such as laptop undocking, sleep, and hibernation—are disallowed. However, if a Plug and Play driver is manually installed for the device, the driver can at least implement PnP manager-directed resource assignment for the device.
 
 Drivers that aren't Plug and Play-compatible include legacy drivers, such as those that ran on Windows NT 4. Although these drivers might continue to function on later versions of Windows, the PnP manager can't reconfigure the resources assigned to such devices in the event that resource reallocation is necessary to accommodate the needs of a dynamically added device. For example, a device might be able to use I/O memory ranges A and B, and during the boot, the PnP manager assigns it range A. If a device that can use only A is attached to the system later, the PnP manager can't direct the first device's driver to reconfigure itself to use range B. This prevents the second device from obtaining required resources, which results in the device being unavailable for use by the system. Legacy drivers
 
-
 CHAPTER 6 I/O system
-
 
 From the Library of I
 
@@ -2816,8 +2755,7 @@ which USB, ISA, and SCSI buses are connected to.
 
 FIGURE 6-32 An example of a device tree.
 
-CHAPTER 6   I/O system     561
-
+CHAPTER 6 I/O system 561
 
 ---
 
@@ -2846,10 +2784,9 @@ DevNode 0x85161a98 for PDO 0x84d10390
 
 562 CHAPTER 6 I/O system
 
-
 ---
 
-Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x4dd56b0 for PDO 0x84dc738 InstancePath is "ACPI\_HAL\PNPCDC08\0" ServiceName is "ACPI" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ebf1b0 for PDO 0x85ec0210 InstancePath is "ACPI\GenuineIntel_~x86_Family_6_Model_15\0" ServiceName is "intlppm" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed6970 for PDO 0x8515e618 InstancePath is "ACPI\GenuineIntel_~x86_Family_6_Model_15\1" ServiceName is "intlppm" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed75c8 for PDO 0x85ed79e8 InstancePath is "ACPI\ThermalZone\_ThM" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed6c80 for PDO 0x85ed858 InstancePath is "ACPI\pnp0c14\0" ServiceName is "WmiCapp" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed7008 for PDO 0x85ed7630 InstancePath is "ACPI\ACPI0003\28dada3ff82" ServiceName is "CmBatt" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed7e60 for PDO 0x84d2e030 InstancePath is "ACPI\PNPCOCA1" State = {DeviceNodeStarted (0x308)
+Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x4dd56b0 for PDO 0x84dc738 InstancePath is "ACPI_HAL\PNPCDC08\0" ServiceName is "ACPI" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ebf1b0 for PDO 0x85ec0210 InstancePath is "ACPI\GenuineIntel*~x86_Family_6_Model_15\0" ServiceName is "intlppm" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed6970 for PDO 0x8515e618 InstancePath is "ACPI\GenuineIntel*~x86_Family_6_Model_15\1" ServiceName is "intlppm" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed75c8 for PDO 0x85ed79e8 InstancePath is "ACPI\ThermalZone_ThM" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed6c80 for PDO 0x85ed858 InstancePath is "ACPI\pnp0c14\0" ServiceName is "WmiCapp" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed7008 for PDO 0x85ed7630 InstancePath is "ACPI\ACPI0003\28dada3ff82" ServiceName is "CmBatt" State = {DeviceNodeStarted (0x308) Previous State = {DeviceNodeEnumerateCompletion (0x30d) DevNode 0x85ed7e60 for PDO 0x84d2e030 InstancePath is "ACPI\PNPCOCA1" State = {DeviceNodeStarted (0x308)
 
 ... Information shown for each devnode is the InstancePath, which is the name of the device's enumeration registry key stored under HKLM\SYSTEM\CurrentControlSet\Enum, and the Servicelane, which corresponds to the device's driver registry key under HKLM\SYSTEM\ CurrentControlSet\Services. To see the resources assigned to each devnode, such as interrupts, ports, and memory, specify 0 3 as the command options for the I devnode command.
 
@@ -2859,7 +2796,6 @@ As devnodes are created by the PnP manager, driver objects and device objects ar
 
 CHAPTER 6 |/O system 563
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_581_figure_000.png)
@@ -2867,23 +2803,23 @@ CHAPTER 6 |/O system 563
 FIGURE 6-34 Devnode (device stack).
 
 - ■ A physical device object (PDO) that the PnP manager instructs a bus driver to create when the
-bus driver reports the presence of a device on its bus during enumeration. The PDO represents
-the physical interface to the device and is always at the bottom of the device stack.
-■ One or more optional filter device objects (FIDOs) that layer between the PDO and the func-
-tional device object (FDO; described in the next bullet), called lower filters (the term "lower" is
-always considered in relation to the FDO). These may be used for intercepting IRPs coming out
-of the FDO and towards the bus driver (which may be of interest to bus filters).
-■ One (and only one) functional device object (FDO) that is created by the driver, which is called
-a function driver, that the PnP manager loads to manage a detected device. An FDO represents
-the logical interface to a device, having the most "intimate" knowledge of the functionality
-provided by the device. A function driver can also act as a bus driver if devices are attached to
-the device represented by the FDO. The function driver often creates an interface (essentially a
-name) to the FDO's corresponding PDO so that applications and other drivers can open the de-
-vice and interact with it. Sometimes function drivers are divided into a separate class/port driver
-and miniport driver that work together to manage I/O for the FDO.
-■ One or more optional FIDOs that layer above the FDO, called upper filters. These get first crack
-at an IRP header for the FDO.
-![Figure](figures/Winternals7thPt1_page_581_figure_003.png)
+  bus driver reports the presence of a device on its bus during enumeration. The PDO represents
+  the physical interface to the device and is always at the bottom of the device stack.
+  ■ One or more optional filter device objects (FIDOs) that layer between the PDO and the func-
+  tional device object (FDO; described in the next bullet), called lower filters (the term "lower" is
+  always considered in relation to the FDO). These may be used for intercepting IRPs coming out
+  of the FDO and towards the bus driver (which may be of interest to bus filters).
+  ■ One (and only one) functional device object (FDO) that is created by the driver, which is called
+  a function driver, that the PnP manager loads to manage a detected device. An FDO represents
+  the logical interface to a device, having the most "intimate" knowledge of the functionality
+  provided by the device. A function driver can also act as a bus driver if devices are attached to
+  the device represented by the FDO. The function driver often creates an interface (essentially a
+  name) to the FDO's corresponding PDO so that applications and other drivers can open the de-
+  vice and interact with it. Sometimes function drivers are divided into a separate class/port driver
+  and miniport driver that work together to manage I/O for the FDO.
+  ■ One or more optional FIDOs that layer above the FDO, called upper filters. These get first crack
+  at an IRP header for the FDO.
+  ![Figure](figures/Winternals7thPt1_page_581_figure_003.png)
 
 Note The various device objects have different names in Figure 6-34 to make them easier to describe. However, they are all instances of DEVICE_OBJECT structures.
 
@@ -2893,7 +2829,7 @@ IRPs flow from the top of a device stack toward the bottom. However, any level i
 
 choose to complete an IRP, as described in the "IRP flow" section earlier in this chapter.
 
-564    CHAPTER 6  I/O system
+564 CHAPTER 6 I/O system
 
 ---
 
@@ -2904,7 +2840,6 @@ How does the PnP manager find the correct drivers as part of building the device
 TABLE 6-7 Important registry keys for plug-and-play driver loading
 
 <table><tr><td>Registry Key</td><td>Short Name</td><td>Description</td></tr><tr><td>HKLM\System\CCS\Enum</td><td>Hardware key</td><td>Settings for known hardware devices</td></tr><tr><td>HKLM\System\CCS\Control\Class</td><td>Class key</td><td>Settings for device types</td></tr><tr><td>HKLM\System\CCS\Services</td><td>Software key</td><td>Settings for drivers</td></tr></table>
-
 
 When a bus driver performs device enumeration and discovers a new device, it first creates a PDO to represent the existence of the physical device that has been detected. Next, it informs the PnP manager by calling IoInvalidDeviceRelations (documented in the WDK) with the BusRelations enumeration value and the PDO, indicating to the PnP manager that a change on its bus has been detected. In response, the PnP manager asks the bus driver (through an IRP) for the device identifier.
 
@@ -2919,15 +2854,14 @@ contains descriptive data and includes values named Service and ClassGUID (which
 driver's INF file upon installation) that help the PnP manager locate the device's drivers as follows:
 
 - ■ The Service value is looked up in the Software key, and there the path to the driver (SYS file) is
-stored in the ImagePath value. Figure 6-36 shows the Software subkey named lgfx (from Figure
-6-35) where the Intel display driver can be located. The PnP manager will load that driver (if it's
-not already loaded), call its add-device routine, and there the driver will create the FDO.
+  stored in the ImagePath value. Figure 6-36 shows the Software subkey named lgfx (from Figure
+  6-35) where the Intel display driver can be located. The PnP manager will load that driver (if it's
+  not already loaded), call its add-device routine, and there the driver will create the FDO.
 
 ■ If a value named LowerFilters is present, it contains a multiple string list of drivers to load as
 lower filters, which can be located in the Software subkey. The PnP manager loads these drivers
 before loading the driver associated with the Service value above.
-CHAPTER 6   I/O system     565
-
+CHAPTER 6 I/O system 565
 
 ---
 
@@ -2940,19 +2874,20 @@ FIGURE 6-35 Example of a Hardware subkey.
 FIGURE 6-36 Example of a Software subkey.
 
 - ■ If a value named UpperFilters is present, it indicates a list of driver names (under the Software
-key, similar to LowerFilters) which the PnP manager will load in much the same way after it
-loads the driver pointed to by the Service value.
-■ The ClassGUID value represents the general type of device (display, keyboard, disk, etc), and
-points to a subkey under the Class key (from Table 6-7). The key represents settings applicable to
-all drivers for that type of device. In particular, if the values LowerFilters and/or UpperFilters
-are present, they are treated just like the same values in the Hardware key of the particular
-device. This allows, for example, the loading of an upper filter for keyboard devices, regardless
-of the particular keyboard or the vendor. Figure 6-37 shows the class key for keyboard devices.
-Notice the friendly name (Keyboard), although the GUID is what matters (the decision on the
-particular class is provided as part of the installation INF file). An UpperFilters value exists,
-listing the system provided keyboard class driver that always loads as part of any keyboard
-drivernote. (You can also see the IconPath value that is used as the icon for the keyboard type
-in the Device Manager's UI.)
+  key, similar to LowerFilters) which the PnP manager will load in much the same way after it
+  loads the driver pointed to by the Service value.
+  ■ The ClassGUID value represents the general type of device (display, keyboard, disk, etc), and
+  points to a subkey under the Class key (from Table 6-7). The key represents settings applicable to
+  all drivers for that type of device. In particular, if the values LowerFilters and/or UpperFilters
+  are present, they are treated just like the same values in the Hardware key of the particular
+  device. This allows, for example, the loading of an upper filter for keyboard devices, regardless
+  of the particular keyboard or the vendor. Figure 6-37 shows the class key for keyboard devices.
+  Notice the friendly name (Keyboard), although the GUID is what matters (the decision on the
+  particular class is provided as part of the installation INF file). An UpperFilters value exists,
+  listing the system provided keyboard class driver that always loads as part of any keyboard
+  drivernote. (You can also see the IconPath value that is used as the icon for the keyboard type
+  in the Device Manager's UI.)
+
 ---
 
 ![Figure](figures/Winternals7thPt1_page_584_figure_000.png)
@@ -2986,8 +2921,7 @@ To deal with multifunction devices (such as all-in-one printers or cell phones w
 
 FIGURE 6-38 All-in-one printer with a unique ID as seen by the PnP manager.
 
-CHAPTER 6   I/O system     567
-
+CHAPTER 6 I/O system 567
 
 ---
 
@@ -3049,10 +2983,9 @@ After a device has started, the PnP manager can send the driver additional Plug 
 
 CHAPTER 6 I/O system 569
 
-
 ---
 
-request, the PnP manager sends a query-remove command to the driver that owns the device being ejected (IRP_MN_QUERY_REMOVE_DEVICE). At that point, the driver has a chance to deny the removal or to ensure that any pending I/O operations involving the device have completed, and to begin rejecting further I/O requests aimed at the device. If the driver agrees to the remove request and no open handles to the device remain, the PnP manager next sends a remove command to the driver (IRP_MN_ REMOVE_DEVICE) to request that the driver stop accessing the device and release any resources the driver has allocated on behalf of the device.
+request, the PnP manager sends a query-remove command to the driver that owns the device being ejected (IRP*MN_QUERY_REMOVE_DEVICE). At that point, the driver has a chance to deny the removal or to ensure that any pending I/O operations involving the device have completed, and to begin rejecting further I/O requests aimed at the device. If the driver agrees to the remove request and no open handles to the device remain, the PnP manager next sends a remove command to the driver (IRP_MN* REMOVE_DEVICE) to request that the driver stop accessing the device and release any resources the driver has allocated on behalf of the device.
 
 ![Figure](figures/Winternals7thPt1_page_587_figure_001.png)
 
@@ -3060,7 +2993,7 @@ FIGURE 6-40 The remove/eject device utility.
 
 When the PnP manager needs to reassign a device's resources, it first asks the driver whether it can temporarily suspend further activity on the device by sending the driver a query-stop command (ERP_MN_QUERY_STOP_DEVICE). The driver either agrees to the request (if doing so won't cause data loss or corruption) or denies the request. As with a query-remove command, if the driver agrees to the request, the driver completes pending I/O operations and won't initiate further I/O requests for the device that can't be aborted and subsequently restarted. The driver typically queues new I/O requests so that the resource reshuffling is transparent to applications currently accessing the device. The PnP manager then sends the driver a stop command (ERP_MN_STOP_DEVICE). At that point, the PnP manager can direct the driver to assign different resources to the device and once again send the driver a start-device command for the device.
 
-The various Plug and Play commands essentially guide a device through an operational state machine, forming a well-defined state-transition table, which is shown in Figure 6-41. (The state diagram reflects the state machine implemented by function drivers. Bus drivers implement a more complex state machine.) Each transition in Figure 6-41 is marked by its minor IRP constant name without the IRP_MN_ prefix. One state that we haven't discussed is the one that results from the PnP manager's command (IRP_MN_SURPRISE_REMOVAL). This command results when either a user removes a device without warning, as when the user ejects a PCMCIA card without using the remove/eject utility, or the device fails. The command tells the driver to immediately cease all interaction with the device because the device is no longer attached to the system and to cancel any pending I/O requests.
+The various Plug and Play commands essentially guide a device through an operational state machine, forming a well-defined state-transition table, which is shown in Figure 6-41. (The state diagram reflects the state machine implemented by function drivers. Bus drivers implement a more complex state machine.) Each transition in Figure 6-41 is marked by its minor IRP constant name without the IRP*MN* prefix. One state that we haven't discussed is the one that results from the PnP manager's command (IRP_MN_SURPRISE_REMOVAL). This command results when either a user removes a device without warning, as when the user ejects a PCMCIA card without using the remove/eject utility, or the device fails. The command tells the driver to immediately cease all interaction with the device because the device is no longer attached to the system and to cancel any pending I/O requests.
 
 ---
 
@@ -3070,8 +3003,7 @@ Plug-and-play driver installation
 
 If the PnP manager encounters a device for which no driver is installed, it relies on the user-mode PnP manager to guide the installation process. If the device is detected during the system boot, a devnode is defined for the device, but the loading process is postponed until the user-mode PnP manager starts. (The user-mode PnP manager service is implemented in Unpnpmgr.dll hosted in a standard Svchost. exe instance.)
 
-The components involved in a driver's installation are shown in Figure 6-42. Dark-shaded objects in the figure correspond to components generally supplied by the system, whereas lighter-shaded objects are those included in a driver's installation files. First, a bus driver informs the PnP manager of a device it enumerates using a Device ID (1). The PnP manager checks the registry for the presence of a corresponding function driver, and when it doesn't find one, it informs the user-mode PnP manager (2) of the new device by its Device ID. The user-mode PnP manager first tries to perform an automatic install without user intervention. If the installation process involves the posting of dialog boxes that require user interaction and the currently logged-on driver has administrator privileges, the user-mode PnP manager launches the Rundll32.exe application (the same application that hosts classic .cpl Control Panel utilities) to execute the Hardware Installation Wizard (3) (%SystemRoot%\System32\Newdev. dll). If the currently logged-on user doesn't have administrator privileges (or if no user is logged on) and the installation of the device requires user interaction, the user-mode PnP manager defers the installation until a privileged user logs on. The Hardware Installation Wizard uses Setupapi.dll and CfgMgr32.dll (configuration manager) API functions to locate INF files that correspond to drivers that are compatible with the detected device. This process might involve having the user insert installation media containing a vendor's INF files, or the wizard might locate a suitable INF file in the driver store (%SystemRoot%\System32\DriverStore) that contains drivers that ship with Windows or others that are downloaded through Windows Update. Installation is performed in two steps. In the first, the third CHAPTER 6     I/O system      571
-
+The components involved in a driver's installation are shown in Figure 6-42. Dark-shaded objects in the figure correspond to components generally supplied by the system, whereas lighter-shaded objects are those included in a driver's installation files. First, a bus driver informs the PnP manager of a device it enumerates using a Device ID (1). The PnP manager checks the registry for the presence of a corresponding function driver, and when it doesn't find one, it informs the user-mode PnP manager (2) of the new device by its Device ID. The user-mode PnP manager first tries to perform an automatic install without user intervention. If the installation process involves the posting of dialog boxes that require user interaction and the currently logged-on driver has administrator privileges, the user-mode PnP manager launches the Rundll32.exe application (the same application that hosts classic .cpl Control Panel utilities) to execute the Hardware Installation Wizard (3) (%SystemRoot%\System32\Newdev. dll). If the currently logged-on user doesn't have administrator privileges (or if no user is logged on) and the installation of the device requires user interaction, the user-mode PnP manager defers the installation until a privileged user logs on. The Hardware Installation Wizard uses Setupapi.dll and CfgMgr32.dll (configuration manager) API functions to locate INF files that correspond to drivers that are compatible with the detected device. This process might involve having the user insert installation media containing a vendor's INF files, or the wizard might locate a suitable INF file in the driver store (%SystemRoot%\System32\DriverStore) that contains drivers that ship with Windows or others that are downloaded through Windows Update. Installation is performed in two steps. In the first, the third CHAPTER 6 I/O system 571
 
 ---
 
@@ -3089,7 +3021,6 @@ To find drivers for the new device, the installation process gets a list of hard
 
 These IDs describe all the various ways the hardware might be identified in a driver installation file
 
-
 (INF). The lists are ordered so that the most specific description of the hardware is listed first. If matches
 
 are found in multiple INFs, the following points apply:
@@ -3105,7 +3036,7 @@ Note If a match is found based on a compatible ID, the Hardware Installation wiz
 
 The INF file locates the function driver's files and contains instructions that fill in the driver's enumeration and class keys in the registry, copy required files, and the INF file might direct the Hardware Installation Wizard to (4) launch class or device co-installer DLLs that perform class-specific or devicespecific installation steps, such as displaying configuration dialog boxes that let the user specify settings for a device. Finally, when the drivers that make up a devnode load, the device/driver stack is built (5).
 
-572    CHAPTER 6   I/O system
+572 CHAPTER 6 I/O system
 
 ---
 
@@ -3205,16 +3136,16 @@ Each subkey under the Software key (HKLMLSystem\CurrentControlSet\Services) hold
 The Start value indicates the phase in which a driver (or service) is loaded. There are two main differences between device drivers and services in this regard:
 
 - ■ Only device drivers can specify Start: values of boot-start (0) or system-start (1). This is because
-at these phases, no user mode exists yet, so services cannot be loaded.
-■ Device drivers can use the Group and Tag values (not shown in Table 6-8) to control the order
-of loading within a phase of the boot, but unlike services, they can't specify DependOnGroup or
-DependOnService values (see Chapter 9 in Part 2 for more details).
+  at these phases, no user mode exists yet, so services cannot be loaded.
+  ■ Device drivers can use the Group and Tag values (not shown in Table 6-8) to control the order
+  of loading within a phase of the boot, but unlike services, they can't specify DependOnGroup or
+  DependOnService values (see Chapter 9 in Part 2 for more details).
+
 ---
 
 TABLE 6-8 Important values in a driver's registry key
 
 <table><tr><td>Value Name</td><td>Description</td></tr><tr><td>ImagePath</td><td>This is the path to the driver&#x27;s image file (SYS)</td></tr><tr><td>Type</td><td>This indicates whether this key represents a service or a driver. A value of 1 means a driver and a value of 2 means a file system (or filter) driver. Values of 16 (0x10) and 32 (0x20) mean a service. See Chapter 9 in Part 2 for more information.</td></tr><tr><td>Start</td><td>This indicates when the driver should load. The options are as follows: 0 (SERVICE_BOOT_START) The driver is loaded by the boot loader. 1 (SERVICE_SYSTEM_START) The driver is loaded after the executive is initialized. 2 (SERVICE_AUTO_START) The driver is loaded by the service control manager. 3 (SERVICE_DEMAND_START) The driver is loaded on demand. 4 (SERVICE_DISABLED) The driver is not loaded.</td></tr></table>
-
 
 Chapter 11, "Startup and shutdown, in Part 2 describes the phases of the boot process and explains that a driver Start value of 0 means that the operating system loader loads the driver. A Start value of 1 means that the I/O manager loads the driver after the executive subsystems have finished initializing. The I/O manager calls driver initialization routines in the order that the drivers load within a boot phase. Like Windows services, drivers use the Group value in their registry key to specify which group they belong to: the registry value HKLM\SYSTEM\CurrentControlSet\Control\ServiceGroupOrderList determines the order that groups are loaded within a boot phase.
 
@@ -3251,16 +3182,15 @@ driver can’t enumerate specifies a Start value of system-start (1). An example
 
 driver, which informs the PnP manager of the presence of standard PC serial ports that were
 
-detected by Setup and recorded in the registry.
----
+## detected by Setup and recorded in the registry.
 
 - • A non-Plug and Play driver or file-system driver that doesn't have to be present when the
-system boots specifies a Start value of auto-start (2). An example is the Multiple Universal
-Naming Convention (UNC) Provider (MUP) driver, which provides support for UNC-based path
-names to remote resources (for example, \\RemoteComputerName\SomeShare).
-• Plug and Play drivers that aren't required to boot the system specify a Start value of demand-
-start (3). Examples include network adapter drivers.
-The only purpose that the Start values for Plug and Play drivers and drivers for enumerable devices
+  system boots specifies a Start value of auto-start (2). An example is the Multiple Universal
+  Naming Convention (UNC) Provider (MUP) driver, which provides support for UNC-based path
+  names to remote resources (for example, \\RemoteComputerName\SomeShare).
+  • Plug and Play drivers that aren't required to boot the system specify a Start value of demand-
+  start (3). Examples include network adapter drivers.
+  The only purpose that the Start values for Plug and Play drivers and drivers for enumerable devices
 
 have is to ensure that the operating system loader loads the driver—if the driver is required for the
 
@@ -3286,8 +3216,7 @@ A software-only driver typically creates a device object with a name its clients
 
 FIGURE 6-43 Process Explorer's symbolic link and device name.
 
-CHAPTER 6   I/O system      577
-
+CHAPTER 6 I/O system 577
 
 ---
 
@@ -3299,11 +3228,9 @@ TABLE 6-9 KMDF versions
 
 <table><tr><td>KMDF Version</td><td>Release Method</td><td>Included in Windows</td><td>Drivers Using It Run On</td></tr><tr><td>1.9</td><td>Windows 7 WDK</td><td>Windows 7</td><td>Windows XP and later</td></tr><tr><td>1.11</td><td>Windows 8 WDK</td><td>Windows 8</td><td>Windows Vista and later</td></tr><tr><td>1.13</td><td>Windows 8.1 WDK</td><td>Windows 8.1</td><td>Windows 8.1 and later</td></tr><tr><td>1.15</td><td>Windows 10 WDK</td><td>Windows 10</td><td>Windows 10, Windows Server 2016</td></tr><tr><td>1.17</td><td>Windows 10 version 1511 WDK</td><td>Windows 10 version 1511</td><td>Windows 10 version 1511 and later, Windows Server 2016</td></tr><tr><td>1.19</td><td>Windows 10 version 1607 WDK</td><td>Windows 10 version 1607</td><td>Windows 10 version 1607 and later, Windows Server 2016</td></tr></table>
 
-
 TABLE 6-10 UMDF versions
 
 <table><tr><td>UMDF Version</td><td>Release Method</td><td>Included in Windows</td><td>Drivers Using it Run On</td></tr><tr><td>1.9</td><td>Windows 7 WDK</td><td>Windows 7</td><td>Windows XP and later</td></tr><tr><td>1.11</td><td>Windows 8 WDK</td><td>Windows 8</td><td>Windows Vista and later</td></tr><tr><td>2.0</td><td>Windows 8.1 WDK</td><td>Windows 8.1</td><td>Windows 8.1 and later</td></tr><tr><td>2.15</td><td>Windows 10 WDK</td><td>Windows 10</td><td>Windows 10 and later, Windows Server 2016</td></tr><tr><td>2.17</td><td>Windows 10 version 1511 WDK</td><td>Windows 10 version 1511</td><td>Windows 10 version 1511 and later, Windows Server 2016</td></tr><tr><td>2.19</td><td>Windows 10 version 1607 WDK</td><td>Windows 10 version 1607</td><td>Windows 10 version 1607, Windows Server 2016</td></tr></table>
-
 
 Windows 10 introduced the concept of Universal Drivers, briefly described in Chapter 2, "System architecture." These drivers use a common set of DDIs implemented in multiple editions of Windows 10— from IoT Core, to Mobile, to desktops. Universal drivers can be built with KMDF, UMDF 2.x, or WDM.
 
@@ -3312,7 +3239,6 @@ Building such drivers is relatively easy with the aid of Visual Studio, where th
 UMDF versions 1.x used a COM based model for programming drivers, which is a very different programming model than KMDF, which is using object-based C. UMDF 2 has been aligned with KMDF and provides an almost identical API, reducing overall cost associated with WDF driver development; in fact, UMDF 2.x drivers can be converted to KMDF if the need arises with little work. UMDF 1.x will not be discussed in this book; consult the WDK for more information.
 
 578 CHAPTER 6 I/O system
-
 
 ---
 
@@ -3333,20 +3259,19 @@ First, let's look at which kinds of drivers or devices are supported by KMDF. In
 Although KMDF provides an abstraction on top of WDM, the basic driver structure shown earlier also generally applies to KMDF drivers. At their core, KMDF drivers must have the following functions:
 
 - ■ An initialization routine Like any other driver, a KMDF driver has a DriverEntry function
-that initializes the driver. KMDF drivers initiate the framework at this point and perform any
-configuration and initialization steps that are part of the driver or part of describing the driver
-to the framework. For non-Plug and Play drivers, this is where the first device object should be
-created.
-■ An add-device routine KMDF driver operation is based on events and callbacks (described
-shortly), and the EvtDriverDeviceAdd callback is the single most important one for PnP de-
-vices because it receives notifications when the PnP manager in the kernel enumerates one of
-the driver's devices.
-■ One or more EvtIo* routines Similar to a WDM driver's dispatch routines, these callback
-routines handle specific types of I/O requests from a particular device queue. A driver typically
-creates one or more queues in which KMDF places I/O requests for the driver's devices. These
-queues can be configured by request type and dispatching type.
-CHAPTER 6   I/O system      579
-
+  that initializes the driver. KMDF drivers initiate the framework at this point and perform any
+  configuration and initialization steps that are part of the driver or part of describing the driver
+  to the framework. For non-Plug and Play drivers, this is where the first device object should be
+  created.
+  ■ An add-device routine KMDF driver operation is based on events and callbacks (described
+  shortly), and the EvtDriverDeviceAdd callback is the single most important one for PnP de-
+  vices because it receives notifications when the PnP manager in the kernel enumerates one of
+  the driver's devices.
+  ■ One or more EvtIo\* routines Similar to a WDM driver's dispatch routines, these callback
+  routines handle specific types of I/O requests from a particular device queue. A driver typically
+  creates one or more queues in which KMDF places I/O requests for the driver's devices. These
+  queues can be configured by request type and dispatching type.
+  CHAPTER 6 I/O system 579
 
 ---
 
@@ -3396,7 +3321,6 @@ intlppm.sys        v1.15 0x80df4c0 0x8d0f4fb0 0x87a5000 0x00021000
 
 580 CHAPTER 6 I/O system
 
-
 ---
 
 ```bash
@@ -3436,8 +3360,7 @@ The KMDF object model is object-based, with properties, methods and events, impl
 
 Also unlike the implementation of kernel objects, which all refer to distinct and isolated object types, KMDF objects are all part of a hierarchy—most object types are bound to a parent. The root object is the WDFDRIVER structure, which describes the actual driver. The structure and meaning is analogous to the DRIVER_OBJECT structure provided by the /O manager, and all other KMDF structures are children of it. The next most important object is WDFDEVICE, which refers to a given instance of a detected device on the system, which must have been created with wdfdeviceCreate. Again, this is analogous to the DEVICE_OBJECT structure that's used in the WDM model and by the I/O manager. Table 6-11 lists the object types supported by KMDF.
 
-CHAPTER 6 I/O system   581
-
+CHAPTER 6 I/O system 581
 
 ---
 
@@ -3445,13 +3368,11 @@ TABLE 6-11 KMDF object types
 
 <table><tr><td>Object</td><td>Type</td><td>Description</td></tr><tr><td>Child list</td><td>WDFCHILDLIST</td><td>This is a list of child WDFDEVICE objects associated with the device. It is used only by bus drivers.</td></tr><tr><td>Collection</td><td>WDFCOLLECTION</td><td>This is a list of objects of a similar type, such as a group of WDFDEVICE objects being filtered.</td></tr><tr><td>Deferred Procedure Call</td><td>WDFDC</td><td>This is an instance of a DPC object.</td></tr><tr><td>Device</td><td>WDFDEVICE</td><td>This is an instance of a device.</td></tr><tr><td>DMA common buffer</td><td>WDFCOMMONBUFFER</td><td>This is a region of memory that a device and driver can access for DMA.</td></tr><tr><td>DMA enabler</td><td>WDFDMAENABLER</td><td>This enables DMA on a given channel for a driver.</td></tr><tr><td>DMA transaction</td><td>WDFDATATRANSACTION</td><td>This is an instance of a DMA transaction.</td></tr><tr><td>Driver</td><td>WDFDRIVER</td><td>This is an object for the driver. It represents the driver, its parameters, and its callbacks, among other items.</td></tr><tr><td>File</td><td>WDFFILEOBJECT</td><td>This is an instance of a file object that can be used as a channel for communication between an application and the driver.</td></tr><tr><td>Generic object</td><td>WDFOBJECT</td><td>This allows driver-defined custom data to be wrapped inside the framework&#x27;s object data model as an object.</td></tr><tr><td>Interrupt</td><td>WDFINTERRUPT</td><td>This is an instance of an interrupt that the driver must handle.</td></tr><tr><td>I/O queue</td><td>WDFQUEUE</td><td>This represents a given I/O queue.</td></tr><tr><td>I/O request</td><td>WDFREQUEST</td><td>This represents a given request on a WDFQUEUE.</td></tr><tr><td>I/O target</td><td>WDFIOTARGET</td><td>This represents the device stack being targeted by a given WDFREQUEST.</td></tr><tr><td>Look-aside list</td><td>WDFLOOKASIDE</td><td>This describes an executive look-aside list. (See Chapter 5.)</td></tr><tr><td>Memory</td><td>WDFMEMORY</td><td>This describes a region of paged or nonpaged pool.</td></tr><tr><td>Registry key</td><td>WDFKEY</td><td>This describes a registry key.</td></tr><tr><td>Resource list</td><td>WDFCMRESLIST</td><td>This identifies the hardware resources assigned to a WDFDEVICE.</td></tr><tr><td>Resource range list</td><td>WDFIORESLIST</td><td>This identifies a given possible hardware resource range for a WDFDEVICE.</td></tr><tr><td>Resource requirements list</td><td>WDFIORESREQLIST</td><td>This contains an array of WDFIORESLIST objects describing all possible resource ranges for a WDFDEVICE.</td></tr><tr><td>Spinlock</td><td>WDFSPINLOCK</td><td>This describes a spinlock.</td></tr><tr><td>String</td><td>WDFSTRING</td><td>This describes a Unicode string structure.</td></tr><tr><td>Timer</td><td>WDTIMER</td><td>This describes an executive timer. (See Chapter 8 in Part 2 for more information.)</td></tr><tr><td>USB device</td><td>WDFUSBDEVICE</td><td>This identifies the one instance of a USB device.</td></tr><tr><td>USB interface</td><td>WDFUSBINTERFACE</td><td>This identifies one interface on the given WDFUSBDEVICE.</td></tr><tr><td>USB pipe</td><td>WDFUSBPIPE</td><td>This identifies a pipe to an endpoint on a given WDFUSBINTERFACE.</td></tr><tr><td>Wait lock</td><td>WDFWAITLOCK</td><td>This represents a kernel dispatcher event object.</td></tr></table>
 
-
-582    CHAPTER 6  I/O system
+582 CHAPTER 6 I/O system
 
 ---
 
 <table><tr><td>Object</td><td>Type</td><td>Description</td></tr><tr><td>WMI instance</td><td>WDFWMIINSTANCE</td><td>This represents a WMI data block for a given WDFWMIPROVIDER.</td></tr><tr><td>WMI provider</td><td>WDFWMIPROVIDER</td><td>This describes the WMI schema for all the WDFWMIINSTANCE objects supported by the driver.</td></tr><tr><td>Work item</td><td>WDFWORKITEM</td><td>This describes an executive work item.</td></tr></table>
-
 
 For each of these objects, other KMDF objects can be attached as children. Some objects have only one or two valid parents, while others can be attached to any parent. For example, a WDDIWNTERRUPT object must be associated with a given WDDEVICE, but a WDSPINLOCK or WDSTRING object can have any object as a parent. This allows for fine-grained control over their validity and usage and the reduction of global state variables. Figure 6-44 shows the entire KMDF object hierarchy.
 
@@ -3461,8 +3382,7 @@ FIGURE 6-44 KMDF object hierarchy.
 
 The associations mentioned earlier and shown in Figure 6-44 are not necessarily immediate. The parent must simply be on the hierarchy chain, meaning one of the ancestor nodes must be of this type. This relationship is useful to implement because object hierarchies affect not only an object's locality but also its lifetime. Each time a child object is created, a reference count is added to it by its link to its parent. Therefore, when a parent object is destroyed, all the child objects are also destroyed, which is why associating objects such as WDFSTRING or WDFMEMORY with a given object instead of the default WDFRIVER object can automatically free up memory and state information when the parent object is destroyed.
 
-CHAPTER 6   I/O system   583
-
+CHAPTER 6 I/O system 583
 
 ---
 
@@ -3473,7 +3393,6 @@ Finally, KMDF objects are also associated with a set of attributes, shown in Tab
 TABLE 6-12 KMDF object attributes
 
 <table><tr><td>Attribute</td><td>Description</td></tr><tr><td>ContextSizeOverride</td><td>This is the size of the object context area.</td></tr><tr><td>ContextTypeInfo</td><td>This is the type of the object context area.</td></tr><tr><td>EvtCleanupCallback</td><td>This is the callback to notify the driver of the object&#x27;s cleanup before deletion. (References may still exist.)</td></tr><tr><td>EvtDestroyCallback</td><td>This is the callback to notify the driver of the object&#x27;s imminent deletion. (The reference count will be 0.)</td></tr><tr><td>ExecutionLevel</td><td>This describes the maximum IRQL at which the callbacks may be invoked by KMDF.</td></tr><tr><td>ParentObject</td><td>This identifies the parent of the object.</td></tr><tr><td>SynchronizationScope</td><td>Specifies whether callbacks should be synchronized with the parent, a queue, a device, or nothing.</td></tr></table>
-
 
 ## KMDF I/O model
 
@@ -3503,40 +3422,41 @@ handler action or as the result of a driver call. If KMDF has finished processin
 itself has still not been fully processed, KMDF will take one of the following actions:
 
 - For bus drivers and function drivers, it completes the IRP with STATUS_INVALID_DEVICE_REQUEST.
-For filter drivers, it forwards the request to the next lower driver.
-I/O processing by KMDF is based on the mechanism of queues (WDFQUEUE, not the KQUEUE object discussed earlier in this chapter). KMDF queues are highly scalable containers of I/O requests (packaged as WDFREQUEST objects) and provide a rich feature set beyond merely sorting the pending I/Os for a given device. For example, queues track currently active requests and support I/O cancellation, I/O concurrency (the ability to perform and complete more than one I/O request at a time), and I/O synchronization (as noted in the list of object attributes in Table 6-12). A typical KMDF driver creates at least one queue (if not more) and associates one or more events with each queue, as well as some of the following options:
+  For filter drivers, it forwards the request to the next lower driver.
+  I/O processing by KMDF is based on the mechanism of queues (WDFQUEUE, not the KQUEUE object discussed earlier in this chapter). KMDF queues are highly scalable containers of I/O requests (packaged as WDFREQUEST objects) and provide a rich feature set beyond merely sorting the pending I/Os for a given device. For example, queues track currently active requests and support I/O cancellation, I/O concurrency (the ability to perform and complete more than one I/O request at a time), and I/O synchronization (as noted in the list of object attributes in Table 6-12). A typical KMDF driver creates at least one queue (if not more) and associates one or more events with each queue, as well as some of the following options:
 
-CHAPTER 6   I/O system   585
+CHAPTER 6 I/O system 585
 
 ---
 
 - ■ The callbacks registered with the events associated with this queue.
-■ The power management state for the queue. KMDF supports both power-managed and non-
-power managed queues. For the former, the I/O handler wakes up the device when required
-(and when possible), arms the idle timer when the device has no I/Os queued up, and calls the
-driver's I/O cancellation routines when the system is switching away from a working state.
-■ The dispatch method for the queue. KMDF can deliver I/Os from a queue in sequential, parallel,
-or manual mode. Sequential I/Os are delivered one at a time (KMDF waits for the driver to com-
-plete the previous request), while parallel I/Os are delivered to the driver as soon as possible. In
-manual mode, the driver must manually retrieve I/Os from the queue.
-■ Whether the queue can accept zero-length buffers, such as incoming requests that don't actu-
-ally contain any data.
-![Figure](figures/Winternals7thPt1_page_603_figure_001.png)
+  ■ The power management state for the queue. KMDF supports both power-managed and non-
+  power managed queues. For the former, the I/O handler wakes up the device when required
+  (and when possible), arms the idle timer when the device has no I/Os queued up, and calls the
+  driver's I/O cancellation routines when the system is switching away from a working state.
+  ■ The dispatch method for the queue. KMDF can deliver I/Os from a queue in sequential, parallel,
+  or manual mode. Sequential I/Os are delivered one at a time (KMDF waits for the driver to com-
+  plete the previous request), while parallel I/Os are delivered to the driver as soon as possible. In
+  manual mode, the driver must manually retrieve I/Os from the queue.
+  ■ Whether the queue can accept zero-length buffers, such as incoming requests that don't actu-
+  ally contain any data.
+  ![Figure](figures/Winternals7thPt1_page_603_figure_001.png)
 
 Note The dispatch method only affects the number of requests that can be active inside a driver's queue at one time. It does not determine whether the event callbacks themselves will be called concurrently or serially. That behavior is determined through the synchronization scope object attribute described earlier. Therefore, it is possible for a parallel queue to have concurrency disabled but still have multiple incoming requests.
 
 Based on the mechanism of queues, the KMDF I/O handler can perform various tasks upon receiving a create, close, cleanup, write, read, or device control (IOCTL) request:
 
 - ■ For create requests, the driver can request to be immediately notified through the EvtDevice-
-FileCreate callback event, or it can create a non-manual queue to receive create requests.
-It must then register an EvtIoDefault callback to receive the notifications. Finally, if none of
-these methods are used, KMDF will simply complete the request with a success code, meaning
-that by default, applications will be able to open handles to KMDF drivers that don't supply their
-own code.
-■ For cleanup and close requests, the driver will be immediately notified through the EvtFileClean-
-up and EvtFileClose callbacks, if registered. Otherwise, the framework will simply complete
-with a success code.
-■ For write, read, and IOCTL requests, the flow shown in Figure 6-46 applies.
+  FileCreate callback event, or it can create a non-manual queue to receive create requests.
+  It must then register an EvtIoDefault callback to receive the notifications. Finally, if none of
+  these methods are used, KMDF will simply complete the request with a success code, meaning
+  that by default, applications will be able to open handles to KMDF drivers that don't supply their
+  own code.
+  ■ For cleanup and close requests, the driver will be immediately notified through the EvtFileClean-
+  up and EvtFileClose callbacks, if registered. Otherwise, the framework will simply complete
+  with a success code.
+  ■ For write, read, and IOCTL requests, the flow shown in Figure 6-46 applies.
+
 ---
 
 FIGURE 6-46 Handling read, write, and IOCTL request by KMDF.
@@ -3548,7 +3468,6 @@ Windows includes a growing number of drivers that run in user mode, using the Us
 • UMDF hosts execute in user mode, so any unhandled exception crashes the UMDF host process, but not the entire system. • UMDF hosts process runs with the Local Service account, which has very limited privileges on the local machine and only anonymous access on network connections. This reduces the security attack surface. • UMDF hosts process means the IRQL is always 0 (PASSIVE_LEVEL). Thus, the driver can always take page faults and use kernel dispatcher objects for synchronization (events, mutexes, and so on). • UMDF hosts process means the debugging UMDF drivers because the debugging setup does not require two separate machines (virtual or physical).
 
 CHAPTER 6 I/O system 587
-
 
 ---
 
@@ -3566,8 +3485,7 @@ As in the kernel, each UMDF driver runs as part of a stack. This can contain mul
 
 FIGURE 6-47 UMDF architecture.
 
-588   CHAPTER 6  I/O system
-
+588 CHAPTER 6 I/O system
 
 ---
 
@@ -3577,44 +3495,43 @@ with a UMDF driver running inside its own driver host process. From the diagram,
 
 following components comprise the architecture:
 
-- ■ Applications  These are the clients of the drivers. They are standard Windows applications that
-use the same APIs to perform I/Os as they would with a KMDF-managed or WDM-managed
-device. Applications don't know (nor care) that they're talking to a UMDF-based device, and the
-calls are still sent to the kernel's I/O manager.
-■ Windows kernel (I/O manager)  Based on the application I/O APIs, the I/O manager builds
-the IRPs for the operations, just like for any other standard device.
-■ Reflector  The reflector is what makes UMDF "tick." It is a standard WDM filter driver
-(%SystemRoot%\System32\Drivers\WUDFRd.Sys) that sits at the top of the device stack of each
-device that is being managed by a UMDF driver. The reflector is responsible for managing the
-communication between the kernel and the user-mode driver host process. IRPs related to
-power management, Plug and Play, and standard I/O are redirected to the host process through
-ALPC. This enables the UMDF driver to respond to the I/Os and perform work, as well as be
-involved in the Plug and Play model, by providing enumeration, installation, and management
-of its devices. Finally, the reflector is responsible for keeping an eye on the driver host processes
-by making sure they remain responsive to requests within an adequate time to prevent drivers
-and applications from hanging.
-■ Driver manager  The driver manager is responsible for starting and quitting the driver host
-processes, based on which UMDF-managed devices are present, and also for managing infor-
-mation on them. It is also responsible for responding to messages coming from the reflector
-and applying them to the appropriate host process (such as reacting to device installation). The
-driver manager runs as a standard Windows service implemented in %SystemRoot%\System32\
-WUDSvc.dll (hosted in a standard Svchost.exe), and is configured for automatic startup as soon
-as the first UMDF driver for a device is installed. Only one instance of the driver manager runs
-for all driver host processes (as is always the case with services), and it must always be running
-to allow UMDF drivers to work.
-■ Host process  The host process provides the address space and run-time environment for
-the actual driver (WUDFHost.exe). Although it runs in the local service account, it is not actu-
-ally a Windows service and is not managed by the SCM—only by the driver manager. The host
-process is also responsible for providing the user-mode device stack for the actual hardware,
-which is visible to all applications on the system. Currently, each device instance has its own
-device stack, which runs in a separate host process. In the future, multiple instances may share
-the same host process. Host processes are child processes of the driver manager.
-■ Kernel-mode drivers  If specific kernel support for a device that is managed by a UMDF
-driver is needed, it is also possible to write a companion kernel-mode driver that fills that role.
-In this way, it is possible for a device to be managed both by a UMDF and a KMDF (or WDM)
-driver.
-CHAPTER 6   I/O system     589
-
+- ■ Applications These are the clients of the drivers. They are standard Windows applications that
+  use the same APIs to perform I/Os as they would with a KMDF-managed or WDM-managed
+  device. Applications don't know (nor care) that they're talking to a UMDF-based device, and the
+  calls are still sent to the kernel's I/O manager.
+  ■ Windows kernel (I/O manager) Based on the application I/O APIs, the I/O manager builds
+  the IRPs for the operations, just like for any other standard device.
+  ■ Reflector The reflector is what makes UMDF "tick." It is a standard WDM filter driver
+  (%SystemRoot%\System32\Drivers\WUDFRd.Sys) that sits at the top of the device stack of each
+  device that is being managed by a UMDF driver. The reflector is responsible for managing the
+  communication between the kernel and the user-mode driver host process. IRPs related to
+  power management, Plug and Play, and standard I/O are redirected to the host process through
+  ALPC. This enables the UMDF driver to respond to the I/Os and perform work, as well as be
+  involved in the Plug and Play model, by providing enumeration, installation, and management
+  of its devices. Finally, the reflector is responsible for keeping an eye on the driver host processes
+  by making sure they remain responsive to requests within an adequate time to prevent drivers
+  and applications from hanging.
+  ■ Driver manager The driver manager is responsible for starting and quitting the driver host
+  processes, based on which UMDF-managed devices are present, and also for managing infor-
+  mation on them. It is also responsible for responding to messages coming from the reflector
+  and applying them to the appropriate host process (such as reacting to device installation). The
+  driver manager runs as a standard Windows service implemented in %SystemRoot%\System32\
+  WUDSvc.dll (hosted in a standard Svchost.exe), and is configured for automatic startup as soon
+  as the first UMDF driver for a device is installed. Only one instance of the driver manager runs
+  for all driver host processes (as is always the case with services), and it must always be running
+  to allow UMDF drivers to work.
+  ■ Host process The host process provides the address space and run-time environment for
+  the actual driver (WUDFHost.exe). Although it runs in the local service account, it is not actu-
+  ally a Windows service and is not managed by the SCM—only by the driver manager. The host
+  process is also responsible for providing the user-mode device stack for the actual hardware,
+  which is visible to all applications on the system. Currently, each device instance has its own
+  device stack, which runs in a separate host process. In the future, multiple instances may share
+  the same host process. Host processes are child processes of the driver manager.
+  ■ Kernel-mode drivers If specific kernel support for a device that is managed by a UMDF
+  driver is needed, it is also possible to write a companion kernel-mode driver that fills that role.
+  In this way, it is possible for a device to be managed both by a UMDF and a KMDF (or WDM)
+  driver.
+  CHAPTER 6 I/O system 589
 
 ---
 
@@ -3626,7 +3543,7 @@ host process. Switch to DLL view and scroll down until you see DLLs like the one
 
 ![Figure](figures/Winternals7thPt1_page_607_figure_001.png)
 
-FIGURE 6-48  DLL in UMDF host process.
+FIGURE 6-48 DLL in UMDF host process.
 
 You can identify three main components, which match the architectural overview described earlier:
 
@@ -3635,6 +3552,7 @@ You can identify three main components, which match the architectural overview d
 ● WUDFx02000.dll This is the UMDF 2.x framework DLL.
 
 ● WUDFPlatform.dll This is the run-time environment.
+
 ## The power manager
 
 Just as Windows Plug and Play features require support from a system's hardware, its power-management capabilities require hardware that complies with the Advanced Configuration and Power Interface (ACPI) specification, which is now part of the Unified Extensible Firmware Interface (UEFI). (The ACPI spec is available at http://www.uefi.org/specifications.)
@@ -3647,13 +3565,11 @@ The ACPI standard defines various power levels for a system and for devices. The
 
 to a "more on" state.
 
-■ Hardware latency This is the length of time it takes to return the system to the fully on state.
----
+## ■ Hardware latency This is the length of time it takes to return the system to the fully on state.
 
 TABLE 6-13 System power-state definitions
 
 <table><tr><td>State</td><td>Power Consumption</td><td>Software Resumption</td><td>Hardware Latency</td></tr><tr><td>S0 (fully on)</td><td>Maximum</td><td>Not applicable</td><td>None</td></tr><tr><td>S1 (sleeping)</td><td>Less than S0, more than S2</td><td>System resumes where it left off (returns to S0)</td><td>Less than 2 seconds</td></tr><tr><td>S2 (sleeping)</td><td>Less than S1, more than S3</td><td>System resumes where it left off (returns to S0)</td><td>2 or more seconds</td></tr><tr><td>S3 (sleeping)</td><td>Less than S2; processor is off</td><td>System resumes where it left off (returns to S0)</td><td>Same as S2</td></tr><tr><td>S4 (hibernating)</td><td>Trickle current to power button and wake circuitry</td><td>System restarts from saved hibernation file and resumes where it left off before hibernation (returns to S0)</td><td>Long and undefined</td></tr><tr><td>S5 (fully off)</td><td>Trickle current to power button</td><td>System boot</td><td>Long and undefined</td></tr></table>
-
 
 As noted in Table 6-13, states S1 through S4 are sleeping states, in which the system appears to be off because of reduced power consumption. However, in these sleeping states, the system retains enough information—either in memory or on disk—to move to S0. For states S1 through S3, enough power is required to preserve the contents of the computer's memory so that when the transition is made to S0 (when the user or a device wakes up the computer), the power manager continues executing where it left off before the suspend.
 
@@ -3665,8 +3581,7 @@ On systems with hybrid sleep enabled, a user request to put the computer to slee
 
 Note You can disable hibernation completely and gain some disk space by running powercfg /h off from an elevated command prompt.
 
-CHAPTER 6   I/O system     591
-
+CHAPTER 6 I/O system 591
 
 ---
 
@@ -3704,7 +3619,7 @@ C:\WINDOWS\system32\powercfg /h off
 C:\WINDOWS\system32\powercfg /a
 ```
 
-592    CHAPTER 6  I/O system
+592 CHAPTER 6 I/O system
 
 ---
 
@@ -3737,8 +3652,7 @@ Figure 6-50 shows the device states and the possible state transitions.
 
 FIGURE 6-50 Device power-state transitions.
 
-CHAPTER 6   I/O system    593
-
+CHAPTER 6 I/O system 593
 
 ---
 
@@ -3795,9 +3709,7 @@ TABLE 6-14 An example of system-to-device power mappings
 
 <table><tr><td>System Power State</td><td>Device Power State</td></tr><tr><td>S0 (fully on)</td><td>D0 (fully on)</td></tr><tr><td>S1 (sleeping)</td><td>D1</td></tr><tr><td>S2 (sleeping)</td><td>D2</td></tr><tr><td>S3 (sleeping)</td><td>D2</td></tr><tr><td>S4 (hibernating)</td><td>D3 (fully off)</td></tr><tr><td>S5 (fully off)</td><td>D3 (fully off)</td></tr></table>
 
-
-CHAPTER 6   I/O system   595
-
+CHAPTER 6 I/O system 595
 
 ---
 
@@ -3823,9 +3735,7 @@ You can use Device Manager to see a driver's system power state-to-driver power 
 
 Many power commands have corresponding query commands. For example, when the system is moving to a sleep state, the power manager will first ask the devices on the system whether the transition is acceptable. A device that is busy performing time-critical operations or interacting with device hardware might reject the command, which results in the system maintaining its current system powerstate setting.
 
-
 CHAPTER 6 I/O system
-
 
 From the Library of
 
@@ -3860,7 +3770,7 @@ The Power Options page, which you open by selecting Power Options in the Control
 
 ![Figure](figures/Winternals7thPt1_page_614_figure_005.png)
 
-CHAPTER 6 I/O system     597
+CHAPTER 6 I/O system 597
 
 ---
 
@@ -3892,7 +3802,7 @@ SYSTEM_POWER_POLICY (R.1) @ 0xffff88035a98cc64
     Idle:                Sleep   Flags:     00000000    Event:   00000000
 ```
 
-598   CHAPTER 6   I/O system
+598 CHAPTER 6 I/O system
 
 ---
 
@@ -3937,7 +3847,6 @@ Although a device has control over its own power state, it does not have the abi
 
 CHAPTER 6 I/O system 599
 
-
 ---
 
 The driver may veto the request, but the power manager does not have to comply; it may delay transi tion if possible (e.g., the device is running on a battery that is not critically low); transition to hibernation,
@@ -3955,17 +3864,17 @@ The power policy owner of the device (typically the FDO) must register with PoFy
 PoFyRegisterDevice function. The driver passes along the following information in the call:
 
 - ■ The number of components within the device.
-■ A set of callbacks the driver can implement to be notified by PoFx when various events occur,
-such as switching to active or idle state, switching the device to D0 state and sending power
-control codes (see the WDK for more information).
-■ For each component, the number of F-states it supports.
-■ For each component, the deepest F-state from which the component can wake.
-■ For each component, for each F-state, the time required to return from this state to F0, the min-
-imum amount of time the component can be in this F-state to make the transition worthwhile,
-and the nominal power the component consumes in this F-state. Or, it can be set to indicate
-that the power consumption is negligible and is not worth considering when PoFx decides to
-wake several components simultaneously.
-POFx uses this information—combined with information from other devices and system-wide power
+  ■ A set of callbacks the driver can implement to be notified by PoFx when various events occur,
+  such as switching to active or idle state, switching the device to D0 state and sending power
+  control codes (see the WDK for more information).
+  ■ For each component, the number of F-states it supports.
+  ■ For each component, the deepest F-state from which the component can wake.
+  ■ For each component, for each F-state, the time required to return from this state to F0, the min-
+  imum amount of time the component can be in this F-state to make the transition worthwhile,
+  and the nominal power the component consumes in this F-state. Or, it can be set to indicate
+  that the power consumption is negligible and is not worth considering when PoFx decides to
+  wake several components simultaneously.
+  POFx uses this information—combined with information from other devices and system-wide power
 
 state information, such as the current power profile—to make intelligent decisions for which power
 
@@ -3974,7 +3883,6 @@ F-state a particular component should be in. The challenge is to reconcile two c
 first, ensuring that an idle component consumes as little power as possible, and second, making sure a
 
 600 CHAPTER 6 I/O system
-
 
 ---
 
@@ -4025,8 +3933,7 @@ make the actual change. If the PEP denies the request, the driver may try again 
 
 the aforementioned functions. Only a single call can be made before the driver's callback is invoked.
 
-CHAPTER 6   I/O system      601
-
+CHAPTER 6 I/O system 601
 
 ---
 
@@ -4063,18 +3970,20 @@ respectively. In the kernel, drivers use PoCreatePowerRequest, PoSetPowerRequest
 There are four kinds of requests that can be used through the Power Request API:
 
 - ■ System request This type request asks that the system not automatically go to sleep due to
-the idle timer (although the user can still close the lid to enter sleep, for example).
-■ Display request This type of request does the same as a system request, but for the display.
-■ Away-mode request This is a modification to the normal sleep (S3 state) behavior of Windows,
-which is used to keep the computer in full powered-on mode but with the display and sound
-card turned off, making it appear to the user as though the machine is really sleeping. This be-
-havior is normally used only by specialized set-top boxes or media center devices when media
-delivery must continue even though the user has pressed a physical sleep button, for example.
-■ Execution required request This type of request (available starting with Windows 8 and Server
-2012) requests a UWP app process continue execution even if normally the Process Lifecycle Man-
-ager (PLM) would have terminated it (for whatever reason); the extended length of time depends
-on factors such as the power policy settings. This request type is only supported for systems that
-support Modern Standby, otherwise this request is interpreted as a system request.
+  the idle timer (although the user can still close the lid to enter sleep, for example).
+  ■ Display request This type of request does the same as a system request, but for the display.
+  ■ Away-mode request This is a modification to the normal sleep (S3 state) behavior of Windows,
+  which is used to keep the computer in full powered-on mode but with the display and sound
+  card turned off, making it appear to the user as though the machine is really sleeping. This be-
+  havior is normally used only by specialized set-top boxes or media center devices when media
+  delivery must continue even though the user has pressed a physical sleep button, for example.
+  ■ Execution required request This type of request (available starting with Windows 8 and Server
+
+2012. requests a UWP app process continue execution even if normally the Process Lifecycle Man-
+      ager (PLM) would have terminated it (for whatever reason); the extended length of time depends
+      on factors such as the power policy settings. This request type is only supported for systems that
+      support Modern Standby, otherwise this request is interpreted as a system request.
+
 ---
 
 ### EXPERIMENT: Viewing power availability requests
@@ -4114,8 +4023,7 @@ The output shows six request types (as opposed to the four described previously)
 
 The I/O system defines the model of I/O processing on Windows and performs functions that are common to or required by more than one driver. Its chief responsibilities are to create IRPs representing I/O requests and to shepherd the packets through various drivers, returning results to the caller when an I/O is complete. The I/O manager locates various drivers and devices by using I/O system objects, including driver and device objects. Internally, the Windows I/O system operates asynchronously to achieve high performance and provides both synchronous and asynchronous I/O capabilities to usermode applications.
 
-CHAPTER 6 I/O system   603
-
+CHAPTER 6 I/O system 603
 
 ---
 
@@ -4130,4 +4038,3 @@ applicable to conserve energy and prolong battery life.
 The next chapter touches on one of the most important aspects of today's computer systems: security.
 
 ---
-

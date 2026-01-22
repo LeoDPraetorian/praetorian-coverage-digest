@@ -192,7 +192,7 @@ func TestIntegration_MaxPagesLimit(t *testing.T) {
 
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         requestCount++
-        
+
         // Always return next page (infinite pagination simulation)
         json.NewEncoder(w).Encode(map[string]interface{}{
             "items":    []map[string]string{{"id": fmt.Sprintf("%d", requestCount)}},
@@ -204,7 +204,7 @@ func TestIntegration_MaxPagesLimit(t *testing.T) {
     integration := model.NewIntegration("test", server.URL)
     job := model.NewJob("test", &integration)
 
-    task := NewIntegration(job, &integration, 
+    task := NewIntegration(job, &integration,
         base.WithHTTPBaseURL(server.URL),
         base.WithMaxPages(5),  // Limit to 5 pages
     )

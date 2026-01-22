@@ -29,13 +29,13 @@ Invoke when:
 
 ## Recognition Patterns
 
-| Symptom                    | Likely Cause               |
-| -------------------------- | -------------------------- |
-| Layout never settles       | Culling interfering        |
-| Janky animations           | User interaction conflict  |
-| Flash of incomplete data   | Render racing with fetch   |
-| Clicks during zoom trigger | Event handler race         |
-| Feature disabled in code   | Unresolved interference    |
+| Symptom                    | Likely Cause              |
+| -------------------------- | ------------------------- |
+| Layout never settles       | Culling interfering       |
+| Janky animations           | User interaction conflict |
+| Flash of incomplete data   | Render racing with fetch  |
+| Clicks during zoom trigger | Event handler race        |
+| Feature disabled in code   | Unresolved interference   |
 
 ## Core Pattern: Guard Conditions
 
@@ -52,7 +52,7 @@ Check if another system is in a compatible state before acting.
 const useViewportCulling = ({ graph, enabled }: Props) => {
   const updateVisibility = useCallback(() => {
     // GUARD: Check if layout is still running
-    const layout = graph?.getAttribute('layout');
+    const layout = graph?.getAttribute("layout");
     if (layout?.isRunning()) {
       return; // Skip - layout needs all nodes
     }
@@ -81,7 +81,7 @@ const useLayoutThenCull = (graph: Graph) => {
   const [layoutComplete, setLayoutComplete] = useState(false);
 
   useEffect(() => {
-    const layout = graph.getAttribute('layout');
+    const layout = graph.getAttribute("layout");
     if (!layout) return;
 
     // Listen for layout completion
@@ -210,14 +210,14 @@ const updateGraph = async () => {
 
 ## Common Interference Patterns
 
-| System A         | System B          | Symptom                       | Solution                              |
-| ---------------- | ----------------- | ----------------------------- | ------------------------------------- |
-| Force layout     | Viewport culling  | Layout never settles          | Guard: cull only after layout complete |
-| Animation        | User drag         | Janky movement                | Pause animation during drag           |
-| Data fetch       | Render            | Flash of incomplete data      | Progressive loading with skeleton     |
-| Zoom handler     | Click handler     | Clicks trigger during zoom    | Debounce + event order check          |
-| Batch updates    | Live search       | Stale results                 | Abort previous, sequence updates      |
-| Undo/redo        | Auto-save         | Conflicting state             | Mutex on state modifications          |
+| System A      | System B         | Symptom                    | Solution                               |
+| ------------- | ---------------- | -------------------------- | -------------------------------------- |
+| Force layout  | Viewport culling | Layout never settles       | Guard: cull only after layout complete |
+| Animation     | User drag        | Janky movement             | Pause animation during drag            |
+| Data fetch    | Render           | Flash of incomplete data   | Progressive loading with skeleton      |
+| Zoom handler  | Click handler    | Clicks trigger during zoom | Debounce + event order check           |
+| Batch updates | Live search      | Stale results              | Abort previous, sequence updates       |
+| Undo/redo     | Auto-save        | Conflicting state          | Mutex on state modifications           |
 
 ## Debugging Interference
 
@@ -268,10 +268,10 @@ Is feature broken when combined with another?
 
 ### Requires (invoke before starting)
 
-| Skill                                   | When     | Purpose                               |
-| --------------------------------------- | -------- | ------------------------------------- |
-| `debugging-systematically`              | Start    | Identify root cause before applying pattern |
-| `optimizing-large-data-visualization`   | Parallel | Often used together for performance   |
+| Skill                                 | When     | Purpose                                     |
+| ------------------------------------- | -------- | ------------------------------------------- |
+| `debugging-systematically`            | Start    | Identify root cause before applying pattern |
+| `optimizing-large-data-visualization` | Parallel | Often used together for performance         |
 
 ### Calls (during execution)
 
@@ -279,10 +279,10 @@ None - provides patterns, doesn't invoke other skills.
 
 ### Pairs With (conditional)
 
-| Skill                                   | Trigger               | Purpose                           |
-| --------------------------------------- | --------------------- | --------------------------------- |
-| `preventing-react-hook-infinite-loops` | When guards in hooks  | Avoid creating new infinite loops |
-| `debugging-systematically`              | When pattern fails    | Root cause analysis               |
+| Skill                                  | Trigger              | Purpose                           |
+| -------------------------------------- | -------------------- | --------------------------------- |
+| `preventing-react-hook-infinite-loops` | When guards in hooks | Avoid creating new infinite loops |
+| `debugging-systematically`             | When pattern fails   | Root cause analysis               |
 
 ## Related Skills
 

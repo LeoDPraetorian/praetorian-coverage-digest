@@ -29,14 +29,14 @@ Before completing, verify:
 
 ### ❌ Don't Copy-Paste Without Context or Skip Research
 
-Don't fill templates with placeholder text. Use `researching-skills` to find real patterns (see Phase 6 rationalization table).
+Don't fill templates with placeholder text. Use `orchestrating-research` to find real patterns (see Phase 6 rationalization table).
 
 ### ❌ Don't Exceed Line Limits (MANDATORY)
 
 **🚨 CRITICAL: SKILL.md MUST be <500 lines**
 
 - **Target**: 300-500 lines for SKILL.md
-- **Always use references/** for detailed documentation (no line limit)
+- **Always use references/** for detailed documentation (<400 lines each)
 - **Always use progressive disclosure pattern** from the start
 - **Plan content distribution** during Phase 5 (Generation), not after
 
@@ -58,7 +58,7 @@ Skills must use sequential integer phase numbers (Phase 1, 2, 3, 4...) not fract
 
 **Rule**: [Phase Numbering](.claude/skills/managing-skills/references/patterns/changelog-format.md)
 
-**Acceptable**: Sub-steps within phases (Step 5.1, 5.2, 5.3) for decomposition
+**Acceptable**: Sub-steps within phases (Sub-Phase 5.1, 5.2, 5.3) for decomposition
 
 **When adding phases**: Renumber subsequent phases to maintain sequential integers
 

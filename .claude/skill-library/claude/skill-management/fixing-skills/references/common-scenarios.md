@@ -24,7 +24,25 @@ Common skill compliance issues and recommended fix order.
 4. Troubleshooting → `references/troubleshooting.md`
 5. Complete examples → `examples/example-1.md`
 
-## Scenario 3: Legacy Skill Migration
+## Scenario 3: Over-Long Reference File
+
+**Typical issues:** Phase 3b (reference file >400 lines)
+
+**Fix:** Claude-Auto (3b) - Split by H2 headers into sub-files
+
+**Split decision guide:**
+
+| File Lines | Action                               |
+| ---------- | ------------------------------------ |
+| 400-500    | Split into 2 files by major sections |
+| 500-800    | Split into 2-3 files by H2 headers   |
+| >800       | Split into index + category files    |
+
+**Naming convention:** `{parent}-{category}.md`
+
+Example: `phase-details.md` → `phase-details-deterministic.md`, `phase-details-hybrid.md`
+
+## Scenario 4: Legacy Skill Migration
 
 **Typical issues:** Phase 9 (bash), Phase 11 (cd paths), Phase 13 (no TodoWrite)
 
@@ -32,7 +50,7 @@ Common skill compliance issues and recommended fix order.
 
 **Rationale:** Fix command patterns and add TodoWrite first (automated). Bash migration requires human judgment on migration value.
 
-## Scenario 4: Visual/Style Cleanup
+## Scenario 5: Visual/Style Cleanup
 
 **Typical issues:** Phase 14 (tables), Phase 15 (code blocks), Phase 16 (headers)
 
@@ -40,7 +58,7 @@ Common skill compliance issues and recommended fix order.
 
 **Rationale:** Prettier formatting is automated. Code blocks and headers require semantic understanding (validation-only).
 
-## Scenario 5: Orphan Library Skill
+## Scenario 6: Orphan Library Skill
 
 **Typical issues:** Phase 18 (no gateway or agent reference)
 
@@ -55,7 +73,7 @@ Common skill compliance issues and recommended fix order.
 - MCP tools → `gateway-mcp-tools`
 - Integrations → `gateway-integrations`
 
-## Scenario 6: Missing Integration Section
+## Scenario 7: Missing Integration Section
 
 **Typical issues:** Phase 28 (no Integration section, has Related Skills)
 
@@ -69,7 +87,7 @@ Common skill compliance issues and recommended fix order.
 4. Insert before Related Skills or at end
 5. Optionally consolidate Related Skills
 
-## Scenario 7: Stub Reference Files
+## Scenario 8: Stub Reference Files
 
 **Typical issues:** Phase 26 (empty or placeholder content in references/)
 
@@ -77,7 +95,7 @@ Common skill compliance issues and recommended fix order.
 
 **Critical:** Never populate from training data. Always use research for verified content.
 
-## Scenario 8: Broken Integration References
+## Scenario 9: Broken Integration References
 
 **Typical issues:** Phase 10 (references to renamed/deleted skills)
 

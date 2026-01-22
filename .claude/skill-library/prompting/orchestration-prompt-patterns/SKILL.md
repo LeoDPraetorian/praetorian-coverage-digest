@@ -68,11 +68,11 @@ None - terminal skill providing patterns.
 
 ### Pairs With (conditional)
 
-| Skill                      | Trigger                                | Purpose                                    |
-| -------------------------- | -------------------------------------- | ------------------------------------------ |
-| `orchestrating-research`   | When researching new prompt techniques | Find evidence for pattern effectiveness    |
-| `developing-with-tdd`      | When creating few-shot TDD examples    | Ensure examples follow correct methodology |
-| `debugging-systematically` | When chain-of-thought patterns fail    | Diagnose why reasoning chains break down   |
+| Skill                              | Trigger                                | Purpose                                                                                                            |
+| ---------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| `orchestrating-research` (LIBRARY) | When researching new prompt techniques | Find evidence for pattern effectiveness - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `developing-with-tdd`              | When creating few-shot TDD examples    | Ensure examples follow correct methodology                                                                         |
+| `debugging-systematically`         | When chain-of-thought patterns fail    | Diagnose why reasoning chains break down                                                                           |
 
 ## Anti-Patterns
 

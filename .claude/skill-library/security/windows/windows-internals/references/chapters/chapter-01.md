@@ -1,4 +1,4 @@
-## CHAPTER 1  Concepts and tools
+## CHAPTER 1 Concepts and tools
 
 In this chapter, we'll introduce the key Microsoft Windows operating system (OS) concepts and terms we'll be using throughout this book, such as the Windows API, processes, threads, virtual memory, kernel mode and user mode. objects, handles, security, and the registry. We'll also introduce the tools that you can use to explore Windows internals, such as the kernel debugger, the Performance Monitor, and key tools from Windows Sysinternals (http://www.microsoft.com/technet/sysinternals). In addition, we'll explain how you can use the Windows Driver Kit (WDK) and the Windows Software Development Kit (SDK) as resources for finding further information on Windows internals.
 
@@ -8,17 +8,15 @@ Be sure that you understand everything in this chapter; the remainder of the boo
 
 This book covers the most recent version of the Microsoft Windows client and server operating systems; Windows 10 (32-bit on x86 and ARM, and 64-bit version on x64) and Windows Server 2016 (which exists as 64-bit version only). Unless specifically stated, the text applies to all versions. As background information, Table 1-1 lists the Windows product names, their internal version number, and their release date.
 
-TABLE 1-1  Windows operating system releases
+TABLE 1-1 Windows operating system releases
 
 <table><tr><td>Product Name</td><td>Internal Version Number</td><td>Release Date</td></tr><tr><td>Windows NT 3.1</td><td>3.1</td><td>July 1993</td></tr><tr><td>Windows NT 3.5</td><td>3.5</td><td>September 1994</td></tr><tr><td>Windows NT 3.51</td><td>3.51</td><td>May 1995</td></tr><tr><td>Windows NT 4.0</td><td>4.0</td><td>July 1996</td></tr><tr><td>Windows 2000</td><td>5.0</td><td>December 1999</td></tr><tr><td>Windows XP</td><td>5.1</td><td>August 2001</td></tr><tr><td>Windows Server 2003</td><td>5.2</td><td>March 2003</td></tr></table>
-
 
 1
 
 ---
 
 <table><tr><td>Product Name</td><td>Internal Version Number</td><td>Release Date (continued)</td></tr><tr><td>Windows Server 2003 R2</td><td>5.2</td><td>December 2005</td></tr><tr><td>Windows Vista</td><td>6.0</td><td>January 2007</td></tr><tr><td>Windows Server 2008</td><td>6.0 (Service Pack 1)</td><td>March 2008</td></tr><tr><td>Windows 7</td><td>6.1</td><td>October 2009</td></tr><tr><td>Windows Server 2008 R2</td><td>6.1</td><td>October 2009</td></tr><tr><td>Windows 8</td><td>6.2</td><td>October 2012</td></tr><tr><td>Windows Server 2012</td><td>6.2</td><td>October 2012</td></tr><tr><td>Windows 8.1</td><td>6.3</td><td>October 2013</td></tr><tr><td>Windows Server 2012 R2</td><td>6.3</td><td>October 2013</td></tr><tr><td>Windows 10</td><td>10.0 (build 10240)</td><td>July 2015</td></tr><tr><td>Windows 10 version 1511</td><td>10.0 (build 10586)</td><td>November 2015</td></tr><tr><td>Windows 10 version 1607 (Anniversary Update)</td><td>10.0 (build 14393)</td><td>July 2016</td></tr><tr><td>Windows Server 2016</td><td>10.0 (build 14393)</td><td>October 2016</td></tr></table>
-
 
 The version numbers seem to have strayed from a well-defined path starting with Windows 7. Its
 
@@ -38,8 +36,7 @@ VerifyVersionInfo function or the newer version helper APIs, such as IsWindows8O
 
 IsWindows8Point1OrGreater, IsWindows10OrGreater, IsWindowsServer, and similar. Also, OS compatibility can be indicated in the executable's manifest, which changes the results of this function. (See the section "Image Loader," in Chapter 3 for details.)
 
-2    CHAPTER 1   Concepts and tools
-
+2 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -61,8 +58,7 @@ Note Internally, Microsoft still builds Windows versions in waves. For example, 
 
 Over the years, several flavors of Windows have evolved. Apart from mainstream Windows running on PCs, there is the Xbox 360 game console that runs a fork off Windows 2000. Windows Phone 7 runs a variant based on Windows CE (Microsoft's real-time OS). Maintaining and extending all these code bases is clearly difficult. Therefore, Microsoft decided to converge the kernels and base platform support binaries into one. This started with Windows 8 and Windows Phone 8 having a shared kernel (and Windows 8.1 and Windows Phone 8.1 having a converged Windows Runtime API). With Windows 10, the convergence is complete; this shared platform is known as OneCore, and it runs on PCs, phones, the Xbox One game console, the Hololens and Internet of Things (IoT) devices such as the Raspberry Pi 2.
 
-CHAPTER 1     Concepts and tools      3
-
+CHAPTER 1 Concepts and tools 3
 
 ---
 
@@ -170,7 +166,6 @@ TABLE 1-2 Default .NET Framework installations on Windows
 
 <table><tr><td>Windows Version</td><td>.NET Framework Version</td></tr><tr><td>Windows 8</td><td>4.5</td></tr><tr><td>Windows 8.1</td><td>4.5.1</td></tr><tr><td>Windows 10</td><td>4.6</td></tr><tr><td>Windows 10 version 1511</td><td>4.6.1</td></tr><tr><td>Windows 10 version 1607</td><td>4.6.2</td></tr></table>
 
-
 6 CHAPTER 1 Concepts and tools
 
 ---
@@ -178,10 +173,10 @@ TABLE 1-2 Default .NET Framework installations on Windows
 The .NET Framework consists of two major components:
 
 - The Common Language Runtime (CLR) This is the run-time engine for .NET and includes a
-Just In Time (JIT) compiler that translates Common Intermediate Language (CIL) instructions to
-the underlying hardware CPU machine language, a garbage collector, type verification, code
-access security, and more. It's implemented as a COM in-process server (DLL) and uses various
-facilities provided by the Windows API.
+  Just In Time (JIT) compiler that translates Common Intermediate Language (CIL) instructions to
+  the underlying hardware CPU machine language, a garbage collector, type verification, code
+  access security, and more. It's implemented as a COM in-process server (DLL) and uses various
+  facilities provided by the Windows API.
 
 The .NET Framework Class Library (FCL) This is a large collection of types that implement
 functionality typically needed by client and server applications, such as user interface services,
@@ -216,22 +211,22 @@ Windows system heaps (called pools).
 
 CHAPTER 1 Concepts and tools 7
 
-From the Library of Mich
----
+## From the Library of Mich
 
 - ■ Windows services These are processes started by the Windows service control manager. For
-example, the Task Scheduler service runs in a user-mode process that supports the schtasks
-command (which is similar to the UNIX commands at and cron). (Note that although the regis-
-try defines Windows device drivers as "services," they are not referred to as such in this book.)
-■ Dynamic link libraries (DLLs) These are callable subroutines linked together as a binary file
-that can be dynamically loaded by applications that use the subroutines. Examples include
-Msvcrt.dll (the C run-time library) and Kernel32.dll (one of the Windows API subsystem libraries).
-Windows user-mode components and applications use DLLs extensively. The advantage DLLs
-provide over static libraries is that applications can share DLLs, and Windows ensures that there
-is only one in-memory copy of a DLL's code among the applications that are referencing it.
-Note that library .NET assemblies are compiled as DLLs but without any unmanaged exported
-subroutines. Instead, the CLR parses compiled metadata to access the corresponding types and
-members.
+  example, the Task Scheduler service runs in a user-mode process that supports the schtasks
+  command (which is similar to the UNIX commands at and cron). (Note that although the regis-
+  try defines Windows device drivers as "services," they are not referred to as such in this book.)
+  ■ Dynamic link libraries (DLLs) These are callable subroutines linked together as a binary file
+  that can be dynamically loaded by applications that use the subroutines. Examples include
+  Msvcrt.dll (the C run-time library) and Kernel32.dll (one of the Windows API subsystem libraries).
+  Windows user-mode components and applications use DLLs extensively. The advantage DLLs
+  provide over static libraries is that applications can share DLLs, and Windows ensures that there
+  is only one in-memory copy of a DLL's code among the applications that are referencing it.
+  Note that library .NET assemblies are compiled as DLLs but without any unmanaged exported
+  subroutines. Instead, the CLR parses compiled metadata to access the corresponding types and
+  members.
+
 ## Processes
 
 Although programs and processes appear similar on the surface, they are fundamentally different. A
@@ -243,22 +238,21 @@ when executing the instance of the program. At the highest level of abstraction,
 comprises the following:
 
 - ■ A private virtual address space This is a set of virtual memory addresses that the process
-can use.
-■ An executable program This defines initial code and data and is mapped into the process's
-virtual address space.
-■ A list of open handles These map to various system resources such as semaphores, synchro-
-nization objects, and files that are accessible to all threads in the process.
-■ A security context This is an access token that identifies the user, security groups, privileges,
-attributes, claims, capabilities, User Account Control (UAC) virtualization state, session, and lim-
-ited user account state associated with the process, as well as the AppContainer identifier and
-its related sandboxing information.
-■ A process ID This is a unique identifier, which is internally part of an identifier called a client ID.
-■ At least one thread of execution Although an "empty" process is possible, it is (mostly) not
-useful.
-A number of tools for viewing (and modifying) processes and process information are available. The following experiments illustrate the various views of process information you can obtain with some of these tools. While many of these tools are included within Windows itself, and within the Debugging Tools for Windows and the Windows SDK, others are stand-alone tools from Sysinternals. Many of these tools show overlapping subsets of the core process and thread information, sometimes identified by different names.
+  can use.
+  ■ An executable program This defines initial code and data and is mapped into the process's
+  virtual address space.
+  ■ A list of open handles These map to various system resources such as semaphores, synchro-
+  nization objects, and files that are accessible to all threads in the process.
+  ■ A security context This is an access token that identifies the user, security groups, privileges,
+  attributes, claims, capabilities, User Account Control (UAC) virtualization state, session, and lim-
+  ited user account state associated with the process, as well as the AppContainer identifier and
+  its related sandboxing information.
+  ■ A process ID This is a unique identifier, which is internally part of an identifier called a client ID.
+  ■ At least one thread of execution Although an "empty" process is possible, it is (mostly) not
+  useful.
+  A number of tools for viewing (and modifying) processes and process information are available. The following experiments illustrate the various views of process information you can obtain with some of these tools. While many of these tools are included within Windows itself, and within the Debugging Tools for Windows and the Windows SDK, others are stand-alone tools from Sysinternals. Many of these tools show overlapping subsets of the core process and thread information, sometimes identified by different names.
 
-8    CHAPTER 1   Concepts and tools
-
+8 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -275,10 +269,10 @@ The built-in Windows Task Manager provides a quick list of the processes on the 
 start Task Manager in one of four ways:
 
 - ■ Press Ctrl+Shift+Esc.
-■ Right-click the taskbar and click Start Task Manager.
-■ Press Ctrl+Alt+Delete and click the Start Task Manager button.
-■ Start the executable Taskmgr.exe.
-The first time Task Manager shows up, it's in "less details" mode, where only processes that have a visible top-level window are shown, as in the following screenshot:
+  ■ Right-click the taskbar and click Start Task Manager.
+  ■ Press Ctrl+Alt+Delete and click the Start Task Manager button.
+  ■ Start the executable Taskmgr.exe.
+  The first time Task Manager shows up, it's in "less details" mode, where only processes that have a visible top-level window are shown, as in the following screenshot:
 
 ![Figure](figures/Winternals7thPt1_page_026_figure_005.png)
 
@@ -294,8 +288,7 @@ Name, Process ID, Type, Status, Publisher, and Command Line. Some processes can 
 
 expanded, showing top-level visible windows created by the process.
 
-CHAPTER 1 Concepts and tools     9
-
+CHAPTER 1 Concepts and tools 9
 
 ---
 
@@ -313,47 +306,45 @@ Notice that processes are identified by the name of the image of which they are 
 
 ![Figure](figures/Winternals7thPt1_page_027_figure_006.png)
 
-10    CHAPTER 1   Concepts and tools
-
+10 CHAPTER 1 Concepts and tools
 
 ---
 
 Some key columns are as follows:
 
 - ■ Threads The Threads column shows the number of threads in each process. This num-
-ber should normally be at least one, as there's no direct way of creating a process with no
-threads (and such a process is pretty useless anyway). If a process shows zero threads, it
-usually means the process can't be deleted for some reason—probably because of some
-buggy driver code.
-■ Handles The Handles column shows the number of handles to kernel objects opened by
-threads running within the process. (This is described later in this chapter and in detail in
-Chapter 8 in Part 2.)
-■ Status The Status column is a little bit tricky. For processes that don't have any user
-interface, Running should be the normal case, although the threads may all be waiting for
-something, such as a kernel object being signaled or some I/O operation to complete. The
-other option for such processes is Suspended, and this happens if all the threads in the
-process are in a suspended state. This is unlikely to occur by the process itself, but can be
-achieved programmatically by calling the undocumented NtSuspendProcess native API
-on the process, typically through a tool (for example, Process Explorer, described later, has
-such an option). For processes that create a user interface, the Running status value means
-that the UI is responsive. In other words, the thread that created the window(s) is waiting for
-UI input (technically, the message queue associated with the thread). The Suspended state
-is possible just like in the non-UI case, but for Windows Apps (those hosting the Windows
-Runtime), Suspended normally occurs when the app loses its foreground status by being
-minimized by the user. Such processes are suspended after 5 seconds so that they don't
-consume any CPU or networking resources, thus allowing the new foreground app to get all
-machine resources. This is especially important for battery-powered devices, such as tablets
-and phones. This and other related mechanisms are described more fully in Chapter 9 in
-Part 2. The third possible value for Status is Not Responding. This can happen if a thread
-within the process that created the user interface has not checked its message queue for
-UI-related activity for at least 5 seconds. The process (actually the thread that owns the win-
-dow) may be busy doing some CPU-intensive work or waiting on something else entirely
-(such as an I/O operation to complete). Either way, the UI freezes up, and Windows indicates
-that by fading the window(s) in question and appending "(Not Responding)" to its title.
-Each process also points to its parent (which may be, but is not always, its creator process). If the parent no longer exists, this information is not updated. Therefore, it is possible for a process to refer to a nonexistent parent. This is not a problem, because nothing relies on this information being kept current. In the case of the Process Explorer tool, the start time of the parent process is taken into account to avoid attaching a child process based on a reused process ID. The following experiment illustrates this behavior.
+  ber should normally be at least one, as there's no direct way of creating a process with no
+  threads (and such a process is pretty useless anyway). If a process shows zero threads, it
+  usually means the process can't be deleted for some reason—probably because of some
+  buggy driver code.
+  ■ Handles The Handles column shows the number of handles to kernel objects opened by
+  threads running within the process. (This is described later in this chapter and in detail in
+  Chapter 8 in Part 2.)
+  ■ Status The Status column is a little bit tricky. For processes that don't have any user
+  interface, Running should be the normal case, although the threads may all be waiting for
+  something, such as a kernel object being signaled or some I/O operation to complete. The
+  other option for such processes is Suspended, and this happens if all the threads in the
+  process are in a suspended state. This is unlikely to occur by the process itself, but can be
+  achieved programmatically by calling the undocumented NtSuspendProcess native API
+  on the process, typically through a tool (for example, Process Explorer, described later, has
+  such an option). For processes that create a user interface, the Running status value means
+  that the UI is responsive. In other words, the thread that created the window(s) is waiting for
+  UI input (technically, the message queue associated with the thread). The Suspended state
+  is possible just like in the non-UI case, but for Windows Apps (those hosting the Windows
+  Runtime), Suspended normally occurs when the app loses its foreground status by being
+  minimized by the user. Such processes are suspended after 5 seconds so that they don't
+  consume any CPU or networking resources, thus allowing the new foreground app to get all
+  machine resources. This is especially important for battery-powered devices, such as tablets
+  and phones. This and other related mechanisms are described more fully in Chapter 9 in
+  Part 2. The third possible value for Status is Not Responding. This can happen if a thread
+  within the process that created the user interface has not checked its message queue for
+  UI-related activity for at least 5 seconds. The process (actually the thread that owns the win-
+  dow) may be busy doing some CPU-intensive work or waiting on something else entirely
+  (such as an I/O operation to complete). Either way, the UI freezes up, and Windows indicates
+  that by fading the window(s) in question and appending "(Not Responding)" to its title.
+  Each process also points to its parent (which may be, but is not always, its creator process). If the parent no longer exists, this information is not updated. Therefore, it is possible for a process to refer to a nonexistent parent. This is not a problem, because nothing relies on this information being kept current. In the case of the Process Explorer tool, the start time of the parent process is taken into account to avoid attaching a child process based on a reused process ID. The following experiment illustrates this behavior.
 
-CHAPTER 1 Concepts and tools     11
-
+CHAPTER 1 Concepts and tools 11
 
 ---
 
@@ -402,13 +393,11 @@ System Process (0)
     MSOIDSVC.EXE (1256)
 ```
 
-12    CHAPTER 1   Concepts and tools
-
+12 CHAPTER 1 Concepts and tools
 
 ---
 
 MSOIDSVM.EXE (2264) MBAMAgent.exe (2072) MsMpEng.exe (2116) SearchIndex.exe (1000) SearchProtocolHost.exe (824) svchost.exe (3328) svchost.exe (3428) svchost.exe (4400) svchost.exe (4360) svchost.exe (3720) TrustedInstaller.exe (6052) lsass.exe (664) crssr.exe (536) winlogon.exe (600) dwm.exe (1100) DWM Notification Window explorer.exe (3148) Program Manager OneDrive.exe (4448) cmd.exe (5992) C:\windows\system32\cmd.exe - tlist /t conhost.exe (3120) C:\c:\r\shar\7\wnd tlist.exe (5888) SystemSettingsAdmin\Flow.exe (4608)
-
 
 The list indents each process to show its parent/child relationship. Processes whose parents
 
@@ -418,7 +407,6 @@ grandparent process exists, there's no way to find that relationship. Windows ma
 
 creator process ID, not a link back to the creator of the creator, and so forth.
 
-
 The number in parentheses is the process ID, and the text that follows some processes is the
 
 title of a window that was created by that process.
@@ -426,7 +414,6 @@ title of a window that was created by that process.
 To prove that Windows doesn't keep track of more than just the parent process ID, follow
 
 these steps:
-
 
 1. Press WinKey+R, type cmd, and press Enter to open a Command Prompt window.
 
@@ -447,7 +434,6 @@ these steps:
 9. T o click the Processes tab.
 
 CHAPTER 1 Concepts and tools 13
-
 
 ---
 
@@ -479,11 +465,10 @@ Following are some of the unique things that Process Explorer shows or enables:
 
 ■ Highlighting to show changes in the process, thread, DLLs, and handles list
 
-■ A list of services inside service-hosting processes, including the display name and description
----
+## ■ A list of services inside service-hosting processes, including the display name and description
 
 - ■ A list of additional process attributes, such as mitigation policies and their process protection
-level
+  level
 
 ■ Processes that are part of a job and job details
 
@@ -517,13 +502,15 @@ Process Explorer also provides easy access to information in one place, such as 
 
 • User-mode and kernel-mode thread stacks, including the mapping of addresses to names using
 the Ddghelp.dll that comes with the Debugging Tools for Windows
+
 - • More accurate CPU percentage using the thread cycle count—an even better representation
-of precise CPU activity, as explained in Chapter 4, “Threads.”
+  of precise CPU activity, as explained in Chapter 4, “Threads.”
 
 • Integrity level
+
 - ■ Memory manager details such as peak commit charge and kernel memory paged and non-
-paged pool limits (other tools show only current size)
-An introductory experiment using Process Explorer follows.
+  paged pool limits (other tools show only current size)
+  An introductory experiment using Process Explorer follows.
 
 ---
 
@@ -568,36 +555,36 @@ briefly discussed in “The Windows Runtime” section earlier in this chapter)
 Here are a few steps to walk you through some basic capabilities of Process Explorer:
 
 - 1. Notice that processes hosting services are highlighted by default in pink. Your own pro-
-cesses are highlighted in blue. You can change these colors by opening the drop-down
-menu, selecting Options, and choosing Configure Colors.
+     cesses are highlighted in blue. You can change these colors by opening the drop-down
+     menu, selecting Options, and choosing Configure Colors.
 
 2. Hover your mouse pointer over the image name for processes. Notice that the tooltip
-displays the full path. As noted, certain types of processes have additional details in the
-tooltip.
-CHAPTER 1 Concepts and tools     17
-
+   displays the full path. As noted, certain types of processes have additional details in the
+   tooltip.
+   CHAPTER 1 Concepts and tools 17
 
 ---
 
 - 3. In the Process Image tab, click View, choose Select Columns, and add the image path.
 
 4. Click the Process column head to sort the processes. Notice that the tree view disap-
-pears. (You can either display the tree view or sort by any of the columns shown.) Click
-the Process column head again to sort from Z to A. Click it a third time to return the
-display to tree view.
+   pears. (You can either display the tree view or sort by any of the columns shown.) Click
+   the Process column head again to sort from Z to A. Click it a third time to return the
+   display to tree view.
 
 5. Open the View menu and deselect Show Processes from All Users to show only your
-processes.
+   processes.
 
 6. Click the Options menu, choose Difference Highlight Duration, and change the
-value to 3 seconds. Then launch a new process (anything). Notice that the new process
-is highlighted in green for 3 seconds. Exit this new process, and notice that the process
-is highlighted in red for 3 seconds before disappearing from the display. This can be
-useful for seeing processes being created and exiting on your system.
+   value to 3 seconds. Then launch a new process (anything). Notice that the new process
+   is highlighted in green for 3 seconds. Exit this new process, and notice that the process
+   is highlighted in red for 3 seconds before disappearing from the display. This can be
+   useful for seeing processes being created and exiting on your system.
 
 7. Double-click a process and explore the various tabs available from the process prop-
-erties display. (These will be referenced in various experiments throughout the book
-where the information being shown is being explained.)
+   erties display. (These will be referenced in various experiments throughout the book
+   where the information being shown is being explained.)
+
 ## Threads
 
 A thread is an entity within a process that Windows schedules for execution. Without it, the process's program can't run. A thread includes the following essential components:
@@ -626,8 +613,7 @@ Because switching execution from one thread to another involves the kernel sched
 
 expensive operation, especially if two threads are often switching between each other. Windows imple ments two mechanisms to reduce this cost: fibers and user-mode scheduling (UMS).
 
-18    CHAPTER 1   Concepts and tools
-
+18 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -647,8 +633,7 @@ Note Using fibers is usually not a good idea. This is because they are invisible
 
 User-mode scheduling (UMS) threads, which are available only on 64-bit versions of Windows, provide the same basic advantages as fibers—and only a few of the disadvantages. UMS threads have their own kernel thread state and are therefore visible to the kernel, which allows multiple UMS threads to issue blocking system calls and share and contend on resources. Or, when two or more UMS threads need to perform work in user mode, they can periodically switch execution contexts (by yielding from one thread to another) in user mode rather than involving the scheduler. From the kernel's perspective, the same kernel thread is still running and nothing has changed. When a UMS thread performs an operation that requires entering the kernel (such as a system call), it switches to its dedicated kernel-mode thread (called a directed context switch). While concurrent UMS threads still cannot run on multiple processors, they do follow a pre-emptible model that's not solely cooperative.
 
-CHAPTER 1 Concepts and tools     19
-
+CHAPTER 1 Concepts and tools 19
 
 ---
 
@@ -682,8 +667,7 @@ accounting information for all processes associated with the job and for all pro
 
 with the job but have since terminated. In some ways, the job object compensates for the lack of a struc tured process tree in Windows—yet in many ways it is more powerful than a UNIX-style process tree.
 
-20    CHAPTER 1   Concepts and tools
-
+20 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -727,7 +711,6 @@ limits for these platforms. Sixty-four bits of address space is 2 to the 64th po
 
 22 CHAPTER 1 Concepts and tools
 
-
 ---
 
 equals 1,024 P8, or 1,048,576 T8), but current 64-bit hardware limits this to smaller values. The unmapped region marked in figure 1-5 is much larger than the possible mapped region (about one million times larger on Windows 8), which means the images are (by far) not to scale.
@@ -748,8 +731,7 @@ To protect user applications from accessing and/or modifying critical OS data, W
 
 Note The architectures of the x86 and x64 processors define four privilege levels (or rings) to protect system code and data from being overwritten either inadvertently or maliciously by code of lesser privilege. Windows uses privilege level 0 (or ring 0) for kernel mode and privilege level 3 (or ring 3) for user mode. The reason Windows uses only two levels is that some hardware architectures, such as ARM today and MIPS/Alpha in the past, implemented only two privilege levels. Settling on the lowest minimum bar allowed for a more efficient and portable architecture, especially as the other x86/x64 ring levels do not provide the same guarantees as the ring 0/ring 3 divide.
 
-CHAPTER 1    Concepts and tools      23
-
+CHAPTER 1 Concepts and tools 23
 
 ---
 
@@ -785,8 +767,7 @@ On Windows 10, Microsoft implemented an even more significant change, which was 
 
 With Windows Server 2016, the operating system takes its strongest stance yet. On top of the aforementioned EV requirements, mere attestation signing is insufficient. For a Windows 10 driver to load on a server system, it must pass through stringent Windows Hardware Quality Labs (WHQL) certification as part of the Hardware Compatibility Kit (HCK) and be submitted for formal evaluation. Only WHQL-signed drivers — which provide certain compatibility, security, performance, and stability assurances to system administrators
 
-24    CHAPTER 1   Concepts and tools
-
+24 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -804,9 +785,7 @@ TABLE 1-3 Mode-related performance counters
 
 <table><tr><td>Object: Counter</td><td>Function</td></tr><tr><td>Processor: % Privileged Time</td><td>Percentage of time that an individual CPU (or all CPUs) has run in kernel mode during a specified interval</td></tr><tr><td>Processor: % User Time</td><td>Percentage of time that an individual CPU (or all CPUs) has run in user mode during a specified interval</td></tr><tr><td>Process: % Privileged Time</td><td>Percentage of time that the threads in a process have run in kernel mode during a specified interval</td></tr><tr><td>Process: % User Time</td><td>Percentage of time that the threads in a process have run in user mode during a specified interval</td></tr><tr><td>Thread: % Privileged Time</td><td>Percentage of time that a thread has run in kernel mode during a specified interval</td></tr><tr><td>Thread: % User Time</td><td>Percentage of time that a thread has run in user mode during a specified interval</td></tr></table>
 
-
-CHAPTER 1   Concepts and tools      25
-
+CHAPTER 1 Concepts and tools 25
 
 ---
 
@@ -841,8 +820,8 @@ You can also quickly see this by using Task Manager. Just click the Performance 
 To see how the Performance Monitor itself uses kernel time and user time, run it again, but add the individual process counters % User Time and % Privileged Time for every process in the system:
 
 - 1. If it's not already running, run the Performance Monitor again. (If it is already running,
-start with a blank display by right-clicking in the graph area and selecting Remove All
-Counters.)
+     start with a blank display by right-clicking in the graph area and selecting Remove All
+     Counters.)
 
 2. Click the Add button on the toolbar.
 
@@ -857,12 +836,12 @@ Counters.)
 7. Move the mouse rapidly back and forth.
 
 8. Press Ctrl+H to turn on highlighting mode. This highlights the currently selected counter
-in black.
+   in black.
 
 9. Scroll through the counters at the bottom of the display to identify the processes whose
-threads were running when you moved the mouse, and note whether they were running
-in user mode or kernel mode.
-When you move the mouse, you should see the kernel-mode and user-mode time increase
+   threads were running when you moved the mouse, and note whether they were running
+   in user mode or kernel mode.
+   When you move the mouse, you should see the kernel-mode and user-mode time increase
 
 in the Instance column of the mmc process in the Process Monitor. This is because the process
 
@@ -884,8 +863,7 @@ process run, when Windows has nothing to do, it does it in kernel mode.
 
 Recent shifts in application and software models, such as the introduction of cloud-based services and the pervasiveness of IoT devices, have resulted in the need for operating systems and hardware vendors to figure out more efficient ways to virtualize other OS guests on the host hardware of the machine.
 
-CHAPTER 1   Concepts and tools      27
-
+CHAPTER 1 Concepts and tools 27
 
 ---
 
@@ -896,8 +874,8 @@ To provide such virtualization services, almost all modern solutions employ the 
 Due to its highly privileged nature, and because it has access even greater than the kernel itself, a hypervisor has a distinct advantage that goes beyond merely running multiple guest instances of other operating systems: It can protect and monitor a single host instance to offer assurances and guarantees beyond what the kernel provides. In Windows 10, Microsoft now leverages the Hyper-V hypervisor to provide a new set of services known as virtualization-based security (VBS):
 
 - ■ Device Guard This provides Hypervisor Code Integrity (HCVI) for stronger code-signing
-guarantees over KMCS alone, and allows for the customization of the signature policy of the
-Windows OS, for both user-mode and kernel-mode code.
+  guarantees over KMCS alone, and allows for the customization of the signature policy of the
+  Windows OS, for both user-mode and kernel-mode code.
 
 ■ Hyper Guard This protects key kernel-related and hypervisor-related data structures and
 code.
@@ -953,8 +931,7 @@ allow one interactive session and up to four Windows Media Center Extender sessi
 
 Windows server systems support two simultaneous remote connections. This is to facilitate remote management—for example, using management tools that require you to be logged in to the machine being managed. They also support more than two remote sessions if appropriately licensed and configured as a terminal server.
 
-CHAPTER 1 Concepts and tools     29
-
+CHAPTER 1 Concepts and tools 29
 
 ---
 
@@ -994,7 +971,6 @@ implementations to be changed easily over time.
 
 30 CHAPTER 1 Concepts and tools
 
-
 ---
 
 Objects, through the help of a kernel component called the object manager, provide a convenient means for accomplishing the following four important OS tasks:
@@ -1017,7 +993,7 @@ Windows was designed from the start to be secure and to meet the requirements of
 The core security capabilities of Windows include:
 
 - ■ Discretionary (need-to-know) and mandatory protection for all shareable system objects, such
-as files, directories, processes, threads, and so forth
+  as files, directories, processes, threads, and so forth
 
 ■ Security auditing for accountability of subjects, or users, and the actions they initiate
 
@@ -1028,35 +1004,34 @@ space, that another user has deallocated
 Windows has three forms of access control over objects:
 
 - ■ Discretionary access control This is the protection mechanism that most people think of
-when they think of OS security. It's the method by which owners of objects (such as files or
-printers) grant or deny access to others. When users log in, they are given a set of security
-credentials, or a security context. When they attempt to access objects, their security context is
-compared to the access control list on the object they are trying to access to determine whether
-they have permission to perform the requested operation. With Windows Server 2012 and
-Windows 8, this form of discretionary control is further improved by implementing attribute-
-based access control (also called Dynamic Access Control). However, a resource's access control
-list does not necessarily identify individual users and groups. Instead, it identifies required
-CHAPTER 1     Concepts and tools      31
-
+  when they think of OS security. It's the method by which owners of objects (such as files or
+  printers) grant or deny access to others. When users log in, they are given a set of security
+  credentials, or a security context. When they attempt to access objects, their security context is
+  compared to the access control list on the object they are trying to access to determine whether
+  they have permission to perform the requested operation. With Windows Server 2012 and
+  Windows 8, this form of discretionary control is further improved by implementing attribute-
+  based access control (also called Dynamic Access Control). However, a resource's access control
+  list does not necessarily identify individual users and groups. Instead, it identifies required
+  CHAPTER 1 Concepts and tools 31
 
 ---
 
 attributes or claims that grant access to a resource, such as "Clearance Level: Top Secret" or "Seniority: 10 Years." With the ability to populate such attributes automatically by parsing SQL databases and schemas through Active Directory, this significantly more elegant and flexible security model helps organizations avoid cumbersome manual group management and group hierarchies.
 
 - ■ Privileged access control This is necessary for those times when discretionary access control
-is not enough. It's a method of ensuring that someone can get to protected objects if the owner
-isn't available. For example, if an employee leaves a company, the administrator needs a way to
-gain access to files that might have been accessible only to that employee. In that case, under
-Windows, the administrator can take ownership of the file so that they can manage its rights as
-necessary.
-■ Mandatory integrity control This is required when an additional level of security control is
-needed to protect objects that are being accessed from within the same user account. It's used
-for everything from providing part of the sandboxing technology for Windows Apps (see the
-upcoming discussion), to isolating Protected Mode Internet Explorer (and other browsers) from
-a user's configuration, to protecting objects created by an elevated administrator account from
-access by a non-elevated administrator account. (See Chapter 7 for more information on User
-Account Control.)
-Starting with Windows 8, a sandbox called an AppContainer is used to host Windows Apps, which provides isolation with relation to other AppContainers and non-Windows Apps processes. Code in AppContainers can communicate with brokers (non-isolated processes running with the user's credentials) and sometimes other AppContainers or processes through well-defined contracts provided by the Windows Runtime. A canonical example is the Microsoft Edge browser that runs inside an AppContainer and thus provides better protection against malicious code running within its boundaries. Additionally, third-party developers can leverage AppContainers to isolate their own non-Windows Apps applications in similar ways. The AppContainer model forces a significant shift in traditional programming paradigms, moving from the traditional multithreaded single-process application implementation to a multi-process one.
+  is not enough. It's a method of ensuring that someone can get to protected objects if the owner
+  isn't available. For example, if an employee leaves a company, the administrator needs a way to
+  gain access to files that might have been accessible only to that employee. In that case, under
+  Windows, the administrator can take ownership of the file so that they can manage its rights as
+  necessary.
+  ■ Mandatory integrity control This is required when an additional level of security control is
+  needed to protect objects that are being accessed from within the same user account. It's used
+  for everything from providing part of the sandboxing technology for Windows Apps (see the
+  upcoming discussion), to isolating Protected Mode Internet Explorer (and other browsers) from
+  a user's configuration, to protecting objects created by an elevated administrator account from
+  access by a non-elevated administrator account. (See Chapter 7 for more information on User
+  Account Control.)
+  Starting with Windows 8, a sandbox called an AppContainer is used to host Windows Apps, which provides isolation with relation to other AppContainers and non-Windows Apps processes. Code in AppContainers can communicate with brokers (non-isolated processes running with the user's credentials) and sometimes other AppContainers or processes through well-defined contracts provided by the Windows Runtime. A canonical example is the Microsoft Edge browser that runs inside an AppContainer and thus provides better protection against malicious code running within its boundaries. Additionally, third-party developers can leverage AppContainers to isolate their own non-Windows Apps applications in similar ways. The AppContainer model forces a significant shift in traditional programming paradigms, moving from the traditional multithreaded single-process application implementation to a multi-process one.
 
 Security pervades the interface of the Windows API. The Windows subsystem implements objectbased security in the same way the OS does: protecting shared Windows objects from unauthorized access by placing Windows security descriptors on them. The first time an application tries to access a shared object, the Windows subsystem verifies the application's right to do so. If the security check succeeds, the Windows subsystem allows the application to proceed.
 
@@ -1066,8 +1041,7 @@ For a comprehensive description of Windows security, see Chapter 7.
 
 If you've worked with Windows operating systems, you've probably heard about or looked at the registry. You can't talk much about Windows internals without referring to the registry because it's the system database that contains the information required to boot and configure the system, systemwide software settings that control the operation of Windows, the security database, and per-user
 
-32    CHAPTER 1  Concepts and tools
-
+32 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -1089,8 +1063,7 @@ Because many applications deal with 8-bit (single-byte) ANSI character strings, 
 
 Regardless of language, all versions of Windows contain the same functions. Instead of having separate language versions, Windows has a single worldwide binary so that a single installation can support multiple languages (through the addition of various language packs). Applications can also take advantage of Windows functions that allow single worldwide application binaries that can support multiple languages.
 
-CHAPTER 1 Concepts and tools     33
-
+CHAPTER 1 Concepts and tools 33
 
 ---
 
@@ -1132,8 +1105,7 @@ locate the function CreateFileA. You'll find CreateFileA not much farther down, 
 shown here:
 ![Figure](figures/Winternals7thPt1_page_051_figure_005.png)
 
-34    CHAPTER 1   Concepts and tools
-
+34 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -1144,8 +1116,8 @@ in fact pairs of functions. In the preceding graphic, the following are visible:
 CreateFileMappingA/W, CreateFileTransactedA/W, and CreateFileMappingNumaA/W.
 
 7. You can scroll the list to locate others. You can also open other system files, such as
-user32.dll and advapi32.dll.
-![Figure](figures/Winternals7thPt1_page_052_figure_001.png)
+   user32.dll and advapi32.dll.
+   ![Figure](figures/Winternals7thPt1_page_052_figure_001.png)
 
 Note The COM-based APIs in Windows typically use Unicode strings, sometimes typed as BSTR. This is essentially a null-terminated array of Unicode characters with the length of the string in bytes stored 4 bytes before the start of the array of characters in memory. The Windows Runtime APIs use Unicode strings only, typed as HSTRING, which is an immutable array of Unicode characters.
 
@@ -1171,18 +1143,15 @@ TABLE 1-4 Tools for viewing Windows internals
 
 <table><tr><td>Tool</td><td>Image Name</td><td>Origin</td></tr><tr><td>Startup Programs Viewer</td><td>AUTORUNS</td><td>Sysinternals</td></tr><tr><td>Access Check</td><td>ACCESSCHK</td><td>Sysinternals</td></tr><tr><td>Dependency Walker</td><td>DEPENDS</td><td>www.dependencywalker.com</td></tr><tr><td>Global Flags</td><td>GFLAGS</td><td>Debugging tools</td></tr><tr><td>Handle Viewer</td><td>HANDLE</td><td>Sysinternals</td></tr></table>
 
-
 Continues...
 
-CHAPTER 1    Concepts and tools      35
-
+CHAPTER 1 Concepts and tools 35
 
 ---
 
 TABLE 1-4 Tools for viewing Windows internals (continued)
 
 <table><tr><td>Tool</td><td>Image Name</td><td>Origin</td></tr><tr><td>Kernel debuggers</td><td>WINDBG_KD</td><td>WDK, Windows SDK</td></tr><tr><td>Object Viewer</td><td>WINOBJ</td><td>Sysinternals</td></tr><tr><td>Performance Monitor</td><td>PERFMON_MSC</td><td>Windows built-in tool</td></tr><tr><td>Pool Monitor</td><td>POOLMON</td><td>WDK</td></tr><tr><td>Process Explorer</td><td>PROCEXP</td><td>Sysinternals</td></tr><tr><td>Process Monitor</td><td>PROCMON</td><td>Sysinternals</td></tr><tr><td>Task (Process) List</td><td>TLIST</td><td>Debugging tools</td></tr><tr><td>Task Manager</td><td>TASKMGR</td><td>Windows built-in tool</td></tr></table>
-
 
 ## Performance Monitor and Resource Monitor
 
@@ -1210,7 +1179,6 @@ When expanded, the CPU tab shows information about per-process CPU usage, just l
 
 The Memory tab displays much of the same information that one can obtain with Task Manager, but it is organized for the entire system. A physical memory bar graph displays the current organization of physical memory from either hardware-reserved, in-use, modified, standby, or free memory.
 
-
 See Chapter 5 for the exact meaning of these terms.
 
 The Disk tab, on the other hand, displays per-file information for I/O in a way that makes it easy to identify the most-accessed, the most-written, or the most-read from files the system. These results can be further filtered down by process.
@@ -1218,7 +1186,6 @@ The Disk tab, on the other hand, displays per-file information for I/O in a way 
 The Network tab displays the active network connections, the processes that own them, and how much data is going through them. This information makes it possible to see background network activity that might be hard to detect otherwise. In addition, it shows the TCP connections that are active in the system, organized by process, with data such as the remote and local port and address and packet latency. Finally, it displays a list of listening ports by process, allowing an administrator to see which services or applications are currently waiting for connections on a given port. The protocol and firewall policy for each port and process is also shown.
 
 CHAPTER 1 Concepts and tools 37
-
 
 ---
 
@@ -1277,8 +1244,8 @@ debugging engine implemented in DbgEng.dll, which is documented fairly well in t
 tools. Here's a brief overview of the debuggers:
 
 - • cdb and ntsd are user-mode debuggers based on a console user interface. The only difference
-between them is that ntsd opens a new console window if activated from an existing console
-window, while cdb does not.
+  between them is that ntsd opens a new console window if activated from an existing console
+  window, while cdb does not.
 
 • kd is a kernel-mode debugger based on a console user interface.
 
@@ -1291,13 +1258,13 @@ Usage of one or the other is a matter of preference.
 • The kernel-mode debuggers (kd and WinDbg, when used as such) are equivalent as well.
 User-mode debugging The debugging tools can also be used to attach to a user-mode process and to examine and/or change process memory. There are two options when attaching to a process:
 
-- ■  Invasive  Unless specified otherwise, when you attach to a running process, you use the
-DebugActiveProcess Windows function to establish a connection between the debugger and
-the debugee. This permits you to examine and/or change process memory, set breakpoints, and
-perform other debugging functions. Windows allows you to stop debugging without killing the
-target process as long as the debugger is detached, not killed.
+- ■ Invasive Unless specified otherwise, when you attach to a running process, you use the
+  DebugActiveProcess Windows function to establish a connection between the debugger and
+  the debugee. This permits you to examine and/or change process memory, set breakpoints, and
+  perform other debugging functions. Windows allows you to stop debugging without killing the
+  target process as long as the debugger is detached, not killed.
 
-■  Noninvasive  With this option, the debugger simply opens the process with the OpenProcess
+■ Noninvasive With this option, the debugger simply opens the process with the OpenProcess
 function. It does not attach to the process as a debugger. This allows you to examine and/or
 change memory in the target process, but you cannot set breakpoints. This also means it's
 possible to attach noninvasively even if another debugger is attached invasively.
@@ -1310,15 +1277,14 @@ debugging: a command-line version (Kd.exe) and a GUI version (Windbg.exe). You c
 types of kernel debugging with these tools:
 
 - ■ Open a crash dump file created as a result of a Windows system crash. (See Chapter 15, "Crash
-dump analysis," in Part 2 for more information on kernel crash dumps.)
-■ Connect to a live, running system and examine the system state (or set breakpoints if you're
-debugging device driver code). This operation requires two computers: a target (the system
-being debugged) and a host (the system running the debugger). The target system can be con-
-nected to the host via a null modem cable, an IEEE 1394 cable, a USB 2.0/3.0 debugging cable,
-or the local network. The target system must be booted in debugging mode. You can configure
-the system to boot in debugging mode using Bcdedit.exe or Msconfig.exe. (Note that you may
-CHAPTER 1 Concepts and tools     39
-
+  dump analysis," in Part 2 for more information on kernel crash dumps.)
+  ■ Connect to a live, running system and examine the system state (or set breakpoints if you're
+  debugging device driver code). This operation requires two computers: a target (the system
+  being debugged) and a host (the system running the debugger). The target system can be con-
+  nected to the host via a null modem cable, an IEEE 1394 cable, a USB 2.0/3.0 debugging cable,
+  or the local network. The target system must be booted in debugging mode. You can configure
+  the system to boot in debugging mode using Bcdedit.exe or Msconfig.exe. (Note that you may
+  CHAPTER 1 Concepts and tools 39
 
 ---
 
@@ -1359,14 +1325,13 @@ can format more than 1,000 kernel structures because the kernel symbol files for
 
 information that the debugger can use to format structures.
 
-40    CHAPTER 1  Concepts and tools
-
+40 CHAPTER 1 Concepts and tools
 
 ---
 
 ## EXPERIMENT: Displaying type information for kernel structures
 
-To display the list of kernel structures whose type information is included in the kernel symbols, type dt ntl_* in the kernel debugger. A sample partial output is shown here. (ntrknlmp is the internal file name of the 64-bit kernel. For more details, see Chapter 2.)
+To display the list of kernel structures whose type information is included in the kernel symbols, type dt ntl\_\* in the kernel debugger. A sample partial output is shown here. (ntrknlmp is the internal file name of the 64-bit kernel. For more details, see Chapter 2.)
 
 ```bash
 !kds- dt ntl*_
@@ -1388,7 +1353,7 @@ You can also use the dt command to search for specific structures by using its w
 
 capability. For example, if you were looking for the structure name for an interrupt object, you
 
-could type dt n!*_interrupt* .
+could type dt n!_\_interrupt_ .
 
 ```bash
 !kds: dt ntl_interrupt*
@@ -1424,8 +1389,7 @@ as case insensitive):
   +0x05c Irql        : UChar
 ```
 
-CHAPTER 1 Concepts and tools     41
-
+CHAPTER 1 Concepts and tools 41
 
 ---
 
@@ -1453,7 +1417,7 @@ CHAPTER 1 Concepts and tools     41
 +0x0f8 Padding       : [8] UChar
 ```
 
-Note that dt does not show substructures (structures within structures) by default. To show substructures, use the -r or -b switches. For example, using one of these switches to display the kernel interrupt object shows the format of the _LIST_ENTRY structure stored in the InterruptListEntry field. (See the documentation for the exact differences between the -r and -b switches.)
+Note that dt does not show substructures (structures within structures) by default. To show substructures, use the -r or -b switches. For example, using one of these switches to display the kernel interrupt object shows the format of the \_LIST_ENTRY structure stored in the InterruptListEntry field. (See the documentation for the exact differences between the -r and -b switches.)
 
 ```bash
 !Id> dt nt!\_KINTERRUPT -r
@@ -1483,8 +1447,7 @@ additional details on using kernel debuggers aimed primarily at device-driver wr
 
 documentation.
 
-42      CHAPTER 1   Concepts and tools
-
+42 CHAPTER 1 Concepts and tools
 
 ---
 
@@ -1524,8 +1487,7 @@ The Windows Driver Kit (WDK) is also available through the MSDN subscription pro
 
 Although the WDK is aimed at developers of device drivers, it is an abundant source of Windows internals information. For example, although Chapter 6 describes the I/O system architecture, driver model, and basic device driver data structures, it does not describe the individual kernel support functions in detail. The WDK documentation contains a comprehensive description of all the Windows kernel support functions and mechanisms used by device drivers in both tutorial and reference form.
 
-CHAPTER 1 Concepts and tools     43
-
+CHAPTER 1 Concepts and tools 43
 
 ---
 
@@ -1570,4 +1532,3 @@ Now you're ready to begin your exploration of the internal design of the system,
 overall view of the system architecture and its key components.
 
 ---
-

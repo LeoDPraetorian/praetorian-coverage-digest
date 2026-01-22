@@ -1,3 +1,8 @@
+## 2026-01-19 20:14
+
+- **Phase 28 compliance**: Converted Calls and Pairs With subsections from bullet list format to table format
+- Method: Claude-Automated
+
 # Changelog
 
 ## 2026-01-06 - Initial Creation
@@ -114,3 +119,33 @@
 - Updated `.claude/skills/gateway-claude/SKILL.md` routing table
 - Updated `.claude/docs/agents/AGENT-LOOPHOLES.md` methodology references
 - Updated `references/description-trap.md` example section header
+
+## 2026-01-19 - Line Count Compliance Fix
+
+**Method:** Claude-Automated (Phase 3: Line Count)
+
+**Issue:** SKILL.md had 571 lines, exceeding 500-line hard limit by 71 lines (14.2% overage, WARNING severity)
+
+**Fix Applied:**
+- Extracted detailed counter template content (~125 lines) to `references/counter-templates.md`
+- Replaced inline templates with concise reference link in SKILL.md
+- Renumbered subsequent GREEN Phase steps (8→4, 9→5)
+- Maintained all functionality through progressive disclosure
+
+**Result:**
+- Before: 571 lines (14% over limit)
+- After: 446 lines (11% under limit)
+- Reduction: 125 lines (21.9% decrease)
+- Status: ✅ PASS - Well within 500-line limit
+
+**Files Modified:**
+- `SKILL.md` - Replaced lines 183-316 with reference link, renumbered steps
+- `references/counter-templates.md` - NEW FILE - Counter template documentation
+
+**Verification:**
+```bash
+$ wc -l SKILL.md
+446 SKILL.md
+```
+
+**Backup:** `.local/2026-01-19-19-09-42-pre-fix.bak`

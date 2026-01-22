@@ -82,12 +82,12 @@ This gateway implements 3-tier loading:
 | Test File Existence           | `.claude/skill-library/testing/verifying-test-file-existence/SKILL.md`     | before writing tests                                           |
 | Test Infrastructure Discovery | `.claude/skill-library/testing/test-infrastructure-discovery/SKILL.md`     | what exists, fixtures                                          |
 | Vitest Test Isolation         | `.claude/skill-library/testing/configuring-vitest-test-isolation/SKILL.md` | vitest config, test isolation, process spawning, hanging tests |
-| Discovering Bugs for Fixing   | `.claude/skill-library/testing/discovering-bugs-for-fixing/SKILL.md`   | bug discovery, find bug location, scope bug investigation      |
+| Discovering Bugs for Fixing   | `.claude/skill-library/testing/discovering-bugs-for-fixing/SKILL.md`       | bug discovery, find bug location, scope bug investigation      |
 
 ### Bug Fixing
 
-| Skill                 | Path                                                              | Triggers                                        |
-| --------------------- | ----------------------------------------------------------------- | ----------------------------------------------- |
+| Skill                 | Path                                                          | Triggers                                        |
+| --------------------- | ------------------------------------------------------------- | ----------------------------------------------- |
 | Orchestrating Bug Fix | `.claude/skill-library/testing/orchestrating-bugfix/SKILL.md` | fix bug, bug fix, why is X broken, reported bug |
 
 ### By Test Type

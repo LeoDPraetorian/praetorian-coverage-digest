@@ -26,7 +26,42 @@ After TypeScript detection flags skills with metrics:
 
 For each skill flagged with metrics, determine:
 
-### Step 1: Classify Skill Type
+### Step 1: Distinguish 'Used During' vs 'Guides Workflow' (CRITICAL)
+
+**Before applying any criteria, determine the skill's primary purpose:**
+
+| Type                            | Description                       | Example                                   | TodoWrite? |
+| ------------------------------- | --------------------------------- | ----------------------------------------- | ---------- |
+| **Reference doc used during X** | Consulted while doing X work      | using-tanstack-table (used during review) | NO         |
+| **Workflow guide for X**        | Step-by-step process to execute X | orchestrating-feature-development         | YES        |
+
+**Detection heuristic:**
+
+1. Does the skill have explicit phases/steps the agent must execute in order?
+   - YES → Workflow guide, evaluate further
+   - NO → Reference doc, likely doesn't need TodoWrite
+
+2. Is the skill primarily code examples, API patterns, or lookup material?
+   - YES → Reference doc, doesn't need TodoWrite
+   - NO → Evaluate further
+
+**Common false positive patterns (DO NOT FLAG):**
+
+| Description Pattern                   | Skill Type    | Why No TodoWrite Needed                     |
+| ------------------------------------- | ------------- | ------------------------------------------- |
+| 'Use when REVIEWING code that uses X' | Reference doc | Agent reads patterns, doesn't execute steps |
+| 'Use when ARCHITECTING X features'    | Reference doc | Agent consults patterns, no phases to track |
+| 'Use when implementing X'             | Reference doc | Agent applies patterns atomically           |
+
+**These ARE workflow skills (DO flag if missing TodoWrite):**
+
+| Description Pattern                    | Skill Type       | Why Needs TodoWrite                  |
+| -------------------------------------- | ---------------- | ------------------------------------ |
+| 'Use when orchestrating X development' | Orchestration    | Multi-phase coordination with gates  |
+| 'Use when debugging X systematically'  | Process workflow | 4-phase investigation with evidence  |
+| 'Use when creating X with TDD'         | Process workflow | RED-GREEN-REFACTOR cycle with phases |
+
+### Step 2: Classify Skill Type
 
 **Question: What type of skill is this?**
 
@@ -38,7 +73,7 @@ For each skill flagged with metrics, determine:
 | **Atomic action**           | Single tool call or decision, no intermediate state | ❌ NO             |
 | **Conceptual guide**        | Teaching principles, not execution instructions     | ❌ NO             |
 
-### Step 2: Semantic Criteria for "Needs TodoWrite"
+### Step 3: Semantic Criteria for "Needs TodoWrite"
 
 A skill **NEEDS** TodoWrite if it describes a **stateful workflow**:
 
@@ -66,7 +101,7 @@ A skill **NEEDS** TodoWrite if it describes a **stateful workflow**:
    - Phase 1 output feeds into Phase 2 input
    - State accumulated across phases
 
-### Step 3: Semantic Criteria for "Does NOT Need TodoWrite"
+### Step 4: Semantic Criteria for "Does NOT Need TodoWrite"
 
 A skill does **NOT** need TodoWrite if:
 
@@ -169,6 +204,17 @@ A skill does **NOT** need TodoWrite if:
 - Agent reads examples and applies to own code
 - Single action: read pattern, apply it
 - **Verdict:** Should NOT have TodoWrite mandate
+
+### False Positive Examples (Look Like Workflows But Aren't)
+
+**using-tanstack-table:**
+
+- Description: 'Use when implementing, REVIEWING, or ARCHITECTING TanStack Table v8'
+- Actual content: API patterns, code examples, common errors reference
+- Has 'REVIEWING' and 'ARCHITECTING' in description but...
+- NO phases/steps to execute, just reference material to consult
+- **Verdict:** Reference doc, should NOT have TodoWrite mandate
+- **Why description is misleading:** 'Reviewing' means 'consult this skill while reviewing Table code' NOT 'follow a multi-step review workflow'
 
 ## Reasoning Template
 

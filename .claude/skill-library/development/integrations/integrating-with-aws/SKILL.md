@@ -70,17 +70,17 @@ client = boto3.client('dynamodb', region_name='us-east-1')
 
 ## Quick Reference
 
-| Service              | Common Operations                          | Chariot Usage                            |
-| -------------------- | ------------------------------------------ | ---------------------------------------- |
-| Lambda               | Function deployment, invocation, logs      | Backend API handlers, async processing   |
-| DynamoDB             | Query, Scan, PutItem, UpdateItem           | Primary data store                       |
-| S3                   | PutObject, GetObject, ListObjects          | File storage, scan results               |
-| API Gateway          | REST API, WebSocket, authorization         | HTTP API entry points                    |
-| CloudFormation       | Stack creation, updates, outputs           | Infrastructure as Code                   |
-| **StackSets**        | **Org-wide deployment, delegated admin**   | **Multi-account IAM roles, baselines**   |
-| IAM                  | Role management, policy attachment         | Service permissions                      |
-| CloudWatch           | Logs, metrics, alarms                      | Monitoring and debugging                 |
-| Neo4j (AWS)          | Graph queries, relationship traversal      | Attack surface graph database            |
+| Service        | Common Operations                        | Chariot Usage                          |
+| -------------- | ---------------------------------------- | -------------------------------------- |
+| Lambda         | Function deployment, invocation, logs    | Backend API handlers, async processing |
+| DynamoDB       | Query, Scan, PutItem, UpdateItem         | Primary data store                     |
+| S3             | PutObject, GetObject, ListObjects        | File storage, scan results             |
+| API Gateway    | REST API, WebSocket, authorization       | HTTP API entry points                  |
+| CloudFormation | Stack creation, updates, outputs         | Infrastructure as Code                 |
+| **StackSets**  | **Org-wide deployment, delegated admin** | **Multi-account IAM roles, baselines** |
+| IAM            | Role management, policy attachment       | Service permissions                    |
+| CloudWatch     | Logs, metrics, alarms                    | Monitoring and debugging               |
+| Neo4j (AWS)    | Graph queries, relationship traversal    | Attack surface graph database          |
 
 ## Implementation
 

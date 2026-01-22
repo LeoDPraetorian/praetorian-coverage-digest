@@ -18,7 +18,8 @@ Bad approach:
 
 **Why this is wrong:**
 
-- Only 2 steps (threshold is ≥3)
+- Only 1 substantial action (summarizing) after file read
+- Reading + summarizing is a single cognitive task, not 2 distinct steps
 - Takes <5 minutes total
 - No context drift risk
 - No user visibility benefit
@@ -426,7 +427,7 @@ Good granularity:
 
 ## Mistake 13: No TodoWrite for Complex Workflows
 
-**❌ Bad: Skip TodoWrite for ≥3 steps**
+**❌ Bad: Skip TodoWrite for ≥2 steps**
 
 ```
 User: "Refactor authentication system"
@@ -442,7 +443,7 @@ Result:
 
 **Why this is wrong:**
 
-- Violates complexity triggers (≥3 steps → use TodoWrite)
+- Violates complexity triggers (≥2 steps → use TodoWrite)
 - Risk forgetting tasks
 - No user visibility
 - Violates system prompt requirement
@@ -453,7 +454,7 @@ Result:
 User: "Refactor authentication system"
 
 Good approach:
-1. Check triggers: ≥3 steps? YES → Use TodoWrite
+1. Check triggers: ≥2 steps? YES → Use TodoWrite
 2. Create complete task list
 3. Work through tasks with status updates
 ```

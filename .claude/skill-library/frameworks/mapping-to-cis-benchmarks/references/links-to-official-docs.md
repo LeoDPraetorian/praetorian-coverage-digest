@@ -35,14 +35,17 @@
 ### AWS CIS Foundations Benchmark
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/amazon_web_services
 
 **AWS Documentation**:
+
 - [AWS Security Hub - CIS AWS Foundations Benchmark](https://docs.aws.amazon.com/securityhub/latest/userguide/cis-aws-foundations-benchmark.html)
 - [What Are CIS Benchmarks? - AWS](https://aws.amazon.com/what-is/cis-benchmarks/)
 - [AWS Audit Manager - CIS Benchmark](https://docs.aws.amazon.com/audit-manager/latest/userguide/CIS.html)
 
 **Current Versions**:
+
 - v3.0.0 (May 2024) - Latest
 - v2.0.0 - Previous
 - v1.4.0 - Legacy
@@ -50,14 +53,17 @@
 ### Azure CIS Foundations Benchmark
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/azure
 
 **Microsoft Documentation**:
+
 - [CIS Microsoft Azure Foundations Benchmark Compliance](https://learn.microsoft.com/en-us/azure/governance/policy/samples/cis-azure-2-0-0)
 - [Azure Security Benchmark and CIS Mapping](https://learn.microsoft.com/en-us/security/benchmark/azure/v2-cis-benchmark)
 - [Center for Internet Security (CIS) Benchmarks](https://learn.microsoft.com/en-us/compliance/regulatory/offering-cis-benchmark)
 
 **Current Versions**:
+
 - v5.0.0 - Latest
 - v2.0.0 - Widely adopted
 - v1.3.0 - Previous
@@ -65,14 +71,17 @@
 ### GCP CIS Foundations Benchmark
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/google_cloud_computing_platform
 
 **Google Cloud Documentation**:
+
 - [CIS Benchmarks - GCP Security](https://cloud.google.com/security/compliance/cis)
 - [Security Command Center Compliance Management](https://cloud.google.com/security-command-center/docs/compliance-management)
 - [Policy Controller - CIS Kubernetes Benchmark](https://cloud.google.com/kubernetes-engine/enterprise/policy-controller/docs/how-to/using-cis-k8s-benchmark)
 
 **Current Versions**:
+
 - v4.0.0 - Latest
 - v2.0.0 - Widely adopted
 - v1.3.0 - Previous
@@ -84,21 +93,26 @@
 ### Linux Distribution Independent
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/distribution_independent_linux
 
 **Current Version**:
+
 - v2.0.0
 
 ### Ubuntu Linux
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/ubuntu_linux
 
 **Ubuntu Documentation**:
+
 - [Ubuntu Security - CIS Benchmarks](https://ubuntu.com/security/cis)
 - [CIS Benchmarks and Profiles - Ubuntu Security Guide](https://documentation.ubuntu.com/security/compliance/usg/cis-benchmarks/)
 
 **Available for**:
+
 - Ubuntu 24.04 LTS
 - Ubuntu 22.04 LTS
 - Ubuntu 20.04 LTS
@@ -106,13 +120,16 @@
 ### Red Hat Enterprise Linux (RHEL)
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/red_hat_linux
 
 **Red Hat Documentation**:
+
 - [Red Hat CIS Benchmarks Compliance](https://access.redhat.com/compliance/cis-benchmarks)
 - [CIS Compliance using OpenSCAP](https://www.redhat.com/en/blog/center-internet-security-cis-compliance-red-hat-enterprise-linux-using-openscap)
 
 **Available for**:
+
 - RHEL 10
 - RHEL 9
 - RHEL 8
@@ -121,11 +138,13 @@
 ### SUSE Linux
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/suse_linux
 
 ### Debian Linux
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/debian_linux
 
 ---
@@ -135,12 +154,15 @@
 ### Microsoft Windows Server
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/microsoft_windows_server
 
 **Microsoft Documentation**:
+
 - [Center for Internet Security (CIS) Benchmarks](https://learn.microsoft.com/en-us/compliance/regulatory/offering-cis-benchmark)
 
 **Available for**:
+
 - Windows Server 2025
 - Windows Server 2022
 - Windows Server 2019
@@ -149,6 +171,7 @@
 ### Microsoft Windows Desktop
 
 **Official CIS Pages**:
+
 - Windows 11: https://www.cisecurity.org/benchmark/microsoft_windows_11
 - Windows 10: https://www.cisecurity.org/benchmark/microsoft_windows_10
 
@@ -159,37 +182,46 @@
 ### Kubernetes
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/kubernetes
 
 **Kubernetes Community Resources**:
+
 - [kube-bench (Aqua Security)](https://github.com/aquasecurity/kube-bench)
 
 **Cloud Provider K8s Benchmarks**:
+
 - [CIS Amazon EKS Benchmark](https://aws.amazon.com/blogs/containers/introducing-cis-amazon-eks-benchmark/)
 - [CIS AKS Benchmark (Azure)](https://learn.microsoft.com/en-us/azure/aks/cis-kubernetes)
 - [CIS GKE Benchmark (GCP) v1.5.1](https://cloud.google.com/kubernetes-engine/enterprise/policy-controller/docs/how-to/using-cis-k8s-benchmark)
 - [CIS GKE Benchmark (GCP) v1.7.1](https://docs.cloud.google.com/kubernetes-engine/enterprise/policy-controller/docs/how-to/using-cis-k8s-v1.7)
 
 **Lightweight Kubernetes**:
+
 - [K3s CIS 1.9 Self Assessment Guide](https://docs.k3s.io/security/self-assessment-1.9)
 - [RKE2 CIS Hardening Guide](https://docs.rke2.io/security/hardening_guide)
 
 **Current Version**:
+
 - v1.9 (for Kubernetes v1.27-v1.29)
 
 ### Docker
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/docker
 
 **Docker Documentation**:
+
 - [Docker CIS Benchmark](https://docs.docker.com/dhi/core-concepts/cis/)
 
 **Community Tools**:
+
 - [docker-bench-security](https://github.com/docker/docker-bench-security)
 - [InSpec CIS Docker Profile](https://github.com/dev-sec/cis-docker-benchmark)
 
 **Current Version**:
+
 - v1.7.0 (July 2024)
 - v1.8.0 for Docker v28
 
@@ -200,26 +232,31 @@
 ### MongoDB
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/mongodb
 
 ### PostgreSQL
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/postgresql
 
 ### MySQL
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/mysql
 
 ### Oracle Database
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/oracle_database
 
 ### Microsoft SQL Server
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/microsoft_sql_server
 
 ---
@@ -229,16 +266,19 @@
 ### Apache HTTP Server
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/apache_http_server
 
 ### NGINX
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/nginx
 
 ### Microsoft IIS
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/microsoft_iis
 
 ---
@@ -248,6 +288,7 @@
 ### Cisco
 
 **Official CIS Pages**:
+
 - Cisco IOS: https://www.cisecurity.org/benchmark/cisco_ios
 - Cisco Firewall: https://www.cisecurity.org/benchmark/cisco_firewall
 - Cisco ASA: https://www.cisecurity.org/benchmark/cisco_asa
@@ -255,11 +296,13 @@
 ### Palo Alto Networks
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/palo_alto_networks
 
 ### Juniper
 
 **Official CIS Page**:
+
 - https://www.cisecurity.org/benchmark/juniper
 
 ---
@@ -267,9 +310,11 @@
 ## CIS STIG Benchmarks
 
 **Overview Page**:
+
 - https://www.cisecurity.org/benchmark/stig_bm
 
 **DISA STIG Resources**:
+
 - [DISA STIGs Homepage](https://public.cyber.mil/stigs/)
 - [STIG Viewer](https://public.cyber.mil/stigs/stig-viewing-tools/)
 

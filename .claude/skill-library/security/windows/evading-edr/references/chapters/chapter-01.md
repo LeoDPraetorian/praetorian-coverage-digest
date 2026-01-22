@@ -1,4 +1,4 @@
-## 1  EDR-CHITECTURE
+## 1 EDR-CHITECTURE
 
 ![Figure](figures/EvadingEDR_page_027_figure_001.png)
 
@@ -30,7 +30,7 @@ When a radio wave bounces off an object and returns to the radar system, it crea
 
 This is very similar to how an EDR handles the telemetry collected by its sensors. On its own, information about how a process was created or a file was accessed rarely provides enough context to make an informed decision regarding actions to be taken. They're just blips on the radar display. Moreover, a process detected by an EDR can terminate at any point in time.
 
-2    Chapter 1
+2 Chapter 1
 
 ---
 
@@ -42,7 +42,7 @@ Therefore, it is important for the telemetry feeding into the EDR to be as compl
 
 The EDR then passes the data to its detection logic. This detection logic takes all available telemetry and uses some internal method, such as environmental heuristics or static signature libraries, to attempt to ascertain whether the activity was benign or malicious and whether the activity meets its threshold for logging or prevention.
 
-## $$  Sensors  $$
+## $$ Sensors $$
 
 If telemetry represents the blips on the radar, then sensors are the transmitter, duplexer, and receiver: the components responsible for detecting objects and turning them into blips. Whereas radar systems constantly ping objects to track their movements, EDR sensors work a bit more passively by intercepting data flowing through an internal process, extracting information, and forwarding it to the central agent.
 
@@ -68,7 +68,7 @@ Many adversaries rely on bypasses described anecdotally or in public proofs of c
 
 First, those public bypasses only work if an EDR's capabilities stay the same over time and across different organizations. This isn't a huge issue for internal red teams, which likely encounter the same product deployed across their entire environment. For consultants and malicious threat actors, however, the evolution of EDR products poses a significant headache, as each environment's software has its own configuration, heuristics,
 
-4    Chapter 1
+4 Chapter 1
 
 ---
 
@@ -102,12 +102,11 @@ Table 1-1: Evaluating a Series of Events on the System
 
 <table><tr><td>Event</td><td>Context</td><td>Determination</td></tr><tr><td>2:55 AM: The application chatapp.exe spawns under the context CONTOSO\cdoe.</td><td>The user JDOE frequently travels internationally and works off-hours to meet with business partners in other regions.</td><td>Benign</td></tr><tr><td>2:55 AM: The application chatapp.exe loads an unsigned DLL, usp10.dll, from the %APPDATA% directory.</td><td>This chat application isn&#x27;t known to load unsigned code in its default configuration, but users at the organization are permitted to install third-party plug-ins that may change the application&#x27;s behavior at startup.</td><td>Mildly suspicious</td></tr><tr><td>2:56 AM: The application chatapp.exe makes a connection to the internet over TCP port 443.</td><td>This chat application&#x27;s server is hosted by a cloud provider, so it regularly polls the server for information.</td><td>Benign</td></tr><tr><td>2:59 AM: The application chatapp.exe queries the registry value HKLM\System\CurrentControlSet\Control\SA\soCoHgFlags.</td><td>This chat application regularly pulls system- and application-configuration information from the registry but isn&#x27;t known to access registry keys associated with Credential Guard.</td><td>Highly suspicious</td></tr><tr><td>3 AM: The application chatapp.exe opens a handle to lsass.exe with PROCESS_VM_READ access.</td><td>This chat application doesn&#x27;t access the address spaces of other processes, but the user JDOE does have the required permissions.</td><td>Malicious</td></tr></table>
 
-
 This contrived example shows the ambiguity involved in determining intent based on the actions taken on a system. Remember that the overwhelming majority of activities on a system are benign, assuming that something horrible hasn't happened. Engineers must determine how sensitive an EDR's detections should be (in other words, how much they should skew toward saying something is malicious) based on how many false negatives the customer can tolerate.
 
 One way that a product can meet its customers' needs is by using a combination of so-called brittle and robust detections.
 
-6    Chapter 1
+6 Chapter 1
 
 ---
 
@@ -171,7 +170,7 @@ Listing 1-2: Elastic's rule for detecting atypical processes communicating over 
 
 This rule targets atypical processes that make outbound connections to TCP port 88, the standard Kerberos port. While this rule contains some gaps to address false positives, it's generally more robust than the brittle detection for Bifrost. Even if the adversary were to rename parameters and recompile the tool, the network behavior inherent to Kerberoasting would cause this rule to fire.
 
-8    Chapter 1
+8 Chapter 1
 
 ---
 
@@ -221,7 +220,7 @@ Filesystem filter drivers A special type of driver that can monitor for operatio
 
 ETW consumers Components of the agent that can subscribe to events created by the host operating system or third-party applications. ETW is covered in Chapter 8 .
 
-10    Chapter 1
+10 Chapter 1
 
 ---
 
@@ -267,7 +266,7 @@ Sometimes they are even used unknowingly, as most mature EDR agents have the abi
 
 Logical bypasses are the trickiest to pull off because they generally require knowledge of the detection's underlying logic. Lastly, classification bypasses require a bit of forethought and system profiling, but red teams
 
-12   Chapter 1
+12 Chapter 1
 
 ---
 
@@ -295,7 +294,6 @@ Table 1-2: An Example Classification System
 
 <table><tr><td>Activity</td><td>Risk score</td></tr><tr><td>Execution of an unsigned binary</td><td>250</td></tr><tr><td>Atypical child process spawned</td><td>400</td></tr><tr><td>Outbound HTTP traffic originating from a non-browser process</td><td>100</td></tr><tr><td>Allocation of a read-write-execute buffer</td><td>200</td></tr><tr><td>Committed memory allocation not backed by an image</td><td>350</td></tr></table>
 
-
 An attacker could bypass each of these activities individually, but when they're combined, evasion becomes much more difficult. How could we chain evasion techniques to avoid triggering the detection logic?
 
 Starting with configuration evasions, let's imagine that the agent lacks a network-inspection sensor, so it can't correlate outgoing network traffic with a client process. However, a compensating control may be present, such as an ETW consumer for the Microsoft-Windows WebIO provider. In that case, we might opt to use a browser as a host process or employ another protocol, such as DNS, for command and control. We might also use a logical evasion to subvert the “ atypical child process ” detection by matching typical parent – child relationships on the system. For a perceptual evasion, let's say that the agent lacks the ability to scan memory allocations to see if they're backed by an image. As attackers, we won't need to worry at all about being detected based on this indicator:
@@ -306,35 +304,32 @@ Next, we need to spawn a sacrificial process at some point to perform our post-e
 
 We receive the output from our tool and determine that we need to run another tool to perform some action to further our access. At this point, any additional detections will raise our risk score to 500 or greater, potentially burning our operation, so we have some decisions to make.
 
-
 Here are a few options:
 
 - • Execute the post-exploitation tooling and accept the detection.
-After the alert, we could move very quickly in an attempt to outpace
-the response, hope for an ineffective response process that fails to
+  After the alert, we could move very quickly in an attempt to outpace
+  the response, hope for an ineffective response process that fails to
+
 ---
 
 eradicate us, or be okay with burning the operation and starting over again if needed.
 
 - • Wait for some period of time before executing our tooling. Because the
-agent correlates only those events that occur within some window of
-time, we can simply wait until the state recycles, resetting our risk score
-to zero, and continue the operation from there.
-• Find another method of execution. This could range from simply drop-
-ping our script on the target and executing it there, to proxying in the
-post-exploitation tool's traffic to reduce most of the host-based indica-
-tors it would create.
-Whatever we choose, our goal is clear: stay below the alerting threshold for as long as possible. By calculating the risks of each action that we need to perform, understanding the indicators our activities create, and using a combination of evasion tactics, we can evade an EDR's complex detection systems. Note that no single evasion worked universally in this example. Rather, a combination of evasions targeted the most relevant detections for the task at hand.
+  agent correlates only those events that occur within some window of
+  time, we can simply wait until the state recycles, resetting our risk score
+  to zero, and continue the operation from there.
+  • Find another method of execution. This could range from simply drop-
+  ping our script on the target and executing it there, to proxying in the
+  post-exploitation tool's traffic to reduce most of the host-based indica-
+  tors it would create.
+  Whatever we choose, our goal is clear: stay below the alerting threshold for as long as possible. By calculating the risks of each action that we need to perform, understanding the indicators our activities create, and using a combination of evasion tactics, we can evade an EDR's complex detection systems. Note that no single evasion worked universally in this example. Rather, a combination of evasions targeted the most relevant detections for the task at hand.
 
 ## Conclusion
 
 In summary, an EDR agent is composed of any number of sensors that are responsible for collecting telemetry related to activity on the system. The EDR applies its own rules or detection logic across this data to pick out what things might indicate a malicious actor's presence. Each of these sensors is susceptible to evasion in some way, and it is our job to identify those blind spots and either abuse them or compensate for them.
 
-EDR Architecture   15
+EDR Architecture 15
 
 ---
 
-
-
 ---
-

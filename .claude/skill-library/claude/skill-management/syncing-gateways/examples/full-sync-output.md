@@ -168,13 +168,14 @@ All routing tables verified successfully
 
 After sync completes, recommended to:
 
-1. **Audit gateways** to verify compliance:
+1. **Verify gateway paths** to ensure compliance:
 
    ```bash
-   npm run audit -- gateway-frontend
-   npm run audit -- gateway-testing
-   npm run audit -- gateway-integrations
-   npm run audit -- gateway-claude
+   # Check all paths exist in each gateway
+   for gw in frontend testing integrations claude; do
+     echo "=== gateway-$gw ==="
+     grep "\.claude/skill-library" .claude/skills/gateway-$gw/SKILL.md | grep -oE '`[^`]+`' | tr -d '`' | while read path; do test -f "$path" || echo "✗ BROKEN: $path"; done
+   done
    ```
 
 2. **Test gateway routing** by loading a newly-added skill:

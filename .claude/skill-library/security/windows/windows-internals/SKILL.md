@@ -11,6 +11,7 @@ allowed-tools: Read
 ## When to Use This Skill
 
 Use this skill when:
+
 - Investigating Windows kernel architecture and system components
 - Understanding process and thread lifecycle at the kernel level
 - Analyzing memory management, virtual memory, and address spaces
@@ -29,6 +30,7 @@ Use this skill when:
 **Coverage**: Windows 10 and Windows Server 2016
 
 This book is the canonical reference for Windows internals, written by the authors of Sysinternals tools and Microsoft kernel engineers. It covers:
+
 - System architecture and design goals
 - Core OS components (kernel, executive, HAL, drivers)
 - Process and thread management
@@ -42,16 +44,16 @@ All chapters have been split into individual markdown files with OCR corrections
 
 **Location**: `references/chapters/` (within this skill)
 
-| Chapter | File | Topics Covered |
-|---------|------|----------------|
-| 0 (Front Matter) | `chapter-00.md` | Introduction, table of contents, setup |
-| 1 | `chapter-01.md` | Concepts and tools - Windows API, processes, threads, virtual memory, kernel/user mode, objects, security, registry, debugging tools |
-| 2 | `chapter-02.md` | System architecture - OS model, portability, SMP, VBS architecture, environment subsystems, executive, kernel, HAL, device drivers, system processes |
-| 3 | `chapter-03.md` | Processes and jobs - CreateProcess flow, protected processes, PPL, minimal/pico processes, trustlets, image loader, DLL resolution |
-| 4 | `chapter-04.md` | Threads - Thread internals, scheduling, synchronization, context switching, thread pools, worker threads |
-| 5 | `chapter-05.md` | Memory management - Virtual memory, address spaces, page tables, heaps, memory-mapped files, section objects |
-| 6 | `chapter-06.md` | I/O system - I/O architecture, driver types, IRPs, I/O completion, plug and play, power management |
-| 7 | `chapter-07.md` | Security - Security architecture, access tokens, security descriptors, ACLs, privileges, auditing, UAC |
+| Chapter          | File            | Topics Covered                                                                                                                                       |
+| ---------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 (Front Matter) | `chapter-00.md` | Introduction, table of contents, setup                                                                                                               |
+| 1                | `chapter-01.md` | Concepts and tools - Windows API, processes, threads, virtual memory, kernel/user mode, objects, security, registry, debugging tools                 |
+| 2                | `chapter-02.md` | System architecture - OS model, portability, SMP, VBS architecture, environment subsystems, executive, kernel, HAL, device drivers, system processes |
+| 3                | `chapter-03.md` | Processes and jobs - CreateProcess flow, protected processes, PPL, minimal/pico processes, trustlets, image loader, DLL resolution                   |
+| 4                | `chapter-04.md` | Threads - Thread internals, scheduling, synchronization, context switching, thread pools, worker threads                                             |
+| 5                | `chapter-05.md` | Memory management - Virtual memory, address spaces, page tables, heaps, memory-mapped files, section objects                                         |
+| 6                | `chapter-06.md` | I/O system - I/O architecture, driver types, IRPs, I/O completion, plug and play, power management                                                   |
+| 7                | `chapter-07.md` | Security - Security architecture, access tokens, security descriptors, ACLs, privileges, auditing, UAC                                               |
 
 ## How to Use
 
@@ -64,6 +66,7 @@ Read(".claude/skill-library/security/windows/windows-internals/references/chapte
 ```
 
 **Example queries:**
+
 - "How does CreateProcess work internally?" → Read chapter 3
 - "What are the stages of thread scheduling?" → Read chapter 4
 - "How does Windows implement virtual memory?" → Read chapter 5
@@ -79,6 +82,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 ```
 
 **Common search terms:**
+
 - Process creation, EPROCESS, process object
 - Thread scheduling, KTHREAD, context switch
 - Virtual memory, page tables, VAD tree
@@ -94,6 +98,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 ## Key Concepts by Chapter
 
 ### Chapter 1: Concepts and Tools
+
 - Windows API layers (Win32, Native API)
 - Process structure and lifecycle
 - Thread execution and scheduling basics
@@ -104,6 +109,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - Debugging tools (WinDbg, Performance Monitor, Sysinternals)
 
 ### Chapter 2: System Architecture
+
 - OS design goals (portability, SMP, scalability)
 - Virtualization-Based Security (VBS) architecture
 - Environment subsystems (Win32, POSIX, WSL)
@@ -114,6 +120,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - System processes (System, Smss, Csrss, Wininit, Services, Lsass)
 
 ### Chapter 3: Processes and Jobs
+
 - CreateProcess flow (7 stages from validation to thread startup)
 - Protected processes and Protected Process Light (PPL)
 - Minimal processes and Pico processes
@@ -124,6 +131,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - Job objects for process groups
 
 ### Chapter 4: Threads
+
 - Thread internals (KTHREAD, ETHREAD, TEB)
 - Thread states and scheduling
 - Priority and affinity
@@ -133,6 +141,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - Fibers and UMS threads
 
 ### Chapter 5: Memory Management
+
 - Virtual address space layout
 - Page tables and TLBs
 - Virtual Address Descriptors (VAD tree)
@@ -143,6 +152,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - Memory compression
 
 ### Chapter 6: I/O System
+
 - I/O architecture and request flow
 - Driver types (WDM, KMDF, UMDF)
 - I/O Request Packets (IRPs)
@@ -153,6 +163,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-internals/refer
 - File system drivers
 
 ### Chapter 7: Security
+
 - Security architecture overview
 - Access tokens (user SID, groups, privileges)
 - Security descriptors and ACLs
@@ -182,10 +193,10 @@ None - terminal skill (reads chapter files directly)
 
 ### Pairs With (conditional)
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
+| Skill                        | Trigger                                                                   | Purpose                                             |
+| ---------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------- |
 | `windows-security-internals` | When security mechanisms need deeper authentication/authorization details | Complements Chapter 7 with authentication internals |
-| `evading-edr` | When researching EDR bypass techniques | Applies Chapter 3-7 concepts to detection evasion |
+| `evading-edr`                | When researching EDR bypass techniques                                    | Applies Chapter 3-7 concepts to detection evasion   |
 
 ## References
 
@@ -205,6 +216,7 @@ ISBN: 978-0-7356-8418-8
 ### OCR Quality Notes
 
 Chapters have been OCR-transcribed from PDF with automated error corrections applied:
+
 - Common patterns fixed: `| n` → `In`, `0r` → `Or`, `ttObject` → `NtObject`
 - Some technical diagrams converted to figure references
 - Complex tables preserved in markdown format

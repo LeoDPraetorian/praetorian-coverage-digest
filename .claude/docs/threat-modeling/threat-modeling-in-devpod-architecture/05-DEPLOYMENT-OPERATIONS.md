@@ -182,9 +182,7 @@ ssh devpod "sudo pkill falco"
 ```javascript
 // Test Web Crypto API key generation
 const keyPair = await generateSSHKeyPair();
-console.assert(
-  keyPair.privateKey.startsWith("-----BEGIN OPENSSH PRIVATE KEY-----")
-);
+console.assert(keyPair.privateKey.startsWith("-----BEGIN OPENSSH PRIVATE KEY-----"));
 console.assert(keyPair.publicKey.startsWith("ssh-rsa "));
 ```
 
@@ -490,7 +488,7 @@ aws cloudwatch put-metric-alarm \
 - DevPod documentation: https://devpod.sh/docs
 - AWS EC2 instance types: https://aws.amazon.com/ec2/instance-types/
 - Chariot integrations: `modules/chariot/backend/build/pkg/tasks/integrations/`
-- Threat modeling skills: `.claude/skills/threat-modeling-orchestrator/`
+- Threat modeling skills: `.claude/skill-library/security/threat-model/threat-modeling-orchestrator/`
 
 ### Network Security
 

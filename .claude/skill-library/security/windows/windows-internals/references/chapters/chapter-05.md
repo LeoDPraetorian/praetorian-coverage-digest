@@ -9,18 +9,16 @@ By default, the virtual size of a process on 32-bit Windows is 2 GB. If the imag
 As you saw in Chapter 2, "System architecture"—specifically in Table 2-2—the maximum amount of physical memory currently supported by Windows ranges from 2 GB to 24 TB, depending on which version and edition of Windows you are running. Because the virtual address space might be larger or smaller than the physical memory on the machine, the memory manager has two primary tasks:
 
 - ■ Translating, or mapping, a process's virtual address space into physical memory so that when
-a thread running in the context of that process reads or writes to the virtual address space, the
-correct physical address is referenced. (The subset of a process's virtual address space that is
-physically resident is called the working set. Working sets are described in more detail in the
-section "Working sets" later in this chapter.)
-■ Paging some of the contents of memory to disk when it becomes overcommitted—that is,
-when running threads try to use more physical memory than is currently available—and bring-
-ing the contents back into physical memory when needed.
-In addition to providing virtual memory management, the memory manager provides a core set of services on which the various Windows environment subsystems are built. These services include memory-mapped files (internally called section objects), copy-on-write memory, and support for applications using large, sparse address spaces. The memory manager also provides a way for a process to allocate and use larger amounts of physical memory than can be mapped into the process virtual address space at one time—for example, on 32-bit systems with more than 3 GB of physical memory. This is explained in the section "Address Windowing Extensions" later in this chapter.
-
+  a thread running in the context of that process reads or writes to the virtual address space, the
+  correct physical address is referenced. (The subset of a process's virtual address space that is
+  physically resident is called the working set. Working sets are described in more detail in the
+  section "Working sets" later in this chapter.)
+  ■ Paging some of the contents of memory to disk when it becomes overcommitted—that is,
+  when running threads try to use more physical memory than is currently available—and bring-
+  ing the contents back into physical memory when needed.
+  In addition to providing virtual memory management, the memory manager provides a core set of services on which the various Windows environment subsystems are built. These services include memory-mapped files (internally called section objects), copy-on-write memory, and support for applications using large, sparse address spaces. The memory manager also provides a way for a process to allocate and use larger amounts of physical memory than can be mapped into the process virtual address space at one time—for example, on 32-bit systems with more than 3 GB of physical memory. This is explained in the section "Address Windowing Extensions" later in this chapter.
 
 3
-
 
 From the Library of Me
 
@@ -39,17 +37,18 @@ It's the largest component in the executive, hinting at its importance and compl
 memory manager exist in the HAL. The memory manager consists of the following components:
 
 - ■ A set of executive system services for allocating, deallocating, and managing virtual memory,
-most of which are exposed through the Windows API or kernel-mode device driver interfaces
+  most of which are exposed through the Windows API or kernel-mode device driver interfaces
 
 ■ A translation-not-valid and access fault trap handler for resolving hardware-detected memory-
 management exceptions and making virtual pages resident on behalf of a process
 
 ■ Six key top-level routines, each running in one of six different kernel-mode threads in the System
 process:
+
 - ● The balance set manager (KeBalanceSetManager, priority 17) This calls an inner routine,
-the working set manager (MmWorkingSetManager), once per second as well as when free
-memory falls below a certain threshold. The working set manager drives the overall memory-
-management policies, such as working set trimming, aging, and modified page writing.
+  the working set manager (MmWorkingSetManager), once per second as well as when free
+  memory falls below a certain threshold. The working set manager drives the overall memory-
+  management policies, such as working set trimming, aging, and modified page writing.
 
 ● The process/stack wrapper (KeSwapProcessOrStack, priority 23) This performs both
 process and kernel thread stack unwrapping and outswapping. The balance set manager and
@@ -74,14 +73,13 @@ that the paged pool used to anchor it can be freed for reuse.
 
 STEP 5 Memory management
 
-From the Library of M
----
+## From the Library of M
 
 - • The zero page thread (MiZeroPageThread, priority 0) This zeroes out pages on the free
-list so that a cache of zero pages is available to satisfy future demand-zero page faults. In
-some cases, memory zeroing is done by a faster function called MiZeroInParallel1. See the
-note in the "Page list dynamics" section later in this chapter.
-Each of these components is covered in more detail later in the chapter except for the segment
+  list so that a cache of zero pages is available to satisfy future demand-zero page faults. In
+  some cases, memory zeroing is done by a faster function called MiZeroInParallel1. See the
+  note in the "Page list dynamics" section later in this chapter.
+  Each of these components is covered in more detail later in the chapter except for the segment
 
 deference thread, which is covered in Chapter 14, “Cache manager,” in Part 2.
 
@@ -89,10 +87,9 @@ deference thread, which is covered in Chapter 14, “Cache manager,” in Part 2
 
 Memory management is done in distinct chunks called pages. This is because the hardware memory management unit translates virtual to physical addresses at the granularity of a page. Hence, a page is the smallest unit of protection at the hardware level. (The various page-protection options are described in the section "Protecting memory" later in this chapter.) The processors on which Windows runs support two page sizes: small and large. The actual sizes vary based on the processor architecture, and they are listed in Table 5-1.
 
-TABLE 5-1    Page sizes
+TABLE 5-1 Page sizes
 
 <table><tr><td>Architecture</td><td>Small Page Size</td><td>Large Page Size</td><td>Small Pages per Large Page</td></tr><tr><td>x86 (PAE)</td><td>4 KB</td><td>2 MB</td><td>512</td></tr><tr><td>x64</td><td>4 KB</td><td>2 MB</td><td>512</td></tr><tr><td>ARM</td><td>4 KB</td><td>4 MB</td><td>1024</td></tr></table>
-
 
 ![Figure](figures/Winternals7thPt1_page_320_figure_006.png)
 
@@ -104,10 +101,9 @@ The primary advantage of large pages is speed of address translation for referen
 
 To take advantage of large pages on systems with more than 2 GB of RAM, Windows maps with large pages the core operating system images (Ntoskrnl.exe and Hal.dll) as well as core operating system data (such as the initial part of non-paged pool and the data structures that describe the state of each physical memory page). Windows also automatically maps I/O space requests (calls by device drivers to MmMapToSpace) with large pages if the request is of a satisfactorily large page length and alignment. In addition, Windows allows applications to map their images, private memory, and page
 
-CHAPTER 5   Memory manage
+CHAPTER 5 Memory manage
 
 303
-
 
 ---
 
@@ -145,7 +141,6 @@ supposed to be read-only operating system or driver code without causing a memor
 
 If small pages are used to map the operating system's kernel-mode code, the read-only portions of
 
-
 Ntoskrnl.exe and Hal.dll can be mapped as read-only pages. Using small pages does reduce efficiency
 
 of address translation, but if a device driver (or other kernel-mode code) attempts to modify a read only part of the operating system, the system will crash immediately with the exception information
@@ -178,11 +173,9 @@ The Performance tab in the Windows Task Manager, shown in the following screensh
 
 <table><tr><td>Task Manager Value</td><td>Definition</td></tr><tr><td>Memory usage histogram</td><td>The chart&#x27;s line height reflects physical memory in use by Windows (not available as a performance counter). The area above the line is equal to the Available value in the bottom section. The total height of the graph is equal to the total value shown at the top right of the graph (31.9 GB in this example). This represents the total RAM used by the operating system, and does not include BIOS shadow pages, device memory, and so on.</td></tr><tr><td>Memory composition</td><td>This details the relation between memory that is actively used, standby, modified, and free-zero (all described later in this chapter).</td></tr></table>
 
-
 ---
 
 <table><tr><td>Task Manager Value</td><td>Definition</td></tr><tr><td>Total physical memory (top right of graph)</td><td>This shows the physical memory usable by Windows.</td></tr><tr><td>In Use (Compressed)</td><td>This is the physical memory currently being used. The amount of compressed physical memory is in parentheses. Hovering over the value shows the amount of memory saved by the compression. (Memory compression is discussed in the section &quot;Memory compression&quot; later in this chapter.)</td></tr><tr><td>Cached</td><td>This is the sum of the following performance counters in the Memory category: Cache Bytes, Modified Page List Bytes, Standby Cache Core Bytes, Standby Cache Normal Priority Bytes, and Standby Cache Reserve Bytes.</td></tr><tr><td>Available</td><td>This is the amount of memory that is immediately available for use by the operating system, processes, and drivers. It is equal to the combined size of the standby, free, and zero page lists.</td></tr><tr><td>Free</td><td>This shows the free and zero-page list bytes. To see this information, hover over the right-most part of the Memory Composition bar (assuming you have enough free memory to hover over it).</td></tr><tr><td>Committed</td><td>The two numbers shown here are equal to the values in the Committed Bytes and Commit Limit performance counters, respectively.</td></tr><tr><td>Paged Pool</td><td>This is the total size of the paged pool, including both free and allocated regions.</td></tr><tr><td>Non-Paged Pool</td><td>This is the total size of the non-paged pool, including both free and allocated regions.</td></tr></table>
-
 
 To see the specific usage of the paged and non-paged pool, use the Poolmon utility, described
 
@@ -198,16 +191,15 @@ explain most of these counters in the relevant sections later in this chapter.)
 
 ![Figure](figures/Winternals7thPt1_page_323_figure_003.png)
 
-306     CHAPTER 5   Memory management
-
+306 CHAPTER 5 Memory management
 
 ---
 
 Two other Sysinternals tools show extended memory information:
 
-■  VMMap  This shows the usage of virtual memory within a process to a fine level of detail.
+■ VMMap This shows the usage of virtual memory within a process to a fine level of detail.
 
-■  RAMMap   This shows detailed physical memory usage.
+■ RAMMap This shows detailed physical memory usage.
 
 These tools are featured in experiments found later in this chapter.
 
@@ -291,8 +283,7 @@ Driver Commit: 44984 C 99936 Kb
 
 Boot Commit: 100044 C 400176 Kb)
 
-CHAPTER 5   Memory management    307
-
+CHAPTER 5 Memory management 307
 
 ---
 
@@ -343,11 +334,10 @@ Some of the system-wide resources to which the memory manager must synchronize a
 Per-process memory-management data structures that require synchronization include the following:
 
 - ■ Working set lock This is held while changes are made to the working set list.
-■ Address space lock This is held whenever the address space is being changed.
-Both these locks are implemented using pushlocks. These are described in Chapter 8 in Part 2.
+  ■ Address space lock This is held whenever the address space is being changed.
+  Both these locks are implemented using pushlocks. These are described in Chapter 8 in Part 2.
 
 308 CHAPTER 5 Memory management
-
 
 ---
 
@@ -378,9 +368,9 @@ Most of these services are exposed through the Windows API. As shown in Figure 5
 API has four groups of functions for managing memory in applications:
 
 - ■ Virtual API This is the lowest-level API for general memory allocations and deallocations. It
-always works on page granularity. It is also the most powerful, supporting the full capabilities
-of the memory manager. Functions include VirualAlloc, VirtualFree, VirtualProtect,
-VirtualLock, and others.
+  always works on page granularity. It is also the most powerful, supporting the full capabilities
+  of the memory manager. Functions include VirualAlloc, VirtualFree, VirtualProtect,
+  VirtualLock, and others.
 
 ■ Heap API This provides functions for small allocations (typically less than a page). It uses
 the Virtual API internally, but adds management on top of it. Heap manager functions include
@@ -507,8 +497,7 @@ The operation completed successfully.
 
 6. Notice that Task Manager shows the committed size but it has no counters that reveal the reserved memory in the other TestLimit process.
 
-312   CHAPTER 5   Memory management
-
+312 CHAPTER 5 Memory management
 
 ---
 
@@ -540,8 +529,7 @@ Commit charge and the system commit limit are explained in more detail in the se
 
 charge and the system commit limit" later in this chapter.
 
-CHAPTER 5   Memory management      313
-
+CHAPTER 5 Memory management 313
 
 ---
 
@@ -554,11 +542,11 @@ However, there might be special circumstances when it might be necessary for an 
 driver to lock pages in physical memory. Pages can be locked in memory in two ways:
 
 - ■ Windows applications can call the VirtualLock function to lock pages in their process work-
-ing set. Pages locked using this mechanism remain in memory until explicitly unlocked or until
-the process that locked them terminates. The number of pages a process can lock can't exceed
-its minimum working set size minus eight pages. If a process needs to lock more pages, it can
-increase its working set minimum with the SetProcessWorkingSetSizeEx function, discussed
-later in this chapter in the section "Working set management."
+  ing set. Pages locked using this mechanism remain in memory until explicitly unlocked or until
+  the process that locked them terminates. The number of pages a process can lock can't exceed
+  its minimum working set size minus eight pages. If a process needs to lock more pages, it can
+  increase its working set minimum with the SetProcessWorkingSetSizeEx function, discussed
+  later in this chapter in the section "Working set management."
 
 ■ Device drivers can call the MmProbeAndLockPages, MmLockPayableCodeSection, MmLockPayable-
 DataSection, or MmLockPayableSectionByHandle kernel-mode functions. Pages locked using
@@ -567,6 +555,7 @@ no quota on the number of pages that can be locked in memory because the residen
 able page charge is obtained when the driver first loads. This ensures that it can never cause a
 system crash due to overclocking. For the first API, quota charges must be obtained or the API
 will return a failure status.
+
 ## Allocation granularity
 
 Windows aligns each region of reserved process address space to begin on an integral boundary defined by the value of the system allocation granularity, which can be retrieved from the Windows GetSystemInfo or GetNativeSystemInfo functions. This value is 64 KB, a granularity that is used by the memory manager to efficiently allocate metadata (for example, VADs, bitmaps, and so on) to support various process operations. In addition, if support were added for future processors with larger page sizes (for example, up to 64 KB) or virtually indexed caches that require system-wide physical-to-virtual page alignment, the risk of requiring changes to applications that made assumptions about allocation alignment would be reduced.
@@ -589,8 +578,7 @@ flag to the MapViewOff11Ex API, which is used to force the use of single-page gr
 
 Finally, when a region of address space is reserved, Windows ensures that the size and base of the region is a multiple of the system page size, whatever that might be. For example, because x86 systems use 4 KB pages, if you tried to reserve a region of memory 18 KB in size, the actual amount reserved on
 
-314   CHAPTER 5   Memory management
-
+314 CHAPTER 5 Memory management
 
 ---
 
@@ -632,8 +620,7 @@ and implementation of section objects are described later in this chapter in the
 
 This fundamental primitive in the memory manager is used to map virtual addresses whether in main memory, in the page file, or in some other file that an application wants to access as if it were in memory. A section can be opened by one process or by many. In other words, section objects don't necessarily equate to shared memory.
 
-CHAPTER 5     Memory management      315
-
+CHAPTER 5 Memory management 315
 
 ---
 
@@ -671,8 +658,7 @@ You can list the memory-mapped files in a process by using Process Explorer. To 
 
 The following display from Process Explorer shows a WinDb process using several different memory mappings to access the memory dump file being examined. Like most Windows programs, it (or one of the Windows DLLs it is using) is also using memory mapping to access a Windows data file called Locale.nls, which is part of the internationalization support in Windows.
 
-316    CHAPTER 5   Memory management
-
+316 CHAPTER 5 Memory management
 
 ---
 
@@ -685,27 +671,26 @@ You can also search for memory-mapped files by opening the Find menu and choosin
 As explained in Chapter 1, "Concepts and tools," Windows provides memory protection so that no user process can inadvertently or deliberately corrupt the address space of another process or the operating system. Windows provides this protection in four primary ways.
 
 - ■ All system-wide data structures and memory pools used by kernel-mode system components
-can be accessed only while in kernel mode. User-mode threads can't access these pages. If they
-attempt to do so, the hardware generates a fault, which the memory manager reports to the
-thread as an access violation.
-■ Each process has a separate, private address space, protected from access by any thread belong-
-ing to another process. Even shared memory is not really an exception to this because each pro-
-cess accesses the shared regions using addresses that are part of its own virtual address space. The
-only exception is if another process has virtual memory read or write access to the process object
-(or holds SeDebugPrivilege) and thus can use the ReadProcessMemory or WriteProcessMemory
-function. Each time a thread references an address, the virtual memory hardware, in concert
-with the memory manager, intervenes and translates the virtual address into a physical one. By
-controlling how virtual addresses are translated, Windows can ensure that threads running in one
-process don't inappropriately access a page belonging to another process.
-■ In addition to the implicit protection offered by virtual-to-physical address translation, all pro-
-cessors supported by Windows provide some form of hardware-controlled memory protection
-such as read/write, read-only, and so on. (The exact details of such protection vary according to
-the processor.) For example, code pages in the address space of a process are marked read-only
-and are thus protected from modification by user threads. Table 5-2 lists the memory-protection
-options defined in the Windows API. (See the documentation for the VirtualProtect, Virtual-
-ProtectEx, VirtualQuery, and VirtualQueryEx functions.)
-CHAPTER 5   Memory management      317
-
+  can be accessed only while in kernel mode. User-mode threads can't access these pages. If they
+  attempt to do so, the hardware generates a fault, which the memory manager reports to the
+  thread as an access violation.
+  ■ Each process has a separate, private address space, protected from access by any thread belong-
+  ing to another process. Even shared memory is not really an exception to this because each pro-
+  cess accesses the shared regions using addresses that are part of its own virtual address space. The
+  only exception is if another process has virtual memory read or write access to the process object
+  (or holds SeDebugPrivilege) and thus can use the ReadProcessMemory or WriteProcessMemory
+  function. Each time a thread references an address, the virtual memory hardware, in concert
+  with the memory manager, intervenes and translates the virtual address into a physical one. By
+  controlling how virtual addresses are translated, Windows can ensure that threads running in one
+  process don't inappropriately access a page belonging to another process.
+  ■ In addition to the implicit protection offered by virtual-to-physical address translation, all pro-
+  cessors supported by Windows provide some form of hardware-controlled memory protection
+  such as read/write, read-only, and so on. (The exact details of such protection vary according to
+  the processor.) For example, code pages in the address space of a process are marked read-only
+  and are thus protected from modification by user threads. Table 5-2 lists the memory-protection
+  options defined in the Windows API. (See the documentation for the VirtualProtect, Virtual-
+  ProtectEx, VirtualQuery, and VirtualQueryEx functions.)
+  CHAPTER 5 Memory management 317
 
 ---
 
@@ -713,22 +698,20 @@ TABLE 5-2 Memory-protection options defined in the Windows API
 
 <table><tr><td>Attribute</td><td>Description</td></tr><tr><td>PAGE_NOACCESS</td><td>Any attempt to read from, write to, or execute code in this region causes an access violation.</td></tr><tr><td>PAGE_READONLY</td><td>Any attempt to write to (and on processors with no execute support, execute code in) memory causes an access violation, but reads are permitted.</td></tr><tr><td>PAGE_READWRITE</td><td>The page is readable and writable but not executable.</td></tr><tr><td>PAGE_EXECUTE</td><td>Any attempt to write to code in memory in this region causes an access violation, but execution (and read operations on all existing processors) is permitted.</td></tr><tr><td>PAGE_EXECUTE_READ*</td><td>Any attempt to write to memory in this region causes an access violation, but executes and reads are permitted.</td></tr><tr><td>PAGE_EXECUTE_READWRITE*</td><td>The page is readable, writable, and executable. Any attempted access will succeed.</td></tr><tr><td>PAGE_WRITECOPY</td><td>Any attempt to write to memory in this region causes the system to give the process a private copy of the page. On processors with no execute support, attempts to execute code in memory in this region cause an access violation.</td></tr><tr><td>PAGE_EXECUTE_WRITECOPY</td><td>Any attempt to write to memory in this region causes the system to give the process a private copy of the page. Reading and executing code in this region is permitted. (No copy is made in this case.)</td></tr><tr><td>PAGE_GUARD</td><td>Any attempt to read from or write to a guard page raises an EXCEPTION_GUARD_PAGE exception and turns off the guard page status. Guard pages thus act as a one-shot alarm. Note that this flag can be specified with any of the page protections listed in this table except PAGE_NOACCESS.</td></tr><tr><td>PAGE_NOCACHE</td><td>This uses physical memory that is not cached. This is not recommended for general usage. It is useful for device drivers—for example, mapping a video frame buffer with no caching.</td></tr><tr><td>PAGE_WRITECOMBINE</td><td>This enables write-combined memory accesses. When enabled, the processor does not cache memory writes (possibly causing significantly more memory traffic than if memory writes were cached), but it does try to aggregate write requests to optimize performance. However, if memory writes are not cached, the most recent write might occur. Separate writes to adjacent addresses may be similarly collapsed into a single large write. This is not typically used for general applications, but it is useful for device drivers—for example, mapping a video frame buffer as write combined.</td></tr><tr><td>PAGE_TARGETS_INVALID and PAGE_TARGETS_NO_UPDATE (Windows 10 and Windows Server 2016)</td><td>These values control behavior of Control Flow Guard (CFG) for executable code in these pages. Both constants have the same value but are used in different calls, essentially acting as a toggle. PAGE_TARGETS_INVALID indicates indirect calls should fail CFG and crash the process. PAGE_TARGETS_NO_UPDATE allows VirtualProtect calls that change the page range to allow execution to not update CFG state. See Chapter 7, “Security,” for more information on CFG.</td></tr></table>
 
-
 "No execute protection is supported on processors that have the necessary hardware support (for example, all x64 processors) but not in older x86 processors. If unsupported, "execute" translates to "read. "
 
 - ■ Shared memory section objects have standard Windows access control lists (ACLs) that are
-checked when processes attempt to open them, thus limiting access of shared memory to those
-processes with the proper rights. Access control also comes into play when a thread creates a
-section to contain a mapped file. To create the section, the thread must have at least read
-access to the underlying file object or the operation will fail.
-Once a thread has successfully opened a handle to a section, its actions are still subject to the
+  checked when processes attempt to open them, thus limiting access of shared memory to those
+  processes with the proper rights. Access control also comes into play when a thread creates a
+  section to contain a mapped file. To create the section, the thread must have at least read
+  access to the underlying file object or the operation will fail.
+  Once a thread has successfully opened a handle to a section, its actions are still subject to the
 
 memory manager and the hardware-based page protections described earlier. A thread can change
 
 the page-level protection on virtual pages in a section if the change doesn’t violate the permissions
 
-318    CHAPTER 5   Memory management
-
+318 CHAPTER 5 Memory management
 
 ---
 
@@ -736,7 +719,7 @@ in the ACL for that section object. For example, the memory manager allows a thr
 
 ## Data Execution Prevention
 
-Data Execution Prevention (DEP), or no-execute (NX) page protection, causes an attempt to transfer control to an instruction in a page marked as "no execute" to generate an access fault. This can prevent certain types of malware from exploiting bugs in the system through the execution of code placed in a data page such as the stack. DEP can also catch poorly written programs that don't correctly set permissions on pages from which they intend to execute code. If an attempt is made in kernel mode to execute code in a page marked as "no execute," the system will crash with the bug check code ATTEMPTED_ EXECUTE_OF_NOEXECUTE_MEMORY (0xFC). (See Chapter 15, "Crash dump analysis," in Part 2 for an explanation of these codes.) If this occurs in user mode, a STATUS_ACCESS_VIOLATION (0x0000005) exception is delivered to the thread attempting the illegal reference. If a process allocates memory that needs to be executable, it must explicitly mark such pages by specifying the PAGE_EXECUTE, PAGE_ EXECUTE_READ, PAGE_EXECUTE_READWRITE, or PAGE_EXECUTE_WRITECOPY flags on the page-granularity memory-allocation functions.
+Data Execution Prevention (DEP), or no-execute (NX) page protection, causes an attempt to transfer control to an instruction in a page marked as "no execute" to generate an access fault. This can prevent certain types of malware from exploiting bugs in the system through the execution of code placed in a data page such as the stack. DEP can also catch poorly written programs that don't correctly set permissions on pages from which they intend to execute code. If an attempt is made in kernel mode to execute code in a page marked as "no execute," the system will crash with the bug check code ATTEMPTED* EXECUTE_OF_NOEXECUTE_MEMORY (0xFC). (See Chapter 15, "Crash dump analysis," in Part 2 for an explanation of these codes.) If this occurs in user mode, a STATUS_ACCESS_VIOLATION (0x0000005) exception is delivered to the thread attempting the illegal reference. If a process allocates memory that needs to be executable, it must explicitly mark such pages by specifying the PAGE_EXECUTE, PAGE* EXECUTE_READ, PAGE_EXECUTE_READWRITE, or PAGE_EXECUTE_WRITECOPY flags on the page-granularity memory-allocation functions.
 
 On 32-bit x86 systems that support DEP, bit 63 in the page table entry (PTE) is used to mark a page as non-executable. Therefore, the DEP feature is available only when the processor is running in Physical Address Extension (PAE) mode, without which page table entries are only 32 bits wide. (See the section "x86 virtual address translation" later in this chapter.) Thus, support for hardware DEP on 32-bit systems requires loading the PAE kernel (%SystemRoot%\System32\Ntkrnlpa.exe), which currently is the only supported kernel on x86 systems.
 
@@ -746,8 +729,7 @@ On 64-bit versions of Windows, execution protection is always applied to all 64-
 
 The application of execution protection for 32-bit processes depends on the value of the BCD nx option. To change the settings, open the Data Execution Prevention tab in the Performance Options dialog box (see Figure 5-3). (To open this dialog box, right-click Computer, select Properties, click Advanced System Settings, and choose Performance Settings.) When you configure no-execute protection in the Performance Options dialog box, the BCD nx option is set to the appropriate value. Table 5-3 lists the variations of the values and how they correspond to the Data Execution Prevention tab. The registry lists 32-bit applications that are excluded from execution protection under the HKLM\ SOFTWARE\Microsoft\Windows NT\CurrentVersion\AppDataCompatFlag\Layers key, with the value name being the full path of the executable and the data set to D1sab1eNXShowUI.
 
-CHAPTER 5   Memory management      319
-
+CHAPTER 5 Memory management 319
 
 ---
 
@@ -758,7 +740,6 @@ FIGURE 5-3 Data Execution Prevention tab settings.
 TABLE 5-3 BCD nx values
 
 <table><tr><td>BCD nx Value</td><td>Option on Data Execution Prevention Tab</td><td>Explanation</td></tr><tr><td>OptIn</td><td>Turn on DEP for Essential Windows Programs and Services Only</td><td>This enables DEP for core Windows system images. It enables 32-bit processes to dynamically configure DEP for their life-time.</td></tr><tr><td>OptOut</td><td>Turn on DEP for All Programs and Services Except those I Select</td><td>This enables DEP for all executables except those specified. It enables 32-bit processes to dynamically configure DEP for their lifetime. It also enables system compatibility fixes for DEP.</td></tr><tr><td>AlwaysOn</td><td>There is no dialog box option for this setting</td><td>This enables DEP for all components with no ability to exclude certain applications. It disables dynamic configuration for 32-bit processes and disables system compatibility fixes.</td></tr><tr><td>AlwaysOff</td><td>There is no dialog box option for this setting</td><td>This disables DEP (not recommended). It also disables dynamic configuration for 32-bit processes.</td></tr></table>
-
 
 On Windows client versions (both 64-bit and 32-bit), execution protection for 32-bit processes is
 
@@ -776,8 +757,7 @@ disable DEP for their own images. For example, regardless of which execution-pro
 
 enabled, the image loader will verify the signature of the executable against known copy-protection
 
-320    CHAPTER 5   Memory management
-
+320 CHAPTER 5 Memory management
 
 ---
 
@@ -788,7 +768,7 @@ mechanisms (such as SafeDisc and SecuROM) and disable execution protection to pr
 Process Explorer can show you the current DEP status for all the processes on your system, including whether the process is opted in or benefiting from permanent protection. To look at the DEP status for processes, right-click any column in the process tree, choose Select Columns, and then select DEP Status on the Process Image tab. There are three possible values:
 
 - ■ DEP (permanent) This means the process has enabled DEP because it is a "necessary
-Windows program or service."
+  Windows program or service."
 
 ■ DEP This means the process opted in to DEP. This may be due to a system-wide policy
 to opt in to all 32-bit processes, because of an API call such as SetProcessDEPPolicy, or
@@ -804,8 +784,7 @@ Finally, if the system is in OptIn or OptOut mode and executing a 32-bit process
 
 Copy-on-write page protection is an optimization the memory manager uses to conserve physical memory. When a process maps a copy-on-write view of a section object that contains read/write pages, the memory manager delays the copying of pages until the page is written to instead of making a process private copy at the time the view is mapped. For example, in Figure 5-4, two processes are sharing three pages, each marked copy-on-write, but neither of the two processes has attempted to modify any data on the pages.
 
-CHAPTER 5   Memory management      321
-
+CHAPTER 5 Memory management 321
 
 ---
 
@@ -828,7 +807,7 @@ access violation, it does the following:
 process to point to the new location.
 
 4. It dismisses the exception, causing the instruction that generated the fault to be re-executed.
-This time, the write operation succeeds. However, as shown in Figure 5-5, the newly copied page is
+   This time, the write operation succeeds. However, as shown in Figure 5-5, the newly copied page is
 
 now private to the process that did the writing and isn't visible to the other process still sharing the copy on-write page. Each new process that writes to that same shared page will also get its own private copy.
 
@@ -838,8 +817,7 @@ FIGURE 5-5 The "after" of copy-on-write.
 
 One application of copy-on-write is to implement breakpoint support in debuggers. For example, by default, code pages start out as execute-only. If a programmer sets a breakpoint while debugging
 
-322   CHAPTER 5   Memory management
-
+322 CHAPTER 5 Memory management
 
 ---
 
@@ -864,20 +842,19 @@ a portion of its virtual address space into selected portions of the physical me
 You allocate and use memory via the AWE functions in three steps:
 
 - 1. You allocate the physical memory to be used. The application uses the Windows functions
-AllocateUserPhysicalPages or AllocateUserPhysicalPagesNuma. (These require the
-SeLockMemoryPrivilege)
+     AllocateUserPhysicalPages or AllocateUserPhysicalPagesNuma. (These require the
+     SeLockMemoryPrivilege)
 
 2. You create one or more regions of virtual address space to act as windows to map views of the
-physical memory. The application uses the Win32 VirtualAlloc, VirtualAllocEx, or Virtual-
-AllocExNuma function with the MEM_PHYSICAL flag.
+   physical memory. The application uses the Win32 VirtualAlloc, VirtualAllocEx, or Virtual-
+   AllocExNuma function with the MEM_PHYSICAL flag.
 
 3. Steps 1 and 2 are, generally speaking, initialization steps. To actually use the memory, the applica-
-tion uses MapUserPhysicalPages or MapUserPhysicalPagesScanner to map a portion of the
-physical region allocated in step 1 into one of the virtual regions, or windows, allocated in step 2.
-Figure 5-6 shows an example. The application has created a 256 MB window in its address space and has allocated 4 GB of physical memory. It can then use MapUserPhysicalPages or MapUserPhysical PagesCatter to access any portion of the physical memory by mapping the desired portion of memory into the 256 MB window. The size of the application's virtual address space window determines the amount of physical memory the application can access with any given mapping. To access another portion of the allocated RAM, the application can simply remap the area.
+   tion uses MapUserPhysicalPages or MapUserPhysicalPagesScanner to map a portion of the
+   physical region allocated in step 1 into one of the virtual regions, or windows, allocated in step 2.
+   Figure 5-6 shows an example. The application has created a 256 MB window in its address space and has allocated 4 GB of physical memory. It can then use MapUserPhysicalPages or MapUserPhysical PagesCatter to access any portion of the physical memory by mapping the desired portion of memory into the 256 MB window. The size of the application's virtual address space window determines the amount of physical memory the application can access with any given mapping. To access another portion of the allocated RAM, the application can simply remap the area.
 
-CHAPTER 5     Memory management      323
-
+CHAPTER 5 Memory management 323
 
 ---
 
@@ -890,9 +867,9 @@ The AWE functions exist on all editions of Windows and are usable regardless of 
 Finally, there are some restrictions on memory allocated and mapped by the AWE functions:
 
 - ■ Pages can't be shared between processes.
-■ The same physical page can't be mapped to more than one virtual address.
-■ Page protection is limited to read/write, read-only, and no access.
-AWE is less useful on 64 bit Windows systems because these systems support 128 TB of virtual address space per process, while allowing a maximum of only 24 TB of RAM (on Windows Server 2016 systems). Therefore, AWE is not necessary to allow an application to use more RAM than it has virtual address space; the amount of RAM on the system will always be smaller than the process virtual address space. AWE remains useful, however, for setting up non-pageable regions of a process address space. It provides finer granularity than the file-mapping APIs. (The system page size is 4 KB rather than 64 KB.)
+  ■ The same physical page can't be mapped to more than one virtual address.
+  ■ Page protection is limited to read/write, read-only, and no access.
+  AWE is less useful on 64 bit Windows systems because these systems support 128 TB of virtual address space per process, while allowing a maximum of only 24 TB of RAM (on Windows Server 2016 systems). Therefore, AWE is not necessary to allow an application to use more RAM than it has virtual address space; the amount of RAM on the system will always be smaller than the process virtual address space. AWE remains useful, however, for setting up non-pageable regions of a process address space. It provides finer granularity than the file-mapping APIs. (The system page size is 4 KB rather than 64 KB.)
 
 For a description of the page table data structures used to map memory on systems with more than 4 GB of physical memory, see the section "x86 virtual address translation."
 
@@ -902,19 +879,18 @@ At system initialization, the memory manager creates two dynamically sized memor
 
 324 CHAPTER 5 Memory management
 
-
 ---
 
-- ■  Non-paged pool  This consists of ranges of system virtual addresses that are guaranteed to
-reside in physical memory at all times. Thus, they can be accessed at any time without incurring
-a page fault—meaning they can be accessed from any IRQL. One of the reasons a non-paged
-pool is required is because page faults can't be satisfied at DPC/dispatch level or above. There-
-fore, any code and data that might execute or be accessed at or above DPC/dispatch level must
-be in non-pageable memory.
-■  Paged pool  This is a region of virtual memory in system space that can be paged into and out
-of the system. Device drivers that don't need to access the memory from DPC/dispatch level or
-above can use paged pool. It is accessible from any process context.
-Both memory pools are in the system part of the address space and are mapped in the virtual
+- ■ Non-paged pool This consists of ranges of system virtual addresses that are guaranteed to
+  reside in physical memory at all times. Thus, they can be accessed at any time without incurring
+  a page fault—meaning they can be accessed from any IRQL. One of the reasons a non-paged
+  pool is required is because page faults can't be satisfied at DPC/dispatch level or above. There-
+  fore, any code and data that might execute or be accessed at or above DPC/dispatch level must
+  be in non-pageable memory.
+  ■ Paged pool This is a region of virtual memory in system space that can be paged into and out
+  of the system. Device drivers that don't need to access the memory from DPC/dispatch level or
+  above can use paged pool. It is accessible from any process context.
+  Both memory pools are in the system part of the address space and are mapped in the virtual
 
 address space of every process. The executive provides routines to allocate and deallocate from these
 
@@ -950,9 +926,7 @@ TABLE 5-4 Maximum pool sizes
 
 <table><tr><td>Pool Type</td><td>Maximum on 32-Bit Systems</td><td>Maximum on 64 bit Systems (Windows 8, Server 2012)</td><td>Maximum on 64-bit Systems (Windows 8.1, 10, Server 2012 R2, 2016)</td></tr><tr><td>Non-paged</td><td>75 percent of physical memory or 2 GB, whichever is smaller</td><td>75 percent of physical memory or 128 GB, whichever is smaller</td><td>16 TB</td></tr><tr><td>Paged</td><td>2 GB</td><td>384 GB</td><td>15.5 TB</td></tr></table>
 
-
-CHAPTER 5     Memory management      325
-
+CHAPTER 5 Memory management 325
 
 ---
 
@@ -968,10 +942,9 @@ Vs (of type MI_VISIBLE_STATE) where this information resides. The global variabl
 
 also points to that Vs member. These variables and counters are listed in Table 5-5.
 
-TABLE 5-5   System pool size variables and performance counters
+TABLE 5-5 System pool size variables and performance counters
 
 <table><tr><td>Kernel Variable</td><td>Performance Counter</td><td>Description</td></tr><tr><td>MmSizeOfNonPagedPoolInBytes</td><td>Memory: Pool non-paged bytes</td><td>This is the size of the initial non-paged pool. It can be reduced or enlarged automatically by the system if memory demands dictate. The kernel variable will not show these changes, but the performance counter will.</td></tr><tr><td>MmMaximumNonPagedPoolInBytes (Windows 8.x and Server 2012/R2)</td><td>Not available</td><td>This is the maximum size of a non-paged pool.</td></tr><tr><td>MmVisibleState-&gt;MaximumNonPagePool InBytes (Windows 10 and Server 2016)</td><td>Not available</td><td>This is the maximum size of a non-paged pool.</td></tr><tr><td>Not available</td><td>Memory: Pool paged bytes</td><td>This is the current total virtual size of paged pool.</td></tr><tr><td>WorkingSetSize (number of pages) in the MmPagePoolWks struct (type MMSUPPORT) (Windows 8.x and Server 2012/R2)</td><td>Memory: Pool paged resident bytes</td><td>This is the current physical (resident) size of paged pool.</td></tr><tr><td>MmSizeOfPagedPoolInBytes (Windows 8.x and Server 2012/R2)</td><td>Not available</td><td>This is the maximum (virtual) size of a paged pool.</td></tr><tr><td>MtState_Vs_SizeOfPagedPoolInBytes (Windows 10 and Server 2016)</td><td>Not available</td><td>This is the maximum (virtual) size of a paged pool.</td></tr></table>
-
 
 EXPERIMENT: Determining the maximum pool sizes
 
@@ -983,8 +956,7 @@ choose System Information, and then click the Memory tab. The pool limits are di
 
 ![Figure](figures/Winternals7thPt1_page_343_figure_005.png)
 
-326    CHAPTER 5   Memory management
-
+326 CHAPTER 5 Memory management
 
 ---
 
@@ -1004,15 +976,13 @@ FIGURE 5-7 Poolmon output.
 
 Any highlighted lines you might see represent changes to the display. (You can disable the highlighting feature by typing / while running Poolmon; type / again to re-enable highlighting.) Type ? while Poolmon is running to bring up its help screen. You can configure which pools you want to monitor (paged, non-paged, or both) and the sort order. For example, by pressing the P key until only nonpaged allocations are shown, and then the D key to sort by the Diff (differences) column, you can find out what kind of structures are most numerous in non-paged pool. Also, the command-line options are shown, which allow you to monitor specific tags (or every tag but one tag). For example, the command poolmon -fCM will monitor only CM tags (allocations from the configuration manager, which manages the registry). The columns have the meanings shown in Table 5-6.
 
-CHAPTER 5     Memory management      327
-
+CHAPTER 5 Memory management 327
 
 ---
 
-TABLE 5-6   Poolmon columns
+TABLE 5-6 Poolmon columns
 
 <table><tr><td>Column</td><td>Explanation</td></tr><tr><td>Tag</td><td>This is a four-byte tag given to the pool allocation.</td></tr><tr><td>Type</td><td>This is the pool type (paged or non-paged).</td></tr><tr><td>Allocs</td><td>This is a count of all allocations. The number in parentheses shows the difference in the Allocs column since the last update.</td></tr><tr><td>Frees</td><td>This is the count of all frees. The number in parentheses shows the difference in the Frees column since the last update.</td></tr><tr><td>Diff</td><td>This is the count of allocations minus frees.</td></tr><tr><td>Bytes</td><td>This is the total bytes consumed by this tag. The number in parentheses shows the difference in the Bytes column since the last update.</td></tr><tr><td>Per Alloc</td><td>This is the size in bytes of a single instance of this tag.</td></tr></table>
-
 
 For a description of the meaning of the pool tags used by Windows, see the Pooltag.txt file in the Triage subdirectory where the Debugging tools for Windows are located. Because third-party devicedriver pool tags are not listed in this file, you can use the -c switch on the 32-bit version of Poolmon that comes with the WDK to generate a local pool tag file (Localtag.txt). This file will contain pool tags used by drivers found on your system, including third-party drivers. (Note that if a device-driver binary has been deleted after it was loaded, its pool tags will not be recognized.)
 
@@ -1051,8 +1021,7 @@ command shows non-paged pool usage sorted by pool tag using the most amount of p
 
 pool. The following example shows the partial output from these two commands:
 
-328    CHAPTER 5   Memory management
-
+328 CHAPTER 5 Memory management
 
 ---
 
@@ -1103,8 +1072,7 @@ In this experiment, you will fix a real paged pool leak on your system so that y
 2. Notmyfault.exe loads the Myfault.sys device driver and presents a Not My Fault dialog
 
 box with the Crash tab selected. Click the Leak tab. It should look something like this:
-CHAPTER 5     Memory management      329
-
+CHAPTER 5 Memory management 329
 
 ---
 
@@ -1113,35 +1081,33 @@ CHAPTER 5     Memory management      329
 - 3. Ensure that the Leak/Second setting is set to 1000 KB.
 
 4. Click the Leak Paged button. This causes Notmyfault to begin sending requests to the
-Myfault device driver to allocate paged pool. Notmyfault will continue sending requests
-until you click the Stop Paged button. Paged pool is not normally released even when
-you close a program that has caused it to occur (by interacting with a buggy device
-driver). The pool is permanently leaked until you reboot the system. However, to make
-testing easier, the Myfault device driver detects that the process was closed and frees its
-allocations.
+   Myfault device driver to allocate paged pool. Notmyfault will continue sending requests
+   until you click the Stop Paged button. Paged pool is not normally released even when
+   you close a program that has caused it to occur (by interacting with a buggy device
+   driver). The pool is permanently leaked until you reboot the system. However, to make
+   testing easier, the Myfault device driver detects that the process was closed and frees its
+   allocations.
 
 5. While the pool is leaking, open Task Manager, click the Performance tab, and select
-the Memory label. Notice the Paged Pool value climbing. You can also check this with
-Process Explorer's System Information display (select the View menu, choose System
-Information, and click the Memory tab).
+   the Memory label. Notice the Paged Pool value climbing. You can also check this with
+   Process Explorer's System Information display (select the View menu, choose System
+   Information, and click the Memory tab).
 
 6. To determine which pool tag is leaking, run Poolmon and press the B key to sort by the
-number of bytes.
+   number of bytes.
 
 7. Press P twice so that Poolmon shows only paged pool. Notice the Leak pool tag climb-
-ing to the top of the list. (Poolmon shows changes to pool allocations by highlighting
-the lines that change.)
+   ing to the top of the list. (Poolmon shows changes to pool allocations by highlighting
+   the lines that change.)
 
 8. Click the Stop Paged button so that you don't exhaust paged pool on your system.
 
 9. Using the technique described in the previous section, run Strings (from Sysinternals) to
-look for driver binaries that contain the Leak pool tag. This should display a match on
-the file Myfault.sys, thus confirming it as the driver using the Leak pool tag.
+   look for driver binaries that contain the Leak pool tag. This should display a match on
+   the file Myfault.sys, thus confirming it as the driver using the Leak pool tag.
 
-
-Strings %SystemRoot%\system32\drivers*\.sys | findstr Leak
-330   CHAPTER 5   Memory management
-
+Strings %SystemRoot%\system32\drivers\*\.sys | findstr Leak
+330 CHAPTER 5 Memory management
 
 ---
 
@@ -1175,8 +1141,7 @@ tkids  !lookaside
      Hit Rate      =     80% Hit Rate   =      81%
 ```
 
-CHAPTER 5   Memory management      331
-
+CHAPTER 5 Memory management 331
 
 ---
 
@@ -1201,7 +1166,7 @@ Most applications allocate smaller blocks than the 64-KB minimum allocation gran
 The heap manager exists in two places: Ntll.dll and Ntoskrnl.exe. The subsystem APIs (such as the Windows heap APIs) call the functions in Ntll.dll, and various executive components and device drivers call the functions in Ntoskrnl.exe. Its native interfaces (prefixed with R1) are available only for use in internal Windows components or kernel-mode device drivers. The documented Windows API interfaces to the heap (prefixed with Heap) are forwarders to the native functions in Ntll.dll. In addition, legacy APIs (prefixed with either Local or Global) are provided to support older Windows applications. These also internally call the heap manager, using some of its specialized interfaces to support legacy behavior. The most common Windows heap functions are:
 
 - ● HeapCreate or HeapDestroy These create or delete, respectively, a heap. The initial reserved
-and committed size can be specified at creation.
+  and committed size can be specified at creation.
 
 ● HeapAlloc This allocates a heap block. It is forwarded to RtlAllocateHeap in Ntdll.dll.
 
@@ -1212,8 +1177,7 @@ block. It is forwarded to RtlReAllocateHeap in Ntdll.dll.
 
 ● HeapLock and HeapLinLock These control mutual exclusion to heap operations.
 
-● HeapWalk This enumerates the entries and regions in a heap.
----
+## ● HeapWalk This enumerates the entries and regions in a heap.
 
 ## Process heaps
 
@@ -1232,17 +1196,17 @@ the Windows GetProcessHeaps function.
 A Universal Windows Platform (UWP) app process includes at least three heaps:
 
 - ■ The default process heap just described.
-■ A shared heap used to pass large arguments to the process' session Css.exe instance.
-This is created by the CsrClientConnectToServer NtDll.dll function, which executes early in
-the process initialization done by NtDll.dll. The heap handle is available in the global variable
-CsrPortHeap (in NtDll.dll).
-■ A heap created by the Microsoft C runtime library. Its handle is stored in the global variable
-_crthep (in the msvcrt module). This heap is the one used internally by the C/C++ memory-
-allocation functions such as malloc, free, operator new/delete, and so on.
-A heap can manage allocations either in large memory regions reserved from the memory manager via Viritual A10c or from memory-mapped file objects mapped in the process address space. The latter approach is rarely used in practice (and is not exposed by the Windows API), but it's suitable for scenarios where the content of the blocks needs to be shared between two processes or between a kernel-mode and a user-mode component. The Win32 GUI subsystem driver (Win32k.sys) uses such a heap for sharing GDI and USER objects with user mode. If a heap is built on top of a memory-mapped file region, certain constraints apply with respect to the component that can call heap functions:
+  ■ A shared heap used to pass large arguments to the process' session Css.exe instance.
+  This is created by the CsrClientConnectToServer NtDll.dll function, which executes early in
+  the process initialization done by NtDll.dll. The heap handle is available in the global variable
+  CsrPortHeap (in NtDll.dll).
+  ■ A heap created by the Microsoft C runtime library. Its handle is stored in the global variable
+  \_crthep (in the msvcrt module). This heap is the one used internally by the C/C++ memory-
+  allocation functions such as malloc, free, operator new/delete, and so on.
+  A heap can manage allocations either in large memory regions reserved from the memory manager via Viritual A10c or from memory-mapped file objects mapped in the process address space. The latter approach is rarely used in practice (and is not exposed by the Windows API), but it's suitable for scenarios where the content of the blocks needs to be shared between two processes or between a kernel-mode and a user-mode component. The Win32 GUI subsystem driver (Win32k.sys) uses such a heap for sharing GDI and USER objects with user mode. If a heap is built on top of a memory-mapped file region, certain constraints apply with respect to the component that can call heap functions:
 
 - ■ The internal heap structures use pointers, and therefore do not allow remapping to different
-addresses in other processes.
+  addresses in other processes.
 
 ■ The synchronization across multiple processes or between a kernel component and a user pro-
 cess is not supported by the heap functions.
@@ -1251,6 +1215,7 @@ cess is not supported by the heap functions.
 should be read-only to prevent user-mode code from corrupting the heap's internal structures,
 which would result in a system crash. The kernel-mode driver is also responsible for not putting
 any sensitive data in a shared heap to avoid leaking it to user mode.
+
 ---
 
 ## Heap types
@@ -1285,7 +1250,6 @@ The heap manager supports concurrent access from multiple threads by default. Ho
 
 334 CHAPTER 5 Memory management
 
-
 ---
 
 A process can also lock the entire heap and prevent other threads from performing heap operations
@@ -1304,7 +1268,6 @@ TABLE 5-7 LFH buckets
 
 <table><tr><td>Buckets</td><td>Granularity</td><td>Range</td></tr><tr><td>1-32</td><td>8</td><td>1-256</td></tr><tr><td>33-48</td><td>16</td><td>257-512</td></tr><tr><td>49-64</td><td>32</td><td>513-1,024</td></tr><tr><td>65-80</td><td>64</td><td>1,025-2,048</td></tr><tr><td>81-96</td><td>128</td><td>2,049-4,096</td></tr><tr><td>97-112</td><td>256</td><td>4,097-8,192</td></tr><tr><td>113-128</td><td>512</td><td>8,193-16,384</td></tr></table>
 
-
 The LFH addresses these issues by using the core heap manager and look-aside lists. The Windows
 
 heap manager implements an automatic tuning algorithm that can enable the LFH by default under
@@ -1313,8 +1276,7 @@ certain conditions, such as lock contention or the presence of popular size allo
 
 better performance with the LFH enabled. For large heaps, a significant percentage of allocations is
 
-CHAPTER 5     Memory management      335
-
+CHAPTER 5 Memory management 335
 
 ---
 
@@ -1330,38 +1292,39 @@ Figure 5-9 shows the architecture of the segment heap, introduced in Windows 10.
 
 ![Figure](figures/Winternals7thPt1_page_353_figure_005.png)
 
-FIGURE 5-9   Segment heap.
+FIGURE 5-9 Segment heap.
 
 The actual layer that manages an allocation depends on the allocation size as follows:
 
 - ■ For small sizes (less than or equal to 16,368 bytes), the LFH allocator is used, but only if the size is
-determined to be a common one. This is a similar logic to the LFH front layer of the NT heap. If
-the LFH has not kicked in yet, the variable size (VS) allocator will be used instead.
+  determined to be a common one. This is a similar logic to the LFH front layer of the NT heap. If
+  the LFH has not kicked in yet, the variable size (VS) allocator will be used instead.
+
 ---
 
 - ■ For sizes less than or equal to 128 KB (and not serviced by the LFH), the VS allocator is used. Both
-VS and LFH allocators use the back end to create the required heap sub-segments as necessary.
-■ Allocations larger than 128 KB and less than or equal to 508 KB are serviced directly by the heap
-back end.
-■ Allocations larger than 508 KB are serviced by calling the memory manager directly (Vi r t ua1 -
-A110c) since these are so large that using the default 64 KB allocation granularity (and rounding
-to the nearest page size) is deemed good enough.
-Here is a quick comparison of the two heap implementations:
+  VS and LFH allocators use the back end to create the required heap sub-segments as necessary.
+  ■ Allocations larger than 128 KB and less than or equal to 508 KB are serviced directly by the heap
+  back end.
+  ■ Allocations larger than 508 KB are serviced by calling the memory manager directly (Vi r t ua1 -
+  A110c) since these are so large that using the default 64 KB allocation granularity (and rounding
+  to the nearest page size) is deemed good enough.
+  Here is a quick comparison of the two heap implementations:
 
 - ■ In some scenarios, the segment heap may be somewhat slower than the NT heap. However, it's
-likely that future Windows versions would make it on par with the NT heap.
-■ The segment heap has a lower memory footprint for its metadata, making it better suited for
-low-memory devices such as phones.
-■ The segment heap's metadata is separated from the actual data, while the NT heap's metadata
-is interspersed with the data itself. This makes the segment heap more secure, as it's more dif-
-ficult to get to the metadata of an allocation given just a block address.
-■ The segment heap can be used only for a growable heap. It cannot be used with a user-supplied
-memory mapped file. If such a segment heap creation is attempted, an NT heap is created
-instead.
-■ Both heaps support LFH-type allocations, but their internal implementation is completely dif-
-ferent. The segment heap has a more efficient implementation in terms of memory consump-
-tion and performance.
-As mentioned, UWP apps use segment heaps by default. This is mainly because of their lower memory footprint, which is suitable for low-memory devices. It's also used with certain system processes based on executable name: csrss.exe, lsaas.exe, runtimebroker.exe, services.exe, smss.exe, and svchost. exe.
+  likely that future Windows versions would make it on par with the NT heap.
+  ■ The segment heap has a lower memory footprint for its metadata, making it better suited for
+  low-memory devices such as phones.
+  ■ The segment heap's metadata is separated from the actual data, while the NT heap's metadata
+  is interspersed with the data itself. This makes the segment heap more secure, as it's more dif-
+  ficult to get to the metadata of an allocation given just a block address.
+  ■ The segment heap can be used only for a growable heap. It cannot be used with a user-supplied
+  memory mapped file. If such a segment heap creation is attempted, an NT heap is created
+  instead.
+  ■ Both heaps support LFH-type allocations, but their internal implementation is completely dif-
+  ferent. The segment heap has a more efficient implementation in terms of memory consump-
+  tion and performance.
+  As mentioned, UWP apps use segment heaps by default. This is mainly because of their lower memory footprint, which is suitable for low-memory devices. It's also used with certain system processes based on executable name: csrss.exe, lsaas.exe, runtimebroker.exe, services.exe, smss.exe, and svchost. exe.
 
 The segment heap is not the default heap for desktop apps because there are some compatibility
 
@@ -1380,8 +1343,7 @@ You can also globally enable or disable the segment heap by adding a value named
 
 key. A zero value disables the segment heap and a non-zero value enables it.
 
-CHAPTER 5   Memory management     337
-
+CHAPTER 5 Memory management 337
 
 ---
 
@@ -1476,7 +1438,7 @@ currently unsupported by the segment heap, it's created as an NT heap.
 
 6. Notice the FrontEndHeap field. This field indicates whether a front-end layer exists. In the preceding output, it's null, meaning there is no front-end layer. A non-null value indicates an LFH front-end layer (since it's the only one defined).
 
-7. A segment heap is defined with the NtD11\[_SEGMENT_HEAP structure. Here's the default
+7. A segment heap is defined with the NtD11\[\_SEGMENT_HEAP structure. Here's the default
 
 process heap:
 
@@ -1499,8 +1461,7 @@ process heap:
 +0x060 SegmentListHead  : _LIST_ENTRY_0x00000253'1ec00000
 ```
 
-CHAPTER 5   Memory management     339
-
+CHAPTER 5 Memory management 339
 
 ---
 
@@ -1521,9 +1482,9 @@ address 0x0000253'1eba5000  """
 
 8. Notice the Signature field. It's used to distinguish between the two types of heaps.
 
-9. Notice the SegmentSignature field of the _HEAP structure. It is in the same offset (0x10). This is how functions such as RtlAlllocateHeap know which implementation to turn to based on the heap handle (address) alone.
+9. Notice the SegmentSignature field of the \_HEAP structure. It is in the same offset (0x10). This is how functions such as RtlAlllocateHeap know which implementation to turn to based on the heap handle (address) alone.
 
-10. Notice the last two fields in the _SEGMENT_HEAP. These contain the VS and LHI allocator information.
+10. Notice the last two fields in the \_SEGMENT_HEAP. These contain the VS and LHI allocator information.
 
 11. T o get more information on each heap, issue the !heap -s command:
 
@@ -1532,7 +1493,6 @@ address 0x0000253'1eba5000  """
 ```
 
 <table><tr><td></td><td></td><td rowspan="2">Global Flags</td><td>Process</td><td>Total</td><td>Total</td></tr><tr><td>Heap Address</td><td>Signature</td><td>Heap List Index</td><td>Reserved Bytes (K)</td><td>Committed Bytes (K)</td></tr><tr><td>2531eb90000</td><td>ddeeddee</td><td>0</td><td>1</td><td>8276</td><td>6832</td></tr><tr><td>2531eb10000</td><td>ddeeddee</td><td>0</td><td>3</td><td>1108</td><td>868</td></tr><tr><td>25320a40000</td><td>ddeeddee</td><td>0</td><td>4</td><td>1108</td><td>16</td></tr><tr><td>253215a0000</td><td>ddeeddee</td><td>0</td><td>5</td><td>1108</td><td>20</td></tr><tr><td>253214f0000</td><td>ddeeddee</td><td>0</td><td>6</td><td>3156</td><td>816</td></tr><tr><td>2531eb70000</td><td>ddeeddee</td><td>0</td><td>7</td><td>1108</td><td>24</td></tr><tr><td>2532692000</td><td>ddeeddee</td><td>0</td><td>8</td><td>1108</td><td>32</td></tr></table>
-
 
 ```bash
 *****************************************************************************
@@ -1555,7 +1515,6 @@ Lock  Fast
 
 <table><tr><td></td><td>(k)</td><td>(k)</td><td>(k)</td><td>(k)</td><td>length</td><td>blocks</td></tr><tr><td>cont. heap</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>-----------------------------</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>000002531e980000 00008000</td><td>64</td><td>4</td><td>64</td><td>2</td><td>1</td><td>1 0</td></tr><tr><td>00000253215d0000 00000001</td><td>16</td><td>16</td><td>16</td><td>10</td><td>1</td><td>1 0</td></tr><tr><td>N/A</td><td></td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>-----------------------------</td><td></td><td></td><td></td><td></td><td></td><td></td></tr></table>
 
-
 12. Notice the first part of the output. It shows extended information on segment heaps (if any). The second part shows extended information on NTT heaps in the process.
 
 The !heap debugger command provides a multitude of options for viewing, investigating, and searching heaps. See the "Debugger Tools for Windows" documentation for more information.
@@ -1572,8 +1531,7 @@ The metadata used by the heaps for internal management is packed with a high deg
 
 As an effect of block metadata randomization, using the debugger to simply dump a block header as an area of memory is not that useful. For example, the size of the block and whether it is busy are not easy to spot from a regular dump. The same applies to LFH blocks. They have a different type of metadata stored in the header, also partially randomized. To dump these details, the !heap -i command in the debugger does all the work to retrieve the metadata fields from a block, also flagging checksum or free-list inconsistencies if they exist. The command works for both LFH and regular heap blocks. The total size of the blocks, the user-requested size, the segment owning the block, and the header partial checksum are available in the output, as shown in the following sample. Because the randomization algorithm uses the heap granularity, the !heap -i command should be used only in the proper context of the heap containing the block. In the example, the heap handle is 0x0011a0000. If the current heap context were different, the decoding of the header would be incorrect. To set the proper context, the same !heap -i command with the heap handle as an argument must be executed first.
 
-CHAPTER 5     Memory management      341
-
+CHAPTER 5 Memory management 341
 
 ---
 
@@ -1599,16 +1557,16 @@ Next block        : 0x000001f72a5eb960
 The segment heap implementation uses many security mechanisms to make it harder to corrupt memory or to allow code injection by an attacker. Here are a few of them:
 
 - ■ Fail fast on linked list node corruption The segment heap uses linked lists to track seg-
-ments and sub-segments. As with the NT heap, checks are added in the list node insertion and
-removal to prevent arbitrary memory writes due to corrupted list nodes. If a corrupted node is
-detected, the process is terminated via a call to RtlFailFast.
+  ments and sub-segments. As with the NT heap, checks are added in the list node insertion and
+  removal to prevent arbitrary memory writes due to corrupted list nodes. If a corrupted node is
+  detected, the process is terminated via a call to RtlFailFast.
 
 ■ Fail fast on red-black (RB) tree node corruption The segment heap uses RB trees to track
 free back-end and VS allocations. Node insertion and deletion functions validate the nodes
 involved or, if corrupted, invoke the fail-fast mechanism.
 
 ■ Function pointer decoding Some aspects of the segment heap allow for callbacks (in
-VsContext and LfHContext structures, part of the _SEGONT_HEAP structure). An attacker can
+VsContext and LfHContext structures, part of the \_SEGONT_HEAP structure). An attacker can
 override these callbacks to point to his or her own code. However, the function pointers are en-
 coded by using a XOR function with an internal random heap key and the context address, both
 of which cannot be guessed in advance.
@@ -1616,6 +1574,7 @@ of which cannot be guessed in advance.
 ■ Guard pages When LFH and VS sub-segments and large blocks are allocated, a guard page is
 added at the end. This helps to detect overflows and corruption of adjacent data. See the sec-
 tion "Stacks" later in this chapter for more information on guard pages.
+
 ## Heap debugging features
 
 The heap manager includes several features to help detect bugs by using the following heap settings:
@@ -1624,13 +1583,12 @@ The heap manager includes several features to help detect bugs by using the foll
 
 block is released. If a buffer overrun destroys the signature entirely or partially, the heap will
 
-report this error.
----
+## report this error.
 
 - ■ Enable free checking A free block is filled with a pattern that is checked at various points
-when the heap manager needs to access the block, such as at removal from the free list to sat-
-isfy an allocate request. If the process continues to write to the block after freeing it, the heap
-manager will detect changes in the pattern and the error will be reported.
+  when the heap manager needs to access the block, such as at removal from the free list to sat-
+  isfy an allocate request. If the process continues to write to the block after freeing it, the heap
+  manager will detect changes in the pattern and the error will be reported.
 
 ■ Parameter checking This function consists of extensive checking of the parameters passed
 to the heap functions.
@@ -1656,8 +1614,7 @@ the increase of references to demand zero pages, loss of locality, and additiona
 
 frequent calls to validate heap structures. A process can reduce the impact by specifying that the page heap be used only for blocks of certain sizes, address ranges, and/or originating DLLs.
 
-CHAPTER 5   Memory management     343
-
+CHAPTER 5 Memory management 343
 
 ---
 
@@ -1691,13 +1648,11 @@ display.
 
 344 CHAPTER 5 Memory management
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_362_figure_000.png)
 
 11. To get a better sense of the extra memory allocated, use the VMMap Sysinternals tool.
-
 
 While the notepad processes are still running, open VMMap.exe and select the notepad
 
@@ -1707,8 +1662,7 @@ instance that is using pageheap:
 
 12. Open another instance of VMMap and select the other notepad instance. Place the windows side by side to see both:
 
-CHAPTER 5   Memory management      345
-
+CHAPTER 5 Memory management 345
 
 ---
 
@@ -1728,8 +1682,7 @@ CHAPTER 5   Memory management      345
 
 For more information on pageheap, see the "Debugging Tools for Windows" help file.
 
-346    CHAPTER 5   Memory management
-
+346 CHAPTER 5 Memory management
 
 ---
 
@@ -1775,8 +1728,7 @@ Microsoft, select Windows, and click Fault-Tolerant-Heap.
 4. The FTH may be disabled completely in the registry. In the HKLM\Software\Microsoft\FTH key,
 
 set the Enabled value to 0.
-CHAPTER 5     Memory management      347
-
+CHAPTER 5 Memory management 347
 
 ---
 
@@ -1795,32 +1747,33 @@ This section describes the components in the user and system address space, foll
 Three main types of data are mapped into the virtual address space in Windows:
 
 - ■ Per-process private code and data As explained in Chapter 1, each process has a private
-address space that cannot be accessed by other processes. That is, a virtual address is always
-evaluated in the context of the current process and cannot refer to an address defined by any
-other process. Threads within the process can therefore never access virtual addresses outside
-this private address space. Even shared memory is not an exception to this rule, because shared
-memory regions are mapped into each participating process, and so are accessed by each
-process using per-process addresses. Similarly, the cross-process memory functions (Read-
-ProcessMemory and WriteProcessMemory) operate by running kernel-mode code in the con-
-text of the target process. The process virtual address space, called page tables, is described in
-the "Address translation" section. Each process has its own set of page tables. They are stored
-in kernel-mode-only accessible pages so that user-mode threads in a process cannot modify
-their own address space layout.
-■ Session-wide code and data Session space contains information that is common to each
-session. (For a description of sessions, see Chapter 2.) A session consists of the processes and
-other system objects such as the window station, desktops, and windows that represent a single
-user's logon session. Each session has a session-specific paged pool area used by the kernel-mode
-portion of the Windows subsystem (Win32k.sys) to allocate session-private GUI data structures.
-In addition, each session has its own copy of the Windows subsystem process (Csrrs.exe) and
-logon process (Winlogon.exe). The Session Manager process (Smss.exe) is responsible for
-creating new sessions, which includes loading a session-private copy of Win32k.sys, creating
-the session-private object manager namespace (see Chapter 8 in Part 2 for more details on the
-object manager), and creating the session-specific instances of the Csrrs.exe and Winlogon.exe
-processes. To virtualize sessions, all session-wide data structures are mapped into a region of
-system space called session space. When a process is created, this range of addresses is mapped
-to the pages associated with the session that the process belongs to.
-CHAPTER 5 Memory management
-From the Library of I
+  address space that cannot be accessed by other processes. That is, a virtual address is always
+  evaluated in the context of the current process and cannot refer to an address defined by any
+  other process. Threads within the process can therefore never access virtual addresses outside
+  this private address space. Even shared memory is not an exception to this rule, because shared
+  memory regions are mapped into each participating process, and so are accessed by each
+  process using per-process addresses. Similarly, the cross-process memory functions (Read-
+  ProcessMemory and WriteProcessMemory) operate by running kernel-mode code in the con-
+  text of the target process. The process virtual address space, called page tables, is described in
+  the "Address translation" section. Each process has its own set of page tables. They are stored
+  in kernel-mode-only accessible pages so that user-mode threads in a process cannot modify
+  their own address space layout.
+  ■ Session-wide code and data Session space contains information that is common to each
+  session. (For a description of sessions, see Chapter 2.) A session consists of the processes and
+  other system objects such as the window station, desktops, and windows that represent a single
+  user's logon session. Each session has a session-specific paged pool area used by the kernel-mode
+  portion of the Windows subsystem (Win32k.sys) to allocate session-private GUI data structures.
+  In addition, each session has its own copy of the Windows subsystem process (Csrrs.exe) and
+  logon process (Winlogon.exe). The Session Manager process (Smss.exe) is responsible for
+  creating new sessions, which includes loading a session-private copy of Win32k.sys, creating
+  the session-private object manager namespace (see Chapter 8 in Part 2 for more details on the
+  object manager), and creating the session-specific instances of the Csrrs.exe and Winlogon.exe
+  processes. To virtualize sessions, all session-wide data structures are mapped into a region of
+  system space called session space. When a process is created, this range of addresses is mapped
+  to the pages associated with the session that the process belongs to.
+  CHAPTER 5 Memory management
+  From the Library of I
+
 ---
 
 ■ System-wide code and data System space contains global operating system code and data structures visible by kernel-mode code regardless of which process is currently executing. System space consists of the following components:
@@ -1864,8 +1817,7 @@ By default, each user process on 32-bit versions of Windows has a 2 GB private a
 
 The ability of a 32-bit process to grow beyond 2 GB was added to accommodate the need for 32-bit applications to keep more data in memory than could be done with a 2 GB address space. Of course, 64-bit systems provide a much larger address space.
 
-CHAPTER 5     Memory management      349
-
+CHAPTER 5 Memory management 349
 
 ---
 
@@ -1878,21 +1830,21 @@ For a process to grow beyond 2 GB of address space, the image file must have the
 Several system images are ranked as large address space aware so that they can take advantage of systems running with large process address spaces. These include the following:
 
 - •
-<lsass.exe> The Local Security Authority Subsystem
+  <lsass.exe> The Local Security Authority Subsystem
 
 •
 <inetinfo.exe> Internet Information Server
 
 •
 <chkdsk.exe> The Check Disk utility
-350    CHAPTER 5   Memory management
-
+350 CHAPTER 5 Memory management
 
 ---
 
 - • Smss.exe The Session Manager
 
 • Dllhst3g.exe A special version of Dllhost.exe (for COM+ applications)
+
 ## EXPERIMENT: Checking whether an application is large address aware
 
 You can use the Dumpbin utility from the Visual Studio Tools (and older versions of the Windows SDK) to check other executables to see if they support large address spaces. Use the /headers flag to display the results. Here's a sample output of Dumpbin on the Session Manager:
@@ -1917,7 +1869,7 @@ FILE HEADER VALUES
              32 bit word machine
 ```
 
-Finally, memory allocations using VirrtuaA11oc, VirrtuaA11ocEx, and VirrtuaA11ocExNuma start with low virtual addresses and grow higher by default. Unless a process allocates a lot of memory or has a very fragmented virtual address space, it will never get back very high virtual addresses. Therefore, for testing purposes, you can force memory allocations to start from high addresses by using the MEM_TOP_DOWN flag to the VirrtuaA11oc* functions or by adding a DWORD registry value named A11ocationPreference to the HKLM\SYSTEM\CurrentControlSet\Controlex\Session Manager\Memory Management key and setting its value to 0x100000.
+Finally, memory allocations using VirrtuaA11oc, VirrtuaA11ocEx, and VirrtuaA11ocExNuma start with low virtual addresses and grow higher by default. Unless a process allocates a lot of memory or has a very fragmented virtual address space, it will never get back very high virtual addresses. Therefore, for testing purposes, you can force memory allocations to start from high addresses by using the MEM_TOP_DOWN flag to the VirrtuaA11oc\* functions or by adding a DWORD registry value named A11ocationPreference to the HKLM\SYSTEM\CurrentControlSet\Controlex\Session Manager\Memory Management key and setting its value to 0x100000.
 
 The following output shows runs of the T estLimit utility (shown in previous experiments) leaking memory on a 32-bit Windows machine booted without the increaseurserv option:
 
@@ -1973,12 +1925,11 @@ Note To revert a system to the normal 2 GB address space per process, run the bc
 
 The 32-bit versions of Windows implement a dynamic system address space layout by using a virtual address allocator. (We'll describe this functionality later in this section.) There are still a few specifically reserved areas, as shown in Figure 5-10. However, many kernel-mode structures use dynamic address space allocation. These structures are therefore not necessarily virtually contiguous with themselves. Each can easily exist in several disjointed pieces in various areas of system address space. The uses of system address space that are allocated in this way include the following:
 
-- ●  Non-paged pool
+- ● Non-paged pool
 
-●  Paged pool
+● Paged pool
 
-●  Special pool
----
+## ● Special pool
 
 - ● System PTEs
 
@@ -1989,6 +1940,7 @@ The 32-bit versions of Windows implement a dynamic system address space layout b
 ● PFN database
 
 ● Session space
+
 ## x86 session space
 
 For systems with multiple sessions (which is almost always the case, as session 0 is used by system
@@ -2003,7 +1955,7 @@ the rest of kernel system address space, are dynamically configured and resized 
 
 ![Figure](figures/Winternals7thPt1_page_370_figure_003.png)
 
-FIGURE 5-11  x86 session space layout (not proportional).
+FIGURE 5-11 x86 session space layout (not proportional).
 
 ### EXPERIMENT: Viewing sessions
 
@@ -2029,8 +1981,7 @@ of the session data structures and the processes in that session with the 1-proc
 Sessions on machine : 3
 ```
 
-CHAPTER 5   Memory management     353
-
+CHAPTER 5 Memory management 353
 
 ---
 
@@ -2121,10 +2072,9 @@ System page table entries (PTEs) are used to dynamically map system pages such a
 
 ## EXPERIMENT: Viewing system PTE information
 
-You can see how many system PTEs are available by examining the value of the Memory: Free System Page Table Entries counter in Performance Monitor or by using the !sysptes or !vm command in the debugger. You can also dump the _MI_SYSTEM_PTE_TYPE structure as part of the memory state (MIState) variable (or the MISystemT eInfo global variable on Windows 8.x/2012/R2). This will also show you how many PTE allocation failures occurred on the system. A high count indicates a problem and possibly a system PTE leak.
+You can see how many system PTEs are available by examining the value of the Memory: Free System Page Table Entries counter in Performance Monitor or by using the !sysptes or !vm command in the debugger. You can also dump the \_MI_SYSTEM_PTE_TYPE structure as part of the memory state (MIState) variable (or the MISystemT eInfo global variable on Windows 8.x/2012/R2). This will also show you how many PTE allocation failures occurred on the system. A high count indicates a problem and possibly a system PTE leak.
 
-CHAPTER 5     Memory management      355
-
+CHAPTER 5 Memory management 355
 
 ---
 
@@ -2165,8 +2115,7 @@ kd> !syptes
 
 As shown in Figure 5-12, the ARM address space layout is nearly identical to the x86 address space. The memory manager treats ARM-based systems exactly as x86 systems in terms of pure memory management. The differences are at the address translation layer, described in the section "Address translation" later in this chapter.
 
-356    CHAPTER 5   Memory management
-
+356 CHAPTER 5 Memory management
 
 ---
 
@@ -2177,7 +2126,6 @@ FIGURE 5-12 ARM virtual address space layout.
 The theoretical 64-bit virtual address space is 16 exabytes (EB), or 18,446,744,073,709,551,616 bytes. Current processor limitations allow for 48 address lines only, limiting the possible address space to 256 TB (2 to the 48th power). The address space is divided in half, where the lower 128 TB are available as private user processes and the upper 128 TB are system space. System space is divided into several different-sized regions (Windows 10 and Server 2016), as shown in Figure 5-13. Clearly, 64 bits provides a tremendous leap in terms of address space sizes as opposed to 32 bit. The actual starts of various kernel sections are not necessarily those shown, as ASLR is in effect in kernel space in the latest versions of Windows.
 
 CHAPTER 5 Memory management 357
-
 
 ---
 
@@ -2241,8 +2189,7 @@ instead of a boot-loaded range.
 
 After this point, the rest of the system virtual address space can be dynamically requested and learned through MObtainSystemVla (and its analogous MObtainServices onVa) and MReturnSystemVa. Operations such as expanding the system cache, the system PTEs, non-paged pool, paged pool, and/or special pool; mapping memory with large pages; creating the PFN database; and creating a new session all result in dynamic virtual address allocations for a specific range.
 
-CHAPTER 5   Memory management     359
-
+CHAPTER 5 Memory management 359
 
 ---
 
@@ -2256,13 +2203,11 @@ TABLE 5-8 System virtual address types
 
 <table><tr><td>Region</td><td>Description</td><td>Limitable</td></tr><tr><td>MiVaUnused (0)</td><td>Unused</td><td>N/A</td></tr><tr><td>MiVaSessionSpace (1)</td><td>Addresses for session space</td><td>Yes</td></tr><tr><td>MiVaProcessSpace (2)</td><td>Addresses for process address space</td><td>No</td></tr><tr><td>MiVaBootLoaded (3)</td><td>Addresses for images loaded by the boot loader</td><td>No</td></tr><tr><td>MiVaPfnDatabase (4)</td><td>Addresses for the PFN database</td><td>No</td></tr><tr><td>MiVaNonPagedPool (5)</td><td>Addresses for the non-paged pool</td><td>Yes</td></tr><tr><td>MiVaPagedPool (6)</td><td>Addresses for the paged pool</td><td>Yes</td></tr><tr><td>MiVaSpecialPoolPaged (7)</td><td>Addresses for the special pool (paged)</td><td>No</td></tr><tr><td>MiVaSystemCache (8)</td><td>Addresses for the system cache</td><td>No</td></tr><tr><td>MiVaSystemPtes (9)</td><td>Addresses for system PTEs</td><td>Yes</td></tr><tr><td>MiVaHal (10)</td><td>Addresses for the HAL</td><td>No</td></tr><tr><td>MiVaSessionGlobalSpace (11)</td><td>Addresses for session global space</td><td>No</td></tr><tr><td>MiVaDriverImages (12)</td><td>Addresses for loaded driver images</td><td>No</td></tr><tr><td>MiVaSpecialPoolNonPaged (13)</td><td>Addresses for the special pool (non-paged)</td><td>Yes</td></tr><tr><td>MiVaSystemPtesLarge (14)</td><td>Addresses for large page PTEs</td><td>Yes</td></tr></table>
 
-
 Although the ability to dynamically reserve virtual address space on demand allows better management of virtual memory, it would be useless without the ability to free this memory. As such, when the paged pool or system cache can be shrunk, or when special pool and large page mappings are freed, the associated virtual address is freed. Another case is when the boot registry is released. This allows dynamic management of memory depending on each component's use. Additionally, components can reclaim memory through MlRelaInsystemVla, which requests virtual addresses associated with the system cache to be flushed out (through the dereference segment thread) if available virtual address space has dropped below 128 MB. Reclaiming can also be satisfied if initial non-paged pool has been freed.
 
 In addition to better proportioning and better management of virtual addresses dedicated to different kernel memory consumers, the dynamic virtual address allocator also has advantages when it comes to memory footprint reduction. Instead of having to manually pre-allocate static page table entries and page tables, paging-related structures are allocated on demand. On both 32-bit and 64-bit systems, this reduces boot-time memory usage because unused addresses won’t have their page tables allocated. It also means that on 64-bit systems, the large address space regions that are reserved don’t need to have their page tables mapped in memory. This allows them to have arbitrarily large limits, especially on systems that have little physical RAM to back the resulting paging structures.
 
-360    CHAPTER 5   Memory management
-
+360 CHAPTER 5 Memory management
 
 ---
 
@@ -2320,8 +2265,7 @@ address types from T able 5-8. Here are the SystemVaT ypeCount and SystemVaT ype
     [05] 0x1b
 ```
 
-CHAPTER 5     Memory management      361
-
+CHAPTER 5 Memory management 361
 
 ---
 
@@ -2420,8 +2364,7 @@ those types marked in Table 5-8.
 
 You can use the MemLimit utility (found in this book's downloadable resources) on 32-bit systems to query and set the different limits for these types and to see the current and peak virtual address space usage. Here's how you can query the current limits with the -q flag:
 
-CHAPTER 5   Memory management      363
-
+CHAPTER 5 Memory management 363
 
 ---
 
@@ -2474,15 +2417,13 @@ TABLE 5-9 Process quota types
 
 <table><tr><td>Value Name</td><td>Description</td><td>Value Type</td><td>Dynamic</td><td>Privilege</td></tr><tr><td>PagedPoolQuota</td><td>This is the maximum size of paged pool that can be allocated by this process.</td><td>Size in MB</td><td>Only for processes running with the system token</td><td>SeIncreaseQuotaPrivilege</td></tr><tr><td>NonPagedPoolQuota</td><td>This is the maximum size of non-paged pool that can be allocated by this process.</td><td>Size in MB</td><td>Only for processes running with the system token</td><td>SeIncreaseQuotaPrivilege</td></tr><tr><td>PagingFileQuota</td><td>This is the maximum number of pages that a process can have backed by the page file.</td><td>Pages</td><td>Only for processes running with the system token</td><td>SeIncreaseQuotaPrivilege</td></tr><tr><td>WorkingSetPagesQuota</td><td>This is the maximum number of pages that a process can have in its working set (in physical memory).</td><td>Pages</td><td>Yes</td><td>SeIncreaseBasePriorityPrivilege unless operation is a purge request</td></tr></table>
 
-
 ## User address space layout
 
 Just as address space in the kernel is dynamic, the user address space is also built dynamically. The addresses of the thread stacks, process heaps, and loaded images (such as DLLs and an application's executable) are dynamically computed (if the application and its images support it) through the ASLR mechanism.
 
 At the operating system level, user address space is divided into a few well-defined regions of memory, as shown in Figure 5-14. The executable and DLLs themselves are present as memory-mapped image files, followed by the heap(s) of the process and the stack(s) of its thread(s). Apart from these regions (and some reserved system structures such as the TEBs and PEB), all other memory allocations are run-time dependent and generated. ASLR is involved with the location of all these run timedependent regions and, combined with DEP, provides a mechanism for making remote exploitation of a system through memory manipulation harder to achieve. Because Windows code and data are placed at dynamic locations, an attacker cannot typically hard-code a meaningful offset into either a program or a system-supplied DLL.
 
-CHAPTER 5     Memory management      365
-
+CHAPTER 5 Memory management 365
 
 ---
 
@@ -2521,7 +2462,7 @@ stack allocations). Furthermore, each allocation's cost is shown both in committ
 
 working set memory. The size and protection of each allocation is also displayed.
 
-ASLR begins at the image level, with the executable for the process and its dependent DLLs. Any image file that has specified ASLR support in its PE header (IMAGE_DLL_CHARACTERISTICS_DYNAMIC_ BASE), typically specified by using the /DYNAMICBASE linker flag in Microsoft Visual Studio, and contains a relocation section will be processed by ASLR. When such an image is found, the system selects an image offset valid globally for the current boot. This offset is selected from a bucket of 256 values, all of which are 64 KB aligned.
+ASLR begins at the image level, with the executable for the process and its dependent DLLs. Any image file that has specified ASLR support in its PE header (IMAGE*DLL_CHARACTERISTICS_DYNAMIC* BASE), typically specified by using the /DYNAMICBASE linker flag in Microsoft Visual Studio, and contains a relocation section will be processed by ASLR. When such an image is found, the system selects an image offset valid globally for the current boot. This offset is selected from a bucket of 256 values, all of which are 64 KB aligned.
 
 ## Image randomization
 
@@ -2539,8 +2480,7 @@ executable's preferred load address, creating one of 256 possible locations with
 
 address in the PE header.
 
-CHAPTER 5     Memory management      367
-
+CHAPTER 5 Memory management 367
 
 ---
 
@@ -2570,9 +2510,9 @@ Once the offset is computed, the memory manager initializes a bitmap called Imag
 
 As each DLL is loaded, the system scans the bitmap from top to bottom for free bits. The ImageBia's value computed earlier is used as a start index from the top to randomize the load across different boots as suggested. Because the bitmap will be entirely empty when the first DLL (which is always Ntdll, dll) is loaded, its load address can easily be calculated. (Sixty-four-bit systems have their own bias.)
 
-- ■ 32 bit 0x78000000 - (ImageBias + NtD1[Sizein64KBChunks] * 0x10000
+- ■ 32 bit 0x78000000 - (ImageBias + NtD1[Sizein64KBChunks] \* 0x10000
 
-■ 64 bit 0x7FFFFF0000 - (ImageBias64High + NtD1[Sizein64KBChunks] * 0x10000
+■ 64 bit 0x7FFFFF0000 - (ImageBias64High + NtD1[Sizein64KBChunks] \* 0x10000
 Each subsequent DLL will then load in a 64 KB chunk below. Because of this, if the address of Ntdll.
 
 dll is known, the addresses of other DLLs could easily be computed. To mitigate this possibility, the or der in which known DLLs are mapped by the Session Manager during initialization is also randomized
@@ -2603,7 +2543,7 @@ tkd- dt_nti_mi_system_information sections.imagebias 820879c0
     +0x0dc ImageBias       : 0x6e
 ```
 
-3. Open Explorer and find the size of Ntll.dll in the System32 directory. On this system, it's 1547 KB = 0x182c00, so the size in 64 KB chunks is 0x19 (always rounding up). The result is 0x78000000 - (0x6E + 0x19) * 0x10000 = 0x7790000.
+3. Open Explorer and find the size of Ntll.dll in the System32 directory. On this system, it's 1547 KB = 0x182c00, so the size in 64 KB chunks is 0x19 (always rounding up). The result is 0x78000000 - (0x6E + 0x19) \* 0x10000 = 0x7790000.
 
 4. Open Process Explorer, find any process, and look at the load address (in the Base or Image Base columns) of Ndtll.dll. You should see the same value.
 
@@ -2635,14 +2575,13 @@ system memory regions, such as paged and non-paged pools, system cache, page tab
 
 database (initialized by M1AssignToPLeveIRanges).
 
-CHAPTER 5     Memory management      369
-
+CHAPTER 5 Memory management 369
 
 ---
 
 ## Controlling security mitigations
 
-As you've seen, ASLR and many other security mitigations in Windows are optional because of their potential compatibility effects: ASLR applies only to images with the IMAGE_DLL_CHARACTERISTICS_ DYNAMIC_BASE bit in their image headers, hardware no-execute (DEP) can be controlled by a combination of boot options and linker options, and so on. T o allow both enterprise customers and individual users more visibility and control of these features, Microsoft publishes the Enhanced Mitigation Experience Toolkit (EMET). EMET offers centralized control of the mitigations built into Windows and adds several more mitigations not yet part of the Windows product. Additionally, EMET provides notification capabilities through the event log to let administrators know when certain software has experienced access faults because mitigations have been applied. Finally, EMET enables manual opt-out for certain applications that might exhibit compatibility issues in certain environments, even though they were opted in by the developer.
+As you've seen, ASLR and many other security mitigations in Windows are optional because of their potential compatibility effects: ASLR applies only to images with the IMAGE*DLL_CHARACTERISTICS* DYNAMIC_BASE bit in their image headers, hardware no-execute (DEP) can be controlled by a combination of boot options and linker options, and so on. T o allow both enterprise customers and individual users more visibility and control of these features, Microsoft publishes the Enhanced Mitigation Experience Toolkit (EMET). EMET offers centralized control of the mitigations built into Windows and adds several more mitigations not yet part of the Windows product. Additionally, EMET provides notification capabilities through the event log to let administrators know when certain software has experienced access faults because mitigations have been applied. Finally, EMET enables manual opt-out for certain applications that might exhibit compatibility issues in certain environments, even though they were opted in by the developer.
 
 ![Figure](figures/Winternals7thPt1_page_387_figure_002.png)
 
@@ -2663,8 +2602,8 @@ To look at the ASLR status for processes, follow these steps:
 2. Select ASLR Enabled on the Process Image and DLL tabs.
 
 3. Notice that all in-box Windows programs and services are running with ASLR enabled,
-but third-party applications may or may not run with ASLR.
-In the example, we have highlighted the Notepad.exe process. In this case, its load address is 0x7FFD76B0000. If you were to close all instances of Notepad and then start another, you would find it at a different load address. If you shut down and reboot the system and then try the experiment again, you will find that the ASLR-enabled DLLs are at different load addresses after each boot.
+   but third-party applications may or may not run with ASLR.
+   In the example, we have highlighted the Notepad.exe process. In this case, its load address is 0x7FFD76B0000. If you were to close all instances of Notepad and then start another, you would find it at a different load address. If you shut down and reboot the system and then try the experiment again, you will find that the ASLR-enabled DLLs are at different load addresses after each boot.
 
 ---
 
@@ -2678,8 +2617,7 @@ Now that you've seen how Windows structures the virtual address space, let's loo
 
 The original x86 kernel supported no more than 4 GB of physical memory, based on the CPU hardware available at the time. The Intel x86 Pentium Pro processor introduced a memory-mapping mode called Physical Address Extension (PAE). With the proper chipset, the PAE mode allows 32-bit operating systems access to up to 64 GB of physical memory on current Intel x86 processors (up from 4 GB without PAE) and up to 1,024 GB of physical memory when running on x64 processors in legacy mode (although Windows currently limits this to 64 GB due to the size of the PPN database required to describe so much memory). Since then, Windows has maintained two separate x86 kernels—one that did not support PAE and one that did. Starting with Windows Vista, an x86 Windows installation always installs the PAE kernel even if the system's physical memory is not higher than 4 GB. This allows Microsoft to maintain a single x86 kernel, as the benefits of the non-PAE kernel in terms of performance and memory footprint became negligible (and is required for hardware no-execute support). Thus, we'll describe only x86 PAE address translation. Interested readers can read the relevant section in the sixth edition of this book for the non-PAE case.
 
-CHAPTER 5     Memory management      371
-
+CHAPTER 5 Memory management 371
 
 ---
 
@@ -2697,8 +2635,7 @@ The actual translation process and the layout of the page tables and page direct
 
 As shown in Figure 5-16, the input to the translation system consists of a 32-bit virtual address (since this is the addressable range with 32 bit) and a bunch of memory-related structures (page tables, page directories, a single page directory pointer table [PDPT], and translation lookaside buffers, all described
 
-372    CHAPTER 5   Memory management
-
+372 CHAPTER 5 Memory management
 
 ---
 
@@ -2716,8 +2653,7 @@ Figure 5-17 depicts the entire process of translating x86 virtual to physical ad
 
 FIGURE 5-17 x86 virtual address translation.
 
-CHAPTER 5     Memory management      373
-
+CHAPTER 5 Memory management 373
 
 ---
 
@@ -2794,16 +2730,13 @@ TABLE 5-10 PTE status and protection bits
 
 <table><tr><td>Name of Bit</td><td>Meaning</td></tr><tr><td>Accessed</td><td>The page has been accessed.</td></tr><tr><td>Cache disabled</td><td>This disables CPU caching for that page.</td></tr><tr><td>Copy-on-write</td><td>The page is using copy-on-write (described earlier).</td></tr></table>
 
-
-CHAPTER 5     Memory management      375
-
+CHAPTER 5 Memory management 375
 
 ---
 
 TABLE 5-10 PTE status and protection bits (continued)
 
 <table><tr><td>Name of Bit</td><td>Meaning</td></tr><tr><td>Dirty</td><td>The page has been written to.</td></tr><tr><td>Global</td><td>Translation applies to all processes. For example, a translation buffer flush won&#x27;t affect this PTE.</td></tr><tr><td>Large page</td><td>This indicates that the PDE maps a 2 MB page. (Refer to the section &quot;Large and small pages&quot; earlier in this chapter.)</td></tr><tr><td>No execute</td><td>This indicates that code cannot execute in the page. (It can be used for data only.)</td></tr><tr><td>Owner</td><td>This indicates whether user-mode code can access the page or whether the page is limited to kernel-mode access.</td></tr><tr><td>Prototype</td><td>The PTE is a prototype PTE, which is used as a template to describe shared memory associated with section objects.</td></tr><tr><td>Valid</td><td>This indicates whether the translation maps to a page in physical memory.</td></tr><tr><td>Write through</td><td>This marks the page as write-through or, if the processor supports the page attribute table, write-combined. This is typically used to map video frame buffer memory.</td></tr><tr><td>Write</td><td>This indicates to the MMU whether the page is writable.</td></tr></table>
-
 
 On x86 systems, a hardware PTE contains two bits that can be changed by the MMU: the dirty bit
 
@@ -2823,8 +2756,7 @@ The additional write bit implemented in software (refer to Table 5-10) is used t
 
 In practice, on multiprocessor systems, this can lead to race conditions that are expensive to resolve. At any time, the MMUs of the various processors can set the dirty bit of any PTE that has its hardware write bit set. The memory manager must, at various times, update the process working set list to reflect the state of the dirty bit in a PTE. The memory manager uses a pushlock to synchronize access to the working set list. But on a multiprocessor system, even while one processor is holding the lock, the dirty bit might be changed by MMUs of other CPUs. This raises the possibility of missing an update to a dirty bit.
 
-376    CHAPTER 5   Memory management
-
+376 CHAPTER 5 Memory management
 
 ---
 
@@ -2843,7 +2775,7 @@ As you've learned, each hardware address translation requires three lookups:
 ■ One to find the right entry in the page table
 Because doing three additional memory lookups for every reference to a virtual address would quadruple the required bandwidth to memory, resulting in poor performance, all CPUs cache address translations so that repeated accesses of the same addresses don't have to be repeatedly translated. This cache is an array of associative memory called the translation lookaside buffer (TLB). Associative memory is a vector whose cells can be read simultaneously and compared to a target value. In the case of the TLB, the vector contains the virtual-to-physical page mappings of the most recently used pages, as shown in Figure 5-19, and the type of page protection, size, attributes, and so on applied to each page. Each entry in the TLB is like a cache entry whose tag holds portions of the virtual address and whose data portion holds a physical page number, protection field, valid bit, and usually a dirty bit indicating the condition of the page to which the cached PTE corresponds. If a PTE's global bit is set (as is done by Windows for system space pages that are visible to all processes), the TLB entry isn't invalidated on process context switches.
 
-CHAPTER 5   Memory manage
+CHAPTER 5 Memory manage
 
 377
 
@@ -2851,7 +2783,7 @@ CHAPTER 5   Memory manage
 
 ![Figure](figures/Winternals7thPt1_page_395_figure_000.png)
 
-FIGURE 5-19  Accessing the TLB.
+FIGURE 5-19 Accessing the TLB.
 
 Frequently used virtual addresses are likely to have entries in the TLB, which provides extremely fast virtual-to-physical address translation and, therefore, fast memory access. If a virtual address isn't in the TLB, it might still be in memory, but multiple memory accesses are needed to find it, which makes the access time slightly slower. If a virtual page has been paged out of memory or if the memory manager changes the PTE, the memory manager is required to explicitly invalidate the TLB entry. If a process accesses it again, a page fault occurs, and the memory manager brings the page back into memory (if needed) and re-creates its PTE (which then results in an entry for it in the TLB).
 
@@ -2861,9 +2793,7 @@ To clarify how address translation works, this experiment shows an example of tr
 
 First convert 0x3166004 to binary and break it into the three fields used to translate an address.
 
-
 In binary, 0x3166004 is 11.0001.0110.0110.0000.0000.0100. Breaking it into the component fields
-
 
 yields the following:
 
@@ -2964,8 +2894,7 @@ and PDE.
 
 Address translation on x64 is similar to x86, but with a fourth level added. Each process has a top-level extended page directory called the page map level 4 table that contains the physical locations of 512 third-level structures, called page directory pointers. The page parent directory is analogous to the x86 PAE PDPT, but there are 512 of them instead of just one, and each page parent directory is an entire page containing 512 entries instead of just four. Like the PDPT, the page parent directory's entries contain the physical locations of second-level page directories, each of which in turn contains 512 entries providing the locations of the individual page tables. Finally, the page tables, each of which contains 512 page table entries, contain the physical locations of the pages in memory. All the "physical locations" in the preceding description are stored in these structures as PFNs.
 
-380    CHAPTER 5   Memory management
-
+380 CHAPTER 5 Memory management
 
 ---
 
@@ -2987,8 +2916,7 @@ FIGURE 5-21 x64 hardware PTE.
 
 Virtual address translation on ARM 32-bit processors uses a single page directory with 1,024 entries, each 32 bits in size. The translation structures are shown in Figure 5-22.
 
-CHAPTER 5     Memory management      381
-
+CHAPTER 5 Memory management 381
 
 ---
 
@@ -3004,8 +2932,7 @@ Curiously, the layout of valid PTE, PDE, and large page PDE are not the same. Fi
 
 FIGURE 5-23 ARM valid PTE layout.
 
-382    CHAPTER 5   Memory management
-
+382 CHAPTER 5 Memory management
 
 ---
 
@@ -3023,15 +2950,13 @@ TABLE 5-11 Reasons for access faults
 
 <table><tr><td>Reason for Fault</td><td>Result</td></tr><tr><td>Corrupt PTE/PDE</td><td>Bug-check (crash) the system with code 0x1A (MEMORY_MANAGEMENT).</td></tr><tr><td>Accessing a page that isn&#x27;t resident in memory but is on disk in a page file or a mapped file</td><td>Allocate a physical page and read the desired page from disk and into the relevant working set.</td></tr><tr><td>Accessing a page that is on the standby or modified list</td><td>Transition the page to the relevant process, session, or system working set.</td></tr><tr><td>Accessing a page that isn&#x27;t committed (for example, reserved address space or address space that isn&#x27;t allocated)</td><td>Access violation exception.</td></tr><tr><td>Accessing a page from user mode that can be accessed only in kernel mode</td><td>Access violation exception.</td></tr><tr><td>Writing to a page that is read-only</td><td>Access violation exception.</td></tr><tr><td>Accessing a demand-zero page</td><td>Add a zero-filled page to the relevant working set.</td></tr><tr><td>Writing to a guard page</td><td>Guard-page violation (if there is a reference to a user-mode stack, perform automatic stack expansion).</td></tr><tr><td>Writing to a copy-on-write page</td><td>Make a process-private (or session-private) copy of the page and use it to replace the original in the process, session, or system working set.</td></tr><tr><td>Writing to a page that is valid but hasn&#x27;t been written to the current backing store copy</td><td>Set the dirty bit in the PTE.</td></tr><tr><td>Executing code in a page that is marked as no execute</td><td>Access violation exception.</td></tr><tr><td>PTE permissions don&#x27;t match enclave permissions (see the section &quot;Memory enclaces&quot; later in this chapter and the Windows SDK documentation for the CreateEnClave function)</td><td>User mode: access violation exception. Kernel mode: bug-check with code 0x50 (PAGE_FAULT_IN_NOTPARED_AREA).</td></tr></table>
 
-
 The following section describes the four basic kinds of invalid PTEs that are processed by the access
 
 fault handler. Following that is an explanation of a special case of invalid PTEs, called prototype PTEs,
 
 which are used to implement shareable pages.
 
-CHAPTER 5     Memory management      383
-
+CHAPTER 5 Memory management 383
 
 ---
 
@@ -3054,36 +2979,35 @@ of the flags are the same as those for a hardware PTE, as described in Table 5-1
 fields have either the same or similar meanings to corresponding fields in the hardware PTE.
 
 - ■ Page file The desired page resides within a paging file. As illustrated in Figure 5-24, 4 bits in
-the PTE indicate in which of 16 possible page files the page resides, and 32 bits provide the page
-number within the file. The pager initiates an in-page operation to bring the page into memory
-and make it valid. The page file offset is always non-zero and never all ones (that is, the very first
-and last pages in the page file are not used for paging) to allow for other formats, described next.
-![Figure](figures/Winternals7thPt1_page_401_figure_004.png)
+  the PTE indicate in which of 16 possible page files the page resides, and 32 bits provide the page
+  number within the file. The pager initiates an in-page operation to bring the page into memory
+  and make it valid. The page file offset is always non-zero and never all ones (that is, the very first
+  and last pages in the page file are not used for paging) to allow for other formats, described next.
+  ![Figure](figures/Winternals7thPt1_page_401_figure_004.png)
 
 FIGURE 5-24 A PTE representing a page in a page file.
 
 - ■ Demand zero This PTE format is the same as the page file PTE shown in the previous entry
-but the page file offset is zero. The desired page must be satisfied with a page of zeroes. The
-pager looks at the zero page list. If the list is empty, the pager takes a page from the free list and
-zeroes it. If the free list is also empty, it takes a page from one of the standby lists and zeroes it.
-■ Virtual Address Descriptor This PTE format is the same as the page file PTE shown previous-
-ly but in this case the page file offset field is all one. This indicates a page whose definition and
-backing store, if any, can be found in the process's Virtual Address Descriptor (VAD) tree. This
-format is used for pages that are backed by sections in mapped files. The pager finds the VAD
-that defines the virtual address range encompassing the virtual page and initiates an in-page
-operation from the mapped file referenced by the VAD. (VADs are described in more detail in
-the section "Virtual address descriptors" later in this chapter.)
-■ Transition The transition bit is one. The desired page is in memory on either the standby,
-modified, or modified-no-write list or not on any list. The pager will remove the page from
-the list (if it is on one) and add it to the process working set. This is known as a soft page fault
-because no I/O is involved.
-■ Unknown The PTE is zero or the page table doesn't yet exist. (The PDE that would provide
-the physical address of the page table contains zero.) In both cases, the memory manager must
+  but the page file offset is zero. The desired page must be satisfied with a page of zeroes. The
+  pager looks at the zero page list. If the list is empty, the pager takes a page from the free list and
+  zeroes it. If the free list is also empty, it takes a page from one of the standby lists and zeroes it.
+  ■ Virtual Address Descriptor This PTE format is the same as the page file PTE shown previous-
+  ly but in this case the page file offset field is all one. This indicates a page whose definition and
+  backing store, if any, can be found in the process's Virtual Address Descriptor (VAD) tree. This
+  format is used for pages that are backed by sections in mapped files. The pager finds the VAD
+  that defines the virtual address range encompassing the virtual page and initiates an in-page
+  operation from the mapped file referenced by the VAD. (VADs are described in more detail in
+  the section "Virtual address descriptors" later in this chapter.)
+  ■ Transition The transition bit is one. The desired page is in memory on either the standby,
+  modified, or modified-no-write list or not on any list. The pager will remove the page from
+  the list (if it is on one) and add it to the process working set. This is known as a soft page fault
+  because no I/O is involved.
+  ■ Unknown The PTE is zero or the page table doesn't yet exist. (The PDE that would provide
+  the physical address of the page table contains zero.) In both cases, the memory manager must
 
 CHAPTER 5 Memory management
 
-From the Library of M
----
+## From the Library of M
 
 examine the VADs to determine whether this virtual address has been committed. If so, page tables are built to represent the newly committed address space. If not—that is, if the page is reserved or hasn't been defined at all—the page fault is reported as an access violation exception.
 
@@ -3107,19 +3031,18 @@ FIGURE 5-25 Structure of an invalid PTE that points to the prototype PTE.
 
 A shared page can be in one of six different states, as described by the prototype PTE:
 
-- ●  Active/valid  The page is in physical memory because of another process that accessed it.
+- ● Active/valid The page is in physical memory because of another process that accessed it.
 
-●  Transition  The desired page is in memory on the standby or modified list (or not on any list).
+● Transition The desired page is in memory on the standby or modified list (or not on any list).
 
-●  Modified-no-write  The desired page is in memory and on the modified-no-write list. (Refer
+● Modified-no-write The desired page is in memory and on the modified-no-write list. (Refer
 to Table 5-11)
 
-●  Demand zero  The desired page should be satisfied with a page of zeroes.
+● Demand zero The desired page should be satisfied with a page of zeroes.
 
-●  Page file  The desired page resides within a page file.
+● Page file The desired page resides within a page file.
 
-●  Mapped file  The desired page resides within a mapped file.
----
+## ● Mapped file The desired page resides within a mapped file.
 
 Although the format of these prototype PTEs is the same as that of the real PTEs described earlier, the prototype PTEs aren't used for address translation. They are a layer between the page table and the PFN database and never appear directly in page tables.
 
@@ -3145,8 +3068,7 @@ The in-page I/O operation is synchronous—that is, the thread waits on an event
 
 While the paging I/O operation is in progress, the faulting thread doesn't own any critical memory management synchronization objects. Other threads within the process can issue virtual memory
 
-386    CHAPTER 5   Memory management
-
+386 CHAPTER 5 Memory management
 
 ---
 
@@ -3155,7 +3077,7 @@ functions and handle page faults while the paging I/O takes place. But there are
 conditions that the pager must recognize when the I/O completes are exposed:
 
 - Another thread in the same process or a different process could have faulted the same page
-(called a collided page fault and described in the next section).
+  (called a collided page fault and described in the next section).
 
 The page could have been deleted and remapped from the virtual address space.
 
@@ -3201,7 +3123,7 @@ cache. The prefetch operations read data directly into the system's page cache i
 
 the size of the fetch operation is not limited to the amount of virtual address space that is available.
 
-CHAPTER 5   Memory manage
+CHAPTER 5 Memory manage
 
 387
 
@@ -3216,7 +3138,6 @@ FIGURE 5-27 Usage of dummy page during virtual-address-to-physical-address mappi
 In the figure, the file offsets and virtual addresses that correspond to pages A, Y, Z, and B are logically contiguous, although the physical pages themselves are not necessarily contiguous. Pages A and B are nonresident, so the memory manager must read them. Pages Y and Z are already resident in memory, so it is not necessary to read them. (In fact, they might already have been modified since they were last read in from their backing store, in which case it would be a serious error to overwrite their contents.) However, reading pages A and B in a single operation is more efficient than performing one read for page A and a second read for page B. Therefore, the memory manager issues a single read request that comprises all four pages (A, Y, Z, and B) from the backing store. Such a read request includes as many pages as it makes sense to read, based on the amount of available memory, the current system usage, and so on.
 
 When the memory manager builds the MDL that describes the request, it supplies valid pointers to pages A and B. However, the entries for pages Y and Z point to a single system-wide dummy page X.
-
 
 The memory manager can fill the dummy page X with the potentially stale data from the backing store because it does not make X visible. However, if a component accesses the Y and Z offsets in the MDL, it sees the dummy page X instead of Y and Z.
 
@@ -3246,7 +3167,7 @@ alone as follows:
 
 - ■ Minimum size Set to the amount of RAM or 1 GB, whichever is larger
 
-■ Maximum size Set to 3 * RAM or 4 GB, whichever is larger
+■ Maximum size Set to 3 \* RAM or 4 GB, whichever is larger
 These settings are not ideal. For example, today's laptops and desktop machines can easily have 32 GB or 64 GB of RAM, and server machines can have hundreds of gigabytes of RAM. Setting the initial page file size to the size of RAM may result in a considerable loss of disk space, especially if disk sizes are relatively small and based on solid-state device (SSD). Furthermore, the amount of RAM in a system is not necessarily indicative of the typical memory workload on that system.
 
 The current implementation uses a more elaborate scheme to derive a "good" minimum page file size based not only on RAM size, but also on page file history usage and other factors. As part of pagefile creation and initialization, Smss.exe calculates page file minimum sizes based on four factors, stored in global variables:
@@ -3259,8 +3180,7 @@ needed to be able to store a crash dump.
 
 ■ History (SmpDesiredPFSizeBasedOnHistory) This is the recommended page file size based on
 
-usage history. Smss.exe uses a timer that triggers once an hour and records the page file usage.
----
+## usage history. Smss.exe uses a timer that triggers once an hour and records the page file usage.
 
 - ■ Apps (SmpDesiredPFSizeForApps) This is the recommended page file for Windows apps.
 
@@ -3270,7 +3190,6 @@ TABLE 5-12 Base calculation for page file size recommendation
 
 <table><tr><td>Recommendation Base</td><td>Recommended Page File Size</td></tr><tr><td>RAM</td><td>If RAM &lt;= 1 GB, then size = 1 GB. If RAM &gt; 1 GB, then add 1/8 GB for every extra gigabyte of RAM, up to a maximum of 32 GB.</td></tr><tr><td>Crash dump</td><td>If a dedicated dump file is configured, then no page file is required for storing a dump file, and the size is 0. You can configure this for a dedicated dump file by adding the value DatedCuedumpFile in the HKLM\System\CurrentControlSet\Control\CrashControl key.) If the dump type configured is set to Automatic (the default), then: If RAM size is 1 GB, then size = 1 GB. Otherwise, size = 2/3 GB = 1/8 GB for each extra gigabyte above 4 GB, capped to 32 GB. If there was a recent crash for which the page file was not large enough, then recommended-ed size is increased to RAM size or 32 GB, whichever is smaller. If a full dump is configured, returned size = RAM size plus additional information size present in a dump file. If a kernel dump is configured, then size = RAM.</td></tr><tr><td>History</td><td>If enough samples have been logged, returns the 90th percentile as the recommended size. Otherwise, returns the size based on RAM (above).</td></tr><tr><td>Apps</td><td>If it&#x27;s a server, return zero. The recommended size is based on a factor that the Process Lifecycle Manager (PLM) uses to determine when to terminate an app. Current factor is 2.3 * RAM, which was considered with RAM = 1 GB (rough minimum for mobile devices). The recommended size (based on the mentioned factor) is around 2.5 GB. If this is more than RAM, RAM is subtracted. Otherwise, zero is returned.</td></tr></table>
 
-
 The maximum page file size for a system-managed size is set at three times the size of RAM or 4 GB, whichever is larger. The minimum (initial) page file size is determined as follows:
 
 ■ If it's the first system-managed page file, then the base size is set based on page file history (refer to Table 5-12). Otherwise, the base size is based on RAM.
@@ -3279,12 +3198,12 @@ The maximum page file size for a system-managed size is set at three times the s
 
 - • If the base size is smaller than the computed page file size for apps (SmpDesiredPFSize-
 
-
 ForApps), then set the new base as the size computed for apps (refer to Table 5-12).
 
 • If the (new) base size is smaller than the computed size for crash dumps (SmpDesiredPf-
 
 SizeForCrashDump), then set the new base to be the size computed for crash dumps.
+
 ## EXPERIMENT: Viewing page files
 
 To view the list of page files, look in the registry at the PagingFiles value in the HKLM\SYSTEM\ CurrentControlSet\Control\Session Manager\Memory Management key. This entry contains the paging file configuration settings modified through the Advanced System Settings dialog box. To access these settings, follow these steps:
@@ -3345,8 +3264,7 @@ Tkb-dq smsslSmDepredPFSIsizeBasedOnRAM L1
 00974cd0 00000000^4fff1a0
 ```
 
-CHAPTER 5     Memory management      391
-
+CHAPTER 5 Memory management 391
 
 ---
 
@@ -3407,12 +3325,11 @@ was created (the normal case). Its name is SwapFile.sys and it resides in the sy
 
 example, C:\SwapFile.Sys.
 
-392    CHAPTER 5   Memory management
-
+392 CHAPTER 5 Memory management
 
 ---
 
-After the normal page files are created, the HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management registry key is consulted. If a DWORD value named SwapFileControl1 exists and its value is zero, swap file creation is aborted. If a value named SwapFile11e exists, it's read as a string with the same format as a normal page file, with a filename, an initial size, and a maximum size. The difference is that a value of zero for the sizes is interpreted as no swap file creation. These two registry values do not exist by default, which results in the creation of a SwapFile.sys file on the system root partition with a minimum size of 16 MB on fast (and small) disks (for example, SSD) or 256 MB on slow (or large SSD) disks. The maximum size of the swap file is set to 1.5 * RAM or 10 percent of the system root partition size, whichever is smaller. See Chapter 7 in this book and Chapter 8, "System mechanisms," and Chapter 9, "Management mechanisms," in Part 2 for more on UWP apps.
+After the normal page files are created, the HKLM\System\CurrentControlSet\Control\Session Manager\Memory Management registry key is consulted. If a DWORD value named SwapFileControl1 exists and its value is zero, swap file creation is aborted. If a value named SwapFile11e exists, it's read as a string with the same format as a normal page file, with a filename, an initial size, and a maximum size. The difference is that a value of zero for the sizes is interpreted as no swap file creation. These two registry values do not exist by default, which results in the creation of a SwapFile.sys file on the system root partition with a minimum size of 16 MB on fast (and small) disks (for example, SSD) or 256 MB on slow (or large SSD) disks. The maximum size of the swap file is set to 1.5 \* RAM or 10 percent of the system root partition size, whichever is smaller. See Chapter 7 in this book and Chapter 8, "System mechanisms," and Chapter 9, "Management mechanisms," in Part 2 for more on UWP apps.
 
 ![Figure](figures/Winternals7thPt1_page_410_figure_001.png)
 
@@ -3441,10 +3358,9 @@ Minimum:     11469744 Kb  Maximum:    11469744 Kb
 
 On this system, the swap file minimum size is 256 MB, as the system is a Windows 10 virtual machine. (The VHD behind the disk is considered a slow disk.) The maximum size of the swap file is about 4.5 GB, as the RAM on the system is 3 GB and disk partition size is 64 GB (the minimum of 4.5 GB and 6.4 GB).
 
-CHAPTER 5   Memory manage
+CHAPTER 5 Memory manage
 
 393
-
 
 ---
 
@@ -3471,14 +3387,15 @@ The following types of memory allocations contribute to the system commit charge
 to the process page file quota. (Some of these will be described in detail in later sections of this chapter.)
 
 - ■ Private committed memory This is memory allocated with the Virtua1Alloc call with the
-MEM_COMMIT option. This is the most common type of contributor to the commit charge. These
-allocations are also charged to the process page file quota.
+  MEM_COMMIT option. This is the most common type of contributor to the commit charge. These
+  allocations are also charged to the process page file quota.
+
 ---
 
 - ■ Page-file-backed mapped memory This is memory allocated with a MapViewOffFile call
-that references a section object, which in turn is not associated with a file. The system uses a
-portion of the page file as the backing store instead. These allocations are not charged to the
-process page file quota.
+  that references a section object, which in turn is not associated with a file. The system uses a
+  portion of the page file as the backing store instead. These allocations are not charged to the
+  process page file quota.
 
 ■ Copy-on-write regions of mapped memory (even if it is associated with ordinary mapped
 files) The mapped file provides backing store for its own unmodified content. However,
@@ -3513,8 +3430,7 @@ A region of a file mapped as copy-on-write has a similar requirement. Until the 
 
 A particularly interesting case occurs when reserving private memory and later committing it. When the reserved region is created with VirtualAlloc, system commit charge is not charged for the actual virtual region. On Windows 8 and Server 2012 and earlier versions, it is charged for any new page table
 
-CHAPTER 5   Memory management      395
-
+CHAPTER 5 Memory management 395
 
 ---
 
@@ -3544,10 +3460,9 @@ freed. The performance counters listed in T able 5-13 allow you to examine priva
 
 usage on a system-wide, per-process, or per-page-file, basis.
 
-TABLE 5-13  Committed memory and page file performance counters
+TABLE 5-13 Committed memory and page file performance counters
 
 <table><tr><td>Performance Counter</td><td>Description</td></tr><tr><td>Memory: Committed Bytes</td><td>This is the number of bytes of virtual (not reserved) memory that has been committed. This number does not necessarily represent page file usage because it includes private committed pages in physical memory that have never been paged out. Rather, it represents the charged amount that must be backed by page file space and/or RAM.</td></tr><tr><td>Memory: Commit Limit</td><td>This is the number of bytes of virtual memory that can be committed without having to extend the paging files. If the paging files can be extended, this limit is soft.</td></tr><tr><td>Process: Page File Quota</td><td>This is the process&#x27;s contribution to Memory: Committed Bytes.</td></tr><tr><td>Process: Private Bytes</td><td>This is the same as Process: Page File Quota.</td></tr><tr><td>Process: Working Set - Private</td><td>This is the subset of Process: Page File Quota that is currently in RAM and can be referenced without a page fault. It is also a subset of Process: Working Set.</td></tr><tr><td>Process: Working Set</td><td>This is the subset of Process: Virtual Bytes that is currently in RAM and can be referenced without a page fault.</td></tr><tr><td>Process: Virtual Bytes</td><td>This is the total virtual memory allocation of the process, including mapped regions, private committed regions, and private reserved regions.</td></tr><tr><td>Paging File: % Usage</td><td>This is the percentage of the page file space that is currently in use.</td></tr><tr><td>Paging File: % Usage Peak</td><td>This is the highest observed value of Paging File: % Usage.</td></tr><tr><td colspan="2">CHAPTER 5 Memory management</td></tr><tr><td colspan="2">From the Library of</td></tr></table>
-
 
 ---
 
@@ -3567,8 +3482,7 @@ You'll see the following counters related to page files:
 
 ![Figure](figures/Winternals7thPt1_page_414_figure_006.png)
 
-CHAPTER 5   Memory management      397
-
+CHAPTER 5 Memory management 397
 
 ---
 
@@ -3618,7 +3532,6 @@ If you attempt this experiment on a 64-bit Windows installation (with 128 TB of 
 
 You will need to terminate TestLimit with Process Explorer or Task Manager. You cannot use
 
-
 Ctrl-C to break the application because this operation itself creates a new thread, which will not
 
 be possible once memory is exhausted.
@@ -3663,8 +3576,7 @@ To view kernel-stack usage, try the following:
 
 3. Open the File menu and select Refresh (or press F5). You should see a much higher
 
-kernel stack size:
----
+## kernel stack size:
 
 ```bash
 Driver Locked  34,892.84K   34,892.8K
@@ -3696,8 +3608,7 @@ The memory manager uses lazy evaluation not only to bring pages into memory but 
 
 The virtual address space that would be occupied by such as-yet-nonexistent page tables is charged to the process page file quota and to the system commit charge. This ensures that space will be available for them should they actually be created. With the lazy-evaluation algorithm, allocating even large blocks of memory is a fast operation. When a thread allocates memory, the memory manager must respond with a range of addresses for the thread to use. To do this, the memory manager maintains another set of data structures to keep track of which virtual addresses have been reserved in the process's address space and which have not. These data structures are known as Virtual Address Descriptors (VADs). VADs are allocated in non-paged pool.
 
-CHAPTER 5    Memory management      401
-
+CHAPTER 5 Memory management 401
 
 ---
 
@@ -3740,8 +3651,7 @@ PROCESS ffffc8069382e080
 CHAPTER 5   Memory management
 ```
 
-402    CHAPTER 5   Memory management
-
+402 CHAPTER 5 Memory management
 
 ---
 
@@ -3778,8 +3688,7 @@ A video card driver must typically copy data from the user-mode graphics applica
 
 FIGURE 5-30 Rotate VADs.
 
-CHAPTER 5   Memory management      403
-
+CHAPTER 5 Memory management 403
 
 ---
 
@@ -3837,10 +3746,9 @@ Like other objects, section objects are allocated and deallocated by the object 
 
 FIGURE 5-31 A section object.
 
-TABLE 5-14  Section object body attributes
+TABLE 5-14 Section object body attributes
 
 <table><tr><td>Attribute</td><td>Purpose</td></tr><tr><td>Maximum size</td><td>This is the largest size to which the section can grow in bytes. If mapping a file, this is the maximum size of the file.</td></tr><tr><td>Page protection</td><td>This is page-based memory protection assigned to all pages in the section when it is created.</td></tr><tr><td>Paging file or mapped file</td><td>This indicates whether the section is created empty (backed by the paging file—as explained earlier, page-file-backed sections use page-file resources only when the pages need to be written out to disk) or loaded with a file (backed by the mapped file).</td></tr><tr><td>Based or not based</td><td>This indicates whether a section is a based section, which must appear at the same virtual address for all processes sharing it, or a non-based section, which can appear at different virtual addresses for different processes.</td></tr><tr><td colspan="2">CHAPTER 5 Memory management 405</td></tr><tr><td colspan="2">From the Library of Mich</td></tr></table>
-
 
 ---
 
@@ -3885,8 +3793,7 @@ The data structures maintained by the memory manager that describe mapped sectio
 
 FIGURE 5-32 Internal section structures.
 
-CHAPTER 5    Memory management      407
-
+CHAPTER 5 Memory management 407
 
 ---
 
@@ -3928,8 +3835,7 @@ tkd:: process 0 0 powerprt.exe
 PROCESS ffffc8068913e080
 ```
 
-408    CHAPTER 5   Memory management
-
+408 CHAPTER 5 Memory management
 
 ---
 
@@ -3991,8 +3897,7 @@ Segment @ ffffda8f4d97fdc0
   Flags (c0000) ProtectionMask
 ```
 
-CHAPTER 5   Memory management      409
-
+CHAPTER 5 Memory management 409
 
 ---
 
@@ -4041,8 +3946,7 @@ Dangling No Commit:   514812 ( 2059248 kb)
 Scanning PFN database - (100% complete)
 ```
 
-410   CHAPTER 5   Memory management
-
+410 CHAPTER 5 Memory management
 
 ---
 
@@ -4096,8 +4000,7 @@ Subsection 2 @ ffff8c0b7f8cc418
 ControlArea  ffff8c0b7f8cc360  Starting Sector      2 Number Of Sectors 7b17
 ```
 
-CHAPTER 5     Memory management      411
-
+CHAPTER 5 Memory management 411
 
 ---
 
@@ -4149,8 +4052,7 @@ kernel-mode session-specific data structures allocated by the kernel-mode part o
 subsystem (Win32k.sys), session paged pool, session mapped views, and other session-space
 
 device drivers.
-412   CHAPTER 5   Memory management
-
+412 CHAPTER 5 Memory management
 
 ---
 
@@ -4192,8 +4094,7 @@ service initialization or through 120 seconds, whichever comes first.
 
 The trace assembled in the kernel notes faults taken on the NTFS master file table (MFT) metadata file (if the application accesses files or directories on NTFS volumes), referenced files, and referenced directories. With the trace assembled, the kernel prefetcher code waits for requests from the prefetcher component of the SuperFetch service (%SystemRoot%\System32\Sysmain.dll), running in an instance of XsVshot. The SuperFetch service is responsible for both the logical prefetching component in the kernel
 
-CHAPTER 5     Memory management      413
-
+CHAPTER 5 Memory management 413
 
 ---
 
@@ -4211,8 +4112,7 @@ FIGURE 5-33 Prefetch folder.
 
 There is an exception to the file name rule for images that host other components, including the Microsoft Management Console (%SystemRoot%\System32\Mcmc.exe), the service hosting process (%SystemRoot%\System32\Svcost.exe), the RunDLL component (%SystemRoot%\System32\Rundll32.exe), and Dllhost (%SystemRoot%\System32\Dllhost.exe). Because add-on components are specified on the command line for these applications, the prefetcher includes the command line in the generated hash.
 
-414   CHAPTER 5   Memory management
-
+414 CHAPTER 5 Memory management
 
 ---
 
@@ -4236,8 +4136,7 @@ If you capture a trace of application startup with Process Monitor from Sysinter
 
 ![Figure](figures/Winternals7thPt1_page_432_figure_005.png)
 
-CHAPTER 5     Memory management      415
-
+CHAPTER 5 Memory management 415
 
 ---
 
@@ -4267,8 +4166,7 @@ policy. Windows considers the size of CPU memory caches when choosing page frame
 
 unnecessary thrashing of the cache.
 
-416    CHAPTER 5   Memory management
-
+416 CHAPTER 5 Memory management
 
 ---
 
@@ -4304,9 +4202,7 @@ TABLE 5-15 Upper limit for working set maximums
 
 <table><tr><td>Windows Version</td><td>Working Set Maximum</td></tr><tr><td>x86, ARM</td><td>2 GB—64 KB (0x7FF0000)</td></tr><tr><td>x86 versions of Windows booted with increaseuserva</td><td>2 GB—64 KB + user virtual address increase</td></tr><tr><td>x64 (Windows 8, Server 2012)</td><td>8,192 GB (8 TB)</td></tr><tr><td>X64 (Windows 8.1, 10, Server 2012 R2, 2016)</td><td>128 TB</td></tr></table>
 
-
-CHAPTER 5     Memory management     417
-
+CHAPTER 5 Memory management 417
 
 ---
 
@@ -4350,8 +4246,7 @@ Manager and Process Explorer) also display the process working set size.
 
 <table><tr><td>Counter</td><td>Description</td></tr><tr><td>Process: Working Set</td><td>This notes the current size of the selected process&#x27;s working set in bytes.</td></tr><tr><td>Process: Working Set Peak</td><td>This tracks the peak size of the selected process&#x27;s working set in bytes.</td></tr><tr><td>Process: Page Faults/Sec</td><td>This indicates the number of page faults for the process that occur each second.</td></tr></table>
 
-
-You can also get the total of all the process working sets by selecting the _Total process in
+You can also get the total of all the process working sets by selecting the \_Total process in
 
 the instance box in Performance Monitor. This process isn't real; it's simply a total of the process specific counters for all processes currently running on the system. The total you see is larger
 
@@ -4388,8 +4283,7 @@ WS Private Bytes counters.
 
 5. Find the three instances of TestLimit, as shown in the display:
 
-CHAPTER 5   Memory management      419
-
+CHAPTER 5 Memory management 419
 
 ---
 
@@ -4413,9 +4307,7 @@ out of the process working set due to replacement or have not been paged in yet.
 
 You can view the individual entries in the working set by using the kernel debugger !w31e command.
 
-
 The following example shows a partial output of the working set of WinDnq (32-bit system):
-
 
 1
 
@@ -4448,7 +4340,6 @@ From the Librar
 
 <table><tr><td>c0004209</td><td>1</td><td>0</td><td>1</td></tr><tr><td>72a37805</td><td>4</td><td>0</td><td>1</td></tr><tr><td>b50409</td><td>2</td><td>0</td><td>1</td></tr><tr><td>b52809</td><td>4</td><td>0</td><td>1</td></tr><tr><td>7731dc05</td><td>6</td><td>0</td><td>1</td></tr><tr><td>bbec09</td><td>6</td><td>0</td><td>1</td></tr><tr><td>bbfc09</td><td>6</td><td>0</td><td>1</td></tr><tr><td>6c801805</td><td>4</td><td>0</td><td>1</td></tr><tr><td>772a1405</td><td>2</td><td>0</td><td>1</td></tr><tr><td>944209</td><td>1</td><td>0</td><td>1</td></tr><tr><td>77316a05</td><td>5</td><td>0</td><td>1</td></tr><tr><td>773a4209</td><td>1</td><td>0</td><td>1</td></tr><tr><td>77317405</td><td>2</td><td>0</td><td>1</td></tr><tr><td>772d6605</td><td>3</td><td>0</td><td>1</td></tr><tr><td>a71409</td><td>2</td><td>0</td><td>1</td></tr><tr><td>c1d409</td><td>2</td><td>0</td><td>1</td></tr><tr><td>772d4a05</td><td>5</td><td>0</td><td>1</td></tr><tr><td>77342c05</td><td>6</td><td>0</td><td>1</td></tr><tr><td>6c80f605</td><td>3</td><td>0</td><td>1</td></tr><tr><td>77320405</td><td>2</td><td>0</td><td>1</td></tr><tr><td>77323205</td><td>1</td><td>0</td><td>1</td></tr><tr><td>77321405</td><td>2</td><td>0</td><td>1</td></tr><tr><td>7fffe0215</td><td>1</td><td>0</td><td>1</td></tr><tr><td>a5fc09</td><td>6</td><td>0</td><td>1</td></tr><tr><td>7735cc05</td><td>6</td><td>0</td><td>1</td></tr><tr><td>...</td><td></td><td></td><td></td></tr></table>
 
-
 Notice that some entries in the working set list are page table pages (the ones with addresses
 
 greater than 0xC0000000), some are from system DLLs (the ones in the 0x7nnnnnnn range), and
@@ -4473,41 +4364,41 @@ manager wakes up the balance set manager so that it will call the working set ma
 
 working sets will grow only as needed.
 
-CHAPTER 5     Memory management      421
-
+CHAPTER 5 Memory management 421
 
 ---
 
 When the balance set manager wakes up because its 1-second timer has expired, it takes the following steps:
 
 - 1. If the system supports Virtual Secure Mode (VSM, Windows 10 and Server 2016), then the
-secure kernel is called to do its periodic housekeeping (Vs1SecureKernelPeriodicTick).
+     secure kernel is called to do its periodic housekeeping (Vs1SecureKernelPeriodicTick).
 
 2. Calls a routine to adjust IRP credits to optimize the usage of the per-processor look-aside lists
-used in IRP completion (IoAdjustIrpCredits). This allows better scalability when certain
-processors are under heavy I/O load. (See Chapter 6 for more on IRPs.)
+   used in IRP completion (IoAdjustIrpCredits). This allows better scalability when certain
+   processors are under heavy I/O load. (See Chapter 6 for more on IRPs.)
 
 3. Checks the look-aside lists and adjusts their depths (if necessary) to improve access time and
-reduce pool usage and pool fragmentation (ExAdjustLookasideDepth).
+   reduce pool usage and pool fragmentation (ExAdjustLookasideDepth).
 
 4. Calls to adjust the Event Tracing for Windows (ETW) buffer pool size to use ETW memory buf-
-fers more efficiently (EtwAdjustTraceBuffers). (For more on ETW, see Chapter 8 in Part 2.)
+   fers more efficiently (EtwAdjustTraceBuffers). (For more on ETW, see Chapter 8 in Part 2.)
 
 5. Calls the memory manager's working set manager. The working set manager has its own inter-
-nal counters that regulate when to perform working set trimming and how aggressively to trim.
+   nal counters that regulate when to perform working set trimming and how aggressively to trim.
 
 6. Enforces execution time for jobs (PsEnforceExecutionLimits).
 
 7. Every eighth time the balance set manager wakes up because its 1-second timer has expired,
-it signals an event that wakes up another system thread called the wrapper (KeSwapProcess-
-OrStack). It attempts to outswap kernel stacks for threads that have not executed for a long
-time. The wrapper thread (which runs at priority 23) looks for threads that have been in a user
-mode wait state for 15 seconds. If it finds one, it puts the thread's kernel stack in transition
-(moving the pages to the modified or standby lists) to reclaim its physical memory, operating
-on the principle that if a thread has been waiting that long, it's going to be waiting even longer.
-When the last thread in a process has its kernel stack removed from memory, the process is
-marked to be entirely outswapped. That's why, for example, processes that have been idle for a
-long time (such as Wininit or Winlogon) can have a working set size of zero.
+   it signals an event that wakes up another system thread called the wrapper (KeSwapProcess-
+   OrStack). It attempts to outswap kernel stacks for threads that have not executed for a long
+   time. The wrapper thread (which runs at priority 23) looks for threads that have been in a user
+   mode wait state for 15 seconds. If it finds one, it puts the thread's kernel stack in transition
+   (moving the pages to the modified or standby lists) to reclaim its physical memory, operating
+   on the principle that if a thread has been waiting that long, it's going to be waiting even longer.
+   When the last thread in a process has its kernel stack removed from memory, the process is
+   marked to be entirely outswapped. That's why, for example, processes that have been idle for a
+   long time (such as Wininit or Winlogon) can have a working set size of zero.
+
 ## System working sets
 
 Just as processes have working sets that manage pageable portions of the process address space, the
@@ -4525,10 +4416,9 @@ Table 5-16 shows where these system working set types are stored.
 
 ---
 
-TABLE 5-16   System working sets
+TABLE 5-16 System working sets
 
 <table><tr><td>System Working Set Type</td><td>Stored in (Windows 8.x, Server 2012/R2)</td><td>Stored in (Windows 10, Server 2016)</td></tr><tr><td>System cache</td><td>MmSystemCacheWS</td><td>MiState.SystemVa.SystemWs[0]</td></tr><tr><td>Paged pool</td><td>MmPagedPoolWS</td><td>MiState.SystemVa.SystemWs[2]</td></tr><tr><td>System PTEs</td><td>MmSystemPtesWS</td><td>MiState.SystemVa.SystemWs[1]</td></tr></table>
-
 
 You can examine the sizes of these working sets or the sizes of the components that contribute to
 
@@ -4538,7 +4428,6 @@ TABLE 5-17 System working set performance counters
 
 <table><tr><td>Performance Counter (in Bytes)</td><td>System Variable (in Pages)</td><td>Description</td></tr><tr><td>Memory: Cache Bytes Memory: System Cache Resident Bytes</td><td>WorkingSetSize member</td><td>This is the physical memory consumed by the file system cache.</td></tr><tr><td>Memory: Cache Bytes Peak</td><td>PeakWorkingSetSize member (Windows 10 and 2016) Peak member (Windows 8.x and 2012/R2)</td><td>This is the peak system working set size.</td></tr><tr><td>Memory: System Driver Resident Bytes</td><td>SystemPageCounts: SystemDriverPage (global, Windows 10 and Server 2016) MeSystemDriverPage (global, Windows 8.x and Server 2012/R2)</td><td>This is the physical memory consumed by pageable device driver code.</td></tr><tr><td>Memory: Pool Paged Resident Bytes</td><td>WorkingSetSize member</td><td>This is the physical memory consumed by paged pool.</td></tr></table>
 
-
 You can also examine the paging activity in the system cache working set by examining the Memory Cache Faults/Sec performance counter. This counter describes page faults that occur in the system cache working set (both hard and soft). The PageFaultCount member in the system cache working set structure contains the value for this counter.
 
 ## Memory notification events
@@ -4547,17 +4436,15 @@ Windows provides a way for user-mode processes and kernel-mode drivers to be not
 
 User-mode processes can be notified only of low or high memory conditions. An application can call the CreateMemoryResourceNotification function, specifying whether low or high memory notification is desired. The returned handle can be provided to any of the wait functions. When memory is low (or high), the wait completes, thus notifying the thread of the condition. Alternatively, the QueryMemoryResourceNotification can be used to query the system memory condition at any time without blocking the calling thread.
 
-CHAPTER 5     Memory management      423
-
+CHAPTER 5 Memory management 423
 
 ---
 
 Drivers, on the other hand, use the specific event name that the memory manager has set up in the \ KernelObjects object manager directory. This is because notification is implemented by the memory manager signaling one of the globally named event objects it defines, shown in Table 5-18. When a given memory condition is detected, the appropriate event is signaled, thus waking up any waiting threads.
 
-TABLE 5-18  Memory manager notification events
+TABLE 5-18 Memory manager notification events
 
 <table><tr><td>Event Name</td><td>Description</td></tr><tr><td>HighCommitCondition</td><td>This event is set when the commit charge is near the maximum commit limit—in other words, memory usage is very high, very little space is available in physical memory or paging files, and the operating system cannot increase the size of its paging files.</td></tr><tr><td>HighMemoryCondition</td><td>This event is set whenever the amount of free physical memory exceeds the defined amount.</td></tr><tr><td>HighNonPagedPoolCondition</td><td>This event is set whenever the amount of non-paged pool exceeds the defined amount.</td></tr><tr><td>HighPagedPoolCondition</td><td>This event is set whenever the amount of paged pool exceeds the defined amount.</td></tr><tr><td>LowCommitCondition</td><td>This event is set when the commit charge is low relative to the current commit limit—in other words, memory usage is low and a lot of space is available in physical memory or paging files.</td></tr><tr><td>LowMemoryCondition</td><td>This event is set whenever the amount of free physical memory falls below the defined amount.</td></tr><tr><td>LowNonPagedPoolCondition</td><td>This event is set whenever the amount of free non-paged pool falls below the defined amount.</td></tr><tr><td>LowPagedPoolCondition</td><td>This event is set whenever the amount of free paged pool falls below the defined amount.</td></tr><tr><td>MaximumCommitCondition</td><td>This event is set when the commit charge is near the maximum commit limit—in other words, memory usage is very high, very little space is available in physical memory or paging files, and the operating system cannot increase the size or number of paging files.</td></tr><tr><td>MemoryErrors</td><td>This indicates that a bad page (non-zeroed zero page) has been detected.</td></tr></table>
-
 
 ![Figure](figures/Winternals7thPt1_page_441_figure_003.png)
 
@@ -4571,8 +4458,7 @@ KernelObjects folder. You will see both the low and high memory condition events
 
 pane on the right:
 
-424   CHAPTER 5   Memory management
-
+424 CHAPTER 5 Memory management
 
 ---
 
@@ -4588,13 +4474,11 @@ TABLE 5-19 Physical page states
 
 <table><tr><td>Status</td><td>Description</td></tr><tr><td>Active (also called valid)</td><td>The page is part of a working set (either a process working set, a session working set, or a system working set), or it&#x27;s not in any working set (for example, a non-paged kernel page) and a valid PTE usually points to it.</td></tr><tr><td>Transition</td><td>This is a temporary state for a page that isn&#x27;t owned by a working set and isn&#x27;t on any paging list. A page is in this state when an I/O to the page is in progress. The PTE is encoded so that collided page faults can be recognized and handled properly. (This use of the term transition differs from the use of the word in the section on invalid PTEs. An invalid transition PTE refers to a page on the standby or modified list.)</td></tr><tr><td>Standby</td><td>The page previously belonged to a working set but was removed or was prefetched/clustered directly into the standby list. The page wasn&#x27;t modified since it was last written to disk. The PTE still refers to the physical page but it is marked invalid and in transition.</td></tr></table>
 
-
 ---
 
 TABLE 5-19 Physical page states (continued)
 
 <table><tr><td>Status</td><td>Description</td></tr><tr><td>Modified</td><td>The page previously belonged to a working set but was removed. However, the page was modified while it was in use and its current contents haven’t yet been written to disk or remote storage. The PTE still refers to the physical page but is marked invalid and in transition. It must be written to the backing store before the physical page can be reused.</td></tr><tr><td>Modified no-write</td><td>This is the same as a modified page except that the page has been marked so that the memory manager’s modified page writer won’t write it to disk. The cache manager marks pages as modified no-write at the request of file system drivers. For example, NTFS uses this state for pages containing file system metadata so that it can first ensure that transaction log entries are flushed to disk before the pages they are protecting are written to disk. (NTFS transaction logging is explained in Chapter 13, “File systems,” in Part 2.)</td></tr><tr><td>Free</td><td>The page is free but has unspecified dirty data in it. For security reasons, these pages can’t be given as a user page to a user process without being initialized with zeroes, but they can be overwritten with new data (for example, from a file) before being given to a user process.</td></tr><tr><td>Zeroed</td><td>The page is free and has been initialized with zeroes by the zero page thread or was determined to already contain zeroes.</td></tr><tr><td>Rom</td><td>The page represents read-only memory.</td></tr><tr><td>Bad</td><td>The page has generated parity or other hardware errors and can’t be used (or used as part of an enclave).</td></tr></table>
-
 
 The PFN database consists of an array of structures that represent each physical page of memory
 
@@ -4613,7 +4497,6 @@ prototype PTE.
 FIGURE 5-35 Page tables and the PFN database.
 
 426 CHAPTER 5 Memory management
-
 
 ---
 
@@ -4668,11 +4551,11 @@ FIGURE 5-37 State diagram for physical pages.
 Page frames move between the paging lists in the following ways:
 
 - ■ When the memory manager needs a zero-initialized page to service a demand-zero page fault
-(a reference to a page that is defined to be all zeroes or to a user-mode committed private page
-that has never been accessed), it first attempts to get one from the zero page list. If the list is
-empty, it gets one from the free page list and zeroes the page. If the free list is empty, it goes to
-the standby list and zeroes that page.
-428    CHAPTER 5   Memory management
+  (a reference to a page that is defined to be all zeroes or to a user-mode committed private page
+  that has never been accessed), it first attempts to get one from the zero page list. If the list is
+  empty, it gets one from the free page list and zeroes the page. If the free list is empty, it goes to
+  the standby list and zeroes that page.
+  428 CHAPTER 5 Memory management
 
 ---
 
@@ -4701,25 +4584,25 @@ and the lowest priority that a user thread can be set to is 1
 Note When memory needs to be zeroed as a result of a physical page allocation by a driver that calls MAllocatePageForMinEx, by a Windows application that calls A11ocateUserPhysicalPages or A11ocateUserPhysicalPagesNuma, or when an application allocates large pages, the memory manager zeroes the memory by using a higher-performing function called MZeroInParallel that maps larger regions than the zero page thread, which only zeroes a page at a time. In addition, on multiprocessor systems, the memory manager creates additional system threads to perform the zeroing in parallel (and in a NUMA-optimized fashion on NUMA platforms).
 
 - When the memory manager doesn't require a zero-initialized page, it goes first to the free list.
-If that's empty, it goes to the zeroed list. If the zeroed list is empty, it goes to the standby lists.
-Before the memory manager can use a page frame from the standby lists, it must first backtrack
-and remove the reference from the invalid PTE (or prototype PTE) that still points to the page
-frame. Because entries in the PFN database contain pointers back to the previous user's page
-table page (or to a page of prototype PTE pool for shared pages), the memory manager can
-quickly find the PTE and make the appropriate change.
-When a process must give up a page out of its working set either because it referenced a new
-page and its working set was full or the memory manager trimmed its working set, the page
-goes to the standby lists if the page was clean (not modified) or to the modified list if the page
-was modified while it was resident.
-When a process exits, all the private pages go to the free list. Also, when the last reference to
-a page-file-backed section is closed, and the section has no remaining mapped views, these
-pages also go to the free list.
+  If that's empty, it goes to the zeroed list. If the zeroed list is empty, it goes to the standby lists.
+  Before the memory manager can use a page frame from the standby lists, it must first backtrack
+  and remove the reference from the invalid PTE (or prototype PTE) that still points to the page
+  frame. Because entries in the PFN database contain pointers back to the previous user's page
+  table page (or to a page of prototype PTE pool for shared pages), the memory manager can
+  quickly find the PTE and make the appropriate change.
+  When a process must give up a page out of its working set either because it referenced a new
+  page and its working set was full or the memory manager trimmed its working set, the page
+  goes to the standby lists if the page was clean (not modified) or to the modified list if the page
+  was modified while it was resident.
+  When a process exits, all the private pages go to the free list. Also, when the last reference to
+  a page-file-backed section is closed, and the section has no remaining mapped views, these
+  pages also go to the free list.
+
 ## EXPERIMENT: The free and zero page lists
 
 You can observe the release of private pages at process exit with Process Explorer's System Information display. Begin by creating a process with numerous private pages in its working set. We did this in an earlier experiment with the TestLimit utility:
 
-CHAPTER 5   Memory management      429
-
+CHAPTER 5 Memory management 429
 
 ---
 
@@ -4743,7 +4626,7 @@ The -d option causes TestLimit to not only allocate the memory as private commit
 3. Observe the size of the Free and Zeroed lists.
 
 4. Terminate or exit the TestLimit process.
-You may see the free page list briefly increase in size. We say "may" because the zero page
+   You may see the free page list briefly increase in size. We say "may" because the zero page
 
 thread is awakened as soon as there are only eight pages on the free list, and it acts very quickly.
 
@@ -4770,8 +4653,7 @@ debugger. Follow these steps:
 Figure 5-37 (a few of the columns not important to this discussion have been narrowed
 
 for ease of reference).
-430    CHAPTER 5   Memory management
-
+430 CHAPTER 5 Memory management
 
 ---
 
@@ -4823,8 +4705,7 @@ process working set.
 
 ![Figure](figures/Winternals7thPt1_page_449_figure_003.png)
 
-432    CHAPTER 5   Memory management
-
+432 CHAPTER 5 Memory management
 
 ---
 
@@ -4836,8 +4717,7 @@ process working set.
 
 10. Now go back to RAMMap's physical memory display. Arrange the columns to make the Virtual Address column easily visible, click it to sort by that value, and you can find that virtual address:
 
-CHAPTER 5   Memory management     433
-
+CHAPTER 5 Memory management 433
 
 ---
 
@@ -4867,8 +4747,7 @@ VMMap's display should now look like this:
 
 ![Figure](figures/Winternals7thPt1_page_451_figure_005.png)
 
-434 CHAPTER 5   Memory management
-
+434 CHAPTER 5 Memory management
 
 ---
 
@@ -4882,8 +4761,7 @@ pages to those lists:
 
 ![Figure](figures/Winternals7thPt1_page_452_figure_003.png)
 
-CHAPTER 5     Memory management     435
-
+CHAPTER 5 Memory management 435
 
 ---
 
@@ -4903,7 +4781,6 @@ The real power of memory priorities is realized only when the relative prioritie
 
 436 CHAPTER 5 Memory management
 
-
 ---
 
 ## EXPERIMENT: Viewing the prioritized standby lists
@@ -4916,9 +4793,7 @@ Information dialog box and selecting the Memory tab:
 
 On the recently started x86 system used in this experiment, there is about 9 MB of data
 
-
 cached at priority 0, about 47 MB at priority 1, about 68 MB at priority 2, etc. The following shows what happens when we use the TestLimit tool from Sysinternals to commit and touch as much
-
 
 memory as possible:
 
@@ -4928,8 +4803,7 @@ C:\Tools\Sysinternals>TestLimit.exe -d
 
 Note how the lower-priority standby page lists were used first (shown by the repurposed count) and are now much smaller, while the higher lists still contain valuable cached data.
 
-CHAPTER 5   Memory management      437
-
+CHAPTER 5 Memory management 437
 
 ---
 
@@ -4942,39 +4816,36 @@ Both threads run at priority 18, and after initialization they wait for separate
 their operation. The mapped page writer waits on 18 event objects:
 
 - ■ An exit event, signaling the thread to exit (not relevant to this discussion).
-■ The mapped writer event, stored in the global variable MiSystemPartition.Modwriter.
-MappedPageWriterEvent (MmMappedPageWriterEvent on Windows 8.x and Server 2012/R2).
-This event can be signaled in the following instances:
-• During a page list operation (MiInsertPageInList); this routine inserts a page into one of
-the lists (standby, modified, etc.) based on its input arguments. The routine signals this event
-if the number of file-system-destined pages on the modified page list has reached more
-than 16 and the number of available pages has fallen below 1024.
-• In an attempt to obtain free pages (MiObtainFreePages).
-• By the memory manager’s working set manager (MmWorkingSetManager), which runs as part
-of the kernel’s balance set manager (once every second). The working set manager signals
-this event if the number of file-system-destined pages on the modified page list has reached
-more than 800.
-• Upon a request to flush all modified pages (MmFlushAllPages).
-• Upon a request to flush all file-system-destined modified pages (MmFlushAllFilesystem-
-Pages). Note that in most cases, writing modified mapped pages to their backing store files
-does not occur if the number of mapped pages on the modified page list is less than the
-maximum write cluster size, which is 16 pages. This check is not made in MmFlushAllFile-
-systemPages or MmFlushAllPages.
-■ An array of 16 events associated with 16 mapped page lists, stored in MiSystemPartition.
-PageLists.MappedPageListHeadEvent (MiMappedPageListHeadEvent on Windows 8.x and
-Server 2012/R2). Each time a mapped page is drilled, it is inserted into one of these 16 mapped
-page lists based on a bucket number, stored in MiSystemPartition.WorkingSetControl-
->CurrentMappedPageBucket (MiCurrentMappedPageBucket on Windows 8.x and Server
-2012/R2). This bucket number is updated by the working set manager whenever the system
-considers that mapped pages have gotten old enough, which is currently 100 seconds (stored
-in the WriteGapCounter variable in the same structure MiWriteGapCounter on Windows 8.x
-
+  ■ The mapped writer event, stored in the global variable MiSystemPartition.Modwriter.
+  MappedPageWriterEvent (MmMappedPageWriterEvent on Windows 8.x and Server 2012/R2).
+  This event can be signaled in the following instances:
+  • During a page list operation (MiInsertPageInList); this routine inserts a page into one of
+  the lists (standby, modified, etc.) based on its input arguments. The routine signals this event
+  if the number of file-system-destined pages on the modified page list has reached more
+  than 16 and the number of available pages has fallen below 1024.
+  • In an attempt to obtain free pages (MiObtainFreePages).
+  • By the memory manager’s working set manager (MmWorkingSetManager), which runs as part
+  of the kernel’s balance set manager (once every second). The working set manager signals
+  this event if the number of file-system-destined pages on the modified page list has reached
+  more than 800.
+  • Upon a request to flush all modified pages (MmFlushAllPages).
+  • Upon a request to flush all file-system-destined modified pages (MmFlushAllFilesystem-
+  Pages). Note that in most cases, writing modified mapped pages to their backing store files
+  does not occur if the number of mapped pages on the modified page list is less than the
+  maximum write cluster size, which is 16 pages. This check is not made in MmFlushAllFile-
+  systemPages or MmFlushAllPages.
+  ■ An array of 16 events associated with 16 mapped page lists, stored in MiSystemPartition.
+  PageLists.MappedPageListHeadEvent (MiMappedPageListHeadEvent on Windows 8.x and
+  Server 2012/R2). Each time a mapped page is drilled, it is inserted into one of these 16 mapped
+  page lists based on a bucket number, stored in MiSystemPartition.WorkingSetControl-
+  > CurrentMappedPageBucket (MiCurrentMappedPageBucket on Windows 8.x and Server
+  > 2012/R2). This bucket number is updated by the working set manager whenever the system
+  > considers that mapped pages have gotten old enough, which is currently 100 seconds (stored
+  > in the WriteGapCounter variable in the same structure MiWriteGapCounter on Windows 8.x
 
 CHAPTER 5 Memory management
 
-
-From the Library of I
----
+## From the Library of I
 
 and Server 2012/R2 and incremented whenever the working set manager runs). The reason
 
@@ -4986,7 +4857,6 @@ threshold of 800 pages.
 
 The modified page writer waits on two events: the first is an Exit event, and the second stored in
 
-
 MiSystemPartition.Modwriter.ModifiedPageWriterEvent (on Windows 8.x and Server 2012/R2
 
 waits on a kernel gate stored in MmModifiedPageWriterGate), which can be signaled in the following
@@ -4994,17 +4864,17 @@ waits on a kernel gate stored in MmModifiedPageWriterGate), which can be signale
 scenarios:
 
 - ■ A request to flush all pages has been received.
-■ The number of available pages—stored in MiSystemPartition.Vp.AvailablePages
-(MmAvailablePages on Windows 8.x and Server 2012/R2)—drops below 128 pages.
-■ The total size of the zeroed and free page lists drops below 20,000 pages, and the number of
-modified pages destined for the paging file is greater than the smaller of one-sixteenth of the
-available pages or 64 MB (16,384 pages).
-■ When a working set is being trimmed to accommodate additional pages, if the number of
-pages available is less than 15,000.
-■ During a page list operation (MiInsertPageInList) this routine signals this event if the num-
-ber of page-file-destined pages on the modified page list has reached more than 16 pages and
-the number of available pages has fallen below 1,024.
-Additionally, the modified page writer waits on two other events after the preceding event is
+  ■ The number of available pages—stored in MiSystemPartition.Vp.AvailablePages
+  (MmAvailablePages on Windows 8.x and Server 2012/R2)—drops below 128 pages.
+  ■ The total size of the zeroed and free page lists drops below 20,000 pages, and the number of
+  modified pages destined for the paging file is greater than the smaller of one-sixteenth of the
+  available pages or 64 MB (16,384 pages).
+  ■ When a working set is being trimmed to accommodate additional pages, if the number of
+  pages available is less than 15,000.
+  ■ During a page list operation (MiInsertPageInList) this routine signals this event if the num-
+  ber of page-file-destined pages on the modified page list has reached more than 16 pages and
+  the number of available pages has fallen below 1,024.
+  Additionally, the modified page writer waits on two other events after the preceding event is
 
 signaled. One is used to indicate rescanning of the paging file is required (for example, a new page
 
@@ -5035,44 +4905,41 @@ FIGURE 5-39 States of PFN database entries (specific layouts are conceptual).
 Several fields are the same for several PFN types, but others are specific to a given type of PFN. The following fields appear in more than one PFN type:
 
 - ■ PTE address This is the virtual address of the PTE that points to this page. Also, since PTE
-addresses will always be aligned on a 4-byte boundary (8 bytes on 64-bit systems), the two
-low-order bits are used as a locking mechanism to serialize access to the PFN entry.
-■ Reference count This is the number of references to this page. The reference count is incre-
-mented when a page is first added to a working set and/or when the page is locked in memory for
-I/O (for example, by a device driver). The reference count is decremented when the share count be-
-comes 0 or when pages are unlocked from memory. When the share count becomes 0, the page is
-no longer owned by a working set. Then, if the reference count is also zero, the PFN database entry
-that describes the page is updated to add the page to the free, standby, or modified list.
-■ Type This is the type of page represented by this PFN. (Types include active/valid, standby,
-modified, modified-no-write, free, zeroed, bad, and transition.)
-■ Flags The information contained in the flags field is shown in Table 5-20.
-■ Priority This is the priority associated with this PFN, which will determine on which standby
-list it will be placed.
+  addresses will always be aligned on a 4-byte boundary (8 bytes on 64-bit systems), the two
+  low-order bits are used as a locking mechanism to serialize access to the PFN entry.
+  ■ Reference count This is the number of references to this page. The reference count is incre-
+  mented when a page is first added to a working set and/or when the page is locked in memory for
+  I/O (for example, by a device driver). The reference count is decremented when the share count be-
+  comes 0 or when pages are unlocked from memory. When the share count becomes 0, the page is
+  no longer owned by a working set. Then, if the reference count is also zero, the PFN database entry
+  that describes the page is updated to add the page to the free, standby, or modified list.
+  ■ Type This is the type of page represented by this PFN. (Types include active/valid, standby,
+  modified, modified-no-write, free, zeroed, bad, and transition.)
+  ■ Flags The information contained in the flags field is shown in Table 5-20.
+  ■ Priority This is the priority associated with this PFN, which will determine on which standby
+  list it will be placed.
 
 CHAPTER 5 Memory management
 
-From the Library of
----
+## From the Library of
 
-- ■  Original PTE contents  All PFN database entries contain the original contents of the PTE that
-pointed to the page (which could be a prototype PTE). Saving the contents of the PTE allows it
-to be restored when the physical page is no longer resident. PFN entries for AWE allocations are
-exceptions; they store the AWE reference count in this field instead.
-■  PFN of PTE  This is the physical page number of the page table page containing the PTE that
-points to this page.
-■  Color Besides being linked together on a list, PFN database entries use an additional field to
-link physical pages by "color," which is the page's NUMA node number.
-■  Flags A second flags field is used to encode additional information on the PTE. These flags are
-described in Table 5-21.
-TABLE 5-20 Flags within PFN database entries
+- ■ Original PTE contents All PFN database entries contain the original contents of the PTE that
+  pointed to the page (which could be a prototype PTE). Saving the contents of the PTE allows it
+  to be restored when the physical page is no longer resident. PFN entries for AWE allocations are
+  exceptions; they store the AWE reference count in this field instead.
+  ■ PFN of PTE This is the physical page number of the page table page containing the PTE that
+  points to this page.
+  ■ Color Besides being linked together on a list, PFN database entries use an additional field to
+  link physical pages by "color," which is the page's NUMA node number.
+  ■ Flags A second flags field is used to encode additional information on the PTE. These flags are
+  described in Table 5-21.
+  TABLE 5-20 Flags within PFN database entries
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>Write in progress</td><td>This indicates that a page write operation is in progress. The first DWORD contains the address of the event object that will be signaled when the I/O is complete.</td></tr><tr><td>Modified state</td><td>This indicates whether the page was modified. (If the page was modified, its contents must be saved to disk before removing it from memory.)</td></tr><tr><td>Read in progress</td><td>This indicates that an in-page operation is in progress for the page. The first DWORD contains the address of the event object that will be signaled when the I/O is complete.</td></tr><tr><td>ROM</td><td>This indicates that this page comes from the computer&#x27;s firmware or another piece of read-only memory such as a device register.</td></tr><tr><td>In-page error</td><td>This indicates that an I/O error occurred during the in-page operation on this page. (In this case, the first field in the PFN contains the error code.)</td></tr><tr><td>Kernel stack</td><td>This indicates that this page is being used to contain a kernel stack. In this case, the PFN entry contains the owner of the stack and the next stack PFN for this thread.</td></tr><tr><td>Removal requested</td><td>This indicates that the page is the target of a remove (due to ECC/scrubbing or hot memory removal).</td></tr><tr><td>Parity error</td><td>This indicates that the physical page contains parity or error correction control errors.</td></tr></table>
-
 
 TABLE 5-21 Secondary flags within PFN database entries
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>PFN image verified</td><td>This indicates that the code signature for this PFN (contained in the cryptographic signature catalog for the image being backed by this PFN) has been verified.</td></tr><tr><td>AWE allocation</td><td>This indicates that this PFN backs an AWE allocation.</td></tr><tr><td>Prototype PTE</td><td>This indicates that the PTE referenced by the PFN entry is a prototype PTE. For example, this page is shareable.</td></tr></table>
-
 
 The remaining fields are specific to the type of PFN. For example, the first PFN in Figure 5-39 repre sents a page that is active and part of a working set. The share count field represents the number of PTEs
 
@@ -5082,8 +4949,7 @@ multiple processes.) For page table pages, this field is the number of valid and
 
 table. As long as the share count is greater than 0, the page isn't eligible for removal from memory.
 
-CHAPTER 5     Memory management      441
-
+CHAPTER 5 Memory management 441
 
 ---
 
@@ -5108,7 +4974,6 @@ physical memory.
 TABLE 5-22 System variables that describe physical memory
 
 <table><tr><td>Variable (Windows 10 and Server 2016)</td><td>Variable (Windows 8.x and Server 2012/R2)</td><td>Description</td></tr><tr><td>MiSystemPartition.Vp.NumberOfPhysicalPages</td><td>MmNumberOfPhysicalPages</td><td>This is the total number of physical pages available on the system.</td></tr><tr><td>MiSystemPartition.Vp.AvailablePages</td><td>MmAvailablePages</td><td>This is the total number of available pages on the system—the sum of the pages on the zeroed, free, and standby lists.</td></tr><tr><td>MiSystemPartition.Vp.ResidentAvailablePages</td><td>MmResidentAvailablePages</td><td>This is the total number of physical pages that would be available if every process was trimmed to its minimum working set size and all of its pages were flushed to disk.</td></tr><tr><td colspan="3">CHAPTER 5 Memory management</td></tr><tr><td colspan="3">From the Library</td></tr></table>
-
 
 ---
 
@@ -5169,8 +5034,7 @@ such mechanism, and so is memory compression (see the "Memory compression" secti
 
 chapter). Another optimization the memory uses is directly related to accessing page files themselves.
 
-CHAPTER 5   Memory management     443
-
+CHAPTER 5 Memory management 443
 
 ---
 
@@ -5228,7 +5092,7 @@ Note The clustered pages (except the original starting PTE) are not linked to an
 
 The modified page writer needs to handle writing pages that have reservations as a special case. It uses all the gathered information described previously to build an MDL that contains the correct PFNs for the cluster that is used as part of writing to the page file. Building the cluster includes finding contiguous pages that can span reservation clusters. If there are "holes" between clusters, a dummy page is added in between (a page that contains all bytes with 0xFF value). If the dummy page count is above 32, the cluster is broken. This "walk" is done going forward and then backward to build the final cluster to write. Figure 5-41 shows an example of the state of pages after such a cluster has been built by the modified page writer.
 
-CHAPTER 5   Memory manage
+CHAPTER 5 Memory manage
 
 445
 
@@ -5252,14 +5116,13 @@ Besides affecting performance, the amount of physical memory affects other resou
 
 Windows support for physical memory is dictated by hardware limitations, licensing, operating system data structures, and driver compatibility. The following URL shows the memory limits of the various Windows editions: https://msdn.microsoft.com/en-us/library/windows/desktop/aa366778.aspx. Table 5-23 summarizes the limits in Windows 8 and higher versions.
 
-446 CHAPTER 5   Memory management
+446 CHAPTER 5 Memory management
 
 ---
 
 TABLE 5-23 Limitations on physical memory support in Windows
 
 <table><tr><td>Operating System Version/Edition</td><td>32-Bit Maximum</td><td>64-Bit Maximum</td></tr><tr><td>Windows 8.x Professional and Enterprise</td><td>4 GB</td><td>512</td></tr><tr><td>Windows 8.x (all other editions)</td><td>4 GB</td><td>128 GB</td></tr><tr><td>Windows Server 2012/R2 Standard and Datacenter</td><td>N/A</td><td>4 TB</td></tr><tr><td>Windows Server 2012/R2 Essentials</td><td>N/A</td><td>64 GB</td></tr><tr><td>Windows Server 2012/R2 Foundation</td><td>N/A</td><td>32 GB</td></tr><tr><td>Windows Storage Server 2012 Workgroup</td><td>N/A</td><td>32 GB</td></tr><tr><td>Windows Storage Server 2012 Standard Hyper-V Server 2012</td><td>N/A</td><td>4 TB</td></tr><tr><td>Windows 10 Home</td><td>4 GB</td><td>128 GB</td></tr><tr><td>Windows 10 Pro, Education and Enterprise</td><td>4 GB</td><td>2 TB</td></tr><tr><td>Windows Server 2016 Standard and Datacenter</td><td>N/A</td><td>24 TB</td></tr></table>
-
 
 At the time of this writing, the maximum supported physical memory is 4 TB on some Server 2012/R2 editions and 24 TB on Server 2016 editions. The limitations don’t come from any implementation or hardware limitation, but because Microsoft will support only configurations it can test. As of this writing, these were the largest tested and supported memory configurations.
 
@@ -5277,8 +5140,7 @@ includes not only RAM but device memory, and x86 and x64 systems typically map a
 
 below the 4 GB address boundary to remain compatible with 32-bit operating systems that don't know
 
-CHAPTER 5   Memory management      447
-
+CHAPTER 5 Memory management 447
 
 ---
 
@@ -5304,9 +5166,7 @@ installed, the amount of physical memory available is 3.87 GB, as shown in the M
 
 <table><tr><td>Installed Physical Memory (RAM)</td><td>4.00 GB</td></tr><tr><td>Total Physical Memory</td><td>3.87 GB</td></tr></table>
 
-
 You can see the physical memory layout with the MemInfo tool. The following output is from
-
 
 MemInfo when run on a 32-bit system, using the -- switch to dump physical memory ranges:
 
@@ -5323,16 +5183,13 @@ C:\Tools\MemInfo.exe =r
 
 Note the gap in the memory address range from A0000 to 100000 (384 KB), and another gap from F800000 to FFFFFFF (128 MB).
 
-448 CHAPTER 5   Memory management
-
+448 CHAPTER 5 Memory management
 
 ---
 
 You can use Device Manager on your machine to see what is occupying the various reserved
 
-
 memory regions that can't be used by Windows (and that will show up as holes in MemInfo's output).
-
 
 To check Device Manager, follow these steps:
 
@@ -5364,17 +5221,18 @@ Note Experiments have shown that pages compress to around 30–50 percent of the
 The memory compression architecture must adhere to the following requirements:
 
 - ■ A page cannot be in memory in a compressed and an uncompressed form because this would
-waste physical memory due to duplication. This means that whenever a page is compressed, it
-must become a free page after successful compression.
+  waste physical memory due to duplication. This means that whenever a page is compressed, it
+  must become a free page after successful compression.
+
 ---
 
 - The compression store must maintain its data structures and store the compressed data such
-that it is always saving memory for the system overall. This means that if a page doesn't com-
-press well enough, it will not be added to the store.
-Compressed pages must appear as available memory (because they can really be repurposed
-if needed) to avoid creating a perception issue that compressing memory somehow increases
-memory consumption.
-Memory compression is enabled by default on client SKUs (phone, PC, Xbox, and so on). Server SKUs do not currently use memory compression, but that is likely to change in future server versions.
+  that it is always saving memory for the system overall. This means that if a page doesn't com-
+  press well enough, it will not be added to the store.
+  Compressed pages must appear as available memory (because they can really be repurposed
+  if needed) to avoid creating a perception issue that compressing memory somehow increases
+  memory consumption.
+  Memory compression is enabled by default on client SKUs (phone, PC, Xbox, and so on). Server SKUs do not currently use memory compression, but that is likely to change in future server versions.
 
 ![Figure](figures/Winternals7thPt1_page_467_figure_002.png)
 
@@ -5392,8 +5250,7 @@ The zero and free page lists contain pages that have garbage and zeroes, respect
 
 Now assume the memory manager decides to trim the modified page list—for example, because it has become too large or the zero/free pages have become too small. Assume three pages are to be removed from the modified list. The memory manager compresses their contents into a single page (taken from the zero/free list):
 
-450 CHAPTER 5   Memory management
-
+450 CHAPTER 5 Memory management
 
 ---
 
@@ -5409,8 +5266,7 @@ Suppose the same process repeats. This time, pages 14, 15, and 16 are compressed
 
 The result is that pages 2 and 3 join the working set of the memory compression process, while pages 14, 15, and 16 become free.
 
-CHAPTER 5     Memory management      451
-
+CHAPTER 5 Memory management 451
 
 ---
 
@@ -5462,22 +5318,23 @@ For each store, the Store Manager allocates memory in regions with a configurabl
 
 ![Figure](figures/Winternals7thPt1_page_471_figure_001.png)
 
-FIGURE 5-44   Store data structures.
+FIGURE 5-44 Store data structures.
 
 As shown in Figure 5-44, pages are managed with a B+Tree--essentially a tree where a node can have any number of children--where each page entry points to its compressed content within one of the regions. A store starts with zero regions, and regions are allocated and deallocated as needed. Regions are also associated with priorities, as described in the "Page priority and rebalancing" section later in this chapter.
 
 Adding a page involves the following major steps:
 
 - 1. If there is no current region with the page's priority, allocate a new region, lock it in physi-
-cal memory, and assign it the priority of the page to be added. Set the current region for that
-priority to the allocated region.
+     cal memory, and assign it the priority of the page to be added. Set the current region for that
+     priority to the allocated region.
 
 2. Compress the page and store it in the region, rounding up to the granularity unit (16 bytes). For
-example, if a page compresses to 687 bytes, it consumes 43 16-byte units (always rounding up).
-Compression is done on the current thread, with low CPU priority (7) to minimize interference.
-When decompression is needed, it's performed in parallel using all available processors.
+   example, if a page compresses to 687 bytes, it consumes 43 16-byte units (always rounding up).
+   Compression is done on the current thread, with low CPU priority (7) to minimize interference.
+   When decompression is needed, it's performed in parallel using all available processors.
 
 3. Update the page and region information in the Page and Region B+Trees.
+
 ---
 
 - 4. If the remaining space in the current region is not large enough to store the compressed page,
@@ -5490,7 +5347,7 @@ Removing a page from the store involves the following steps:
 2. Remove the entries and update the space used in the region.
 
 3. If the region becomes empty, deallocate the region.
-Regions become fragmented over time as compressed pages are added and removed. The memory for a region is not freed until the region is completely empty. This means some kind of compaction is necessary to reduce memory waste. A compaction operation is lazily scheduled with aggressiveness depending on the amount of fragmentation. Region priorities are taken into account when consolidating regions.
+   Regions become fragmented over time as compressed pages are added and removed. The memory for a region is not freed until the region is completely empty. This means some kind of compaction is necessary to reduce memory waste. A compaction operation is lazily scheduled with aggressiveness depending on the amount of fragmentation. Region priorities are taken into account when consolidating regions.
 
 ## EXPERIMENT: Memory compression
 
@@ -5524,8 +5381,7 @@ Creating such containers is difficult, as it would require kernel drivers that p
 
 ■ Process management for associating processes with the correct container by using process create/
 
-notifications (PsSetCreateNotifyRoutineEx)
----
+## notifications (PsSetCreateNotifyRoutineEx)
 
 Even with these in place, some things are difficult to virtualize, specifically memory management. Each container may want to use its own PFN database, its own page file; and so on. Windows 10 (64-bit versions only) and Windows Server 2016 provide such possible memory control through Memory Partitions.
 
@@ -5579,8 +5435,7 @@ to the partition, add a paging file, copy memory from one partition to another, 
 
 information about a partition.
 
-CHAPTER 5     Memory management      457
-
+CHAPTER 5 Memory management 457
 
 ---
 
@@ -5640,8 +5495,7 @@ job objects) to be associated with a partition, such as when exclusive control o
 
 be beneficial. One such scenario slated for the Creators Update release is game mode (more informa tion on game mode is included in Chapter 8 in Part 2).
 
-458 CHAPTER 5   Memory management
-
+458 CHAPTER 5 Memory management
 
 ---
 
@@ -5696,8 +5550,7 @@ Two special page types are called common pages. One includes an all zero bytes, 
 
 To initiate memory combining, the NtSetSystemInformation native API is called with the SystemCombinePhysicalMemoryInformation system information class. The caller must have the SeProfileSingleProcessPrivilege in its token, normally granted to the local administrators group. The argument to the API provides the following options through a combination of flags:
 
-CHAPTER 5   Memory management      459
-
+CHAPTER 5 Memory management 459
 
 ---
 
@@ -5727,7 +5580,6 @@ with a customized algorithm (Mi Computershash64 routine), and the system PTE fre
 unmapped from system address space).
 
 460 CHAPTER 5 Memory management
-
 
 ---
 
@@ -5783,8 +5635,7 @@ the candidate pages located inside the node are sorted by their original virtual
 
 now ready to perform the actual page combining.
 
-CHAPTER 5     Memory management      461
-
+CHAPTER 5 Memory management 461
 
 ---
 
@@ -5877,8 +5728,7 @@ is again a valid hardware PTE. Figure 5-48 shows the effect of a soft page fault
 
 making it valid and incrementing the share count.
 
-CHAPTER 5   Memory management      463
-
+CHAPTER 5 Memory management 463
 
 ---
 
@@ -5900,8 +5750,7 @@ combined PFN is managed exactly like the one for a prototype PFN. The only diffe
 
 (if the combined bit is set) calls MiDecrementCombinedPte after processing the prototype PFN.
 
-464 CHAPTER 5   Memory management
-
+464 CHAPTER 5 Memory management
 
 ---
 
@@ -5959,8 +5808,7 @@ nt!DbgBreakPointWithStatus:
 ffffffff801'94b691c0 cc           ____________ int    3
 ```
 
-CHAPTER 5   Memory management      465
-
+CHAPTER 5 Memory management 465
 
 ---
 
@@ -6065,10 +5913,9 @@ memory enclaves is shown in Figure 5-49.
 
 ![Figure](figures/Winternals7thPt1_page_484_figure_006.png)
 
-FIGURE 5-49   Memory enclaves.
+FIGURE 5-49 Memory enclaves.
 
-CHAPTER 5     Memory management      467
-
+CHAPTER 5 Memory management 467
 
 ---
 
@@ -6091,35 +5938,37 @@ Note Current SGX versions do not support enclaves in ring 0 (kernel mode). Only 
 From an application developer's perspective, creating and working with an enclave consists of the following steps. (The internal details are described in the following sections.)
 
 - 1. Initially the program should determine whether memory enclaves are supported by calling
-IsEncIaveTypeSupported, passing a value representing the enclave technology, which cur-
-rently can only be ENCLAVE_TYPE_SGX.
+     IsEncIaveTypeSupported, passing a value representing the enclave technology, which cur-
+     rently can only be ENCLAVE_TYPE_SGX.
 
 2. A new enclave is created by calling the CreateEncIave function, which is similar in its arguments
-to VirtualIocEx. For example, it's possible to create an enclave in a different process than
-the caller process. The complication in this function is the need to provide a vendor-specific
-configuration structure, which for Intel means a 4 KB data structure called SGX Enclave Control
-Structure (SECS), which Microsoft does not define explicitly. Instead, developers are expected
-to create their own structure based on the particular technology used and defined in its docu-
-mentation.
+   to VirtualIocEx. For example, it's possible to create an enclave in a different process than
+   the caller process. The complication in this function is the need to provide a vendor-specific
+   configuration structure, which for Intel means a 4 KB data structure called SGX Enclave Control
+   Structure (SECS), which Microsoft does not define explicitly. Instead, developers are expected
+   to create their own structure based on the particular technology used and defined in its docu-
+   mentation.
 
 3. Once an empty enclave is created, the next step is to populate the enclave with code and data
-from outside of the enclave. This is accomplished by calling LoadEncIaveData where an external
-memory to the enclave is used to copy data to the enclave. Multiple calls to LoadEncIaveData
-may be used to populate the enclave.
+   from outside of the enclave. This is accomplished by calling LoadEncIaveData where an external
+   memory to the enclave is used to copy data to the enclave. Multiple calls to LoadEncIaveData
+   may be used to populate the enclave.
+
 ---
 
 - 4. The last step that is required to "activate" the enclave is achieved with the InitializeEnclave
-function. At that point, code that was configured to execute within the enclave can start executing.
+     function. At that point, code that was configured to execute within the enclave can start executing.
 
 5. Unfortunately, executing the code in the enclave is not wrapped by the API. Direct use of as-
-sembly language is required. The ENTER instruction transfers execution to the enclave and the
-EEXIT instruction causes return to the calling function. Abnormal termination of the enclave
-execution is also possible with Asynchronous Enclave Exit (AEX), such as due to a fault. The
-exact details are beyond the scope of this book, as they are not Windows-specific. Consult the
-SGX documentation to get the fine details.
+   sembly language is required. The ENTER instruction transfers execution to the enclave and the
+   EEXIT instruction causes return to the calling function. Abnormal termination of the enclave
+   execution is also possible with Asynchronous Enclave Exit (AEX), such as due to a fault. The
+   exact details are beyond the scope of this book, as they are not Windows-specific. Consult the
+   SGX documentation to get the fine details.
 
 6. Finally, to destroy the enclave, a normal VirtualFree(Ex) function can be used on the pointer
-to the enclave obtained in CreateEnclave.
+   to the enclave obtained in CreateEnclave.
+
 ## Memory enclave initializations
 
 During boot, Winload (the Windows Boot Loader) calls Os\EnumerateEnclavePageRegions, which first checks if SGX is supported using the CPUID instruction. If it is, issues instructions to enumerate Enclave Page Cache (EPC) descriptors. EPC is the protected memory provided by the processor for creating and using enclaves. For each enumerated EPC, Os\EnumerateEnclavePageRegions calls BlMmAddEnclavePageRange to add the page range information to a sorted list of memory descriptors with a type value of LoaderEnclaveMemory. This list is eventually stored in the MemoryDescriptorList.ed member of the LAOADER_PARAMETER BLOCK structure used to pass information from the boot loader to the kernel.
@@ -6137,7 +5986,6 @@ NtCreateEnclave we first checks if memory enclaves are supported by looking at t
 TABLE 5-24 SECS structure layout
 
 <table><tr><td>Field</td><td>Offset (bytes)</td><td>Size (bytes)</td><td>Description</td></tr><tr><td>SIZE</td><td>0</td><td>8</td><td>Size of enclave in bytes; must be power of 2</td></tr><tr><td>BASEADDR</td><td>8</td><td>8</td><td>Enclave base linear address must be naturally aligned to size</td></tr><tr><td>SSAFRAMESIZE</td><td>16</td><td>4</td><td>Size of one SSA frame in pages (including XSAVE, pad, GPR, and conditionally MISC)</td></tr><tr><td>MRSIGNER</td><td>128</td><td>32</td><td>Measurement register extended with the public key that verified the enclave. See SIGSTRUCT for proper format</td></tr><tr><td>RESERVED</td><td>160</td><td>96</td><td></td></tr><tr><td>ISVPRODIG</td><td>256</td><td>2</td><td>Product ID of enclave</td></tr><tr><td>ISVSVN</td><td>258</td><td>2</td><td>Security version number (SVN) of the enclave</td></tr><tr><td>EID</td><td>Implementation dependent</td><td>8</td><td>Enclave identifier</td></tr><tr><td>PADDING</td><td>Implementation dependent</td><td>352</td><td>Padding pattern from the signature (used for key derivation strings)</td></tr><tr><td>RESERVED</td><td>260</td><td>3836</td><td>Includes EID, other non-zero reserved field and must-be-zero fields</td></tr></table>
-
 
 The first thing I'llCreateEnvelope does is allocate the Address Windowing Extension (AWE) information structure that AWE APIs also utilize. This is because similar to the AWE functionality, an enclave allows a user-mode application to directly have access over physical pages (that is to say, the physical pages that are EPC pages based on the detection described earlier). Anytime a user-mode application has such direct control over physical pages, AWE data structures and locks must be used. This data structure is stored in the AweInfo field of the EPROCESS structure.
 
@@ -6165,8 +6013,7 @@ play, and MI_PFN_IS_ENCLAVE is a function that the kernel uses whenever it needs
 
 indeed describing an EPC region.
 
-470    CHAPTER 5   Memory management
-
+470 CHAPTER 5 Memory management
 
 ---
 
@@ -6192,8 +6039,7 @@ this information in hand, it will eventually call KeAddEncIavePage that calls th
 
 actual page adding.
 
-CHAPTER 5   Memory management      471
-
+CHAPTER 5 Memory management 471
 
 ---
 
@@ -6231,8 +6077,7 @@ data that active applications had cached in memory to be overwritten by the memo
 
 versions of Windows take a big step toward resolving these limitations with SuperFetch.
 
-472    CHAPTER 5   Memory management
-
+472 CHAPTER 5 Memory management
 
 ---
 
@@ -6277,8 +6122,7 @@ FileInfo and kernel services to preload memory with useful pages.
 
 All these components use facilities inside the memory manager that allow for the querying of detailed information about the state of each page in the PFN database, the current page counts for each page list and prioritized list, and more. Figure 5-50 shows an architectural diagram of SuperFetch's multiple components. SuperFetch components also use prioritized I/O to minimize user impact. (See Chapter 8 in Part 2 for more on I/O priority.)
 
-CHAPTER 5     Memory management      473
-
+CHAPTER 5 Memory management 473
 
 ---
 
@@ -6304,8 +6148,7 @@ access tracking implemented for SuperFetch.
 
 SuperFetch always keeps a trace running and continuously queries trace data from the system, which tracks page usage and access through the memory manager's access bit tracking and workingset aging. To track file-related information, which is as critical as page usage because it allows prioritization of file data in the cache, SuperFetch leverages existing filtering functionality with the addition of the FileInfo driver. (See Chapter 6 for more information on filter drivers.) This driver sits on the file-system device stack and monitors access and changes to files at the stream level, which provides it with fine-grained understanding of file access. (For more information on NTFS data streams, see Chapter 13 in Part 2.) The main job of the FileInfo driver is to associate streams—identified by a unique key, currently implemented as the FsContext field of the respective file object—with file names so that the user-mode SuperFetch service can identify the specific file stream and offset that a page in the standby list belonging to a memory-mapped section is associated with. It also provides the interface for prefetching file data transparently, without interfering with locked files and other file-system state.
 
-474    CHAPTER 5   Memory management
-
+474 CHAPTER 5 Memory management
 
 ---
 
@@ -6322,20 +6165,19 @@ Although a SuperFetch trace only keeps track of page accesses, the SuperFetch se
 One aspect of SuperFetch that is distinct from its primary page reprioritization and prefetching mechanisms (covered in more detail in the next section) is its support for scenarios, which are specific actions on the machine for which SuperFetch strives to improve the user experience. These scenarios are as follows:
 
 - ■ Hibernation The goal of hibernation is to intelligently decide which pages are saved in the
-hibernation file other than the existing working-set pages. The idea is to minimize the amount
-of time it takes for the system to become responsive after a resume.
-■ Standby The goal of standby is to completely remove hard faults after resume. Because a typ-
-ical system can resume in less than 2 seconds, but can take 5 seconds to spin up the hard drive
-after a long sleep, a single hard fault could cause such a delay in the resume cycle. SuperFetch
-prioritizes pages needed after a standby to remove this chance.
-■ Fast user switching The goal of fast user switching is to keep an accurate priority and un-
-derstanding of each user's memory. That way, switching to another user will cause the user's
-session to be immediately usable, and won't require a large amount of lag time to allow pages
-to be faulted in.
-Each of these scenarios has different goals, but all are centered around the main purpose of minimizing or removing hard faults.
+  hibernation file other than the existing working-set pages. The idea is to minimize the amount
+  of time it takes for the system to become responsive after a resume.
+  ■ Standby The goal of standby is to completely remove hard faults after resume. Because a typ-
+  ical system can resume in less than 2 seconds, but can take 5 seconds to spin up the hard drive
+  after a long sleep, a single hard fault could cause such a delay in the resume cycle. SuperFetch
+  prioritizes pages needed after a standby to remove this chance.
+  ■ Fast user switching The goal of fast user switching is to keep an accurate priority and un-
+  derstanding of each user's memory. That way, switching to another user will cause the user's
+  session to be immediately usable, and won't require a large amount of lag time to allow pages
+  to be faulted in.
+  Each of these scenarios has different goals, but all are centered around the main purpose of minimizing or removing hard faults.
 
-CHAPTER 5     Memory management      475
-
+CHAPTER 5 Memory management 475
 
 ---
 
@@ -6379,7 +6221,7 @@ Finally, the rebalancer also runs periodically to ensure that pages it has marke
 
 A special agent called the application launch agent is involved in a different kind of prefetching mechanism, which attempts to predict application launches and builds a Markov chain model that describes the probability of certain application launches given the existence of other application launches within a time segment. These time segments are divided across four different periods of roughly 6 hours each—morning, noon, evening, and night—and by weekday or weekend. For example, if on Saturday and Sunday evening a user typically launches Outlook after having launched Word, the application launch agent will likely prefetch Outlook based on the high probability of it running after Word during weekend evenings.
 
-CHAPTER 5    Memory management      477
+CHAPTER 5 Memory management 477
 
 ---
 
@@ -6422,9 +6264,7 @@ as well as an internal hard-coded list of exceptions. If a process is detected t
 
 files, robustion is disabled on the process to restore the expected behavior.
 
-
 CHAPTER 5 Memory management
-
 
 From the Library of
 
@@ -6454,8 +6294,7 @@ ReadyBoot (not to be confused with ReadyBoot) is implemented with the aid of a d
 
 If the new device is between 256 MB and 32 GB in size, has a transfer rate of 2.5 MB per second or higher for random 4 KB reads, and has a transfer rate of 1.75 MB per second or higher for random 512 KB writes, then ReadyBoost will ask if you'd like to dedicate some of the space for disk caching. If you agree, ReadyBoost creates a file named ReadyBoost.sfcache in the root of the device, which it uses to store cached pages.
 
-CHAPTER 5     Memory management      479
-
+CHAPTER 5 Memory management 479
 
 ---
 
@@ -6489,8 +6328,7 @@ Another consumer of ReadyDrive is SuperFetch. It offers the same advantages as R
 
 There are often cases where a process exhibits problematic behavior, but because it's still providing service, suspending it to generate a full memory dump or interactively debug it is undesirable. The length of time a process is suspended to generate a dump can be minimized by taking a minidump, which captures thread registers and stacks along with pages of memory referenced by registers, but that dump type has a very limited amount of information, which many times is sufficient for diagnosing
 
-480    CHAPTER 5   Memory management
-
+480 CHAPTER 5 Memory management
 
 ---
 
@@ -6519,7 +6357,6 @@ The RtlCreateProcessReflection function in Ntidll.dll drives the implementation 
 9. If the RtlCreateProcessReflection option that specifies the creation of the clone when the process is not executing in the loader, performing heap operations, modifying the process environment block (PEB), or modifying fiber-local storage is present, then RtlCreateProcessReflection acquires the associated locks before continuing. This can be useful for debugging because the memory dump's copy of the data structures will be in a consistent state.
 
 CHAPTER 5 Memory management 481
-
 
 ---
 
@@ -6555,4 +6392,3 @@ capabilities available to applications through the Windows API.
 The next chapter covers another critical part of any operating system—the I/O system.
 
 ---
-

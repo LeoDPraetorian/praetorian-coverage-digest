@@ -305,12 +305,12 @@ Before adding ANY of these patterns, ask:
 
 **If you're about to add:**
 
-| Pattern | Ask First |
-|---------|-----------|
+| Pattern                          | Ask First                                     |
+| -------------------------------- | --------------------------------------------- |
 | `var _ Interface = (*Type)(nil)` | "Should I add compile-time interface checks?" |
-| `version/version.go` | "Do you need version tracking?" |
-| Comments on every function | "Should I add documentation?" |
-| Empty placeholder types | Don't create - wait until needed |
-| Custom error types | "Is standard error handling sufficient?" |
-| Interfaces with one impl | "Do you need interface abstraction?" |
-| Large config structs | "What configuration options do you need?" |
+| `version/version.go`             | "Do you need version tracking?"               |
+| Comments on every function       | "Should I add documentation?"                 |
+| Empty placeholder types          | Don't create - wait until needed              |
+| Custom error types               | "Is standard error handling sufficient?"      |
+| Interfaces with one impl         | "Do you need interface abstraction?"          |
+| Large config structs             | "What configuration options do you need?"     |

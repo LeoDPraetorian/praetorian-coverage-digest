@@ -257,7 +257,7 @@ None - terminal skill providing documentation and mapping guidance.
 | ---------------------- | ---------------------------- | -------------------------------------------------------------------- |
 | `mapping-to-iso-27001` | When dual compliance needed  | Cross-reference ISO controls with DORA articles                      |
 | `mapping-to-nist-csf`  | US + EU compliance           | Map NIST CSF functions to DORA requirements                          |
-| `scoring-cvss-threats`         | Vulnerability prioritization | Determine if vulnerability severity triggers DORA reporting          |
+| `scoring-cvss-threats` | Vulnerability prioritization | Determine if vulnerability severity triggers DORA reporting          |
 | `mapping-to-nis2`      | Network security entities    | Coordinate DORA and NIS2 Directive compliance (harmonized timelines) |
 
 ---

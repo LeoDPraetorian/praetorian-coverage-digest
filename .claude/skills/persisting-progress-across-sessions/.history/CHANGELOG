@@ -1,5 +1,39 @@
 # Changelog - persisting-progress-across-sessions
 
+## 2026-01-19 - Align with Unified MANIFEST.yaml State Management
+
+**Changed:**
+- Progress file location: `.claude/progress/<domain>-<feature>.md` → `.claude/.output/{type}/{id}/MANIFEST.yaml`
+- Progress file format: Markdown → YAML (MANIFEST.yaml schema)
+- Resume protocol: `ls .claude/progress/*.md` → `find .claude/.output -name 'MANIFEST.yaml' -mmin -1440`
+
+**Updated:**
+- SKILL.md: Quick Reference, Progress File Location, Progress File Structure, Resume Protocol, Integration with TodoWrite, Lifecycle Management, Anti-Patterns, Related Skills, References
+- references/file-templates.md: Complete rewrite from markdown templates to YAML templates
+- references/resume-checklist.md: Updated all commands and procedures for MANIFEST.yaml
+- references/compaction-protocol.md: Updated "progress file" references to "MANIFEST.yaml"
+
+**Added:**
+- Integration Note explaining relationship with `persisting-agent-outputs` skill
+- Link to persisting-agent-outputs/references/manifest-structure.md for field definitions
+- `persisting-agent-outputs` (CORE) in Related Skills section
+- `orchestrating-capability-development` in Related Skills section
+
+**Removed:**
+- References to `.claude/progress/` directory (never existed in practice)
+- Markdown progress file format examples
+- `archived/` subdirectory pattern (not used)
+
+**Why:**
+The skill documented a `.claude/progress/` directory pattern that:
+1. No repos actually used (verified directory doesn't exist)
+2. Conflicted with actual pattern: `.claude/.output/{type}/{id}/MANIFEST.yaml`
+3. Was inconsistent with `persisting-agent-outputs` skill's MANIFEST.yaml schema
+
+This update aligns the skill with the actual implementation, making it the PROTOCOL skill (when/how to persist) while `persisting-agent-outputs` provides the FORMAT (MANIFEST.yaml schema).
+
+---
+
 ## 2026-01-16 - Context Compaction Protocol
 
 **Added:**

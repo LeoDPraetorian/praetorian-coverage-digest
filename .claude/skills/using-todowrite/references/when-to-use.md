@@ -5,7 +5,7 @@
 ```
 Start: New user request received
   │
-  ├─→ Is this ≥3 distinct steps?
+  ├─→ Is this ≥2 distinct steps?
   │   └─→ YES → Use TodoWrite
   │   └─→ NO → Continue checking
   │
@@ -28,9 +28,9 @@ Start: New user request received
 
 ## Detailed Trigger Explanations
 
-### Trigger 1: ≥3 Distinct Steps
+### Trigger 1: ≥2 Distinct Steps
 
-**Definition:** Task requires three or more separate, independent actions.
+**Definition:** Task requires two or more separate, independent actions.
 
 **Examples:**
 
@@ -295,7 +295,7 @@ Action:
 
 | Trigger         | Weight | Threshold  | Use TodoWrite?   |
 | --------------- | ------ | ---------- | ---------------- |
-| ≥3 steps        | High   | 3+ steps   | ✅ YES           |
+| ≥2 steps        | High   | 2+ steps   | ✅ YES           |
 | ≥5 phases       | High   | 5+ phases  | ✅ YES           |
 | >10 minutes     | High   | >10 min    | ✅ YES           |
 | Context drift   | Medium | High risk  | ✅ YES           |

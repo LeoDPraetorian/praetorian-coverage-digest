@@ -63,7 +63,7 @@ func TestIntegration_ConcurrentDiscovery(t *testing.T) {
 
     integration := model.NewIntegration("test", server.URL)
     job := model.NewJob("test", &integration)
-    
+
     task := NewIntegration(job, &integration, base.WithMaxConcurrent(5))
     aws := mock.NewMockAWS("test@example.com")
 
@@ -96,7 +96,7 @@ func TestIntegration_NoRaceConditions(t *testing.T) {
     err := inv.Invoke()
 
     require.NoError(t, err)
-    
+
     // If -race detects issues, test will fail
 }
 ```
@@ -109,7 +109,7 @@ func TestIntegration_ErrorPropagation(t *testing.T) {
 
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         itemID := r.URL.Query().Get("id")
-        
+
         if itemID == failItem {
             w.WriteHeader(http.StatusInternalServerError)
             json.NewEncoder(w).Encode(map[string]string{"error": "processing_failed"})
@@ -187,7 +187,7 @@ func TestIntegration_SetLimitRespected(t *testing.T) {
     integration := model.NewIntegration("test", server.URL)
     job := model.NewJob("test", &integration)
 
-    task := NewIntegration(job, &integration, 
+    task := NewIntegration(job, &integration,
         base.WithHTTPBaseURL(server.URL),
         base.WithMaxConcurrent(3),  // Limit to 3 concurrent goroutines
     )

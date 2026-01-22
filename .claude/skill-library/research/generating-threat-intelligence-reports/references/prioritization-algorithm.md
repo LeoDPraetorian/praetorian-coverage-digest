@@ -11,17 +11,20 @@
 ### Combined Approach (CVSS + EPSS + KEV + Attribution)
 
 **Industry Benchmark** (from 2026 research):
+
 - **CVSS**: Theoretical severity based on technical characteristics
 - **EPSS**: Exploitation probability (next 30 days, machine learning prediction)
 - **KEV**: Confirmed exploitation evidence (real-world)
 
 **This Skill's Enhancement**:
+
 - **Attribution Confidence**: Nation-state > Ransomware > Opportunistic
 - **Detection Coverage**: Gap > Partial > Covered (drives capability development)
 
 ### Combined Effectiveness
 
 **Research Finding**: Multi-factor approach achieves **~95% workload reduction** while maintaining comprehensive coverage:
+
 - **From**: 16,182 vulnerabilities requiring immediate attention
 - **To**: ~850 high-priority vulnerabilities
 - **Result**: Focused resources without compromising security
@@ -30,12 +33,12 @@
 
 ## Scoring Weights
 
-| Factor | Weight | Rationale |
-|--------|--------|-----------|
-| **Threat Actor Attribution** | 35% | Nation-state actors are persistent/sophisticated; ransomware groups financially motivated and widespread |
-| **Federal Deadline Proximity** | 30% | CISA binding operational directives for federal agencies; industry follows suit |
-| **CVSS Severity** | 20% | Theoretical severity still matters for impact assessment |
-| **Detection Coverage** | 15% | Gaps alert customers to blind spots, drive capability development |
+| Factor                         | Weight | Rationale                                                                                                |
+| ------------------------------ | ------ | -------------------------------------------------------------------------------------------------------- |
+| **Threat Actor Attribution**   | 35%    | Nation-state actors are persistent/sophisticated; ransomware groups financially motivated and widespread |
+| **Federal Deadline Proximity** | 30%    | CISA binding operational directives for federal agencies; industry follows suit                          |
+| **CVSS Severity**              | 20%    | Theoretical severity still matters for impact assessment                                                 |
+| **Detection Coverage**         | 15%    | Gaps alert customers to blind spots, drive capability development                                        |
 
 **Total**: 100%
 
@@ -45,13 +48,13 @@
 
 ### Scoring Table
 
-| Attribution | Confidence | Score | Rationale |
-|-------------|-----------|-------|-----------|
-| **Nation-state** | HIGH | 10 | Persistent, sophisticated, targeted |
-| **Ransomware** | HIGH | 8 | Financially motivated, widespread, high business impact |
-| **Nation-state** | MEDIUM | 6 | Likely accurate but unconfirmed |
-| **Opportunistic** | N/A | 3 | Mass exploitation, lower sophistication |
-| **Unknown** | N/A | 1 | Exploitation confirmed (in KEV) but no actor identified |
+| Attribution       | Confidence | Score | Rationale                                               |
+| ----------------- | ---------- | ----- | ------------------------------------------------------- |
+| **Nation-state**  | HIGH       | 10    | Persistent, sophisticated, targeted                     |
+| **Ransomware**    | HIGH       | 8     | Financially motivated, widespread, high business impact |
+| **Nation-state**  | MEDIUM     | 6     | Likely accurate but unconfirmed                         |
+| **Opportunistic** | N/A        | 3     | Mass exploitation, lower sophistication                 |
+| **Unknown**       | N/A        | 1     | Exploitation confirmed (in KEV) but no actor identified |
 
 ### Confidence Multipliers
 
@@ -69,6 +72,7 @@ else:  # UNKNOWN
 ```
 
 **Example**:
+
 - Nation-state + HIGH confidence: 10 × 1.0 = 10 points
 - Nation-state + MEDIUM confidence: 10 × 0.7 = 7 points
 - Ransomware + HIGH confidence: 8 × 1.0 = 8 points
@@ -78,10 +82,12 @@ else:  # UNKNOWN
 When multiple threat actors exploit the same CVE:
 
 **Primary actor determines base score:**
+
 - Use highest-priority actor (nation-state > ransomware > opportunistic)
 - Add +1 bonus for multi-actor convergence
 
 **Example**:
+
 - APT28 (nation-state, HIGH) + LockBit (ransomware, HIGH)
 - Base score: 10 (nation-state)
 - Convergence bonus: +1
@@ -97,12 +103,12 @@ When multiple threat actors exploit the same CVE:
 
 **Federal agencies must remediate KEV vulnerabilities within specified timeframes:**
 
-| Timeline | Typical Assignment | Priority Level |
-|----------|-------------------|----------------|
-| **2 weeks** | Critical infrastructure, active campaigns | Emergency |
-| **3 weeks** | High severity with exploitation evidence | Urgent |
-| **6 weeks** | Standard KEV timeline | High |
-| **12+ weeks** | Older KEV additions, complex mitigations | Medium |
+| Timeline      | Typical Assignment                        | Priority Level |
+| ------------- | ----------------------------------------- | -------------- |
+| **2 weeks**   | Critical infrastructure, active campaigns | Emergency      |
+| **3 weeks**   | High severity with exploitation evidence  | Urgent         |
+| **6 weeks**   | Standard KEV timeline                     | High           |
+| **12+ weeks** | Older KEV additions, complex mitigations  | Medium         |
 
 ### Scoring Formula
 
@@ -147,12 +153,12 @@ else:
 
 ### CVSS v3.x Score Mapping
 
-| CVSS Score | Severity | Points | Notes |
-|------------|----------|--------|-------|
-| **9.0-10.0** | Critical | 10 | Maximum impact |
-| **7.0-8.9** | High | 7 | Serious risk |
-| **4.0-6.9** | Medium | 4 | Moderate risk |
-| **0.1-3.9** | Low | 1 | Minimal risk |
+| CVSS Score   | Severity | Points | Notes          |
+| ------------ | -------- | ------ | -------------- |
+| **9.0-10.0** | Critical | 10     | Maximum impact |
+| **7.0-8.9**  | High     | 7      | Serious risk   |
+| **4.0-6.9**  | Medium   | 4      | Moderate risk  |
+| **0.1-3.9**  | Low      | 1      | Minimal risk   |
 
 **Rationale**: CVSS provides theoretical severity baseline, but exploitation evidence (KEV) and attribution matter more.
 
@@ -172,13 +178,14 @@ if cvss_score is None:
 
 ### Coverage Status Scoring
 
-| Detection Status | Score | Rationale |
-|-----------------|-------|-----------|
-| **GAP** | 10 | No nuclei template - **alerts customer to blind spot** |
-| **Partial** | 5 | Template exists but limited scope - needs review |
-| **Covered** | 1 | Template exists and verified - actively monitored |
+| Detection Status | Score | Rationale                                              |
+| ---------------- | ----- | ------------------------------------------------------ |
+| **GAP**          | 10    | No nuclei template - **alerts customer to blind spot** |
+| **Partial**      | 5     | Template exists but limited scope - needs review       |
+| **Covered**      | 1     | Template exists and verified - actively monitored      |
 
 **Key Insight**: Higher score for gaps because:
+
 1. **Customer Transparency**: Alerts to vulnerabilities Chariot cannot detect
 2. **Capability Development**: Drives prioritization of template creation
 3. **Risk Communication**: Honest about detection limitations
@@ -210,6 +217,7 @@ final_score = attribution_score + deadline_score + cvss_score + detection_score
 ### Example Calculation
 
 **CVE-2025-55182:**
+
 - **Attribution**: APT28 (nation-state, HIGH confidence) = 10 × 1.0 = 10 points
 - **Deadline**: 14 days until due = 9 points
 - **CVSS**: 9.8 (Critical) = 10 points
@@ -232,12 +240,12 @@ Final Score:           9.70
 
 ### Tier Thresholds
 
-| Priority Tier | Score Range | Customer Action |
-|--------------|-------------|-----------------|
-| **CRITICAL** | 9.0-10.0 | Immediate patching (24-48 hours) |
-| **HIGH** | 7.0-8.9 | Urgent patching (1 week) |
-| **MEDIUM** | 5.0-6.9 | Standard patching (2-4 weeks) |
-| **LOW** | 0.0-4.9 | Planned patching (next cycle) |
+| Priority Tier | Score Range | Customer Action                  |
+| ------------- | ----------- | -------------------------------- |
+| **CRITICAL**  | 9.0-10.0    | Immediate patching (24-48 hours) |
+| **HIGH**      | 7.0-8.9     | Urgent patching (1 week)         |
+| **MEDIUM**    | 5.0-6.9     | Standard patching (2-4 weeks)    |
+| **LOW**       | 0.0-4.9     | Planned patching (next cycle)    |
 
 ### Tie-Breaking Rules
 
@@ -258,11 +266,13 @@ When multiple CVEs have similar scores:
 **Future**: Add EPSS (Exploit Prediction Scoring System) for non-KEV vulnerabilities
 
 **EPSS provides**:
+
 - Machine learning probability of exploitation (next 30 days)
 - Complement to KEV: "Will this be exploited?" vs "Has this been exploited?"
 - **Industry finding**: EPSS + KEV reduces workload by 95%
 
 **Implementation**:
+
 ```python
 # For non-KEV vulnerabilities
 if not in_kev_catalog:
@@ -275,6 +285,7 @@ if not in_kev_catalog:
 ### Attack Surface Considerations
 
 **Environmental Factors** (not currently weighted but could be):
+
 - **Internet-facing** assets: +1 priority bump
 - **Crown jewel systems** (customer-defined): +2 priority bump
 - **Already compromised** in past incidents: +1 priority bump
@@ -286,13 +297,13 @@ if not in_kev_catalog:
 ### Priority Matrix
 
 ```markdown
-| Priority | CVE | Score | Attribution | Confidence | Deadline | CVSS | Detection |
-|----------|-----|-------|-------------|-----------|----------|------|-----------|
-| CRITICAL | CVE-2025-55182 | 9.70 | APT28 (Russia) | HIGH | 14 days | 9.8 | **GAP** |
-| HIGH | CVE-2024-12345 | 8.20 | LockBit 3.0 | HIGH | 21 days | 8.5 | COVERED |
-| HIGH | CVE-2024-23456 | 7.65 | Opportunistic | N/A | 30 days | 9.1 | COVERED |
-| MEDIUM | CVE-2024-34567 | 6.40 | APT41 (China) | MEDIUM | 45 days | 7.2 | Partial |
-| MEDIUM | CVE-2024-45678 | 5.80 | Unknown | LOW | 60 days | 8.0 | COVERED |
+| Priority | CVE            | Score | Attribution    | Confidence | Deadline | CVSS | Detection |
+| -------- | -------------- | ----- | -------------- | ---------- | -------- | ---- | --------- |
+| CRITICAL | CVE-2025-55182 | 9.70  | APT28 (Russia) | HIGH       | 14 days  | 9.8  | **GAP**   |
+| HIGH     | CVE-2024-12345 | 8.20  | LockBit 3.0    | HIGH       | 21 days  | 8.5  | COVERED   |
+| HIGH     | CVE-2024-23456 | 7.65  | Opportunistic  | N/A        | 30 days  | 9.1  | COVERED   |
+| MEDIUM   | CVE-2024-34567 | 6.40  | APT41 (China)  | MEDIUM     | 45 days  | 7.2  | Partial   |
+| MEDIUM   | CVE-2024-45678 | 5.80  | Unknown        | LOW        | 60 days  | 8.0  | COVERED   |
 ```
 
 ### Ranking Explanation
@@ -303,12 +314,14 @@ For each CVE, document scoring breakdown:
 ### Priority 1: CVE-2025-55182 (Score: 9.70)
 
 **Scoring Breakdown:**
+
 - Attribution: APT28 (nation-state, HIGH confidence) → 3.50 points (35% × 10)
 - Deadline: 14 days until due → 2.70 points (30% × 9)
 - CVSS: 9.8 (Critical) → 2.00 points (20% × 10)
 - Detection: GAP (no nuclei template) → 1.50 points (15% × 10)
 
 **Why Priority 1:**
+
 - Nation-state actor with HIGH confidence attribution
 - Approaching federal deadline (2 weeks)
 - Critical CVSS score
@@ -322,6 +335,7 @@ For each CVE, document scoring breakdown:
 ### Scenario 1: High CVSS, No Attribution
 
 **CVE-2024-XXXXX:**
+
 - CVSS: 9.5 (Critical)
 - Attribution: Unknown
 - Deadline: 30 days
@@ -333,6 +347,7 @@ For each CVE, document scoring breakdown:
 ### Scenario 2: Nation-State, Low CVSS
 
 **CVE-2024-YYYYY:**
+
 - CVSS: 6.1 (Medium)
 - Attribution: APT29 (HIGH confidence)
 - Deadline: 14 days
@@ -344,6 +359,7 @@ For each CVE, document scoring breakdown:
 ### Scenario 3: Old KEV, Still Relevant
 
 **CVE-2023-ZZZZZ:**
+
 - CVSS: 8.8 (High)
 - Attribution: Ransomware (HIGH)
 - Deadline: 120 days ago (past due)

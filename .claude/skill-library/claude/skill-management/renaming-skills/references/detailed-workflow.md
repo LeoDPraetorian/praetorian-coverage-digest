@@ -2,7 +2,24 @@
 
 **Complete step-by-step guide for safe skill renaming operations.**
 
-## Step 1: Validate Source Exists
+## Step 1: Navigate to Repository Root
+
+**Execute BEFORE any rename operation:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+**Validation:**
+
+```bash
+pwd  # Should be repo root
+ls .claude/skills  # Should list core skills
+```
+
+**Cannot proceed without navigating to repo root** ✅
+
+## Step 2: Validate Source Exists
 
 **Check skill exists in core:**
 
@@ -39,7 +56,7 @@ Error: "Skill '<old-skill-name>' not found or invalid"
 → Stop. Verify skill name and location.
 ```
 
-## Step 2: Validate Target Available
+## Step 3: Validate Target Available
 
 **Check core doesn't have target:**
 
@@ -62,7 +79,7 @@ Error: "Skill '<new-skill-name>' already exists"
 → Stop. Choose different name or delete existing skill first.
 ```
 
-## Step 3: Confirm with User
+## Step 4: Confirm with User
 
 **Use AskUserQuestion to show impact:**
 
@@ -86,14 +103,14 @@ Options:
 
 **If user selects "Show me what will change":**
 
-- Run Step 5 (find references) but don't apply
+- Run Step 7 (find references) but don't apply
 - Display all files that would be modified
 - Ask again with "Yes/No" options only
 
 **If user selects "No":**
 → Stop. Operation cancelled.
 
-## Step 4: Update Frontmatter
+## Step 5: Update Frontmatter
 
 **Read current SKILL.md:**
 
@@ -118,7 +135,7 @@ grep "^name:" {skill-path}/SKILL.md
 # Should show: name: <new-skill-name>
 ```
 
-## Step 5: Move Directory
+## Step 6: Move Directory
 
 **Core skill:**
 
@@ -143,67 +160,56 @@ ls {old-path}  # Should error
 ls {new-path}  # Should succeed
 ```
 
-## Step 6: Find All References
+## Step 7: Find All References
 
-**Search strategy:** Find all references to old skill name
+**Search strategy:** Comprehensive search across entire .claude infrastructure
 
-**Note:** Gateway references are tracked here but updated separately in Step 8 using `syncing-gateways` for proper table formatting and sorting.
-
-**In gateways (for tracking only):**
+**Single comprehensive search:**
 
 ```bash
 Grep {
   pattern: "<old-skill-name>",
-  path: ".claude/skills/gateway-*",
+  path: ".claude",
   output_mode: "files_with_matches"
 }
 ```
 
-**In commands:**
+**This finds ALL references in:**
 
-```bash
-Grep {
-  pattern: "<old-skill-name>",
-  path: ".claude/commands",
-  output_mode: "files_with_matches"
-}
-```
+- `.claude/skills/` (core skills)
+- `.claude/skill-library/` (library skills)
+- `.claude/commands/` (slash commands)
+- `.claude/agents/` (agent definitions)
+- `.claude/tools/` (tool wrappers)
+- `.claude/docs/` (documentation)
+- `.claude/hooks/` (git hooks and scripts)
 
-**In other skills (core):**
+**Categorize results for processing:**
 
-```bash
-Grep {
-  pattern: "<old-skill-name>",
-  path: ".claude/skills",
-  output_mode: "files_with_matches"
-}
-```
-
-**In other skills (library):**
-
-```bash
-Grep {
-  pattern: "<old-skill-name>",
-  path: ".claude/skill-library",
-  output_mode: "files_with_matches"
-}
-```
-
-**Compile list:**
+After getting the complete list, categorize files by type:
 
 ```text
-Files with references:
+Gateway files (.claude/skills/gateway-*):
 - .claude/skills/gateway-claude/SKILL.md
+- .claude/skills/gateway-frontend/SKILL.md
+→ Will be handled in Step 8 by syncing-gateways skill
+
+Non-gateway files (all others):
 - .claude/commands/skill-manager.md
-- .claude/skills/skill-manager/SKILL.md
-- (list all matches)
+- .claude/skills/managing-skills/SKILL.md
+- .claude/agents/development/backend-developer.md
+- .claude/tools/example-tool/README.md
+- .claude/docs/orchestration/ARCHITECTURE.md
+→ Will be updated in Step 7
 ```
 
-## Step 7: Update Non-Gateway References
+**Note:** Gateway references are tracked here but updated separately in Step 9 using `syncing-gateways` for proper table formatting and sorting.
+
+## Step 8: Update Non-Gateway References
 
 For each non-gateway file found (commands, other skills), update references:
 
-**Note:** Gateways are handled in Step 8 by `syncing-gateways` skill.
+**Note:** Gateways are handled in Step 9 by `syncing-gateways` skill.
 
 **Pattern 1: Skill invocation**
 
@@ -258,6 +264,42 @@ Edit {
 }
 ```
 
+**Pattern 5: Agent references**
+
+```typescript
+// For files in .claude/agents/
+// Agents reference skills in their instructions and skill lists
+Edit {
+  file_path: "{agent-file}",
+  old_string: "<old-skill-name>",
+  new_string: "<new-skill-name>"
+}
+```
+
+**Pattern 6: Documentation references**
+
+```typescript
+// For files in .claude/docs/
+// Documentation references skills in examples and procedures
+Edit {
+  file_path: "{doc-file}",
+  old_string: "<old-skill-name>",
+  new_string: "<new-skill-name>"
+}
+```
+
+**Pattern 7: Tool references**
+
+```typescript
+// For files in .claude/tools/
+// Tool wrappers may reference skills in their documentation
+Edit {
+  file_path: "{tool-file}",
+  old_string: "<old-skill-name>",
+  new_string: "<new-skill-name>"
+}
+```
+
 **Track updates:**
 
 ```text
@@ -265,11 +307,14 @@ Updated non-gateway references:
 ✅ .claude/commands/skill-manager.md (1 occurrence)
 ✅ .claude/skills/using-skills/SKILL.md (2 occurrences)
 ✅ .claude/skill-library/.../other-skill/SKILL.md (3 occurrences)
+✅ .claude/agents/development/backend-developer.md (1 occurrence)
+✅ .claude/docs/orchestration/ARCHITECTURE.md (2 occurrences)
+✅ .claude/tools/example-tool/README.md (1 occurrence)
 
-Note: Gateway references will be updated in Step 8.
+Note: Gateway references will be updated in Step 9.
 ```
 
-## Step 8: Sync Gateway Tables
+## Step 9: Sync Gateway Tables
 
 **Use `syncing-gateways` skill for proper structural validation.**
 
@@ -279,15 +324,19 @@ After updating non-gateway references, gateway routing tables need to be synced 
 2. Maintain alphabetical sorting
 3. Ensure Prettier-compliant table structure
 
-**Read the syncing-gateways skill:**
+**Load and execute the syncing-gateways skill:**
 
 ```typescript
+// Step 9.1: Load the skill
 Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
+
+// Step 9.2: Follow the workflow in that skill to update gateway tables
+// The skill provides instructions for detecting and updating skill references
 ```
 
-**Execute the gateway sync workflow:**
+**What syncing-gateways will do (follow its workflow):**
 
-The `syncing-gateways` skill will:
+After reading, execute the syncing-gateways workflow. It will:
 
 - Detect old skill name in gateway routing tables
 - Update to new skill name
@@ -306,7 +355,7 @@ Using regex/Edit directly on gateway tables can:
 
 The `syncing-gateways` skill ensures gateway tables remain structurally sound.
 
-## Step 9: Verify Integrity
+## Step 10: Verify Integrity
 
 **Search for any remaining old name references:**
 
@@ -344,7 +393,7 @@ Options:
 - Update these too
 ```
 
-## Step 10: Report Success
+## Step 11: Report Success
 
 **Summary output:**
 

@@ -2,6 +2,33 @@
 
 All notable changes to this skill.
 
+## [Date: 2026-01-18] - Phase 29 Logical Coherence Fix
+
+### Fixed
+- **Phase 29 (Logical Coherence)**: Fixed inconsistent step threshold across skill files
+  - SKILL.md frontmatter: "≥3 steps" → "≥2 steps"
+  - references/when-to-use.md line 8: "≥3 distinct steps" → "≥2 distinct steps"
+  - references/when-to-use.md line 31: "Trigger 1: ≥3 Distinct Steps" → "Trigger 1: ≥2 Distinct Steps"
+  - references/when-to-use.md line 298: Table row "≥3 steps" → "≥2 steps"
+  - references/common-mistakes.md line 21: Replaced "threshold is ≥3" with accurate description (read+summarize is 1 cognitive task, not 2 distinct steps)
+  - references/common-mistakes.md line 429: "≥3 steps" → "≥2 steps"
+  - references/common-mistakes.md line 445: "≥3 steps" → "≥2 steps"
+  - references/common-mistakes.md line 456: "≥3 steps?" → "≥2 steps?"
+  - references/progress-tracking.md line 151: "Simple (≥3 steps)" → "Simple (≥2 steps)"
+  - examples/refactoring-workflow.md line 9: "≥3 steps?" → "≥2 steps?"
+
+### Reason
+- The skill body (SKILL.md line 17) had the correct threshold "≥2 distinct steps" after the 2025-12-25 update
+- However, frontmatter, references, and examples still referenced the old "≥3" threshold
+- This created logical inconsistency where agents received conflicting guidance depending on which section they read
+- Violates Phase 29 (Logical Coherence): "Skills must not contradict themselves across sections"
+
+### Impact
+- ✅ All references now consistently state ≥2 step threshold
+- ✅ Eliminates confusion for agents loading the skill
+- ✅ Ensures frontmatter description matches implementation
+- ✅ Grep verification confirms no remaining ≥3 references (except in this changelog)
+
 ## [Date: 2025-12-25]
 
 ### Changed
@@ -44,3 +71,18 @@ All notable changes to this skill.
 - ✅ Threshold lowered from ≥3 to ≥2 across all references
 - ✅ Compliance passed (line count, audit)
 - ✅ No functionality lost, improves tracking coverage
+
+## 2026-01-18 - Compliance Fixes (Audit-Driven)
+
+### Fixed
+- **Phase 4**: Removed broken links to non-existent reference files (multi-agent.md, custom-config.md, sources.md)
+- **Phase 28**: Added structured Integration section with Called By, Requires, Calls, Pairs With subsections
+
+### Changed
+- Converted broken multi-agent.md link to inline workaround text
+- Converted broken custom-config.md link to inline tip text
+- Removed references to sources.md (consolidated into existing References section)
+
+### Method
+- Fixes applied via `fixing-skills` workflow (Claude-Automated category)
+- Backup created: .local/2026-01-18-21-03-24-pre-fix.bak

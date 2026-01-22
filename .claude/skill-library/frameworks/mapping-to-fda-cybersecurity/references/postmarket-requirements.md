@@ -9,6 +9,7 @@
 ## Risk-Based Framework
 
 FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines are **risk-calibrated** based on:
+
 - Patient harm severity
 - Exploitability level
 - Availability of compensating controls
@@ -17,12 +18,14 @@ FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines a
 ### Controlled vs. Uncontrolled Risk
 
 **Controlled Risk (Acceptable)**
+
 - Residual risk acceptable with compensating controls
 - Most routine patches treated as "device enhancements"
 - Do NOT require 21 CFR 806 reporting
 - Standard patch cycle (next release)
 
 **Uncontrolled Risk (Unacceptable)**
+
 - Unacceptable patient safety risk
 - Requires urgent remediation
 - May trigger MDR reporting (21 CFR 803)
@@ -35,21 +38,25 @@ FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines a
 ### Standard CVD Process
 
 **Day 0-7: Discovery & Acknowledgment**
+
 - Researcher notifies vendor
 - Vendor acknowledges receipt (48-72 hours)
 - Initial triage and severity assessment
 
 **Day 7-90: Patch Development & Testing**
+
 - Vendor develops and tests patch
 - Standard CVD window: 90 days
 - May be extended for complex vulnerabilities
 
 **Day 90: Public Disclosure**
+
 - Default public disclosure deadline
 - Negotiable based on risk factors
 - Coordinated release with patch availability
 
 **30-Day Voluntary FDA Notification**
+
 - FDA recommends (but does NOT mandate) notifying them within 30 days
 - Provides enforcement discretion for Part 806 reporting
 - Facilitates coordination and guidance
@@ -57,6 +64,7 @@ FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines a
 ### Real-World Timeline Performance
 
 **Industry data shows:**
+
 - **93% fail to meet 30-60 day timelines**
 - **Average timeline: 4.5-6 months** from discovery to patch
 - **Case studies:**
@@ -71,6 +79,7 @@ FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines a
 ### Voluntary Coordination Benefits
 
 **FDA strongly encourages** coordination through CISA/ICS-CERT:
+
 - Facilitates multi-stakeholder coordination
 - Provides technical expertise
 - Offers enforcement discretion for Part 806
@@ -99,6 +108,7 @@ FDA uses **"reasonable time"** language rather than fixed deadlines. Timelines a
 ### 21 CFR Part 803 Triggers
 
 MDR reporting is **REQUIRED** when vulnerabilities:
+
 - Cause or contribute to death or serious injury
 - Would likely cause death or serious injury if malfunction recurred
 
@@ -109,11 +119,13 @@ MDR reporting is **REQUIRED** when vulnerabilities:
 ### Most Cybersecurity Vulnerabilities Do NOT Trigger MDR
 
 **MDR applies ONLY when:**
+
 - Actual patient harm occurred
 - Vulnerability was exploited in clinical setting
 - Malfunction would likely recur and cause harm
 
 **MDR does NOT apply when:**
+
 - Vulnerability discovered proactively (no exploitation)
 - Compensating controls prevent patient harm
 - Risk assessment determines controlled risk
@@ -125,6 +137,7 @@ MDR reporting is **REQUIRED** when vulnerabilities:
 ### Mandatory Elements
 
 Cyber devices MUST include:
+
 1. **Documented vulnerability monitoring plan**
 2. **Processes for delivering updates in "reasonable time"**
 3. **SBOM** (Software Bill of Materials)
@@ -144,6 +157,7 @@ Cyber devices MUST include:
 ### Phase 1: Discovery (Day 0)
 
 **Sources:**
+
 - External researcher disclosure
 - Internal security testing
 - SBOM-based vulnerability monitoring (KEV catalog, NVD)
@@ -151,6 +165,7 @@ Cyber devices MUST include:
 - Customer reports
 
 **Actions:**
+
 - Acknowledge receipt (48-72 hours)
 - Assign tracking ID
 - Initial triage
@@ -158,6 +173,7 @@ Cyber devices MUST include:
 ### Phase 2: Assessment (Day 1-7)
 
 **Risk Assessment:**
+
 - Technical exploitability (CVSS scoring)
 - Patient harm severity (ISO 14971)
 - Deployment context (hospital, home, ambulance)
@@ -165,6 +181,7 @@ Cyber devices MUST include:
 - Availability of compensating controls
 
 **Classification:**
+
 - Controlled risk vs. uncontrolled risk
 - Tier 1 (multi-patient harm) vs. Tier 2
 - Response timeline determination
@@ -172,6 +189,7 @@ Cyber devices MUST include:
 ### Phase 3: Remediation (Day 7-60)
 
 **Patch Development:**
+
 - Root cause analysis
 - Security fix design
 - Code implementation
@@ -179,6 +197,7 @@ Cyber devices MUST include:
 - Security testing (re-test vulnerability)
 
 **Design Controls Integration:**
+
 - Change order under 21 CFR 820.30
 - Risk management update (ISO 14971)
 - Verification and validation
@@ -187,6 +206,7 @@ Cyber devices MUST include:
 ### Phase 4: Validation (Day 30-60)
 
 **Testing:**
+
 - Functional testing (no regression)
 - Security testing (vulnerability mitigated)
 - Performance testing (no degradation)
@@ -194,6 +214,7 @@ Cyber devices MUST include:
 - Field trial (pilot deployment)
 
 **Documentation:**
+
 - Test reports
 - Risk assessment update
 - Traceability to vulnerability
@@ -202,12 +223,14 @@ Cyber devices MUST include:
 ### Phase 5: Distribution (Day 60+)
 
 **Deployment Strategy:**
+
 - Phased rollout (pilot → production)
 - Field Safety Notice (FSN) to customers
 - Update instructions and guidance
 - Monitoring and verification
 
 **Communication:**
+
 - Customer notification (healthcare providers, biomedical engineering)
 - Patient communication (if applicable)
 - Public advisory (coordinated with ICS-CERT)
@@ -252,11 +275,13 @@ Cyber devices MUST include:
 ### Information Sharing Analysis Organizations
 
 **FDA encourages** active participation in ISAOs (e.g., H-ISAC, Med-ISAO):
+
 - **Threat intelligence sharing**: Early warning of emerging vulnerabilities
 - **Coordination**: Multi-manufacturer coordination for shared components
 - **Enforcement discretion**: FDA more lenient on Part 806 reporting timelines when coordinating through ISAO
 
 **Benefits:**
+
 - Access to vulnerability intelligence feeds
 - Peer learning on remediation strategies
 - Regulatory coordination and guidance
@@ -292,6 +317,7 @@ Cyber devices MUST include:
 ### Field Safety Notice (FSN)
 
 **Required Elements:**
+
 - Vulnerability description (non-technical summary)
 - Affected device models and versions
 - Patient safety impact assessment
@@ -303,6 +329,7 @@ Cyber devices MUST include:
 ### Security Advisory
 
 **Required Elements:**
+
 - CVE identifier (if assigned)
 - CVSS score and vector
 - Vulnerability description
@@ -314,6 +341,7 @@ Cyber devices MUST include:
 ### 30-Day FDA Notification
 
 **Recommended Content:**
+
 - Device identification (510(k) number, trade name)
 - Vulnerability description and CVE
 - Risk assessment (exploitability + patient harm)
@@ -329,6 +357,7 @@ Cyber devices MUST include:
 ### FDA Enforcement Discretion
 
 **FDA exercises enforcement discretion when:**
+
 - Manufacturer is actively coordinating through CISA/ICS-CERT
 - Timelines are risk-appropriate
 - Communication to customers is timely
@@ -336,6 +365,7 @@ Cyber devices MUST include:
 - ISAO participation shows due diligence
 
 **FDA enforcement actions when:**
+
 - Vulnerability known but not disclosed
 - No patch provided within reasonable time
 - Inadequate customer communication

@@ -1,7 +1,7 @@
 ---
 name: persisting-agent-outputs
 description: Use when agents need to persist work outputs to files - defines directory discovery protocol, file naming conventions, MANIFEST.yaml structure, and JSON metadata format for feature workflow coordination
-allowed-tools: Write, Edit, Bash, Read, Grep
+allowed-tools: Write, Edit, Bash, Read
 ---
 
 # Persisting Agent Outputs
@@ -257,6 +257,35 @@ artifacts:
 
 **For complete YAML structure and examples, see:** [references/manifest-structure.md](references/manifest-structure.md)
 
+### Two-Layer State Management
+
+This skill defines a **two-layer metadata system**:
+
+**Layer 1: Per-Agent Metadata** (Embedded in each agent's output file)
+
+- JSON metadata block at end of each `.md` file
+- Contains: agent, status, skills_invoked, source_files_verified, handoff
+- Defined in [references/metadata-format.md](references/metadata-format.md)
+
+**Layer 2: Directory Metadata** (MANIFEST.yaml tracks all agents)
+
+- YAML file tracking agents_contributed and artifacts arrays
+- Contains: feature_name, status, agents, artifacts
+- **OPTIONAL**: orchestration state (phases, verification, current_phase)
+- Defined in [references/manifest-structure.md](references/manifest-structure.md)
+
+**When orchestration skills are active:**
+
+- MANIFEST.yaml is the SINGLE source of truth for workflow state
+- Orchestrators MUST NOT create separate metadata.json or progress.json files
+- Use MANIFEST.yaml optional fields (phases, verification) for orchestration tracking
+
+**When agents run without orchestration:**
+
+- Agents write output file with embedded JSON metadata (Layer 1)
+- Agents update MANIFEST.yaml agents_contributed array (Layer 2)
+- The phases/verification sections remain empty (not applicable)
+
 ---
 
 ## JSON Metadata Block
@@ -288,7 +317,7 @@ artifacts:
 ```
 ````
 
-When `status` is `blocked`, include `blocked_reason` and `attempted` fields. See [references/metadata-format.md](references/metadata-format.md) for blocked example.
+When `status` is `blocked`, include `blocked_reason` and `attempted` fields. See [references/metadata-format.md](references/metadata-format.md) for blocked example. For routing logic to determine `handoff.next_agent` based on `blocked_reason`, see [references/blocked-agent-routing.md](references/blocked-agent-routing.md).
 
 **For complete field definitions, see:** [references/metadata-format.md](references/metadata-format.md)
 
@@ -392,6 +421,37 @@ Orchestrator:
 
 ---
 
+## Integration
+
+### Called By
+
+- All domain agents (frontend-_, backend-_, tool-_, capability-_)
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 1 - provides OUTPUT_DIRECTORY)
+- `orchestrating-capability-development` (Phase 1 - provides OUTPUT_DIRECTORY)
+- `orchestrating-integration-development` (Phase 1 - provides OUTPUT_DIRECTORY)
+- `orchestrating-multi-agent-workflows` (before spawning agents)
+- `orchestrating-fingerprintx-development` (Phase 1 - provides OUTPUT_DIRECTORY)
+
+### Requires (invoke before starting)
+
+None - this is a foundational skill invoked early in agent workflows
+
+### Calls (during execution)
+
+None - terminal skill that performs file I/O operations
+
+### Pairs With (conditional)
+
+- **`verifying-before-completion`** (CORE) - After writing output files
+  - Purpose: Verify files actually written
+  - `skill: "verifying-before-completion"`
+
+- **`orchestrating-multi-agent-workflows`** (CORE) - Multi-agent context
+  - Purpose: Coordinates shared output directory
+  - `skill: "orchestrating-multi-agent-workflows"`
+
+---
+
 ## Gateway Integration
 
 This skill is MANDATORY in all gateways:
@@ -405,19 +465,11 @@ Agents invoke via: `skill: "persisting-agent-outputs"`
 
 ---
 
-## Related Skills
-
-- `writing-plans` - Creates implementation plans (uses this skill for output)
-- `orchestrating-feature-development` - Feature orchestrator (passes feature_directory to agents)
-- `using-todowrite` - Task tracking (separate concern from file persistence)
-- `verifying-before-completion` - Ensures artifacts were actually written
-
----
-
 ## References
 
 **Detailed documentation:**
 
+- [Blocked Agent Routing](references/blocked-agent-routing.md) - Routing table for blocked agents by domain and reason
 - [Discovery Protocol](references/discovery-protocol.md) - Complete algorithm
 - [MANIFEST Structure](references/manifest-structure.md) - YAML format and examples
 - [Metadata Format](references/metadata-format.md) - JSON field definitions

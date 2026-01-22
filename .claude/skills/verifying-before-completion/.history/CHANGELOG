@@ -2,6 +2,21 @@
 
 All notable changes to this skill will be documented in this file.
 
+## [2026-01-18] - Integration Section
+
+### Added
+- New "Integration" section documenting skill relationships
+- "Called By" subsection listing 4 orchestration workflows, 1 development workflow, and 13 agent types
+- "Requires" subsection documenting no prerequisites (standalone skill)
+- "Calls" subsection documenting no delegations (terminal verification skill)
+- "Pairs With" subsection documenting no conditional pairing (mandatory gate)
+
+### Context
+Phase 28 compliance fix from audit. Integration section makes explicit that this skill is invoked as a mandatory completion gate by all orchestration workflows and agent types before completion claims. Clarifies the skill's role as a terminal verification gate with no prerequisites or delegations.
+
+### Method
+Claude-Automated fix via auditing-skills + fixing-skills workflow. Analyzed 236 references across codebase to identify all callers.
+
 ## [2026-01-10] - Exit Criteria Interpretation
 
 ### Added

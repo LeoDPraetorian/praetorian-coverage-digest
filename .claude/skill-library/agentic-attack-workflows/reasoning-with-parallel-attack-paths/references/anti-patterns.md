@@ -23,6 +23,7 @@ for model, prompt in prompts.items():
 ```
 
 **Why it fails:**
+
 - You're telling models what to find (confirmation bias)
 - Defeats emergent diversity from model architecture
 - Creates artificial specialization that may miss cross-domain issues
@@ -53,6 +54,7 @@ for model in MODELS:
 ```
 
 **Why it fails:**
+
 - 4x latency (4 models × 30s each = 120s total)
 - No parallel benefit
 - Wastes time
@@ -65,6 +67,7 @@ results = await asyncio.gather(*tasks, return_exceptions=True)  # All at once
 ```
 
 **Performance:**
+
 - Sequential: 4 × 30s = 120s
 - Parallel: max(30s, 30s, 30s, 30s) = 30s
 
@@ -84,6 +87,7 @@ print(report)  # No deduplication, no confidence scoring
 ```
 
 **Why it fails:**
+
 - User sees duplicate findings (same SQLi reported 4 times with different wording)
 - No confidence calibration (can't tell if 1 model or 4 models found it)
 - Overwhelms with raw data instead of synthesized insights
@@ -113,6 +117,7 @@ for group in groups:
 ```
 
 **Why it fails:**
+
 - Loses model-specific insights (DeepSeek's code-level bugs, Claude's auth edge cases)
 - Assumes only consensus matters (but unique findings can be valid)
 - Misses specialized vulnerabilities
@@ -144,6 +149,7 @@ avg = sum(severities.values()) / len(severities)  # 8.5
 ```
 
 **Why it fails:**
+
 - Hides worst-case risk (one model rates CRITICAL, others HIGH → avg is HIGH)
 - Security decisions should be risk-averse (assume worst case)
 - Dilutes strong signals
@@ -175,6 +181,7 @@ for finding in findings:
 ```
 
 **Why it fails:**
+
 - Misses paraphrasing:
   - "SQL injection in login" ≠ "Unsanitized database query in authentication"
   - "XSS in search" ≠ "Cross-site scripting in query parameter"
@@ -211,6 +218,7 @@ Analyze this JWT implementation. Check for:
 ```
 
 **Why it fails:**
+
 - Confirms your hypothesis instead of discovering issues
 - Misses vulnerabilities you didn't think to list
 - Reduces model creativity
@@ -241,6 +249,7 @@ Return ONLY valid JSON in this exact format, no other text:
 ```
 
 **Why it fails:**
+
 - Constrains model analysis to rigid schema
 - Discourages narrative explanation (which provides context)
 - May miss nuanced findings that don't fit schema
@@ -276,6 +285,7 @@ response = await acompletion(
 ```
 
 **Why it fails:**
+
 - Complex threat analysis takes time (60-120s)
 - Timeouts interrupt mid-analysis
 - Lose valuable findings
@@ -302,6 +312,7 @@ results = await asyncio.gather(*tasks)  # Fails if any model errors
 ```
 
 **Why it fails:**
+
 - One API error (rate limit, timeout) kills entire analysis
 - Lose results from successful models
 - No visibility into which model failed
@@ -336,6 +347,7 @@ MODELS = ['anthropic/claude-opus-4-20241120'] * 4
 ```
 
 **Why it fails:**
+
 - Unnecessary cost ($15/M tokens × 4 models = $60/M tokens)
 - Overkill for simple checks
 - Same results as cheaper models for straightforward issues
@@ -367,6 +379,7 @@ response = await acompletion(
 ```
 
 **Why it fails:**
+
 - Output tokens cost 3-5x more than input tokens
 - Verbose responses waste money
 - No guarantee of conciseness
@@ -406,6 +419,7 @@ DeepSeek says:
 ```
 
 **Why it fails:**
+
 - User sees 4x duplicate findings
 - No synthesis or confidence scoring
 - Overwhelming amount of text
@@ -415,14 +429,17 @@ DeepSeek says:
 
 ```markdown
 ## High-Confidence Findings (3-4 models agree)
-| Vulnerability | Severity | Confidence |
-|---------------|----------|------------|
+
+| Vulnerability      | Severity | Confidence |
+| ------------------ | -------- | ---------- |
 | SQLi in /api/login | CRITICAL | 4/4 models |
 
 ## Medium-Confidence Findings (2 models agree)
+
 ...
 
 ## Model-Unique Findings (investigate)
+
 ...
 ```
 
@@ -440,6 +457,7 @@ DeepSeek says:
 ```
 
 **Why it fails:**
+
 - DeepSeek specializes in code-level bugs
 - Dismisses finding due to low model count
 - Ignores that this aligns with model's strength

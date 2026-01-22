@@ -218,15 +218,15 @@ const agents = [];
 for (let i = 0; i < sections.length; i++) {
   const agent = Task({
     subagent_type: "general-purpose",
-    description: `${mode} section ${i+1} of ${sections.length}`,
+    description: `${mode} section ${i + 1} of ${sections.length}`,
     prompt: fillTemplate(mode, {
       path: artifact.path,
       start: sections[i].start,
       end: sections[i].end,
       i: i + 1,
       n: sections.length,
-      output_path: mode === 'split' ? `output/${i+1}-${sections[i].title}.md` : undefined
-    })
+      output_path: mode === "split" ? `output/${i + 1}-${sections[i].title}.md` : undefined,
+    }),
   });
   agents.push(agent);
 }

@@ -1,0 +1,500 @@
+---
+name: creating-skills
+description: Use when creating new skills with TDD - guides through RED-GREEN-REFACTOR phases, progressive disclosure, location selection, and research integration
+allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, Task, Skill
+---
+
+# Creating Skills
+
+**Instruction-driven skill creation workflow using native tools.**
+
+## When to Use
+
+Use this skill when:
+
+- Creating a new skill from scratch
+- User says "create a skill for X"
+- You need to scaffold a new skill structure
+
+**You MUST use TodoWrite** to track progress through all phases.
+
+## Quick Reference
+
+| Phase             | Purpose                                              |
+| ----------------- | ---------------------------------------------------- |
+| 1. 🔴 RED         | Prove gap exists, test fails without skill           |
+| 2. Validation     | Name format, check existence                         |
+| 3. Location & Cat | Core vs Library, which folder                        |
+| 4. Skill Type     | Process/Library/Integration/Tool-wrapper             |
+| 5. Generation     | Create directory, SKILL.md (<500 lines), references/ |
+| 6. Research       | Populate content with progressive disclosure         |
+| 7. Gateway Update | Add to routing table (library skills only)           |
+| 8. 🟢 GREEN       | Verify skill works, test passes                      |
+| 9. 🔵 REFACTOR    | Pressure test, close loopholes                       |
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any skill operation:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Cannot proceed without navigating to repo root** ✅
+
+---
+
+## Workflow Continuation Rules
+
+**All 9 phases run automatically.** After Phase 6 research, workflow MUST continue to Phase 6.3 → 7 → 8 → 9 without stopping.
+
+**See:** [Workflow Continuation](references/workflow-continuation.md) for research continuation protocol and anti-patterns.
+
+---
+
+## Phase 0: Scope Validation
+
+Validate that a skill (not an agent) is the appropriate solution. Skills provide knowledge/workflows; agents execute tasks.
+
+**See:** [Scope Validation](references/scope-validation.md) for skill vs agent decision criteria and compliance target.
+
+---
+
+## Rationalization Prevention
+
+Skill creation has many shortcuts that lead to low-quality skills. Watch for warning phrases and use evidence-based gates.
+
+**References**: [Shared prevention patterns](../using-skills/references/rationalization-prevention.md) | [Skill-specific rationalizations](references/rationalization-table.md)
+
+**Key principle**: Detect rationalization phrases → STOP → Return to phase checklist → Complete all items.
+
+---
+
+## Phase 1: 🔴 RED Phase (Prove Gap Exists)
+
+**You CANNOT skip this phase. TDD is mandatory.**
+
+**Statistical evidence**: Skills created without RED phase have ~40% failure rate (don't solve the actual problem). The 5 minutes to document failure prevents hours of building the wrong thing.
+
+**Complete Phase 1 workflow and agent spawning requirements:** [references/tdd-verification.md](references/tdd-verification.md)
+
+**Quick steps:**
+1. Document the gap (why skill is needed)
+2. Test without the skill (specific scenario)
+3. Capture failure behavior via agent spawning (MANDATORY)
+4. Confirm RED state
+
+---
+
+## Phase 2: Validation
+
+### 2.1 Validate Skill Name
+
+For complete naming conventions (gerund form, kebab-case, what to avoid), see [Anthropic Best Practices - Naming Conventions](.claude/skills/managing-skills/references/anthropic-best-practices.md#naming-conventions).
+
+**Quick validation:**
+
+- Format: kebab-case (lowercase, hyphens only)
+- Style: Gerund form preferred (`creating-skills`, not `create-skill`)
+- Pattern: `^[a-z][a-z0-9-]*$`
+
+```
+Valid:   creating-skills, managing-agents, debugging-react
+Invalid: CreateSkills, create_skills, create skills, 123-skill
+```
+
+### 2.2 Check If Skill Exists
+
+Search both core and library locations:
+
+```bash
+# Check core skills
+ls .claude/skills/ | grep -w "^skill-name$"
+
+# Check library skills
+find .claude/skill-library -name "skill-name" -type d
+```
+
+**If skill exists**: Stop and inform user. Suggest using `update` workflow instead.
+
+### 2.3 Gateway Detection
+
+**Check if creating a gateway skill**:
+
+```bash
+# Gateway if name starts with 'gateway-' OR user specified --type gateway
+if [[ "$SKILL_NAME" =~ ^gateway- ]] || [[ "$FLAGS" == *"--type gateway"* ]]; then
+  isGateway=true
+fi
+```
+
+**Gateway validation**: Name must match `gateway-{domain}` pattern (e.g., `gateway-frontend`). Reject `gateway` alone or `gateway-foo-bar-baz`.
+
+**If gateway detected**: Use **[references/gateway-creation.md](references/gateway-creation.md)** for complete gateway creation workflow (location, template, validation phases 17-20).
+
+**Return here after completing gateway creation to continue with Phase 8 (GREEN) and Phase 9 (REFACTOR).**
+
+---
+
+## Phase 3: Location and Category Selection
+
+For detailed location selection (Core vs Library) and category selection guidance, see **[Location and Category Selection](references/location-and-category-selection.md)**.
+
+## Phase 4: Skill Type Selection
+
+**Note**: Gateways have fixed type (routing index). See [references/gateway-creation.md](references/gateway-creation.md).
+
+Ask the user via AskUserQuestion:
+
+```
+Question: What type of skill is this?
+
+Options:
+1. Process/Pattern
+   - Methodology, workflow, or best practice
+   - Examples: TDD, debugging, brainstorming
+
+2. Library/Framework
+   - Documentation for npm package, API, or framework
+   - Examples: TanStack Query, Zustand, Zod
+
+3. Integration
+   - Connecting two or more tools/services
+   - Examples: GitHub + Linear, AWS + Terraform
+
+4. Tool Wrapper
+   - Wraps CLI tool or MCP server
+   - Examples: praetorian-cli wrapper, context7 wrapper
+```
+
+## Phase 5: Generate Skill Structure
+
+### 5.1 Create Directory Structure
+
+Create directories using `$ROOT` from Step 0 (prevents `.claude/.claude/` duplication):
+
+```bash
+# Core skill
+mkdir -p $ROOT/.claude/skills/{skill-name}/references
+# Library skill
+mkdir -p $ROOT/.claude/skill-library/{category}/{skill-name}/references
+```
+
+**See:** [File Organization](.claude/skills/managing-skills/references/file-organization.md)
+
+### 5.2 Generate SKILL.md with Progressive Disclosure
+
+**🚨 CRITICAL: Design for progressive disclosure from the start.** Target: <500 lines (ideally 300-450).
+
+**See:** [template-guidance.md](references/template-guidance.md) for templates by skill type, line count management, description patterns.
+
+**Gateways:** Use gateway-template.md (see [references/gateway-creation.md](references/gateway-creation.md)).
+
+#### 🚨 Integration Section (MANDATORY)
+
+Every skill MUST include an Integration section documenting dependencies. This is validated by Phase 28 of the audit.
+
+**Required subsections:**
+
+```markdown
+## Integration
+
+### Called By
+
+- [What invokes this skill - commands, agents, or other skills]
+
+### Requires (invoke before starting)
+
+| Skill        | When  | Purpose    |
+| ------------ | ----- | ---------- |
+| `skill-name` | Start | Why needed |
+
+### Calls (during execution)
+
+| Skill        | Phase/Step | Purpose      |
+| ------------ | ---------- | ------------ |
+| `skill-name` | Phase N    | What it does |
+
+### Pairs With (conditional)
+
+| Skill        | Trigger | Purpose    |
+| ------------ | ------- | ---------- |
+| `skill-name` | When X  | Why paired |
+```
+
+##### Phase 30 Validation (MANDATORY before inserting Integration references)
+
+Before adding ANY skill reference to Integration tables, validate its location:
+
+```bash
+SKILL_NAME="skill-to-reference"
+if [ -f ".claude/skills/$SKILL_NAME/SKILL.md" ]; then
+  echo "CORE: Use \`$SKILL_NAME\` in Integration tables"
+elif find .claude/skill-library -type f -path "*/$SKILL_NAME/SKILL.md" 2>/dev/null | grep -q .; then
+  PATH=$(find .claude/skill-library -type f -path "*/$SKILL_NAME/SKILL.md" | head -1)
+  echo "LIBRARY: \`$SKILL_NAME\` (LIBRARY) | Phase N | Purpose - \`Read(\"$PATH\")\`"
+else
+  echo "NOT FOUND: Do not add - skill does not exist"
+fi
+```
+
+**Integration table format:**
+- CORE: `` `skill-name` | Phase N | Purpose ``
+- LIBRARY: `` `skill-name` (LIBRARY) | Phase N | Purpose - `Read("path")` ``
+
+Library skills MUST include (LIBRARY) annotation and Read() path in Purpose column.
+
+**Cannot proceed to Phase 6 if skill references cannot be validated** ✅
+
+**If no dependencies**: Still include section with "None - standalone skill" or "None - terminal skill"
+
+**Why required**: Based on [obra/superpowers](https://github.com/obra/superpowers) analysis, skills with explicit Integration sections are never orphaned, have clear dependencies, and form traceable workflow chains.
+
+**See**: [Phase 28 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-28-integration-section)
+
+#### 🚨 Related Skills Section (MANDATORY)
+
+Every skill MUST include a Related Skills section at the end documenting complementary skills. This is validated by Phase 30 of the audit.
+
+##### Phase 30 Validation (MANDATORY before inserting Related Skills references)
+
+Before adding ANY skill reference to the Related Skills section, validate its location and format appropriately:
+
+```bash
+SKILL_NAME="skill-to-reference"
+if [ -f ".claude/skills/$SKILL_NAME/SKILL.md" ]; then
+  echo "CORE: Use \`$SKILL_NAME\` (CORE) - Purpose"
+elif find .claude/skill-library -type f -path "*/$SKILL_NAME/SKILL.md" 2>/dev/null | grep -q .; then
+  PATH=$(find .claude/skill-library -type f -path "*/$SKILL_NAME/SKILL.md" | head -1)
+  echo "LIBRARY: Use \`$SKILL_NAME\` (LIBRARY) - \`Read(\"$PATH\")\` - Purpose"
+else
+  echo "NOT FOUND: Do not add - skill does not exist"
+fi
+```
+
+**Related Skills format:**
+- Core skills: `` `skill-name` (CORE) - Purpose description ``
+- Library skills: `` `skill-name` (LIBRARY) - `Read(".claude/skill-library/.../skill-name/SKILL.md")` - Purpose ``
+
+**Example:**
+```markdown
+## Related Skills
+
+- `developing-with-tdd` (CORE) - TDD methodology and best practices
+- `orchestrating-research` (LIBRARY) - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` - Parallel research orchestrator for populating skill content
+```
+
+**Cannot proceed to Phase 6 if skill references cannot be validated** ✅
+
+#### 🚨 Code Reference Pattern (MANDATORY)
+
+❌ **NEVER**: `file.go:123-127` (line numbers drift with every change)
+✅ **USE**: `file.go - func MethodName()` or `file.go (between Match() and Invoke())`
+
+**See:** [code-reference-patterns.md](.claude/skills/managing-skills/references/patterns/code-reference-patterns.md)
+
+#### 🚨 Phase Numbering Pattern (MANDATORY)
+
+Use sequential integers (Phase 1, 2, 3...) not fractional (Phase 1.5, 4.5). Sub-steps (5.1, 5.2) acceptable.
+
+**See:** [Phase Numbering](.claude/skills/managing-skills/references/patterns/changelog-format.md) | Caught by: auditing-skills Phase 7
+
+### 5.3 Verify Line Count (MANDATORY)
+
+See [Line Count Limits](.claude/skills/managing-skills/references/patterns/line-count-limits.md) for complete thresholds and extraction strategy.
+
+```bash
+wc -l $ROOT/{skill-path}/SKILL.md  # Must be <500
+```
+
+**Quick reference:** <350 = safe, 350-450 = caution, 450-500 = warning, >500 = FAIL.
+
+**Cannot proceed to research phase if > 500 lines** ✅
+
+**Format tables:** Run `npx prettier --write` on .md files. See [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)
+
+### 5.4 Create Initial Changelog
+
+Create `.history/CHANGELOG` with "Initial Creation" entry (RED failure, category, skill type).
+
+**See:** [Changelog Format](.claude/skills/managing-skills/references/patterns/changelog-format.md)
+
+### 5.5 Prepare Reference File Structure
+
+Prepare `references/` directory. Files created later when you have content. **Do NOT create empty placeholder files.**
+
+```bash
+mkdir -p $ROOT/{skill-path}/references
+```
+
+**For reference file patterns by skill type, see:** [references/template-guidance.md](references/template-guidance.md)
+
+## Phase 6: Research & Populate Content
+
+### 6.1 Research Decision
+
+Ask user via AskUserQuestion: "Would you like to conduct research to populate the skill content?"
+Options: "Yes, research sources (Recommended)" or "No, skip research"
+
+**If "No":** Populate from original request (not templates), create reference files only with actual content, skip to Phase 7 (library) or 8 (core), document in changelog.
+**If "Yes":** Continue to Phase 6.2.
+
+### 6.2 Execute Research
+
+**BEFORE invoking orchestrating-research, set up continuation state:**
+
+1. Write remaining phases to TodoWrite (these persist across the research context switch):
+
+   ```
+   TodoWrite([
+     { content: 'Phase 6.2: Execute research', status: 'in_progress', activeForm: 'Executing research' },
+     { content: 'Phase 6.3: Incorporate research into skill', status: 'pending', activeForm: 'Incorporating research' },
+     { content: 'Phase 7: Gateway update', status: 'pending', activeForm: 'Updating gateway' },
+     { content: 'Phase 8: GREEN verification', status: 'pending', activeForm: 'Verifying skill works' },
+     { content: 'Phase 9: REFACTOR pressure tests', status: 'pending', activeForm: 'Pressure testing' }
+   ])
+   ```
+
+2. Then invoke orchestrating-research:
+
+   ```
+   Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
+   ```
+
+**IMMEDIATELY after orchestrating-research returns:**
+
+YOU MUST execute these steps in sequence WITHOUT stopping:
+
+1. Mark Phase 6.2 complete in TodoWrite
+2. Check TodoWrite for next pending phase (should be 6.3)
+3. Read SYNTHESIS.md from output directory
+4. **Proceed directly to Phase 6.3** (do NOT report completion, do NOT wait for user)
+
+The signal `WORKFLOW_CONTINUATION_REQUIRED` means: "Resume workflow at next TodoWrite item NOW."
+
+**Do NOT:**
+
+- Report 'Research complete!' to user and stop
+- Summarize research findings and wait for acknowledgment
+- Say "NEXT ACTION: Read SYNTHESIS.md and proceed to Phase 6.3" without actually doing it
+- Wait for user to type 'continue'
+- Mark all phases complete when only 6.2 is done
+
+The orchestrating-research skill provides intent expansion, parallel research across 6 sources, conflict detection, and comprehensive SYNTHESIS.md.
+
+**Why research matters:** [research-rationalizations.md](references/research-rationalizations.md) - Skills from training data have ~30% stale information.
+
+### 6.3 Incorporate Research into Skill ← POST-RESEARCH RESUME POINT
+
+**This phase executes IMMEDIATELY after Phase 6.2 returns.**
+
+Read SYNTHESIS.md from `.claude/.output/research/{timestamp}-{topic}/` (orchestrating-research creates OUTPUT_DIR with SYNTHESIS.md and source files), update SKILL.md with patterns/docs/practices, populate references/, replace placeholders with real examples.
+
+**After reading SYNTHESIS.md:**
+
+1. **Expand TodoWrite** - Create per-file items for required references (see [research-integration.md](references/research-integration.md) for skill type → reference file mapping)
+2. **Map content** - Route SYNTHESIS.md sections to reference files using mapping table
+3. **Create files** - Write each reference file with >50 lines from research sources (not placeholders)
+4. **Verify** - Run bash check confirming all files exist with content
+
+**Verification gate (blocks Phase 7):**
+
+```bash
+for file in workflow.md advanced-patterns.md; do
+  [ ! -f "references/$file" ] || [ $(wc -l < "references/$file") -lt 50 ] && echo "FAIL: $file" && exit 1
+done
+```
+
+**See:** [research-integration.md](references/research-integration.md) for rationalization counters, verification gates, and anti-patterns.
+
+## Phase 7: Gateway Update (Library Skills Only)
+
+If creating a library skill, add it to the appropriate gateway(s).
+
+**Do NOT use deterministic path-to-gateway mapping.** Paths are organizational; skill PURPOSE determines the gateway. Analyze:
+
+- **Primary consumers**: Which agents use this? READ their definition to verify which gateway they invoke in Step 1
+- **Skill purpose**: Testing methodology? Backend patterns? Frontend?
+- **Nested paths**: `testing/backend/` could route to `gateway-testing` OR `gateway-backend`
+
+**Confirm with user** via AskUserQuestion - NO EXCEPTIONS, even under time pressure. Present your analysis (purpose, consumer, gateway they invoke, recommendation) and ask which gateway(s) to use.
+
+---
+
+## Phase 8: 🟢 GREEN Phase (Verify Skill Works)
+
+**The skill is only done when it passes the original test.**
+
+### 8.1 Re-Test the Original Scenario (AGENT SPAWNING MANDATORY)
+
+**CRITICAL**: Spawn an agent WITH the skill loaded. Compare RED vs GREEN behavior.
+
+**Complete Phase 8.1 workflow:** [references/tdd-verification.md](references/tdd-verification.md)
+
+### 8.2 Verify the Gap is Closed
+
+Ask via AskUserQuestion with **verbatim quotes** from both RED (Phase 1.3) and GREEN (Phase 8.1) agent outputs, plus observed behavioral differences. Options: Yes (proceed), Partially (improve), No (rethink).
+
+**If "Partially" or "No"**: Go back to Phase 6 (Research) and improve content.
+
+### 8.3 Run Audit
+
+Verify compliance:
+
+```markdown
+Audit {skill-name} to verify compliance with all 28 phase requirements.
+```
+
+**For gateways**: Also run gateway-specific audit (phases 17-20). See [references/gateway-creation.md](references/gateway-creation.md#phase-8-green-verification).
+
+**Phase 30 specifically**: Verify all skill references in Integration and Related Skills sections have correct annotations. Library skills in Related Skills without (LIBRARY) or Read() paths will fail audit. Integration tables should use backticks only without annotations.
+
+**Must pass with no critical issues before proceeding.**
+
+---
+
+## Phase 9: 🔵 REFACTOR Phase (Pressure Test)
+
+Invoke `pressure-testing-skill-content` (LIBRARY) for time/authority/sunk cost pressure testing.
+
+If loopholes found, fix with `closing-rationalization-loopholes` (LIBRARY) using TDD verification.
+
+**Complete when:** ✅ RED ✅ GREEN ✅ REFACTOR ✅ Audit ✅ Gateway (library only)
+
+**Validation:** See [Validation and Anti-Patterns](references/validation-and-anti-patterns.md)
+
+---
+
+## Integration
+
+### Called By
+- `managing-skills` (CORE) router, `/skill-manager create` command
+
+### Requires (invoke before starting)
+None - standalone workflow initiator
+
+### Calls (during execution)
+| Skill | Phase | Purpose |
+| ----- | ----- | ------- |
+| `orchestrating-research` (LIBRARY) | 6.2 | Content population - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `auditing-skills` (LIBRARY) | 8.3 | Compliance validation - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` |
+| `pressure-testing-skill-content` (LIBRARY) | 9 | Pressure testing - `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` |
+| `closing-rationalization-loopholes` (LIBRARY) | 9 | Fix loopholes - `Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")` |
+
+### Pairs With (conditional)
+None - terminal workflow
+
+---
+
+## Related Skills
+
+- `orchestrating-research` (LIBRARY) - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` - Parallel research orchestrator for populating skill content
+- `managing-skills` (CORE) - Audit and fix existing skills (instruction-based)
+- `pressure-testing-skill-content` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` - Detailed pressure testing methodology for REFACTOR phase
+- `closing-rationalization-loopholes` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")` - TDD methodology for fixing loopholes found during REFACTOR phase

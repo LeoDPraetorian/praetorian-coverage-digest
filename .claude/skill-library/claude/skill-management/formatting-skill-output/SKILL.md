@@ -219,12 +219,30 @@ Validates and parses JSON input against the schema.
 
 ---
 
-## Related Skills
+## Integration
 
-| Skill              | Relationship                                |
-| ------------------ | ------------------------------------------- |
-| `auditing-skills`  | Primary consumer - semantic review findings |
-| `syncing-gateways` | Consumer - gateway sync results             |
+### Called By
+
+- **`auditing-skills`** (LIBRARY) - Primary consumer for semantic review output formatting
+  - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
+
+- **`syncing-gateways`** (LIBRARY) - Consumer for gateway sync result formatting
+  - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")`
+
+### Requires (invoke before starting)
+
+None - Entry point skill for output formatting
+
+### Calls (during execution)
+
+None - Provides formatting utilities only, does not invoke other skills
+
+### Pairs With (conditional)
+
+| Skill              | Trigger                    | Purpose                                                |
+| ------------------ | -------------------------- | ------------------------------------------------------ |
+| `auditing-skills`  | Semantic review completion | Formats semantic findings into deterministic tables    |
+| `syncing-gateways` | Gateway sync completion    | Formats gateway sync results into deterministic tables |
 
 ---
 

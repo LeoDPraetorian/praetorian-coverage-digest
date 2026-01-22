@@ -53,7 +53,7 @@ const useEventSequencing = (graph: Graph) => {
   const [layoutComplete, setLayoutComplete] = useState(false);
 
   useEffect(() => {
-    const layout = graph.getAttribute('layout');
+    const layout = graph.getAttribute("layout");
     if (!layout) return;
 
     // Listen for completion event
@@ -61,10 +61,10 @@ const useEventSequencing = (graph: Graph) => {
       setLayoutComplete(true);
     };
 
-    layout.on('complete', handleComplete);
+    layout.on("complete", handleComplete);
 
     return () => {
-      layout.off('complete', handleComplete);
+      layout.off("complete", handleComplete);
     };
   }, [graph]);
 
@@ -106,11 +106,11 @@ Explicit state machine for complex sequences.
 
 ```typescript
 enum SystemState {
-  IDLE = 'idle',
-  LOADING = 'loading',
-  LAYOUTING = 'layouting',
-  RENDERING = 'rendering',
-  READY = 'ready',
+  IDLE = "idle",
+  LOADING = "loading",
+  LAYOUTING = "layouting",
+  RENDERING = "rendering",
+  READY = "ready",
 }
 
 type StateTransition = {
@@ -155,9 +155,7 @@ const useStateMachine = () => {
 
   const transition = useCallback(
     async (to: SystemState) => {
-      const validTransition = transitions.find(
-        (t) => t.from === state && t.to === to
-      );
+      const validTransition = transitions.find((t) => t.from === state && t.to === to);
 
       if (!validTransition) {
         console.error(`Invalid transition from ${state} to ${to}`);
@@ -210,12 +208,10 @@ const executeInOrder = async (operations: Operation[]) => {
 
   // Execute all operations respecting dependencies
   while (completed.size < operations.length) {
-    const ready = operations.filter(
-      (op) => !completed.has(op.id) && canExecute(op)
-    );
+    const ready = operations.filter((op) => !completed.has(op.id) && canExecute(op));
 
     if (ready.length === 0) {
-      throw new Error('Circular dependency detected');
+      throw new Error("Circular dependency detected");
     }
 
     // Execute all ready operations in parallel
@@ -233,10 +229,7 @@ When events aren't available, polling is necessary. Do it right.
 Start fast, slow down over time.
 
 ```typescript
-const pollWithBackoff = async (
-  checkFn: () => boolean,
-  maxWait: number = 5000
-) => {
+const pollWithBackoff = async (checkFn: () => boolean, maxWait: number = 5000) => {
   let interval = 50; // Start at 50ms
   let elapsed = 0;
 
@@ -343,7 +336,7 @@ const sequenceWithRollback = async () => {
       try {
         await undo();
       } catch (rollbackError) {
-        console.error('Rollback failed', rollbackError);
+        console.error("Rollback failed", rollbackError);
       }
     }
     throw error;
@@ -356,10 +349,7 @@ const sequenceWithRollback = async () => {
 Retry with exponential backoff before failing.
 
 ```typescript
-const retryStep = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3
-): Promise<T> => {
+const retryStep = async <T>(fn: () => Promise<T>, maxRetries: number = 3): Promise<T> => {
   let lastError: Error;
 
   for (let i = 0; i < maxRetries; i++) {
@@ -389,18 +379,18 @@ const sequenceWithRetry = async () => {
 Verify operations execute in correct order.
 
 ```typescript
-test('executes operations in sequence', async () => {
+test("executes operations in sequence", async () => {
   const order: string[] = [];
 
   const ops = [
-    { id: 'A', execute: async () => order.push('A'), dependencies: [] },
-    { id: 'B', execute: async () => order.push('B'), dependencies: ['A'] },
-    { id: 'C', execute: async () => order.push('C'), dependencies: ['B'] },
+    { id: "A", execute: async () => order.push("A"), dependencies: [] },
+    { id: "B", execute: async () => order.push("B"), dependencies: ["A"] },
+    { id: "C", execute: async () => order.push("C"), dependencies: ["B"] },
   ];
 
   await executeInOrder(ops);
 
-  expect(order).toEqual(['A', 'B', 'C']);
+  expect(order).toEqual(["A", "B", "C"]);
 });
 ```
 
@@ -409,23 +399,23 @@ test('executes operations in sequence', async () => {
 Independent operations can run in parallel.
 
 ```typescript
-test('executes independent operations in parallel', async () => {
+test("executes independent operations in parallel", async () => {
   const order: string[] = [];
   const timestamps: Record<string, number> = {};
 
   const ops = [
     {
-      id: 'A',
+      id: "A",
       execute: async () => {
-        timestamps['A'] = Date.now();
+        timestamps["A"] = Date.now();
         await delay(100);
       },
       dependencies: [],
     },
     {
-      id: 'B',
+      id: "B",
       execute: async () => {
-        timestamps['B'] = Date.now();
+        timestamps["B"] = Date.now();
         await delay(100);
       },
       dependencies: [],
@@ -435,7 +425,7 @@ test('executes independent operations in parallel', async () => {
   await executeInOrder(ops);
 
   // Both should start at roughly the same time
-  expect(Math.abs(timestamps['A'] - timestamps['B'])).toBeLessThan(50);
+  expect(Math.abs(timestamps["A"] - timestamps["B"])).toBeLessThan(50);
 });
 ```
 
@@ -444,14 +434,14 @@ test('executes independent operations in parallel', async () => {
 Verify event-based transitions work.
 
 ```typescript
-test('waits for completion event', async () => {
+test("waits for completion event", async () => {
   const { result } = renderHook(() => useEventSequencing(mockGraph));
 
   expect(result.current.layoutComplete).toBe(false);
 
   // Simulate layout completion event
   act(() => {
-    mockLayout.emit('complete');
+    mockLayout.emit("complete");
   });
 
   await waitFor(() => {
@@ -540,7 +530,7 @@ while (!isDone()) {
 const startTime = Date.now();
 while (!isDone()) {
   if (Date.now() - startTime > 5000) {
-    throw new Error('Operation timeout');
+    throw new Error("Operation timeout");
   }
   await delay(100);
 }
@@ -554,13 +544,13 @@ Event might fire before listener is attached.
 
 ```typescript
 startOperation();
-operation.on('complete', handleComplete); // Might miss event!
+operation.on("complete", handleComplete); // Might miss event!
 ```
 
 ✅ **Right**: Add listener before starting
 
 ```typescript
-operation.on('complete', handleComplete);
+operation.on("complete", handleComplete);
 startOperation();
 ```
 

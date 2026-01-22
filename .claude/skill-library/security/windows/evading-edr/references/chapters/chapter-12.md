@@ -1,4 +1,4 @@
-## 12  MICROSOFT-WINDOWS-THREAT- INTELLIGENCE
+## 12 MICROSOFT-WINDOWS-THREAT- INTELLIGENCE
 
 ![Figure](figures/EvadingEDR_page_241_figure_001.png)
 
@@ -97,7 +97,7 @@ The GUID pointed to is in the .data section, shown in Figure 12.2 as fae1897c-bb
 
 Figure 12-2: The GUID pointed to by ThreatIntProviderGuid
 
-Microsoft Windows Threat Intelligence  217
+Microsoft Windows Threat Intelligence 217
 
 ---
 
@@ -137,7 +137,7 @@ Listing 12-5: Using a conditional breakpoint to watch calls to nt!\EWtWlogProtec
 
 This call stack shows a call to nt!nt!Protect(VirtualMemory)() buffering from user mode and hitting the System Service Dispatch Table (SSDT) ❸ which is really just an array of addresses to functions that handle a given syscall. Control is then passed up to nt!nt!Protect(VirtualMemory) where the call to nt!nt!WallProtectExevm() ❹ is made, just as we identified earlier through static analysis.
 
-218    Chapter 12
+218 Chapter 12
 
 ---
 
@@ -157,7 +157,6 @@ Listing 12-6: Listing the values in UserData using the number of entries stored 
 The first 64-bit value on each line of the WinDbg output is a pointer to the data, and the next one describes the size of the data in bytes. Unfortunately, this data isn't named or labeled, so discovering what each descriptor describes is a manual process. To decipher which pointer holds which type of data, we can use the provider GUID collected earlier in this section. f4e1897c-bb5d-5668-f1d8-040f4d8d344 .
 
 As discussed in Chapter 8, ETW providers can register an event manifest, which describes the events emitted by the provider and their contents. We can list these providers using the logman.exe utility, as shown in Listing 12-7.
-
 
 Searching for the GUID associated with the EtwTi provider reveals that the provider's name is Microsoft-Windows-Threat-Intelligence.
 
@@ -186,7 +185,7 @@ You can view the sections of this manifest that relate to the protection of virt
     <data name="CallingProcessCreateTimeTime" inType="win:FILETIME"/>
 ```
 
-Microsoft-Windows-Threat-Intelligence  219
+Microsoft-Windows-Threat-Intelligence 219
 
 ---
 
@@ -235,7 +234,7 @@ Listing 12-10: Evaluating protection mask changes using WinDbg
 
 We can inspect the values' contents to see that LastProtectionMask 2 was originally PAGE_EXECUTE_READ (0x20) and has been changed to PAGE_WRITE (0x4) ❶ Now we know that removing the executable flag in the memory allocation caused the event to fire.
 
-220    Chapter 12
+220 Chapter 12
 
 ---
 
@@ -248,7 +247,6 @@ ProtectExec$m(). At the time of this writing, there are 11 of these sensors, sho
 Table 12-1: Security and Security Mitigation Sensors
 
 <table><tr><td>Microsoft-Windows-Threat-Intelligence Sensors</td><td>Microsoft-Windows-Security-Mitigations Sensors</td></tr><tr><td>EtwTilogAllocExecVm</td><td>EtwTilogBlockNonCetBitaries</td></tr><tr><td>EtwTilogDeviceObjectLoadUnload</td><td>EtwTilogControlProtectionKernelModeReturnMismatch</td></tr><tr><td>EtwTilogDriverObjectLoad</td><td>EtwTilogControlProtectionUserModeReturnMismatch</td></tr><tr><td>EtwTilogDriverObjectUnLoad</td><td>EtwTilogProhibitChildProcessCreation</td></tr><tr><td>EtwTilogInsertQueueUserApc</td><td>EtwTilogProhibitDynamicCode</td></tr><tr><td>EtwTilogMapExecView</td><td>EtwTilogProhibitLowImageMap</td></tr><tr><td>EtwTilogProtectExecView</td><td>EtwTilogProhibitNonMicrosoftBitaries</td></tr><tr><td>EtwTilogReadWriteVm</td><td>EtwTilogProhibitWin32SystemCalls</td></tr><tr><td>EtwTilogSetContextThread</td><td>EtwTilogRedirectionTrustPolicy</td></tr><tr><td>EtwTilogSuspendResumeProcess</td><td>EtwTilogUserCetSetContextIpValidationFailure</td></tr><tr><td>EtwTilogSuspendResumeThread</td><td></td></tr></table>
-
 
 An additional 10 sensors relate to security mitigations and are identified by their EtwTm prefix. These sensors emit events through a different provider, Microsoft-Windows-Security-Mitigations, but function identically to the normal EtwTi sensors. They're responsible for generating alerts about security mitigation violations, such as the loading of low-integrity-level or remote images or the triggering of Arbitrary Code Guard, based on system configuration. While these exploit mitigations are out of scope for this book, you'll occasionally encounter them while investigating EtwTi sensors.
 
@@ -274,7 +272,6 @@ To work with Neo4j, we need a structured dataset, typically in JSON format, to d
 
 We must extract the data needed to map call graphs into the graph database from Ghidra or IDA using a plug-in, then convert it to JSON.
 
-
 Specifically, each entry in the JSON object needs to have three properties: a string containing the name of the function that will serve as the node, the entry point offset for later analysis, and the outgoing references (in other words, the functions being called by this function) to serve as the edges.
 
 The open source Ghidra script CallTreeToJSON.py iterates over all functions in a program that Ghidra has analyzed, collects the attributes of interest, and creates new JSON objects for ingestion by Neo4j. To map the paths related to the EtwiTs sensors, we must first load and analyze ntokernel.exe , the kernel image, in Ghidra. Then we can load the Python script into Ghidra's Script Manager and execute it. This will create a file, xfs.json , that we can load into Neo4j. It contains the Cypher commands shown in Listing 12-11.
@@ -293,7 +290,7 @@ UNWIND value as func
 
 Listing 12-11: Loading call trees into Neo4j
 
-222    Chapter 12
+222 Chapter 12
 
 ---
 
@@ -332,9 +329,7 @@ Figure 12.4: Paths from nt!NtCreatePagingFile() to nt!EtwTilogMapExecView()
 
 As this example demonstrates, many syscalls indirectly hit the sensor.
 
-
 Enumerating these can be useful if you're looking for coverage gaps, but
-
 
 the amount of information generated can quickly become overwhelming.
 
@@ -350,7 +345,6 @@ Table 12-2: EtwTi Sensor-to-Syscall Mappings
 
 <table><tr><td>Sensor</td><td>Call tree from syscall {depth = 4}</td></tr><tr><td>EtwTilogAllocExecVm</td><td>MlAllocateVirtualMemory--MtlAllocateVirtualMemory</td></tr><tr><td>EtwTilogDriverObjectLoad</td><td>IopLoadDriver--IopLoadUnloadDriver--IopLoadDriverImage--IopLoadDriverPrinter--IopLoadDriverVer--IopLoadUnloadDriver--IopLoadDriver--NtUnloadDriver</td></tr></table>
 
-
 (continued)
 
 Microsoft-WindowsThreatIntelligence 225
@@ -360,7 +354,6 @@ Microsoft-WindowsThreatIntelligence 225
 Table 12-2: ElvTi Sensor-to-Syscall Mappings (continued)
 
 <table><tr><td>Sensor</td><td>Call tree from syscall (depth = 4)</td></tr><tr><td>EtwTilogInsertQueueUserApc</td><td>KeInsertQueueApc&lt;NTQueueApcThread</td></tr><tr><td>There are other branches of the call tree that lead to system calls, such as</td><td>KeInsertQueueApc&lt;NTQueueApcThreadEx</td></tr><tr><td>nt!IopCompleteRequest(), ntlPspGet ContextThreadInternal(), and ntlPspSet ContextThreadInternal(), but these aren't particularly useful, as many internal functions rely on these functions regardless of whether the APC is being created explicitly.</td><td>NtMapViewOfSectionMiMapViewOf SectionXcCommon&lt;NtMapViewOfSectionEx</td></tr><tr><td>EtwTilogMapExecView</td><td>NtProtectVirtualMemory</td></tr><tr><td>EtwTilogProtectExecVm</td><td>NtReadWriteVirtualMemory-</td></tr><tr><td>EtwTilogReadWriteVm</td><td>NtReadVirtualMemoryMiReadWrite VirtualMemory--NtRead VirtualMemoryExMReadWriteVirtual Memory--NtWriteVirtualMemory</td></tr><tr><td>EtwTilogSetContextThread</td><td>PspSetContextThreadInternal--NtSetContextThread</td></tr><tr><td>EtwTilogSuspendResumeThread</td><td>PsSuspendThread--</td></tr><tr><td>This sensor has additional paths that are not listed and are tied to debugging APIs, including</td><td>NtSuspendThreadPsSuspendThread--</td></tr><tr><td>ntlld1NtDebugActiveProcess(), ntld11Nt DebugContinue(), and ntld11NtRemove ProcessDebug().</td><td>NtChangeThreadStatePsSuspend Thread--PsSuspendProcess--</td></tr><tr><td>ntlld1NtDebugContinue(), and ntld11NtRemove ProcessDebug().</td><td>NtSuspendProcessMultiResume Thread--NtResumeThread</td></tr></table>
-
 
 An important fact to consider when reviewing this dataset is that Ghidra does not factor conditional calls in its call trees but rather looks for call instructions inside functions. This means that while the graphs generated from the Cypher queries are technically correct, they may not be followed in all instances. To demonstrate this, an exercise for the reader is to reverse ntl1!MtAllLocaleVirtualMemory() to find where the determination to call the ntl!FwlllglgLoadLocaleWm() sensor is made.
 
@@ -407,7 +400,7 @@ typedef struct _PS_PROTECTION {
 
 Listing 12-14: The PS_PROTECTION structure definition
 
-The Type member of PS_PROTECTION correlates to a value in the PS_PROTECTED _TYPE enumeration, defined in Listing 12-15.
+The Type member of PS_PROTECTION correlates to a value in the PS_PROTECTED \_TYPE enumeration, defined in Listing 12-15.
 
 Microsoft-Windows-Threat-Intelligence 227
 
@@ -984,9 +977,7 @@ Listing 12-24: Installing the certificate on the system
 
 This code first opens a handle to the ELAM driver containing the
 
-
 MicrosoftLamCertificateInfo resource. The handle is then passed to kernel
-
 
 32!InstallELAMCertificateInfo() to install the certificate on the system.
 
@@ -999,7 +990,7 @@ BOOL CreateProtectedService() {
     SC_HANDLE hscM = NULL;
 ```
 
-232    Chapter 12
+232 Chapter 12
 
 ---
 
@@ -1053,7 +1044,7 @@ For example, Cobalt Strike's Beacon supports three memory allocation methods: #d
 
 As with all telemetry sources in this book, remember that some other source might be covering the gaps in the EtwiT sensors. Using @ea41a0c as an example, endpoint security agents may track and scan executable heap allocations created by user-mode programs. Microsoft may also modify
 
-234    Chapter 12
+234 Chapter 12
 
 ---
 
@@ -1066,7 +1057,6 @@ Another option is to simply invalidate the global trace handle in the kernel. Up
 The primary challenge of this technique is locating the TRACE_ENABLE_INFO structure, which defines the information used to enable the provider. Inside this structure is a member, 15EnableD, that we must manually change to 0 to prevent events from reaching the security product. We can use some of what we've already learned about how events are published to help make this process easier.
 
 Recall from the previous sections that all sensors use the global
-
 
 EtwThreatIntProvRegHandle_REGHANDLE when calling nt!EtwHandle() to emit an
 
@@ -1176,7 +1166,7 @@ Information() ❶ and then invokes it, passing in the SystemModuleInformation
 
 information class ❷. Upon completion, this function will populate the RL
 
-_PROCESS_MODULES structure (named ModuleInfo), at which point the address
+\_PROCESS_MODULES structure (named ModuleInfo), at which point the address
 
 of the kernel can be retrieved by referencing the ImageBase attribute of the
 
@@ -1198,7 +1188,6 @@ Microsoft-Windows-Threat-Intelligence 237
 
 It provides unparalleled visibility into processes executing on the system by sitting inline of their execution, similar to function-hooking DLLs. Despite their likeness, however, this provider and its hooks live in the kernel, where they are far less susceptible to evasion through direct attacks. Evading this data source is more about learning to work around it than it is about finding the glaring gap or logical flaw in its implementation.
 
-238    Chapter 12
+238 Chapter 12
 
 ---
-

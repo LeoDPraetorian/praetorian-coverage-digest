@@ -237,18 +237,34 @@ Done!
 
 ## Integration
 
-**Required workflow skills:**
+### Called By
 
-- **writing-plans** - REQUIRED: Creates the plan that this skill executes
-- **requesting-code-review** - REQUIRED: Review after each task (see Step 3)
-- **finishing-a-development-branch** - REQUIRED: Complete development after all tasks (see Step 7)
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 5-10, conditional: >3 independent tasks)
+- `orchestrating-capability-development` (Phase 3-6, conditional: >3 independent tasks)
+- `orchestrating-integration-development` (Phase 4-6, conditional: >3 implementation tasks)
+- `orchestrating-multi-agent-workflows` (conditional: 3+ independent tasks pattern)
+- `writing-plans` - REQUIRED SUB-SKILL
 
-**Subagents must use:**
+### Requires (invoke before starting)
 
-- **developing-with-tdd** - Subagents follow TDD for each task
+| Skill           | When  | Purpose                          |
+| --------------- | ----- | -------------------------------- |
+| `writing-plans` | Start | Creates plan this skill executes |
 
-**Alternative workflow:**
+### Calls (during execution)
 
-- **executing-plans** - Use for parallel session instead of same-session execution
+| Skill                            | Phase/Step | Purpose                               |
+| -------------------------------- | ---------- | ------------------------------------- |
+| `requesting-code-review`         | Step 3     | Review after each task implementation |
+| `finishing-a-development-branch` | Step 8     | Complete development after all tasks  |
+| Agent subagents (specialized)    | Step 2     | Implement individual tasks from plan  |
 
-See code-reviewer template: requesting-code-review/code-reviewer.md
+### Pairs With (conditional)
+
+| Skill                      | Trigger                    | Purpose                                             |
+| -------------------------- | -------------------------- | --------------------------------------------------- |
+| `executing-plans`          | Parallel session preferred | Alternative: batch execution with human checkpoints |
+| `developing-with-tdd`      | Subagents implementation   | Subagents follow TDD for each task                  |
+| `persisting-agent-outputs` | Long-running workflows     | Persist subagent outputs across sessions            |
+
+**See code-reviewer template:** requesting-code-review/code-reviewer.md

@@ -292,12 +292,12 @@ Before deploying an LLM-consumed API:
 
 ## Related Skills
 
-| Skill                                    | Purpose                                      |
-| ---------------------------------------- | -------------------------------------------- |
+| Skill                                     | Purpose                                      |
+| ----------------------------------------- | -------------------------------------------- |
 | `orchestrating-mcp-development` (LIBRARY) | Complete MCP wrapper creation workflow       |
-| `designing-progressive-loading-wrappers` | Two-tier loading for context efficiency      |
-| `implementing-graphql-clients`           | GraphQL client patterns with field selection |
-| `implementing-result-either-pattern`     | Error handling without verbose messages      |
+| `designing-progressive-loading-wrappers`  | Two-tier loading for context efficiency      |
+| `implementing-graphql-clients`            | GraphQL client patterns with field selection |
+| `implementing-result-either-pattern`      | Error handling without verbose messages      |
 
 ## Deep Dives
 

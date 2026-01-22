@@ -1,5 +1,32 @@
 # Changelog - persisting-agent-outputs
 
+## 2026-01-18 - Add Blocked Agent Routing Table
+
+**Added:**
+- `references/blocked-agent-routing.md` - Complete routing table mapping `blocked_reason` enum values to next agent by domain (Frontend, Backend, Capability, Tool)
+- Routing logic for two execution contexts: Orchestrated (agent sets `next_agent: null`) vs Direct CLI (agent sets specific next_agent)
+- Domain inference algorithm (extract domain from agent name prefix: `frontend-*`, `backend-*`, etc.)
+- Four complete examples showing blocked metadata with routing applied for different scenarios
+- Decision logic: When orchestrated vs CLI, how to determine next agent
+- Validation rules for blocked metadata fields
+
+**Changed:**
+- `references/metadata-format.md` line 185-187: Updated note to reference `blocked-agent-routing.md` instead of non-existent routing table in `orchestrating-multi-agent-workflows`
+- Distinguished between orchestrated context (orchestrator determines routing) and direct CLI context (agent determines routing)
+- `SKILL.md` line 291: Added sentence referencing `blocked-agent-routing.md` for routing logic
+- `SKILL.md` References section: Added blocked-agent-routing.md entry with description
+
+**Context:**
+- Fills gap identified in Step 1 RED phase where agents couldn't find formal routing table despite multiple references
+- Provides deterministic routing for all 6 `blocked_reason` enum values (security_concern, architecture_decision, missing_requirements, test_failures, out_of_scope, unknown)
+- Supports both orchestrated workflows (orchestrator overrides routing) and direct CLI invocation (agent self-routes)
+- Tested in Step 6 GREEN phase: Agent successfully found routing table, understood context distinction, applied routing logic with "NO CONFUSION"
+
+**Impact:**
+- Agents can now deterministically route when blocked instead of guessing or escalating unnecessarily
+- Clear distinction between orchestrated and CLI contexts prevents routing conflicts
+- Complete coverage of all blocked_reason values (previous informal guidance only covered 3 of 6)
+
 ## 2026-01-04 - Add Threat Modeling Context
 
 **Added:**
@@ -53,3 +80,22 @@
 - Agents now parse orchestrator paths from task prompts before falling back to legacy discovery
 - Supports unified .claude/.output/ structure across all orchestrators
 - Backward compatible with existing feature_directory parameter and standalone workflows
+## 2026-01-19 - v1.1.0
+
+### Added
+- Optional orchestration fields (phases, verification, current_phase) for unified state management
+- Two-layer state management clarification (per-agent vs directory metadata)
+- Pattern examples showing ad-hoc vs orchestrated workflows
+- Phase tracking schema with status/timestamp/metadata per phase
+- Verification object for build/test/review results tracking
+- Explicit note: MANIFEST.yaml is single source of truth for orchestration
+
+### Changed
+- Updated manifest-structure.md with optional field definitions
+- Added orchestration examples to demonstrate both patterns
+- Expanded field definitions table with optional orchestration fields
+
+### Migration Notes
+- Existing MANIFEST.yaml files remain compatible (optional fields)
+- Orchestration skills should migrate from separate metadata.json to MANIFEST.yaml optional fields
+- Non-orchestrated agents continue using core fields only

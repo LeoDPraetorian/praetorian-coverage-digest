@@ -29,7 +29,7 @@ Phase 4: Unit Tests (depends on implementation)
     Output: Test file with coverage
 
 Phase 5: Acceptance Tests (depends on implementation)
-└─> acceptance-test-engineer writes E2E tests
+└─> backend-tester writes E2E tests
     Input: API endpoint, expected behavior
     Output: Integration test file
 ```
@@ -252,7 +252,7 @@ Result:
 // Single message, all spawn together
 Task("backend-tester", "Unit tests for processor.go...")
 Task("backend-tester", "SQS integration tests...")
-Task("acceptance-test-engineer", "E2E job workflow tests...")
+Task("backend-tester", "E2E job workflow tests...")
 
 Results (collected after all complete):
 - Unit: 15 tests, 92% coverage

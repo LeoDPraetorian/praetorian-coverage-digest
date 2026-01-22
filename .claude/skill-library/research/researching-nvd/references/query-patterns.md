@@ -9,6 +9,7 @@
 **Response Format:** JSON
 
 **Rate Limits:**
+
 - Without API key: 5 requests per 30 seconds
 - With API key: 50 requests per 30 seconds
 - **Implementation:** Add 7-second delays between requests if no key
@@ -22,6 +23,7 @@
 **Format:** `?keywordSearch={URL_ENCODED_QUERY}`
 
 **Examples:**
+
 ```
 ?keywordSearch=apache
 ?keywordSearch=remote+code+execution
@@ -37,6 +39,7 @@
 **Format:** `?cveId={CVE-YYYY-NNNNN}`
 
 **Examples:**
+
 ```
 ?cveId=CVE-2024-38475
 ?cveId=CVE-2023-12345
@@ -53,6 +56,7 @@
 **Values:** `CRITICAL`, `HIGH`, `MEDIUM`, `LOW`
 
 **Examples:**
+
 ```
 ?keywordSearch=apache&cvssV3Severity=CRITICAL
 ?keywordSearch=tomcat&cvssV3Severity=HIGH
@@ -67,6 +71,7 @@
 **Format:** `?cpeName={CPE_2.3_STRING}`
 
 **Examples:**
+
 ```
 ?cpeName=cpe:2.3:a:apache:tomcat:9.0.50:*:*:*:*:*:*:*
 ?cpeName=cpe:2.3:a:microsoft:windows_10:*:*:*:*:*:*:*:*
@@ -81,6 +86,7 @@
 **Format:** `?pubStartDate={YYYY-MM-DDTHH:MM:SS}&pubEndDate={YYYY-MM-DDTHH:MM:SS}`
 
 **Examples:**
+
 ```
 ?pubStartDate=2024-01-01T00:00:00&pubEndDate=2024-12-31T23:59:59
 ?pubStartDate=2024-06-01T00:00:00  (start date only - to present)
@@ -97,6 +103,7 @@
 **Default:** 2000
 
 **Examples:**
+
 ```
 ?keywordSearch=apache&resultsPerPage=50
 ```
@@ -113,19 +120,19 @@ cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw
 
 ### Components
 
-| Field        | Description                      | Example       |
-| ------------ | -------------------------------- | ------------- |
-| `part`       | a (application), o (OS), h (HW)  | `a`           |
-| `vendor`     | Vendor name                      | `apache`      |
-| `product`    | Product name                     | `tomcat`      |
-| `version`    | Version number                   | `9.0.50`      |
-| `update`     | Update/patch level               | `*` (any)     |
-| `edition`    | Edition (enterprise, etc.)       | `*`           |
-| `language`   | Language                         | `*`           |
-| `sw_edition` | Software edition                 | `*`           |
-| `target_sw`  | Target software platform         | `*`           |
-| `target_hw`  | Target hardware platform         | `*`           |
-| `other`      | Other                            | `*`           |
+| Field        | Description                     | Example   |
+| ------------ | ------------------------------- | --------- |
+| `part`       | a (application), o (OS), h (HW) | `a`       |
+| `vendor`     | Vendor name                     | `apache`  |
+| `product`    | Product name                    | `tomcat`  |
+| `version`    | Version number                  | `9.0.50`  |
+| `update`     | Update/patch level              | `*` (any) |
+| `edition`    | Edition (enterprise, etc.)      | `*`       |
+| `language`   | Language                        | `*`       |
+| `sw_edition` | Software edition                | `*`       |
+| `target_sw`  | Target software platform        | `*`       |
+| `target_hw`  | Target hardware platform        | `*`       |
+| `other`      | Other                           | `*`       |
 
 ### Wildcards
 
@@ -135,16 +142,19 @@ cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw
 ### Example CPE Strings
 
 **Apache Tomcat 9.0.50:**
+
 ```
 cpe:2.3:a:apache:tomcat:9.0.50:*:*:*:*:*:*:*
 ```
 
 **Microsoft Windows 10 (any version):**
+
 ```
 cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*
 ```
 
 **Cisco IOS 15.2(4):**
+
 ```
 cpe:2.3:o:cisco:ios:15.2\(4\):*:*:*:*:*:*:*
 ```
@@ -209,13 +219,13 @@ https://services.nvd.nist.gov/rest/json/cves/2.0?keywordSearch=tomcat&cvssV3Seve
 
 Special characters must be URL-encoded:
 
-| Character | Encoded | Example                    |
-| --------- | ------- | -------------------------- |
-| Space     | `+` or `%20` | `remote+code+execution`    |
-| :         | `%3A`   | `cpe%3A2.3%3A...`          |
-| /         | `%2F`   | N/A in NVD                 |
-| (         | `%28`   | `15.2%284%29`              |
-| )         | `%29`   | `15.2%284%29`              |
+| Character | Encoded      | Example                 |
+| --------- | ------------ | ----------------------- |
+| Space     | `+` or `%20` | `remote+code+execution` |
+| :         | `%3A`        | `cpe%3A2.3%3A...`       |
+| /         | `%2F`        | N/A in NVD              |
+| (         | `%28`        | `15.2%284%29`           |
+| )         | `%29`        | `15.2%284%29`           |
 
 ## Response Structure
 
@@ -339,12 +349,12 @@ WebFetch("https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-1234",
 
 **Common Errors:**
 
-| HTTP Status | Meaning                          | Solution                       |
-| ----------- | -------------------------------- | ------------------------------ |
-| 403         | Rate limit exceeded              | Wait 30 seconds, retry         |
-| 404         | CVE not found                    | Verify CVE ID format           |
-| 400         | Invalid parameter                | Check query syntax             |
-| 503         | Service unavailable              | Retry after delay              |
+| HTTP Status | Meaning             | Solution               |
+| ----------- | ------------------- | ---------------------- |
+| 403         | Rate limit exceeded | Wait 30 seconds, retry |
+| 404         | CVE not found       | Verify CVE ID format   |
+| 400         | Invalid parameter   | Check query syntax     |
+| 503         | Service unavailable | Retry after delay      |
 
 ## Related References
 

@@ -1,6 +1,6 @@
 ---
 name: closing-rationalization-loopholes
-description: Use when agents skip skill instructions despite explicit requirements - systematically identifies rationalization patterns and adds counters using TDD methodology
+description: Use when agents skip skill instructions despite explicit requirements
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, Task
 ---
 
@@ -51,11 +51,17 @@ This skill handles loopholes from:
 
 ## Quick Reference
 
-| Phase       | Purpose                                                                      |
-| ----------- | ---------------------------------------------------------------------------- |
-| 🔴 RED      | Capture failure, understand rationalization, REPRODUCE with fresh agent      |
-| 🟢 GREEN    | Write counter, VERIFY it works with fresh agent, iterate until passes       |
-| 🔵 REFACTOR | Pressure test variations while staying green, consider scope escalation      |
+| Phase       | Purpose                                                                 |
+| ----------- | ----------------------------------------------------------------------- |
+| 🔴 RED      | Capture failure, understand rationalization, REPRODUCE with fresh agent |
+| 🟢 GREEN    | Write counter, VERIFY it works with fresh agent, iterate until passes   |
+| 🔵 REFACTOR | Pressure test variations while staying green, consider scope escalation |
+
+**Three safeguards built into workflow:**
+
+- Step 1 (GREEN): Create timestamped backup before editing
+- Step 4 (GREEN): Check line count and warn if >450 lines
+- Step 5 (REFACTOR): Optional compliance check after verification
 
 **Complete methodology**: [references/tdd-methodology.md](references/tdd-methodology.md)
 
@@ -131,7 +137,7 @@ Match the observed behavior to a known pattern. See [references/rationalization-
 | Time Pressure             | "This is urgent"                        |
 | Authority Override        | "User wants quick answer"               |
 
-#### 6. Document in Loophole Tracking
+#### 5. Document in Loophole Tracking
 
 Add entry to `.claude/docs/agents/AGENT-LOOPHOLES.md` (create if missing):
 
@@ -152,77 +158,58 @@ Add entry to `.claude/docs/agents/AGENT-LOOPHOLES.md` (create if missing):
 
 **Goal**: Add explicit counter that prevents the specific rationalization.
 
-#### 1. Write Counter Text
+#### 1. Create Backup
 
-Use the counter template addressing ONLY the observed rationalization:
+**Statistical evidence**: ~15% of edits need rollback. Backups take 2 seconds and save hours of reconstruction.
 
-```markdown
-## [Rationalization Name] Counter
+Before modifying any skill or agent file, create a timestamped backup:
 
-If you think: "[exact rationalization thought]"
+```bash
+# Create .local directory if needed
+mkdir -p {target-file-dir}/.local
 
-Reality: [Why this thought is wrong]
-
-Required action: [Specific behavior agent must do instead]
+# Create timestamped backup
+cp {target-file} {target-file-dir}/.local/{filename}.bak.$(date +%Y%m%d_%H%M%S)
 ```
 
-**Example counter for "Quick Question Trap":**
+**Example:**
 
-```markdown
-## Quick Analysis Counter
-
-If you think: "This is just a simple analysis question"
-
-Reality: ALL analysis tasks produce file artifacts. "Quick analysis" is a rationalization trap that leads to lost work and untracked decisions.
-
-Required action:
-
-- Invoke persisting-agent-outputs skill
-- Write output to file in OUTPUT_DIRECTORY
-- Include skills_invoked in metadata
+```bash
+mkdir -p .claude/agents/architecture/.local
+cp .claude/agents/architecture/mcp-lead.md .claude/agents/architecture/.local/mcp-lead.md.bak.$(date +%Y%m%d_%H%M%S)
 ```
 
-#### 2. Place Counter in Appropriate Location
+This enables quick rollback if the counter needs iteration or causes unintended effects.
 
-Determine scope and placement. See [references/counter-placement.md](references/counter-placement.md) for decision tree.
+#### 2. Write Counter and Place in Reference File
 
-**Placement rules:**
+**See:** [references/counter-templates.md](references/counter-templates.md) for:
 
-| Scope              | Location                                       | When to Use                              |
-| ------------------ | ---------------------------------------------- | ---------------------------------------- |
-| **Agent-specific** | Agent's `<EXTREMELY-IMPORTANT>` section        | Only one agent exhibits this behavior    |
-| **Skill-wide**     | Skill's `## Red Flags` or `## Common Mistakes` | Multiple uses of same skill show issue   |
-| **Universal**      | `using-skills` anti-rationalization table      | Multiple agents across different domains |
+- Counter template format ("If you think" → "Reality" → "Required action")
+- Example counters (Quick Question Trap, etc.)
+- Counter placement guidelines (agent-specific / skill-wide / universal)
+- File creation protocol
+- Verification procedures
+- Additional requirements (1% rule, announcement requirement)
 
-#### 3. Ensure 1% Threshold Rule
+#### 3. Verify Counter File Structure
 
-If the skill/agent doesn't have it, add:
+Verify the counter infrastructure is correct:
 
-```markdown
-## The 1% Rule (NON-NEGOTIABLE)
+```bash
+# 1. Counter file exists
+test -f {skill}/references/{skill}-counters.md && echo "✅ Counter file exists"
 
-If there is even a 1% chance a skill might apply:
+# 2. MANDATORY Read block added to SKILL.md
+grep -q "Read(.*counters.md)" {skill}/SKILL.md && echo "✅ Read block exists"
 
-- You MUST invoke that skill
-- This is not optional
-- You cannot rationalize your way out of this
-
-Uncertainty = Invocation. Period.
+# 3. Read block is in EXTREMELY-IMPORTANT tags
+grep -B 2 "Read(.*counters.md)" {skill}/SKILL.md | grep -q "EXTREMELY-IMPORTANT" && echo "✅ Properly tagged"
 ```
 
-#### 4. Add Announcement Requirement (if missing)
+**If any check fails:** Fix before proceeding to verification.
 
-```markdown
-## Skill Announcement (MANDATORY)
-
-Before using any skill, you MUST announce it:
-
-"I am invoking `{skill-name}` because {reason}."
-
-No announcement = protocol violation.
-```
-
-#### 5. Verify Counter Works
+#### 4. Verify Counter Works
 
 Spawn fresh agent via Task tool with the same task:
 
@@ -238,7 +225,7 @@ COMPLIANCE CHECK:
 Note: Counter has been added to {location}. Verify it prevents the rationalization.
 ```
 
-#### 6. Iterate Until Passes
+#### 5. Iterate Until Passes
 
 If agent still fails:
 
@@ -303,6 +290,40 @@ Update loophole tracking:
 ```
 
 **Gate: Stays green through all pressure test variations**
+
+#### 5. Compliance Check (Optional)
+
+After verifying the counter works, you may optionally run compliance validation on the modified file:
+
+**For skill-wide counters:**
+
+```bash
+# Consider running auditing-skills on the modified skill
+skill: "auditing-skills"
+args: "{skill-name}"
+```
+
+**For agent-specific counters:**
+
+```bash
+# Consider running auditing-agents on the modified agent
+# (if auditing-agents skill exists)
+```
+
+**Note**: This step is OPTIONAL. The primary record of loophole closure is the "Verified" status in `.claude/docs/agents/AGENT-LOOPHOLES.md`. Compliance validation provides additional quality assurance but is not required for loophole closure.
+
+**When to consider compliance checks:**
+
+- Counter added 30+ lines to file
+- Multiple counters added in single session
+- File approaching 500-line limit (per Step 4 warning)
+- Counter modified core workflow sections
+
+**When to skip:**
+
+- Simple counter addition (<15 lines)
+- File well under line limit
+- Time-sensitive loophole closure
 
 ---
 
@@ -375,14 +396,31 @@ A loophole is closed when:
 
 ---
 
-## Related Skills
+## Integration
 
-| Skill                            | Purpose                                      |
-| -------------------------------- | -------------------------------------------- |
-| `updating-skills`                | Use after closing loopholes to update skills |
-| `pressure-testing-skill-content` | Discover loopholes through pressure tests    |
-| `auditing-skills`                | Systematic compliance validation             |
-| `fixing-skills`                  | Automated compliance remediation             |
+### Called By
+
+- `/closing-the-loop` command - User-triggered immediately after observing agent rationalization
+- User direct invocation when agent compliance failures are observed
+
+### Requires (invoke before starting)
+
+None - Entry point skill for loophole closure workflow
+
+### Calls (during execution)
+
+| Skill/Tool                  | Phase/Step                        | Purpose                                                                                                 |
+| --------------------------- | --------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Task tool                   | RED Phase Step 3, GREEN Steps 7-8 | Spawn fresh agents for failure reproduction and counter verification                                    |
+| `updating-skills` (LIBRARY) | After closing loopholes           | Update skill content - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` |
+
+### Pairs With (conditional)
+
+| Skill                                      | Trigger                     | Purpose                                                                                                              |
+| ------------------------------------------ | --------------------------- | -------------------------------------------------------------------------------------------------------------------- |
+| `pressure-testing-skill-content` (LIBRARY) | REFACTOR phase              | Discover loopholes - `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` |
+| `auditing-skills` (LIBRARY)                | After counter placement     | Validate compliance - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`               |
+| `fixing-skills` (LIBRARY)                  | When counter modifies files | Compliance remediation - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`              |
 
 ---
 
@@ -400,5 +438,3 @@ A loophole is closed when:
 ## Examples
 
 - [Example: Quick Question Trap](examples/quick-question-trap.md) - mcp-lead analysis scenario
-- [Example: Description Hallucination](examples/description-hallucination.md) - mcp-lead3 using-skills
-- [Example: Skill Invocation Variance](examples/skill-invocation-variance.md) - Non-deterministic compliance

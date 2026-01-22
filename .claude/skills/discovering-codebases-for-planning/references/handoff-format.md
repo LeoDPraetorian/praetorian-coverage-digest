@@ -207,7 +207,7 @@
         },
         "scope_paths": {
           "type": "array",
-          "items": {"type": "string"},
+          "items": { "type": "string" },
           "description": "Scope paths used in Stage 1"
         },
         "total_files_analyzed": {
@@ -327,10 +327,7 @@
   "metadata": {
     "orchestrator": "orchestrating-feature-development",
     "agent_count": 3,
-    "scope_paths": [
-      "modules/chariot/ui/src/",
-      "modules/chariot/backend/pkg/"
-    ],
+    "scope_paths": ["modules/chariot/ui/src/", "modules/chariot/backend/pkg/"],
     "total_files_analyzed": 50
   }
 }
@@ -378,23 +375,19 @@
       "naming_convention": "snake_case with '_service.go' suffix"
     }
   ],
-  "anti_patterns": [
-    "Do not use fetch directly - always use apiClient wrapper"
-  ],
+  "anti_patterns": ["Do not use fetch directly - always use apiClient wrapper"],
   "discovery_gaps": [],
   "metadata": {
     "orchestrator": "orchestrating-feature-development",
     "agent_count": 2,
-    "scope_paths": [
-      "modules/chariot/ui/src/",
-      "modules/chariot/backend/pkg/"
-    ],
+    "scope_paths": ["modules/chariot/ui/src/", "modules/chariot/backend/pkg/"],
     "total_files_analyzed": 8
   }
 }
 ```
 
 **Interpretation**:
+
 - Low reuse (15%) indicates greenfield feature
 - No patterns_to_extend → entirely new functionality
 - Minimal utilities_to_reuse → mostly net-new code
@@ -461,6 +454,7 @@ MUST AVOID:
 ### Implementation Phase (developers)
 
 Developers receive:
+
 - **file-placement.md** - Quick reference for WHERE to put code
 - **discovery.md** - Full context (if needed for deep dives)
 - **NOT discovery-summary.json** - Machine format, not human-readable

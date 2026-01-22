@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/nebula",
+  "version": "1.0.0",
+  "description": "Cloud security scanning and AWS configuration analysis",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

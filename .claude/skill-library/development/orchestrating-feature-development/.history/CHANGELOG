@@ -1,0 +1,17 @@
+# Changelog
+
+## 2026-01-21
+
+### Fixed (Claude-Automated)
+
+- **Phase 28: Integration Section** - Converted from deprecated table format to bullet list format
+- **Phase 28: Integration Section** - Added (LIBRARY) annotation and Read() path for `using-git-worktrees` (was incorrectly appearing as CORE when it's a library skill at `.claude/skill-library/workflow/using-git-worktrees/SKILL.md`)
+- **Phase 28: Integration Section** - Added (LIBRARY) annotation and Read() path for `finishing-a-development-branch` (library skill at `.claude/skill-library/workflow/finishing-a-development-branch/SKILL.md`)
+- **Phase 28: Integration Section** - Added (CORE) annotations to all core skills for consistency
+- **Phase 28: Integration Section** - Spawns and Pairs With sections also converted to bullet list format for consistency
+
+### Verification
+
+- All 10 skill references verified to exist
+- Library skills: `using-git-worktrees`, `finishing-a-development-branch`
+- Core skills: `persisting-agent-outputs`, `discovering-codebases-for-planning`, `brainstorming`, `writing-plans`, `developing-with-subagents`, `dispatching-parallel-agents`, `verifying-before-completion`, `debugging-systematically`

@@ -7,6 +7,7 @@
 **Primary Source**: `https://github.com/projectdiscovery/nuclei-templates`
 
 **Key Directories**:
+
 - `/http/cves/YYYY/` - HTTP-based CVE templates by year
 - `/network/cves/` - Network protocol CVE templates
 - `/file/cves/` - File-based CVE templates
@@ -17,6 +18,7 @@
 **Source**: `https://github.com/praetorian-inc/nuclei-templates`
 
 **Key Directories**:
+
 - `/praetorian/cves/YYYY/` - Custom CVE templates
 - `/praetorian/exposed-panels/` - Panel detection templates
 - `/praetorian/misconfigurations/` - Configuration issue templates
@@ -27,16 +29,19 @@
 ## Template Naming Conventions
 
 **Standard Format**:
+
 ```
 CVE-YYYY-NNNNN.yaml
 ```
 
 **Pre-requisite Templates**:
+
 ```
 CVE-YYYY-NNNNN-pre-req.yaml
 ```
 
 **Multi-variant Templates**:
+
 ```
 CVE-YYYY-NNNNN-v1.yaml
 CVE-YYYY-NNNNN-v2.yaml
@@ -65,6 +70,7 @@ head -n 50 /tmp/nuclei-templates/path/to/CVE-YYYY-NNNNN.yaml
 ```
 
 **Extract**:
+
 - `id`: CVE identifier
 - `info.name`: Vulnerability description
 - `info.severity`: critical/high/medium/low
@@ -73,20 +79,20 @@ head -n 50 /tmp/nuclei-templates/path/to/CVE-YYYY-NNNNN.yaml
 
 ## Template Quality Indicators
 
-| Indicator | Meaning | Trust Level |
-|-----------|---------|-------------|
-| **metadata.verified: true** | Production-ready | HIGH |
-| **tags: case-reviewed** | Human validated | HIGH |
-| **praetorian/ directory** | Custom Chariot template | HIGH |
-| **http/cves/ community** | Community template | MEDIUM |
-| **No verified flag** | Unverified | LOW |
+| Indicator                   | Meaning                 | Trust Level |
+| --------------------------- | ----------------------- | ----------- |
+| **metadata.verified: true** | Production-ready        | HIGH        |
+| **tags: case-reviewed**     | Human validated         | HIGH        |
+| **praetorian/ directory**   | Custom Chariot template | HIGH        |
+| **http/cves/ community**    | Community template      | MEDIUM      |
+| **No verified flag**        | Unverified              | LOW         |
 
 ## Repository Statistics (2026)
 
-| Repository | Total Templates | CVE Templates | Update Frequency |
-|------------|----------------|---------------|------------------|
-| ProjectDiscovery | 12,626 | 2,456+ | Daily |
-| Praetorian | Proprietary | Custom | As needed |
+| Repository       | Total Templates | CVE Templates | Update Frequency |
+| ---------------- | --------------- | ------------- | ---------------- |
+| ProjectDiscovery | 12,626          | 2,456+        | Daily            |
+| Praetorian       | Proprietary     | Custom        | As needed        |
 
 ## Related References
 

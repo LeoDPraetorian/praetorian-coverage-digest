@@ -51,13 +51,16 @@ touch modules/hypercube-ng/.write-test && rm modules/hypercube-ng/.write-test
 ## Common Issues
 
 **Go not installed:**
+
 - Install from https://go.dev/dl/
 - Ensure Go is in PATH: `echo $PATH | grep go`
 
 **Firebase CLI not authenticated:**
+
 - Run: `gcloud auth application-default login`
 - Verify: `firebase projects:list`
 
 **Write permission denied:**
+
 - Check directory ownership: `ls -la modules/hypercube-ng/`
 - May need to run with appropriate permissions

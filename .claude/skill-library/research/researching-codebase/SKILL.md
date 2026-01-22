@@ -334,16 +334,16 @@ This document becomes reference material for the skill being created/updated.
 
 ## Related Skills
 
-| Skill                        | Access Method                                                                              | Purpose                                   |
-| ---------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- |
-| **orchestrating-research**   | `skill: "orchestrating-research"` (CORE)                                                   | Orchestrator for all research types       |
-| **researching-context7**     | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)           | Library/framework documentation           |
-| **researching-arxiv**        | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)              | Academic papers and research              |
-| **creating-skills**          | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY) | Skill creation workflow (invokes this)    |
-| **updating-skills**          | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY) | Skill update workflow (may invoke this)   |
-| **Explore agent**            | `Task(subagent_type="Explore")` (NATIVE AGENT)                                             | Implementation-focused pattern discovery  |
-| **codebase-mapper**          | `Task(subagent_type="codebase-mapper")` (AGENT)                                            | Security-focused codebase mapping         |
-| **debugging-systematically** | `skill: "debugging-systematically"` (CORE)                                                 | When research results don't match reality |
+| Skill                              | Access Method                                                                              | Purpose                                   |
+| ---------------------------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| `orchestrating-research` (LIBRARY) | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`                   | Orchestrator for all research types       |
+| **researching-context7**           | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)           | Library/framework documentation           |
+| **researching-arxiv**              | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)              | Academic papers and research              |
+| **creating-skills**                | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY) | Skill creation workflow (invokes this)    |
+| **updating-skills**                | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY) | Skill update workflow (may invoke this)   |
+| **Explore agent**                  | `Task(subagent_type="Explore")` (NATIVE AGENT)                                             | Implementation-focused pattern discovery  |
+| **codebase-mapper**                | `Task(subagent_type="codebase-mapper")` (AGENT)                                            | Security-focused codebase mapping         |
+| **debugging-systematically**       | `skill: "debugging-systematically"` (CORE)                                                 | When research results don't match reality |
 
 ---
 

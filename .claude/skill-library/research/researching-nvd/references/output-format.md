@@ -18,6 +18,7 @@
 ### Executive Summary
 
 {2-3 paragraphs summarizing:}
+
 - Number of CVEs found
 - CVSS severity distribution
 - Key affected products
@@ -76,38 +77,39 @@
 
 #### CVSS Severity Distribution
 
-| CVSS Severity | Count | Percentage | Action Required      |
-| ------------- | ----- | ---------- | -------------------- |
-| CRITICAL      | X     | X%         | Immediate patching   |
-| HIGH          | X     | X%         | Urgent patching      |
-| MEDIUM        | X     | X%         | Standard timeline    |
-| LOW           | X     | X%         | Low priority         |
+| CVSS Severity | Count | Percentage | Action Required    |
+| ------------- | ----- | ---------- | ------------------ |
+| CRITICAL      | X     | X%         | Immediate patching |
+| HIGH          | X     | X%         | Urgent patching    |
+| MEDIUM        | X     | X%         | Standard timeline  |
+| LOW           | X     | X%         | Low priority       |
 
 #### CWE Distribution
 
-| CWE ID  | Weakness Type            | Count | Notes                |
-| ------- | ------------------------ | ----- | -------------------- |
-| CWE-79  | Cross-site Scripting     | X     | Client-side attacks  |
-| CWE-89  | SQL Injection            | X     | Database attacks     |
-| CWE-787 | Out-of-bounds Write      | X     | Memory corruption    |
+| CWE ID  | Weakness Type        | Count | Notes               |
+| ------- | -------------------- | ----- | ------------------- |
+| CWE-79  | Cross-site Scripting | X     | Client-side attacks |
+| CWE-89  | SQL Injection        | X     | Database attacks    |
+| CWE-787 | Out-of-bounds Write  | X     | Memory corruption   |
 
 #### Affected Product Families
 
-| Vendor     | Product       | Versions Affected | CVE Count |
-| ---------- | ------------- | ----------------- | --------- |
-| {Vendor 1} | {Product 1}   | {X.X - Y.Y}       | X         |
-| {Vendor 2} | {Product 2}   | {All versions}    | X         |
+| Vendor     | Product     | Versions Affected | CVE Count |
+| ---------- | ----------- | ----------------- | --------- |
+| {Vendor 1} | {Product 1} | {X.X - Y.Y}       | X         |
+| {Vendor 2} | {Product 2} | {All versions}    | X         |
 
 #### CISA KEV Cross-Reference
 
 **CVEs In KEV Catalog:** {count} ({percentage}%)
 
-| CVE ID           | CVSS | KEV Date Added | Due Date   | Priority |
-| ---------------- | ---- | -------------- | ---------- | -------- |
-| CVE-YYYY-000001  | 9.8  | 2024-MM-DD     | 2024-MM-DD | P0       |
-| CVE-YYYY-000002  | 8.1  | 2024-MM-DD     | 2024-MM-DD | P1       |
+| CVE ID          | CVSS | KEV Date Added | Due Date   | Priority |
+| --------------- | ---- | -------------- | ---------- | -------- |
+| CVE-YYYY-000001 | 9.8  | 2024-MM-DD     | 2024-MM-DD | P0       |
+| CVE-YYYY-000002 | 8.1  | 2024-MM-DD     | 2024-MM-DD | P1       |
 
 **CVEs Not In KEV:** {count} ({percentage}%)
+
 - No confirmed exploitation per CISA
 - Monitor for KEV addition
 - Lower priority unless high CVSS + exposure
@@ -116,15 +118,16 @@
 
 ### Prioritization Matrix
 
-| Priority | CVE ID           | CVSS | KEV Status | Rationale                              |
-| -------- | ---------------- | ---- | ---------- | -------------------------------------- |
-| P0       | CVE-YYYY-000001  | 9.8  | In KEV     | Critical + Actively exploited          |
-| P0       | CVE-YYYY-000002  | 9.3  | In KEV     | Critical + KEV = emergency             |
-| P1       | CVE-YYYY-000003  | 8.1  | In KEV     | High + Exploited = urgent              |
-| P2       | CVE-YYYY-000004  | 9.1  | Not in KEV | Critical but no exploitation confirmed |
-| P3       | CVE-YYYY-000005  | 7.5  | Not in KEV | High severity, monitor for KEV         |
+| Priority | CVE ID          | CVSS | KEV Status | Rationale                              |
+| -------- | --------------- | ---- | ---------- | -------------------------------------- |
+| P0       | CVE-YYYY-000001 | 9.8  | In KEV     | Critical + Actively exploited          |
+| P0       | CVE-YYYY-000002 | 9.3  | In KEV     | Critical + KEV = emergency             |
+| P1       | CVE-YYYY-000003 | 8.1  | In KEV     | High + Exploited = urgent              |
+| P2       | CVE-YYYY-000004 | 9.1  | Not in KEV | Critical but no exploitation confirmed |
+| P3       | CVE-YYYY-000005 | 7.5  | Not in KEV | High severity, monitor for KEV         |
 
 **Priority Legend:**
+
 - **P0 (Critical):** CVSS ≥9.0 AND In KEV - Immediate action
 - **P1 (High):** CVSS ≥7.0 AND In KEV - Urgent (24-48 hours)
 - **P2 (Medium):** CVSS ≥9.0 AND Not in KEV - High priority
@@ -138,6 +141,7 @@
 #### Existing Coverage
 
 {List capabilities/detections already in place:}
+
 - Nuclei Template 1: Covers CVE-YYYY-NNNNN
 - VQL Capability 2: Detects CWE-79 patterns
 - Scanner Config 3: Identifies affected versions
@@ -192,6 +196,7 @@
 ### Related CVEs
 
 {Optional: List related CVEs not yet assigned CVSS or in analysis:}
+
 - **CVE-YYYY-NNNNN:** Related to {primary CVE}, pending analysis
 - **CVE-YYYY-NNNNN:** Same product family, monitor status
 

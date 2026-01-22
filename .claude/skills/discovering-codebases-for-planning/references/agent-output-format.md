@@ -15,6 +15,7 @@ discovery-{component-name}.md
 **Component name**: Derived from path, kebab-case
 
 **Examples**:
+
 - `modules/chariot/ui/src/features/metrics` → `discovery-metrics-frontend.md`
 - `modules/chariot/backend/pkg/metrics` → `discovery-metrics-backend.md`
 - `modules/janus/pkg/scanner` → `discovery-janus-scanner.md`
@@ -54,6 +55,7 @@ Every discovery report MUST include these sections (even if empty):
 **Tech Stack**: React 19, TypeScript, TanStack Query, Recharts
 
 **Dependencies**:
+
 - `src/hooks/useMetrics.ts` (data fetching)
 - `src/utils/formatters.ts` (date/number formatting)
 - `src/components/charts/` (shared chart components)
@@ -68,6 +70,7 @@ Every discovery report MUST include these sections (even if empty):
 **Format**: Markdown table
 
 **Columns**:
+
 1. Name (function/class/component name)
 2. Location (file path + function/class name, NO line numbers)
 3. Current Purpose (what it does now)
@@ -78,11 +81,11 @@ Every discovery report MUST include these sections (even if empty):
 ```markdown
 ## 2. Existing Code to Extend
 
-| Name                  | Location                     | Current Purpose                      | Extension Point                        |
-| --------------------- | ---------------------------- | ------------------------------------ | -------------------------------------- |
-| MetricsDashboard      | Dashboard.tsx - MetricsDashboard component | Display vulnerability trends        | Add filter controls for date ranges    |
-| useMetrics            | hooks/useMetrics.ts - useMetrics hook      | Fetch metrics from API               | Add parameters for filtering           |
-| getMetricsHandler     | backend/pkg/metrics/handlers/get_metrics.go - GetMetricsHandler func | Return all metrics         | Add query string parsing for filters   |
+| Name              | Location                                                             | Current Purpose              | Extension Point                      |
+| ----------------- | -------------------------------------------------------------------- | ---------------------------- | ------------------------------------ |
+| MetricsDashboard  | Dashboard.tsx - MetricsDashboard component                           | Display vulnerability trends | Add filter controls for date ranges  |
+| useMetrics        | hooks/useMetrics.ts - useMetrics hook                                | Fetch metrics from API       | Add parameters for filtering         |
+| getMetricsHandler | backend/pkg/metrics/handlers/get_metrics.go - GetMetricsHandler func | Return all metrics           | Add query string parsing for filters |
 ```
 
 **If no code to extend**:
@@ -100,6 +103,7 @@ No existing code identified for extension. This is a greenfield component.
 **Format**: Markdown table
 
 **Columns**:
+
 1. Name (function name)
 2. Location (file path + function name)
 3. Signature (function signature with types)
@@ -110,12 +114,12 @@ No existing code identified for extension. This is a greenfield component.
 ```markdown
 ## 3. Utilities to Reuse
 
-| Name              | Location                              | Signature                                  | Use Case                                |
-| ----------------- | ------------------------------------- | ------------------------------------------ | --------------------------------------- |
-| formatDate        | utils/formatters.ts - formatDate      | `(date: Date, format?: string) => string`  | Format all timestamps in dashboard      |
-| formatNumber      | utils/formatters.ts - formatNumber    | `(num: number, decimals?: number) => string` | Format metric values (e.g., 1.2K)      |
-| useDebounce       | hooks/useDebounce.ts - useDebounce    | `<T>(value: T, delay: number) => T`        | Debounce filter input changes           |
-| apiClient         | lib/api.ts - apiClient                | `{ get, post, put, delete }`               | All API calls - don't create new client |
+| Name         | Location                           | Signature                                    | Use Case                                |
+| ------------ | ---------------------------------- | -------------------------------------------- | --------------------------------------- |
+| formatDate   | utils/formatters.ts - formatDate   | `(date: Date, format?: string) => string`    | Format all timestamps in dashboard      |
+| formatNumber | utils/formatters.ts - formatNumber | `(num: number, decimals?: number) => string` | Format metric values (e.g., 1.2K)       |
+| useDebounce  | hooks/useDebounce.ts - useDebounce | `<T>(value: T, delay: number) => T`          | Debounce filter input changes           |
+| apiClient    | lib/api.ts - apiClient             | `{ get, post, put, delete }`                 | All API calls - don't create new client |
 ```
 
 **If no utilities to reuse**:
@@ -133,6 +137,7 @@ No shared utilities identified. Consider extracting common patterns if duplicati
 **Format**: Markdown table
 
 **Columns**:
+
 1. Pattern (pattern name/description)
 2. Description (what the pattern enforces)
 3. Example Location (where it's demonstrated)
@@ -142,13 +147,13 @@ No shared utilities identified. Consider extracting common patterns if duplicati
 ```markdown
 ## 4. Patterns to Follow
 
-| Pattern                  | Description                                                                 | Example Location                          |
-| ------------------------ | --------------------------------------------------------------------------- | ----------------------------------------- |
-| Feature-based organization | All feature code (components, hooks, utils) colocates in `features/X/` | `features/metrics/`, `features/assets/` |
-| TanStack Query for API    | Use `useQuery` for GET, `useMutation` for POST/PUT/DELETE                   | `hooks/useMetrics.ts`, `hooks/useAssets.ts` |
-| Barrel exports            | Each feature exports via `index.ts` barrel                                  | `features/metrics/index.ts`               |
-| Component file structure  | One component per file, matching filename (PascalCase)                      | `Dashboard.tsx` exports `MetricsDashboard` |
-| Error boundaries          | Wrap async components with React Suspense + ErrorBoundary                   | `App.tsx` - Suspense wrapper pattern      |
+| Pattern                    | Description                                                            | Example Location                            |
+| -------------------------- | ---------------------------------------------------------------------- | ------------------------------------------- |
+| Feature-based organization | All feature code (components, hooks, utils) colocates in `features/X/` | `features/metrics/`, `features/assets/`     |
+| TanStack Query for API     | Use `useQuery` for GET, `useMutation` for POST/PUT/DELETE              | `hooks/useMetrics.ts`, `hooks/useAssets.ts` |
+| Barrel exports             | Each feature exports via `index.ts` barrel                             | `features/metrics/index.ts`                 |
+| Component file structure   | One component per file, matching filename (PascalCase)                 | `Dashboard.tsx` exports `MetricsDashboard`  |
+| Error boundaries           | Wrap async components with React Suspense + ErrorBoundary              | `App.tsx` - Suspense wrapper pattern        |
 ```
 
 **If no patterns to follow**:
@@ -179,6 +184,7 @@ No established patterns identified. Recommend following industry best practices 
 **Rationale**: Existing metrics components follow feature-based organization. All metrics-related UI colocates here for easy discovery and maintenance.
 
 **Naming**: Use PascalCase, descriptive names matching component purpose:
+
 - ✅ `MetricsDashboardFilter.tsx`
 - ✅ `MetricsTrendChart.tsx`
 - ❌ `Filter.tsx` (too generic)
@@ -186,18 +192,21 @@ No established patterns identified. Recommend following industry best practices 
 ### New Custom Hooks
 
 **Recommendation**:
+
 - Feature-specific hooks → `features/metrics/hooks/`
 - Reusable across features → `hooks/`
 
 **Rationale**: Keep domain logic close to components. Only promote to shared `hooks/` if 2+ features use it.
 
 **Naming**: Prefix with `use`, camelCase:
+
 - ✅ `useMetricsFilter.ts`
 - ✅ `useMetricsExport.ts`
 
 ### New Utilities
 
 **Recommendation**:
+
 - Metrics-specific → `features/metrics/utils/`
 - Generic formatters/validators → `utils/`
 
@@ -257,6 +266,7 @@ npx prettier --write discovery-*.md
 ```
 
 **Before**:
+
 ```
 | Name | Location | Purpose |
 |---|---|---|
@@ -264,6 +274,7 @@ npx prettier --write discovery-*.md
 ```
 
 **After**:
+
 ```
 | Name | Location | Purpose |
 | ---- | -------- | ------- |
@@ -273,11 +284,13 @@ npx prettier --write discovery-*.md
 ### Code Reference Pattern
 
 **❌ NEVER use line numbers**:
+
 ```
 Dashboard.tsx:45-67
 ```
 
 **✅ ALWAYS use function/class names**:
+
 ```
 Dashboard.tsx - MetricsDashboard component
 utils.ts - formatDate function
@@ -311,6 +324,7 @@ See [examples/agent-reports/](../examples/agent-reports/) for complete examples:
 - `discovery-janus-scanner.md` - Security scanner integration (greenfield)
 
 Each example demonstrates:
+
 - Complete section coverage
 - Proper table formatting
 - Specific, actionable findings

@@ -24,6 +24,7 @@ Enable granular agent access control for Ghidra reverse engineering operations v
 **730 tests, 97.2% coverage** - All 36 wrappers comprehensively tested and production-ready.
 
 **Test Distribution:**
+
 - Min tests per wrapper: 18
 - Max tests per wrapper: 25
 - Avg tests per wrapper: 20.3
@@ -108,16 +109,17 @@ Interact with Ghidra UI state.
 
 - **xrefs-list** - List cross-references with filtering (to/from/type)
 
-
 ## Architecture Highlights
 
 **DRY Design:**
+
 - Shared utilities (`utils.ts`): Address validation, sanitization, error handling, token estimation
 - Shared schemas (`shared-schemas.ts`): Common Zod validators (ports, addresses, names)
 - Centralized error handling: Single `handleMCPError()` function for all wrappers
 - Token reduction: 80%+ reduction through response filtering
 
 **Security:**
+
 - Input validation with Zod schemas
 - XSS protection (sanitize names, comments)
 - Path traversal protection
@@ -129,6 +131,7 @@ Interact with Ghidra UI state.
 See mcp-tools-registry for complete Bash + tsx execution patterns.
 
 **List Ghidra instances:**
+
 ```bash
 npx tsx -e "(async () => {
   const { instancesList } = await import('./.claude/tools/ghydra/instances-list.ts');
@@ -138,6 +141,7 @@ npx tsx -e "(async () => {
 ```
 
 **Decompile a function:**
+
 ```bash
 npx tsx -e "(async () => {
   const { functionsDecompile } = await import('./.claude/tools/ghydra/functions-decompile.ts');
@@ -147,6 +151,7 @@ npx tsx -e "(async () => {
 ```
 
 **Get call graph:**
+
 ```bash
 npx tsx -e "(async () => {
   const { analysisGetCallgraph } = await import('./.claude/tools/ghydra/analysis-get-callgraph.ts');
@@ -158,6 +163,7 @@ npx tsx -e "(async () => {
 ## Common Use Cases
 
 **Malware Analysis Workflow:**
+
 1. `instances-list` - Find available Ghidra instances
 2. `instances-use` - Set active instance
 3. `functions-list` - Find suspicious functions
@@ -166,6 +172,7 @@ npx tsx -e "(async () => {
 6. `analysis-get-callgraph` - Map execution flow
 
 **Binary Reverse Engineering:**
+
 1. `data-list-strings` - Find interesting strings
 2. `functions-get` - Analyze entry points
 3. `structs-list` - Examine data structures
@@ -181,11 +188,13 @@ npx tsx -e "(async () => {
 ## Import Paths
 
 All wrappers follow the pattern:
+
 ```typescript
-import { toolName } from './.claude/tools/ghydra/tool-name.ts';
+import { toolName } from "./.claude/tools/ghydra/tool-name.ts";
 ```
 
 Example imports:
+
 - `instancesList` from `instances-list.ts`
 - `functionsDecompile` from `functions-decompile.ts`
 - `memoryRead` from `memory-read.ts`

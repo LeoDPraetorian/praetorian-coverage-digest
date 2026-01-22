@@ -72,8 +72,8 @@ agents:
 synthesis:
   status: "pending|complete|failed"
   output_file: "final/..."
-  coverage_percent: n  # For verify mode
-  gaps: ["..."]        # For verify mode
+  coverage_percent: n # For verify mode
+  gaps: ["..."] # For verify mode
   notes: "..."
 ```
 
@@ -266,9 +266,11 @@ Each agent writes output in mode-specific format.
 ## Section 1: Architecture and Data Flow (lines 1-1385)
 
 **Key Findings:**
+
 - [Bullet points from section 1 agent]
 
 **Cross-references:**
+
 - [Links to other sections]
 
 ---
@@ -316,6 +318,7 @@ Each agent writes output in mode-specific format.
 ## Section Details
 
 ### 01-ARCHITECTURE.md
+
 - **Lines:** 1-1385
 - **Word Count:** 2,847
 - **Topics:** System components, trust boundaries, data flow
@@ -344,13 +347,13 @@ Each agent writes output in mode-specific format.
 
 ## Overall Coverage
 
-| Section | File                | Coverage | Status           |
-| ------- | ------------------- | -------- | ---------------- |
-| 1       | 01-ARCHITECTURE.md  | 96%      | Minor gaps       |
-| 2       | 02-SCM-FLOW.md      | 100%     | Complete         |
-| 3       | 03-COMPONENTS.md    | 95%      | Minor gaps       |
-| 4       | 04-SECURITY.md      | 100%     | Complete         |
-| 5       | 05-DEPLOYMENT.md    | 97%      | Minor gaps       |
+| Section | File               | Coverage | Status     |
+| ------- | ------------------ | -------- | ---------- |
+| 1       | 01-ARCHITECTURE.md | 96%      | Minor gaps |
+| 2       | 02-SCM-FLOW.md     | 100%     | Complete   |
+| 3       | 03-COMPONENTS.md   | 95%      | Minor gaps |
+| 4       | 04-SECURITY.md     | 100%     | Complete   |
+| 5       | 05-DEPLOYMENT.md   | 97%      | Minor gaps |
 
 **Total Coverage:** 97.6%
 
@@ -359,6 +362,7 @@ Each agent writes output in mode-specific format.
 ## Gaps Identified
 
 ### Section 1: 01-ARCHITECTURE.md
+
 - **Missing:** Diagram ASCII art (lines 234-256)
 - **Impact:** Visual representation lost, textual description preserved
 - **Recommendation:** Manually review and recreate diagram

@@ -108,12 +108,14 @@ req.SetBasicAuth("", pat) // Empty username, PAT as password
 ### Storage Best Practices
 
 **❌ Never:**
+
 - Hardcode PATs in source code
 - Commit PATs to version control
 - Share PATs between team members
 - Use PATs with "Full access" scope
 
 **✅ Always:**
+
 - Store in environment variables or Azure Key Vault
 - Set shortest acceptable expiration (≤90 days)
 - Use minimum required scopes (least privilege)
@@ -184,38 +186,38 @@ connection := azuredevops.NewPatConnection(orgURL, token.Token)
 
 ### PAT Security
 
-| Practice | Implementation |
-|----------|----------------|
-| Secure Storage | Azure Key Vault, environment variables |
-| Expiration | ≤90 days (Microsoft recommendation) |
-| Scope | Minimum required (Code Read, NOT Full Access) |
-| Monitoring | Azure DevOps audit logs, track usage |
-| Rotation | Automate renewal before expiration |
-| Revocation | Immediate on compromise or employee departure |
+| Practice       | Implementation                                |
+| -------------- | --------------------------------------------- |
+| Secure Storage | Azure Key Vault, environment variables        |
+| Expiration     | ≤90 days (Microsoft recommendation)           |
+| Scope          | Minimum required (Code Read, NOT Full Access) |
+| Monitoring     | Azure DevOps audit logs, track usage          |
+| Rotation       | Automate renewal before expiration            |
+| Revocation     | Immediate on compromise or employee departure |
 
 ### OIDF Security
 
-| Practice | Implementation |
-|----------|----------------|
-| Federated Credential | Restrict to specific repos/branches |
-| Token Lifetime | Short-lived (1 hour) - no rotation needed |
-| Audience | Scope to specific Azure DevOps organizations |
-| MFA | Enforce on Entra ID application |
-| Conditional Access | Geographic restrictions, device compliance |
+| Practice             | Implementation                               |
+| -------------------- | -------------------------------------------- |
+| Federated Credential | Restrict to specific repos/branches          |
+| Token Lifetime       | Short-lived (1 hour) - no rotation needed    |
+| Audience             | Scope to specific Azure DevOps organizations |
+| MFA                  | Enforce on Entra ID application              |
+| Conditional Access   | Geographic restrictions, device compliance   |
 
 ---
 
 ## Comparison Matrix
 
-| Feature | OIDF | PAT | OAuth 2.0 | Service Principal |
-|---------|------|-----|-----------|-------------------|
-| Setup Complexity | Medium | Low | High | Medium |
-| Security | Excellent | Good | Deprecated | Fair |
-| Secret Management | None (tokens) | Manual | Manual | Manual |
-| Token Lifetime | 1 hour | Up to 1 year | Varies | Client secret |
-| Auto-Rotation | Yes | No | No | No |
-| Production Ready | ✅ Yes | ⚠️ Limited | ❌ No | ⚠️ Legacy |
-| Microsoft Recommendation | ✅ | ⚠️ Dev only | ❌ Migrate | ⚠️ Migrate to OIDF |
+| Feature                  | OIDF          | PAT          | OAuth 2.0  | Service Principal  |
+| ------------------------ | ------------- | ------------ | ---------- | ------------------ |
+| Setup Complexity         | Medium        | Low          | High       | Medium             |
+| Security                 | Excellent     | Good         | Deprecated | Fair               |
+| Secret Management        | None (tokens) | Manual       | Manual     | Manual             |
+| Token Lifetime           | 1 hour        | Up to 1 year | Varies     | Client secret      |
+| Auto-Rotation            | Yes           | No           | No         | No                 |
+| Production Ready         | ✅ Yes        | ⚠️ Limited   | ❌ No      | ⚠️ Legacy          |
+| Microsoft Recommendation | ✅            | ⚠️ Dev only  | ❌ Migrate | ⚠️ Migrate to OIDF |
 
 ---
 
@@ -224,16 +226,19 @@ connection := azuredevops.NewPatConnection(orgURL, token.Token)
 ### From PATs to OIDF
 
 **Week 1-2:**
+
 - Set up Entra ID application registration
 - Configure federated credentials for CI/CD environment
 - Test OIDF authentication in non-production
 
 **Week 3-4:**
+
 - Migrate dev/staging environments to OIDF
 - Update deployment pipelines
 - Monitor for authentication failures
 
 **Week 5-6:**
+
 - Migrate production to OIDF
 - Revoke PATs
 - Document OIDF setup for team
@@ -241,14 +246,17 @@ connection := azuredevops.NewPatConnection(orgURL, token.Token)
 ### From Service Principals to OIDF
 
 **Week 1:**
+
 - Audit existing service principals
 - Identify Azure DevOps integrations using service principals
 
 **Week 2-3:**
+
 - Create OIDF federated credentials for each integration
 - Test in parallel with existing service principals
 
 **Week 4:**
+
 - Switch to OIDF
 - Delete client secrets
 - Monitor for issues

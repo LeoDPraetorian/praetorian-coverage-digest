@@ -816,13 +816,7 @@ interface TelemetryEvent {
   timestamp: string;
   session_id: string;
   engineer_id_hash: string;
-  event_type:
-    | "prompt"
-    | "response"
-    | "tool_call"
-    | "tool_result"
-    | "edit"
-    | "rating";
+  event_type: "prompt" | "response" | "tool_call" | "tool_result" | "edit" | "rating";
 
   content: {
     role: "user" | "assistant";
@@ -864,11 +858,7 @@ class TelemetryBuffer {
   private readonly flushIntervalMs: number;
   private readonly uploadEndpoint: string;
 
-  constructor(
-    uploadEndpoint: string,
-    maxSize = 100,
-    flushIntervalMs = 5 * 60 * 1000
-  ) {
+  constructor(uploadEndpoint: string, maxSize = 100, flushIntervalMs = 5 * 60 * 1000) {
     this.uploadEndpoint = uploadEndpoint;
     this.maxSize = maxSize;
     this.flushIntervalMs = flushIntervalMs;

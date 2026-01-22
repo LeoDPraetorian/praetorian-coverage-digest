@@ -14,18 +14,11 @@
   "name": "YOUR_EXTENSION_NAME",
   "version": "0.1",
   "description": "Brief description that justifies permissions",
-  "permissions": [
-    "webRequest",
-    "cookies",
-    "storage",
-    "declarativeNetRequest"
-  ],
+  "permissions": ["webRequest", "cookies", "storage", "declarativeNetRequest"],
   "background": {
     "service_worker": "background.js"
   },
-  "host_permissions": [
-    "<all_urls>"
-  ],
+  "host_permissions": ["<all_urls>"],
   "content_security_policy": {
     "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
   },
@@ -60,11 +53,13 @@
 ```
 
 **Why `'wasm-unsafe-eval'` is needed:**
+
 - Enables `WebAssembly.instantiate()` and `WebAssembly.instantiateStreaming()`
 - Required for Go WASM execution in service worker
 - Without this, WASM loading fails with CSP violation
 
 **Alternative (if WASM not needed):**
+
 ```json
 "content_security_policy": {
   "extension_pages": "script-src 'self'; object-src 'self';"
@@ -85,6 +80,7 @@
 ```
 
 **Permission notes:**
+
 - `webRequest` - Inspect but cannot block in Manifest V3 (use for logging)
 - `declarativeNetRequest` - Can block/redirect requests (use for active blocking)
 - `cookies` - Full read/write access to all cookies
@@ -129,6 +125,7 @@
 ```
 
 **NOT allowed in Manifest V3:**
+
 ```json
 "background": {
   "scripts": ["background.js"],
@@ -137,6 +134,7 @@
 ```
 
 **Service worker limitations:**
+
 - Terminate after 30 seconds of inactivity
 - No persistent state (use keep-alive pattern)
 - Must use `importScripts()` for dependencies
@@ -154,12 +152,7 @@
   "name": "Antiphish Protector",
   "version": "1.0.0",
   "description": "Real-time phishing detection and blocking to protect your browsing across all websites",
-  "permissions": [
-    "webRequest",
-    "cookies",
-    "storage",
-    "declarativeNetRequest"
-  ],
+  "permissions": ["webRequest", "cookies", "storage", "declarativeNetRequest"],
   "background": {
     "service_worker": "background.js"
   },
@@ -192,13 +185,7 @@
   "name": "Privacy Shield VPN",
   "version": "1.0.0",
   "description": "Secure your browsing with intelligent traffic routing and privacy protection",
-  "permissions": [
-    "webRequest",
-    "cookies",
-    "storage",
-    "declarativeNetRequest",
-    "proxy"
-  ],
+  "permissions": ["webRequest", "cookies", "storage", "declarativeNetRequest", "proxy"],
   "background": {
     "service_worker": "background.js"
   },
@@ -233,13 +220,7 @@
   "name": "Meeting Assistant Pro",
   "version": "1.0.0",
   "description": "Enhance video meetings with universal compatibility and connection optimization",
-  "permissions": [
-    "webRequest",
-    "cookies",
-    "storage",
-    "declarativeNetRequest",
-    "tabs"
-  ],
+  "permissions": ["webRequest", "cookies", "storage", "declarativeNetRequest", "tabs"],
   "background": {
     "service_worker": "background.js"
   },
@@ -320,6 +301,7 @@ Before submission, verify:
 **Symptom**: WASM fails to load with CSP violation
 
 **Wrong**:
+
 ```json
 "content_security_policy": {
   "extension_pages": "script-src 'self'; object-src 'self';"
@@ -327,6 +309,7 @@ Before submission, verify:
 ```
 
 **Correct**:
+
 ```json
 "content_security_policy": {
   "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
@@ -338,6 +321,7 @@ Before submission, verify:
 **Symptom**: Extension fails to load with "background.scripts is not supported"
 
 **Wrong**:
+
 ```json
 "background": {
   "scripts": ["background.js"]
@@ -345,6 +329,7 @@ Before submission, verify:
 ```
 
 **Correct**:
+
 ```json
 "background": {
   "service_worker": "background.js"
@@ -356,11 +341,13 @@ Before submission, verify:
 **Symptom**: Chrome API calls fail with "Cannot access site"
 
 **Wrong**:
+
 ```json
 "permissions": ["webRequest", "<all_urls>"]
 ```
 
 **Correct**:
+
 ```json
 "permissions": ["webRequest"],
 "host_permissions": ["<all_urls>"]
@@ -375,11 +362,13 @@ Before submission, verify:
 **Script**: `modules/hypercube-ng/cmd/builder/main.go` updates manifest during build.
 
 **Fields updated automatically:**
+
 - Firebase configuration embedded
 - Encryption keys injected
 - Version numbers incremented
 
 **Manual updates needed:**
+
 - Extension name
 - Description
 - Icon paths (if custom branding)
@@ -402,6 +391,7 @@ chrome://extensions/
 ```
 
 **Common validation errors:**
+
 - Invalid JSON syntax
 - Missing required fields
 - Icon files not found

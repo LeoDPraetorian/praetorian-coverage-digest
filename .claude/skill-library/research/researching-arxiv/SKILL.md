@@ -428,7 +428,7 @@ When selecting papers, look for:
 This skill is invoked during research orchestration via `orchestrating-research`:
 
 ```
-skill: "orchestrating-research"
+Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
 ```
 
 Research orchestration typically delegates to:
@@ -477,9 +477,9 @@ Before completing research:
 
 ## Related Skills
 
-| Skill                    | Purpose                                         |
-| ------------------------ | ----------------------------------------------- |
-| `orchestrating-research` | Orchestrator delegating to this skill (CORE)    |
-| `researching-protocols`  | Sibling skill for network protocol research     |
-| `creating-skills`        | Uses research orchestration in Phase 6          |
-| `updating-skills`        | Uses research orchestration when adding content |
+| Skill                              | Purpose                                                                                                          |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `orchestrating-research` (LIBRARY) | Orchestrator delegating to this skill - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `researching-protocols`            | Sibling skill for network protocol research                                                                      |
+| `creating-skills`                  | Uses research orchestration in Phase 6                                                                           |
+| `updating-skills`                  | Uses research orchestration when adding content                                                                  |

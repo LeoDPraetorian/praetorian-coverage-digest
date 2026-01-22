@@ -7,57 +7,57 @@ Event handling patterns for Sigma.js interactions.
 ### Node Events
 
 ```typescript
-sigma.on('enterNode', ({ node }) => {
-  console.log('Mouse entered node:', node);
+sigma.on("enterNode", ({ node }) => {
+  console.log("Mouse entered node:", node);
 });
 
-sigma.on('leaveNode', ({ node }) => {
-  console.log('Mouse left node:', node);
+sigma.on("leaveNode", ({ node }) => {
+  console.log("Mouse left node:", node);
 });
 
-sigma.on('clickNode', ({ node, event }) => {
-  console.log('Clicked node:', node);
+sigma.on("clickNode", ({ node, event }) => {
+  console.log("Clicked node:", node);
   event.preventSigmaDefault(); // Prevent camera behavior
 });
 
-sigma.on('doubleClickNode', ({ node }) => {
-  console.log('Double-clicked node:', node);
+sigma.on("doubleClickNode", ({ node }) => {
+  console.log("Double-clicked node:", node);
 });
 
-sigma.on('rightClickNode', ({ node }) => {
-  console.log('Right-clicked node:', node);
+sigma.on("rightClickNode", ({ node }) => {
+  console.log("Right-clicked node:", node);
 });
 ```
 
 ### Stage Events (Background)
 
 ```typescript
-sigma.on('clickStage', ({ event }) => {
-  console.log('Clicked background');
+sigma.on("clickStage", ({ event }) => {
+  console.log("Clicked background");
 });
 
-sigma.on('doubleClickStage', () => {
-  console.log('Double-clicked background');
+sigma.on("doubleClickStage", () => {
+  console.log("Double-clicked background");
 });
 
-sigma.on('rightClickStage', () => {
-  console.log('Right-clicked background');
+sigma.on("rightClickStage", () => {
+  console.log("Right-clicked background");
 });
 ```
 
 ### Edge Events
 
 ```typescript
-sigma.on('enterEdge', ({ edge }) => {
-  console.log('Mouse entered edge:', edge);
+sigma.on("enterEdge", ({ edge }) => {
+  console.log("Mouse entered edge:", edge);
 });
 
-sigma.on('leaveEdge', ({ edge }) => {
-  console.log('Mouse left edge:', edge);
+sigma.on("leaveEdge", ({ edge }) => {
+  console.log("Mouse left edge:", edge);
 });
 
-sigma.on('clickEdge', ({ edge }) => {
-  console.log('Clicked edge:', edge);
+sigma.on("clickEdge", ({ edge }) => {
+  console.log("Clicked edge:", edge);
 });
 ```
 
@@ -68,31 +68,28 @@ sigma.on('clickEdge', ({ edge }) => {
 **Solution:** Use state with stable event handlers:
 
 ```typescript
-import { useState, useEffect, useCallback } from 'react';
-import { useSigma } from '@react-sigma/core';
+import { useState, useEffect, useCallback } from "react";
+import { useSigma } from "@react-sigma/core";
 
 export const useNodeHover = () => {
   const sigma = useSigma();
   const [hoveredNode, setHoveredNode] = useState<string | null>(null);
 
-  const handleEnterNode = useCallback(
-    ({ node }: { node: string }) => {
-      setHoveredNode(node);
-    },
-    []
-  );
+  const handleEnterNode = useCallback(({ node }: { node: string }) => {
+    setHoveredNode(node);
+  }, []);
 
   const handleLeaveNode = useCallback(() => {
     setHoveredNode(null);
   }, []);
 
   useEffect(() => {
-    sigma.on('enterNode', handleEnterNode);
-    sigma.on('leaveNode', handleLeaveNode);
+    sigma.on("enterNode", handleEnterNode);
+    sigma.on("leaveNode", handleLeaveNode);
 
     return () => {
-      sigma.off('enterNode', handleEnterNode);
-      sigma.off('leaveNode', handleLeaveNode);
+      sigma.off("enterNode", handleEnterNode);
+      sigma.off("leaveNode", handleLeaveNode);
     };
   }, [sigma, handleEnterNode, handleLeaveNode]);
 
@@ -109,37 +106,34 @@ export const useNodeSelection = () => {
   const sigma = useSigma();
   const [selectedNodes, setSelectedNodes] = useState<Set<string>>(new Set());
 
-  const handleClickNode = useCallback(
-    ({ node, event }: { node: string; event: MouseEvent }) => {
-      event.preventSigmaDefault();
+  const handleClickNode = useCallback(({ node, event }: { node: string; event: MouseEvent }) => {
+    event.preventSigmaDefault();
 
-      setSelectedNodes((prev) => {
-        const next = new Set(prev);
-        if (next.has(node)) {
-          next.delete(node); // Toggle off
-        } else {
-          if (!event.shiftKey) {
-            next.clear(); // Clear if not shift-clicking
-          }
-          next.add(node);
+    setSelectedNodes((prev) => {
+      const next = new Set(prev);
+      if (next.has(node)) {
+        next.delete(node); // Toggle off
+      } else {
+        if (!event.shiftKey) {
+          next.clear(); // Clear if not shift-clicking
         }
-        return next;
-      });
-    },
-    []
-  );
+        next.add(node);
+      }
+      return next;
+    });
+  }, []);
 
   const handleClickStage = useCallback(() => {
     setSelectedNodes(new Set()); // Clear selection
   }, []);
 
   useEffect(() => {
-    sigma.on('clickNode', handleClickNode);
-    sigma.on('clickStage', handleClickStage);
+    sigma.on("clickNode", handleClickNode);
+    sigma.on("clickStage", handleClickStage);
 
     return () => {
-      sigma.off('clickNode', handleClickNode);
-      sigma.off('clickStage', handleClickStage);
+      sigma.off("clickNode", handleClickNode);
+      sigma.off("clickStage", handleClickStage);
     };
   }, [sigma, handleClickNode, handleClickStage]);
 
@@ -159,7 +153,7 @@ export const useHoverHighlight = () => {
     if (!hoveredNode) {
       // Reset all nodes to default state
       graph.forEachNode((node) => {
-        graph.setNodeAttribute(node, 'highlighted', false);
+        graph.setNodeAttribute(node, "highlighted", false);
       });
       sigma.refresh();
       return;
@@ -169,7 +163,7 @@ export const useHoverHighlight = () => {
     graph.forEachNode((node) => {
       const isHovered = node === hoveredNode;
       const isNeighbor = graph.hasEdge(hoveredNode, node) || graph.hasEdge(node, hoveredNode);
-      graph.setNodeAttribute(node, 'highlighted', isHovered || isNeighbor);
+      graph.setNodeAttribute(node, "highlighted", isHovered || isNeighbor);
     });
 
     sigma.refresh();
@@ -207,12 +201,12 @@ export const useContextMenu = () => {
   }, []);
 
   useEffect(() => {
-    sigma.on('rightClickNode', handleRightClickNode);
-    sigma.on('clickStage', handleClickStage);
+    sigma.on("rightClickNode", handleRightClickNode);
+    sigma.on("clickStage", handleClickStage);
 
     return () => {
-      sigma.off('rightClickNode', handleRightClickNode);
-      sigma.off('clickStage', handleClickStage);
+      sigma.off("rightClickNode", handleRightClickNode);
+      sigma.off("clickStage", handleClickStage);
     };
   }, [sigma, handleRightClickNode, handleClickStage]);
 
@@ -235,8 +229,8 @@ export const useNodeDrag = () => {
       setDraggedNode(node);
 
       const nodePos = {
-        x: graph.getNodeAttribute(node, 'x'),
-        y: graph.getNodeAttribute(node, 'y'),
+        x: graph.getNodeAttribute(node, "x"),
+        y: graph.getNodeAttribute(node, "y"),
       };
 
       const mousePos = sigma.viewportToGraph({ x: event.x, y: event.y });
@@ -253,16 +247,8 @@ export const useNodeDrag = () => {
       if (!draggedNode) return;
 
       const mousePos = sigma.viewportToGraph({ x: event.x, y: event.y });
-      graph.setNodeAttribute(
-        draggedNode,
-        'x',
-        mousePos.x - dragOffset.current.x
-      );
-      graph.setNodeAttribute(
-        draggedNode,
-        'y',
-        mousePos.y - dragOffset.current.y
-      );
+      graph.setNodeAttribute(draggedNode, "x", mousePos.x - dragOffset.current.x);
+      graph.setNodeAttribute(draggedNode, "y", mousePos.y - dragOffset.current.y);
       sigma.refresh();
     },
     [sigma, graph, draggedNode]
@@ -273,14 +259,14 @@ export const useNodeDrag = () => {
   }, []);
 
   useEffect(() => {
-    sigma.on('downNode', handleMouseDown);
-    document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    sigma.on("downNode", handleMouseDown);
+    document.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseup", handleMouseUp);
 
     return () => {
-      sigma.off('downNode', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+      sigma.off("downNode", handleMouseDown);
+      document.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseup", handleMouseUp);
     };
   }, [sigma, handleMouseDown, handleMouseMove, handleMouseUp]);
 
@@ -298,10 +284,10 @@ useEffect(() => {
     // Handle event
   };
 
-  sigma.on('event', handler);
+  sigma.on("event", handler);
 
   return () => {
-    sigma.off('event', handler);
+    sigma.off("event", handler);
   };
 }, [sigma]);
 ```
@@ -309,10 +295,10 @@ useEffect(() => {
 ## Preventing Default Behavior
 
 ```typescript
-sigma.on('clickNode', ({ node, event }) => {
+sigma.on("clickNode", ({ node, event }) => {
   event.preventSigmaDefault(); // Prevent default Sigma behavior
-  event.preventDefault();      // Prevent browser default
-  event.stopPropagation();     // Stop event bubbling
+  event.preventDefault(); // Prevent browser default
+  event.stopPropagation(); // Stop event bubbling
 });
 ```
 

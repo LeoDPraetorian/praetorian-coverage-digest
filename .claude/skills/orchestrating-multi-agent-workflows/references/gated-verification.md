@@ -39,6 +39,7 @@ Implementation Complete
 ### Context
 
 Developer implemented a new API endpoint. Need to verify:
+
 1. Does it implement all requirements from plan.md?
 2. Is the code well-structured and secure?
 
@@ -47,6 +48,7 @@ Developer implemented a new API endpoint. Need to verify:
 **Agent**: `backend-reviewer` (single)
 
 **Prompt**:
+
 ```
 Task: Verify spec compliance for CreateAsset handler
 
@@ -109,6 +111,7 @@ DELIVERABLE:
 **Agents**: `backend-reviewer` + `backend-security` (parallel)
 
 **Prompt for backend-reviewer**:
+
 ```
 Task: Code quality review for CreateAsset handler
 
@@ -136,6 +139,7 @@ DELIVERABLE:
 ```
 
 **Prompt for backend-security**:
+
 ```
 Task: Security review for CreateAsset handler
 
@@ -220,6 +224,7 @@ if quality_verdict == "CHANGES_REQUESTED" or security_verdict == "CHANGES_REQUES
 ### Context
 
 Testers implemented tests according to test plan. Need to verify:
+
 1. Does test suite cover all requirements from test-plan.md?
 2. Are tests well-written (quality)?
 
@@ -228,6 +233,7 @@ Testers implemented tests according to test plan. Need to verify:
 **Agent**: `test-lead`
 
 **Prompt**:
+
 ```
 Task: Verify test plan adherence
 
@@ -259,6 +265,7 @@ DELIVERABLE:
 **Agent**: `test-lead`
 
 **Prompt**:
+
 ```
 Task: Validate test quality
 
@@ -286,6 +293,7 @@ DELIVERABLE:
 **When NOT to use gated verification:**
 
 Architecture review doesn't benefit from two stages because:
+
 - Single-pass evaluation is sufficient
 - No separate "compliance vs quality" distinction
 - Architectural decisions are holistic
@@ -305,14 +313,14 @@ Architecture Phase
 
 ## Decision Matrix
 
-| Scenario | Use Gated? | Why |
-|----------|------------|-----|
-| Code review after implementation | **Yes** | Clear spec exists (plan.md). Separate compliance from quality. |
-| Test validation after writing tests | **Yes** | Clear spec exists (test-plan.md). Verify plan first, quality second. |
-| Architecture review | **No** | Holistic decision, no clear compliance spec. |
-| Documentation review | **Yes** if requirements doc exists | Can verify completeness before quality. |
-| Bug fix review | **No** | Small scope, single-pass sufficient. |
-| Security audit | **No** | Security is inherently holistic. |
+| Scenario                            | Use Gated?                         | Why                                                                  |
+| ----------------------------------- | ---------------------------------- | -------------------------------------------------------------------- |
+| Code review after implementation    | **Yes**                            | Clear spec exists (plan.md). Separate compliance from quality.       |
+| Test validation after writing tests | **Yes**                            | Clear spec exists (test-plan.md). Verify plan first, quality second. |
+| Architecture review                 | **No**                             | Holistic decision, no clear compliance spec.                         |
+| Documentation review                | **Yes** if requirements doc exists | Can verify completeness before quality.                              |
+| Bug fix review                      | **No**                             | Small scope, single-pass sufficient.                                 |
+| Security audit                      | **No**                             | Security is inherently holistic.                                     |
 
 ## Benefits of Gating
 
@@ -358,6 +366,7 @@ Stage 2: MAX 1 retry → Escalate
 ```
 
 **Why different limits?**
+
 - Stage 1 (compliance): May need 2 attempts to clarify ambiguous requirements
 - Stage 2 (quality): Should pass quickly if spec is right. If quality is bad, likely a deeper issue.
 
@@ -387,6 +396,7 @@ Track both stages in progress:
 ### Pitfall 1: Combining Stages
 
 **WRONG:**
+
 ```
 "Review the implementation. Check if it matches the plan AND if code quality is good."
 ```
@@ -394,6 +404,7 @@ Track both stages in progress:
 **Why wrong**: Reviewer will focus on one or the other, likely quality. Missing requirements get overlooked.
 
 **RIGHT:**
+
 ```
 Stage 1: "Does this match the plan? ONLY focus on requirements."
 Stage 2: "Code quality review. Spec compliance already confirmed."
@@ -402,6 +413,7 @@ Stage 2: "Code quality review. Spec compliance already confirmed."
 ### Pitfall 2: Skipping Stage 1
 
 **WRONG:**
+
 ```
 "The plan is simple, just do quality review."
 ```
@@ -411,6 +423,7 @@ Stage 2: "Code quality review. Spec compliance already confirmed."
 ### Pitfall 3: Running Stages in Parallel
 
 **WRONG:**
+
 ```
 // Both at once
 Task("backend-reviewer", "Spec compliance")
@@ -420,6 +433,7 @@ Task("backend-reviewer", "Code quality")
 **Why wrong**: If spec compliance fails, quality review was wasted effort.
 
 **RIGHT:**
+
 ```
 // Sequential stages
 verdict = Task("backend-reviewer", "Spec compliance")
@@ -431,11 +445,13 @@ if verdict == "COMPLIANT":
 ## Summary
 
 **Use gated verification when:**
+
 1. Clear specification exists (plan, requirements doc)
 2. Can separate "did they do what was asked?" from "did they do it well?"
 3. Multi-agent workflow with potential rework
 
 **Skip gated verification when:**
+
 1. Holistic single-pass evaluation sufficient
 2. Small scope (bug fix, typo)
 3. No clear compliance specification exists

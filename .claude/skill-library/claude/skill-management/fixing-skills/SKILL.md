@@ -1,115 +1,88 @@
 ---
 name: fixing-skills
-description: Use when audit failed - three-tier fix orchestration (deterministic/hybrid/Claude-automated) for compliance errors, Phase 26 research-based stub population, Phase 28 Integration section generation, line count extraction
+description: Use when audit failed - applies fixes based on audit output by routing to appropriate handlers (Deterministic/Hybrid/Claude-Automated/Human-Required)
 allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
 ---
 
 # Fixing Skills
 
-**Intelligent compliance remediation using three-tier fix orchestration.**
+**Intelligent compliance remediation by routing audit failures to appropriate fix handlers.**
 
-> **You MUST use TodoWrite** to track fix progress when handling multiple issues.
+<EXTREMELY-IMPORTANT>
+**You MUST use TodoWrite** to track fix progress when handling multiple issues (2+ compliance failures).
 
-**Three-tier fix model:**
+**When to use TodoWrite:**
 
-- **Deterministic**: Mechanical transformations (phases 2, 5, 6, 7, 12, 14, 19, 21)
-- **Hybrid**: Claude reasoning + confirmation (phases 4, 10, 22)
-- **Claude-Automated**: Claude reasoning only (phases 1, 3, 11, 13, 18, 20, 24, 25, 26)
-- **Validation-Only**: No auto-fix available (phases 15, 16, 17, 29)
-- **Human-Required**: Interactive guidance (phases 8, 9, 23)
+- 2+ compliance issues to fix
+- Multiple phases requiring fixes
+- Any scenario where you'd say "next I'll..." (that's a todo)
 
-**Note:** Phase 14 (table formatting) applies prettier formatting. Phases 15-17 and 29 are validation-only (code block quality, header hierarchy, prose phase references, logical coherence).
+**Red flags you're skipping TodoWrite:**
 
-See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
+- "I'll just fix these quickly"
+- "These are simple enough to track mentally"
+- "I don't need to track progress for only 3 issues"
+
+**Reality**: Untracked work has ~30% incomplete fix rate. Use TodoWrite.
+</EXTREMELY-IMPORTANT>
+
+---
+
+## What This Skill Does
+
+**This skill does NOT define phases** - it applies fixes for violations reported by auditing-skills.
+
+**Single source of truth for phases:**
+
+- Phase definitions → auditing-skills only
+- Phase categorization → See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md)
+- Fix procedures → This skill's references/ (only for complex fixes)
+
+**Workflow:**
+
+1. Run auditing-skills → get failure list
+2. Backup skill files
+3. For each failure, route to appropriate handler based on category
+4. Apply fixes
+5. Re-run auditing-skills to verify
 
 ---
 
 ## Quick Reference
 
-| Category         | Phases                                       | Handler          | User Interaction        |
-| ---------------- | -------------------------------------------- | ---------------- | ----------------------- |
-| Deterministic    | 2, 5, 6, 7, 12, 14, 19, 21                   | Claude applies   | None (auto-apply)       |
-| Hybrid           | 4, 10, 22                                    | Claude reasoning | Confirm ambiguous cases |
-| Claude-Automated | 1, 3, 11, 13, 18, 20, 24, 25, 26, 28, Crit 7 | Claude reasoning | None (Claude applies)   |
-| Validation-Only  | 15, 16, 17, 29                               | Manual only      | Report issues, no fix   |
-| Human-Required   | 8, 9, 23                                     | Interactive      | Full user guidance      |
+| Handler Category | How to Fix                                         | User Interaction      | Example Phases                                         |
+| ---------------- | -------------------------------------------------- | --------------------- | ------------------------------------------------------ |
+| Deterministic    | Claude applies mechanical transformation           | None (auto-apply)     | Allowed tools, File organization                       |
+| Hybrid           | Claude reasoning + confirmation on ambiguous cases | Confirm edge cases    | Broken links, Phantom references                       |
+| Claude-Automated | Claude applies with semantic understanding         | None (Claude decides) | Description format, Line count, Integration generation |
+| Human-Required   | Provide guidance, user implements                  | Full interaction      | TypeScript errors, Bash migration                      |
+| Validation-Only  | Report only, no auto-fix available                 | Manual resolution     | Code block quality, Logical coherence                  |
 
-**Compliance Target:**
-Fixes restore compliance with the [Skill Compliance Contract](.claude/skills/managing-skills/references/skill-compliance-contract.md).
-
----
-
-## Rationalization Prevention
-
-Skill fixing seems mechanical but has shortcuts that leave issues unresolved. Complete all steps fully.
-
-**Reference**: See [shared rationalization prevention](../../../../skills/using-skills/references/rationalization-prevention.md) for:
-
-- Statistical evidence (technical debt ~10% fix rate, 'later' ~5% completion)
-- Phrase detection patterns ('close enough', 'just this once', 'I'll fix it later')
-- Override protocol (requires AskUserQuestion with explicit risk disclosure)
-
-### Skill Fixing Rationalizations
-
-See [references/rationalization-table.md](references/rationalization-table.md) for domain-specific rationalizations.
-
-**Key principle**: If you detect rationalization phrases in your thinking, STOP. Return to the current step. Complete it fully before proceeding.
+**See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for which phases belong to each category.**
 
 ---
 
-## Workflow Overview
+## Workflow
 
-```
-1. Run Audit          → Get issues list
-2. Create Backup      → Protect against mistakes
-3. Categorize Issues  → Route to correct handler
-4. Apply Fixes:
-   a. Deterministic   → Claude applies (no confirmation)
-   b. Claude-Automated→ Claude applies (no confirmation)
-   c. Hybrid          → Claude + confirm ambiguous cases
-   d. Human-Required  → Full interactive guidance
-5. Verify Fixes       → Check changes resolve issues
-6. Update Changelog   → Document changes
-```
-
----
-
-## Step 0: Navigate to Repository Root (MANDATORY)
-
-**Execute BEFORE any fix operation:**
+### Step 1: Navigate to Repository Root (MANDATORY)
 
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
-
-**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
-
-**Statistical evidence**: ~25% of fix failures are caused by wrong working directory. The 2-second navigation check prevents 10+ minutes of debugging 'file not found' errors.
-
 **Cannot proceed without navigating to repo root** ✅
 
----
+### Step 2: Run Audit
 
-## Step 1: Run Audit
-
-Invoke the auditing-skills skill to get issues list:
+Get the failure list from auditing-skills:
 
 ```
 Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
-# Then audit the target skill
 ```
 
-**Capture findings for issue categorization.**
+Then audit the target skill. Capture ALL failures with phase numbers.
 
----
-
-## Step 2: Create Backup
-
-**🚨 MANDATORY** - See [Backup Strategy](.claude/skills/managing-skills/references/patterns/backup-strategy.md).
-
-**Statistical evidence**: ~20% of fix attempts require rollback due to unintended side effects. Backups take 2 seconds and save hours of reconstruction.
+### Step 3: Create Backup
 
 ```bash
 mkdir -p {skill-path}/.local
@@ -117,255 +90,88 @@ TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
 cp {skill-path}/SKILL.md {skill-path}/.local/${TIMESTAMP}-pre-fix.bak
 ```
 
----
+### Step 4: Categorize from Audit Output
 
-## Step 3: Categorize Issues
+Read [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) to understand which handler each failed phase uses.
 
-Based on audit output, group issues by handler:
+Group audit failures by handler:
 
 ```
-Issues found:
-  Deterministic:      Phase 2 (allowed-tools), Phase 5 (directories)
-  Claude-Automated:   Phase 1 (description), Phase 3 (line count)
-  Hybrid:             Phase 10 (phantom ref)
-  Human-Required:     Phase 8 (TypeScript errors)
+Example audit output:
+  Phase 2: Allowed tools - invalid tool "InvalidTool"
+  Phase 3: Line Count - 612 lines (exceeds 500)
+  Phase 4: Broken Links - references/missing.md not found
+  Phase 28: Integration Section - missing
+
+Categorization (from phase-categorization.md):
+  Deterministic: Phase 2
+  Claude-Automated: Phase 3, Phase 28
+  Hybrid: Phase 4
 ```
 
----
+### Step 5: Apply Fixes by Handler
 
-## Step 4a: Apply Deterministic Fixes
+For each category with failures:
 
-**Phases: 2, 5, 6, 7, 12, 14, 19, 21**
+#### 5a. Deterministic Fixes
 
-Claude applies these fixes directly using Edit tool. No confirmation needed - these are mechanical transformations with one correct answer.
+Claude applies mechanical transformations directly. No confirmation needed.
 
-**For table formatting (Phase 14):** Apply prettier formatting - see [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)
+**See phase-categorization.md for list of deterministic phases.**
 
----
+#### 5b. Claude-Automated Fixes
 
-## Step 4b: Apply Claude-Automated Fixes
+Claude applies fixes requiring semantic understanding. No human confirmation needed.
 
-**Phases: 1, 3, 11, 13, 18, 20, 24, 25, 26, 28**
+**See phase-categorization.md for list of Claude-Automated phases.**
 
-Claude applies these fixes directly using Edit tool. No human confirmation needed - these require semantic understanding but have clear correct outcomes.
+**Special fix procedures for complex phases:**
 
-**Covered phases:**
+| Phase                                 | Procedure                                                                                                                  |
+| ------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Phase 26: Reference Content Quality   | [references/phase-26-procedure.md](references/phase-26-procedure.md) - Stub population via orchestrating-research          |
+| Phase 27: Relative Path Depth         | [references/phase-27-procedure.md](references/phase-27-procedure.md) - Convert cross-skill links to `.claude/` paths       |
+| Phase 28: Integration Section         | [references/phase-28-procedure.md](references/phase-28-procedure.md) - Integration generation + skill reference validation |
+| Phase 29: Integration Semantic        | [references/phase-29-procedure.md](references/phase-29-procedure.md) - Semantic relationship validation                    |
+| Semantic Criterion 7: Phase Numbering | [references/semantic-criterion-7-procedure.md](references/semantic-criterion-7-procedure.md) - Renumber fractional phases  |
 
-- Phase 1: Description format
-- Phase 3: Line count >500
-- Phase 11: cd commands
-- Phase 13: TodoWrite missing
-- Phase 18: Orphan detection
-- Phase 20: Gateway structure
-- Phase 24: Line number references
-- Phase 25: Context7 staleness
-- Phase 26: Reference content quality (see [Phase 26 Fix Procedure](#phase-26-fix-procedure) below)
-- Phase 28: Integration section (see [Phase 28 Fix Procedure](#phase-28-fix-procedure) below)
-- **Semantic Criterion 7: Phase Numbering Hygiene** (fractional phase renumbering)
+#### 5c. Hybrid Fixes
 
-**Additional procedures:** Section organization, visual readability, example quality
+Deterministic parts applied automatically, ambiguous cases need user confirmation.
 
-### Phase 26 Fix Procedure
+**See phase-categorization.md for list of hybrid phases.**
 
-**When detected:** Genuine stubs (empty/incomplete reference files) found during semantic review
+#### 5d. Human-Required Fixes
 
-**Complete procedure:** See [references/phase-26-procedure.md](references/phase-26-procedure.md)
+Provide interactive guidance. User implements.
 
-**Summary:**
+**See phase-categorization.md for list of human-required phases.**
 
-1. Enumerate ALL stubs from audit output
-2. Ask user about research approach
-3. If yes: Set up TodoWrite with per-stub items, invoke `orchestrating-research`
-4. Populate each stub from SYNTHESIS.md (not training data)
-5. Verify all stubs have >50 lines, no placeholders
+#### 5e. Validation-Only Phases
 
-**🚨 CRITICAL: Never use training data. Always invoke orchestrating-research for verified content.**
+Cannot auto-fix. Report findings, provide manual resolution guidance.
 
-### Phase 28 Fix Procedure
+**See phase-categorization.md for list of validation-only phases.**
 
-**When detected:** Missing or incomplete Integration section
+**For Phase 30 (Logical Coherence):** See auditing-skills phase-details for manual resolution guidance.
 
-**Complete procedure:** See [references/phase-28-procedure.md](references/phase-28-procedure.md)
+#### 5f. Final Formatting
 
-**Summary:**
+After all content-generating fixes, apply table formatting:
 
-1. Analyze skill content for skill references
-2. Search for what calls this skill (Called By)
-3. Identify prerequisites (Requires)
-4. Find invoked skills (Calls)
-5. Identify conditional relationships (Pairs With)
-6. Generate and insert Integration section
+**See [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)**
 
-**Migration:** If skill has "Related Skills" but no Integration, generate Integration and optionally consolidate.
+### Step 6: Verify Fixes
 
-### Phase Numbering Hygiene Fix (Semantic Criterion 7)
-
-**When detected:** Fractional major phase numbers (Phase 3.5, Phase 5.4) found during semantic review
-
-**Fix procedure:**
-
-1. **Identify all major phases** - Scan SKILL.md and references/ for `## Phase X` or `## Step X` headings
-2. **Create renumbering map** - Example:
-   ```
-   Current: Phase 1, 2, 3, 3.5, 4, 5
-   Map:     Phase 3.5 → Phase 4
-            Phase 4   → Phase 5
-            Phase 5   → Phase 6
-   Target:  Phase 1, 2, 3, 4, 5, 6
-   ```
-3. **Update phase headings** - Use Edit tool to renumber ALL major phase headings sequentially in SKILL.md and references/
-4. **Update markdown links** - Find and update links to phase files:
-   - `[Phase 4](phase-4-file.md)` → `[Phase 5](phase-5-file.md)`
-   - Update in both SKILL.md and all reference files
-5. **Update prose references** (NEW) - For ALL files in skill directory (SKILL.md + references/\*):
-   - Find prose patterns using renumbering map:
-     - `Phase X (` → `Phase Y (` (e.g., "Phase 4 (implementation)" → "Phase 5 (implementation)")
-     - `Phase X:` → `Phase Y:`
-     - `Phase X output` → `Phase Y output`
-     - `to Phase X` → `to Phase Y`
-     - `from Phase X` → `from Phase Y`
-     - `return to Phase X` → `return to Phase Y` (case-insensitive)
-   - Preserve descriptive text: "Phase 4 (implementation)" → "Phase 5 (implementation)" keeps "(implementation)"
-   - Apply to ALL files: troubleshooting.md, progress-persistence.md, agent-handoffs.md, phase-X.md files, etc.
-   - **Exclusions**: Skip .history/CHANGELOG (historical), code blocks (external examples)
-6. **Verify name hints match** (NEW) - After renumbering:
-   - Validate prose hints against actual phase names
-   - Example: "Phase 5 (Implementation)" - verify Phase 5 IS implementation phase
-   - If mismatch detected, flag for manual review
-7. **Update external references** (optional):
-   - Search for external references: `grep -r "skill-name.*Phase [0-9]" .claude/`
-   - Report as INFO: "External reference found in {file}:{line} - manual review recommended"
-   - Do NOT auto-modify external files
-
-**Example transformation:**
-
-```markdown
-# Before
-
-## Phase 3: Validation
-
-## Phase 3.5: Additional Check ← Fractional phase
-
-## Phase 4: Implementation
-
-Return to Phase 3.5 for validation details.
-See [Phase 4](phase-4-impl.md) for implementation.
-
-# After
-
-## Phase 3: Validation
-
-## Phase 4: Additional Check ← Renumbered from 3.5
-
-## Phase 5: Implementation ← Renumbered from 4
-
-Return to Phase 4 for validation details. ← Prose reference updated
-See [Phase 5](phase-5-impl.md) for implementation. ← Link updated
-```
-
-**Distinguish from sub-steps:** Do NOT renumber sub-steps like `### Step 7.1` under `## Step 7` - these represent decomposition, not insertion.
-
-See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete process steps.
-
----
-
-## Step 4c: Apply Hybrid Fixes
-
-**Phases: 4, 10, 22**
-
-These have deterministic parts that Claude handles automatically, but ambiguous cases require user confirmation.
-
-**Covered phases:**
-
-- Phase 4: Broken links (auto-correct if file exists, prompt if missing)
-- Phase 10: Phantom references (auto-replace from deprecation registry, fuzzy match otherwise)
-- Phase 22: Broken gateway paths (fuzzy match with user confirmation)
-
-**Additional procedures:** Example quality assessment
-
-See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete hybrid workflows and AskUserQuestion patterns.
-
----
-
-## Step 4d: Guide Human-Required Fixes
-
-**Phases: 8, 9, 23**
-
-These require genuine human judgment. Provide interactive guidance.
-
-**Covered phases:**
-
-- Phase 8: TypeScript errors (explain and guide fixes)
-- Phase 9: Bash scripts (explain TypeScript migration)
-- Phase 23: Coverage gaps (defer to syncing-gateways skill)
-
-See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for guidance protocols.
-
----
-
-## Step 4e: Validation-Only Phases (No Auto-Fix)
-
-**Phases: 15, 16, 17, 29**
-
-These phases detect issues but cannot auto-fix due to requiring semantic understanding and manual review.
-
-**Covered phases:**
-
-- Phase 15: Code block quality (missing/mismatched language tags, long lines)
-- Phase 16: Header hierarchy (empty headers, incorrect nesting)
-- Phase 17: Prose phase references (stale phase numbers after renumbering)
-- Phase 29: Logical coherence (workflow logic, contradictions, missing steps, purpose alignment)
-
-### Phase 29: Logical Coherence (Manual Resolution)
-
-**When detected:** Audit identifies logical issues such as:
-- Steps in impossible order (Step N needs output from Step M that comes later)
-- Contradictions between sections
-- Missing critical steps in workflow
-- Purpose misalignment (description doesn't match implementation)
-- Broken delegation (skill invokes non-existent sub-skills)
-
-**Why no auto-fix:** Logical coherence issues require understanding the skill's intent and making architectural decisions:
-- Reordering steps may break other dependencies
-- Resolving contradictions requires understanding which section is "correct"
-- Adding missing steps requires domain knowledge
-- Fixing purpose misalignment may require rewriting description OR workflow
-
-**Manual resolution guidance:**
-
-1. **Review the audit finding** - Understand the specific logical issue detected
-2. **Determine intent** - What was the skill trying to accomplish?
-3. **Choose resolution strategy:**
-   - Workflow logic issues → Reorder steps or add missing prerequisites
-   - Contradictions → Determine which section reflects intended behavior, update the other
-   - Missing steps → Add the step with appropriate content
-   - Purpose misalignment → Update description to match workflow OR update workflow to match description
-   - Broken delegation → Fix skill reference or remove the delegation
-4. **Apply fix manually** - Use Edit tool with careful consideration
-5. **Re-run audit** - Verify Phase 29 passes after fix
-
-**See:** [Phase 29 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-29-logical-coherence--internal-consistency)
-
-See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for manual remediation steps.
-
----
-
-## Step 5: Verify Fixes
-
-Re-run audit to verify all issues are resolved:
+Re-run auditing-skills to verify all issues resolved:
 
 ```
 Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
-# Then re-audit the target skill
 ```
 
-**Statistical evidence**: Fix attempts that skip verification have ~30% incomplete fix rate (some issues remain or new issues introduced). Re-audit takes 30 seconds and catches regressions.
+**Expected:** All phases pass. If failures remain, return to Step 4.
 
-**Expected:** All phases pass. If failures remain, return to Step 3.
-
----
-
-## Step 6: Update Changelog
+### Step 7: Update Changelog
 
 See [Changelog Format](.claude/skills/managing-skills/references/patterns/changelog-format.md).
 
@@ -379,20 +185,15 @@ Document fixes applied with method (Deterministic, Claude-Automated, Hybrid, Man
 
 ## Common Scenarios
 
-For detailed fix scenarios and recommended fix orders, see [references/common-scenarios.md](references/common-scenarios.md).
-
-**Quick reference:**
-
-| Scenario               | Typical Issues              | Fix Order              |
-| ---------------------- | --------------------------- | ---------------------- |
-| New Skill Cleanup      | Phase 1, 4, 5               | Deterministic → Hybrid |
-| Over-Long Skill        | Phase 3 (>500 lines)        | Claude-Auto (extract)  |
-| Legacy Migration       | Phase 9, 11, 13             | Claude-Auto → Human    |
-| Visual/Style Cleanup   | Phase 14, 15, 16            | Deterministic → Manual |
-| Orphan Library Skill   | Phase 18                    | Claude-Auto (gateway)  |
-| Missing Integration    | Phase 28                    | Claude-Auto (generate) |
-| Stub Reference Files   | Phase 26                    | Claude-Auto (research) |
-| Broken References      | Phase 10                    | Hybrid (registry/fuzz) |
+| Scenario             | Typical Issues                 | Approach                             |
+| -------------------- | ------------------------------ | ------------------------------------ |
+| New Skill Cleanup    | Phase 1, 4, 5                  | Deterministic → Hybrid               |
+| Over-Long Skill      | Phase 3 (>500 lines)           | Claude-Auto (extract to references/) |
+| Legacy Migration     | Missing TodoWrite, cd commands | Claude-Auto                          |
+| Missing Integration  | Phase 28                       | Claude-Auto (generate)               |
+| Stub Reference Files | Phase 26                       | Claude-Auto (research + populate)    |
+| Broken References    | Phase 10                       | Hybrid (registry/fuzzy match)        |
+| Logical Issues       | Phase 30                       | Validation-Only (manual)             |
 
 ---
 
@@ -402,33 +203,40 @@ For detailed fix scenarios and recommended fix orders, see [references/common-sc
 
 - `managing-skills` (audit → fix workflow delegation)
 - `/skill-manager` command (fix operation)
-- `creating-skills` (Phase 6 - final compliance cleanup)
-- `updating-skills` (Phase 8 - post-update compliance)
+- `creating-skills` (final compliance cleanup)
+- `updating-skills` (post-update compliance)
 
 ### Requires (invoke before starting)
 
-| Skill             | When   | Purpose                     |
-| ----------------- | ------ | --------------------------- |
-| `auditing-skills` | Step 1 | Identify compliance issues to fix |
+- **`auditing-skills`** (LIBRARY) - Step 2
+  - Identify compliance issues to fix
+  - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
 
 ### Calls (during execution)
 
-| Skill                    | Phase/Step | Purpose                          |
-| ------------------------ | ---------- | -------------------------------- |
-| `auditing-skills`        | Step 1     | Get initial issues list          |
-| `auditing-skills`        | Step 5     | Verify fixes resolved issues     |
-| `orchestrating-research` | Phase 26   | Populate stub reference files    |
+- **`auditing-skills`** (LIBRARY) - Steps 2 and 6
+  - Get initial issues list and verify fixes
+  - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
+
+- **`orchestrating-research`** (LIBRARY) - Phase 26 fixes
+  - Populate stub reference files
+  - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`
 
 ### Pairs With (conditional)
 
-| Skill               | Trigger                 | Purpose                    |
-| ------------------- | ----------------------- | -------------------------- |
-| `syncing-gateways`  | Phase 23 (coverage gaps) | Gateway consistency fixes |
+- **`syncing-gateways`** (LIBRARY) - Phase 23 (coverage gaps)
+  - Gateway consistency fixes
+  - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")`
 
 ---
 
-## Related Skills
+## References
 
-- `creating-skills` - Create new skills (uses this for final cleanup)
-- `updating-skills` - Update existing skills (uses this for compliance)
-- `auditing-skills` - Validate skills (identifies issues to fix)
+- [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) - Which handler each phase uses
+- [Phase 26 Procedure](references/phase-26-procedure.md) - Stub population
+- [Phase 27 Procedure](references/phase-27-procedure.md) - Cross-skill path conversion
+- [Phase 28 Procedure](references/phase-28-procedure.md) - Integration generation
+- [Phase 29 Procedure](references/phase-29-procedure.md) - Integration semantic validation
+- [Semantic Criterion 7](references/semantic-criterion-7-procedure.md) - Phase numbering hygiene
+- [Common Scenarios](references/common-scenarios.md) - Fix patterns and recommended orders
+- [Rationalization Table](references/rationalization-table.md) - Domain-specific rationalizations

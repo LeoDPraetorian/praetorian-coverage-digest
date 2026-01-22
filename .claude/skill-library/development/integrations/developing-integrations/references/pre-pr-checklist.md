@@ -78,7 +78,11 @@
 - [ ] Logo added to `modules/chariot/ui/src/assets/integrations/icons/dark/`
 - [ ] Logo added to `modules/chariot/ui/src/assets/integrations/icons/light/`
 - [ ] Integration card added to `modules/chariot/ui/src/hooks/useIntegration.tsx`
+- [ ] **`linkOnValidateFailure` is NOT set (validation bypass disabled)**
+- [ ] `validate: true` is set (credential validation enabled)
 - [ ] Verified: UI displays integration card in integration list
+- [ ] **Verified: Invalid credentials are rejected (validation enforced)**
+- [ ] Verified: Valid credentials are accepted
 
 ---
 

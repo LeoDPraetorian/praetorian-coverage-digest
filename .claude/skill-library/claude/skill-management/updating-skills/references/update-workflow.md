@@ -42,7 +42,10 @@ Ensure this requires updating the skill (not an agent or other component).
 ```bash
 # Search both core and library (from repo root)
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
-cd "$ROOT/.claude" && npm run search -- "keyword"
+# Core skills
+ls "$ROOT/.claude/skills/" | grep -i "keyword"
+# Library skills
+find "$ROOT/.claude/skill-library" -name "SKILL.md" -path "*keyword*"
 ```
 
 > **⚠️ PATH WARNING**: All `{skill-path}` placeholders in this file are **relative to $ROOT** (repo root).
@@ -303,7 +306,7 @@ If research reveals patterns not covered by existing reference files:
    })
    ```
 
-3. **Link from SKILL.md**: Add to Related Skills or References section
+3. **Link from SKILL.md**: Add to References section (Related Skills is obsolete)
 
    ```markdown
    **References**:
@@ -343,6 +346,19 @@ Before proceeding to GREEN, confirm:
 #### Cannot Proceed Until Verification Passes ✅
 
 This gate prevents superficial "I updated SKILL.md" completions that ignore research depth.
+
+---
+
+## Skill Reference Validation
+
+**When adding skill references to Integration section**: See [skill-reference-validation.md](skill-reference-validation.md) for complete procedure including:
+
+1. Validate skill exists (CORE vs LIBRARY)
+2. **READ the skill's SKILL.md** (MANDATORY - not just file check)
+3. Semantic relationship verification (decision tree)
+4. Integration bullet list format requirements
+
+**Key requirement**: You MUST read referenced skills to determine correct relationship type (Requires vs Calls vs Pairs With) based on actual content, not topic similarity.
 
 ---
 
@@ -412,11 +428,13 @@ If not PASS, return to Phase 4 and iterate.
 
 ### 7.1 Run Audit
 
-```bash
-# Navigate to repo root first, then .claude for npm commands
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
-cd "$ROOT/.claude" && npm run audit -- {skill-name}
+Load and follow the auditing-skills workflow:
+
+```typescript
+Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md");
 ```
+
+Follow the workflow to audit `{skill-name}` for compliance violations.
 
 ### 7.2 Line Count Check
 
@@ -495,5 +513,5 @@ Good candidates:
 
 ## Related
 
-- [tdd-methodology.md](../../../../../skills/managing-skills/references/tdd-methodology.md) - RED-GREEN-REFACTOR
-- [progressive-disclosure.md](../../../../../skills/managing-skills/references/progressive-disclosure.md) - Extraction strategy
+- [tdd-methodology.md](.claude/skills/managing-skills/references/tdd-methodology.md) - RED-GREEN-REFACTOR
+- [progressive-disclosure.md](.claude/skills/managing-skills/references/progressive-disclosure.md) - Extraction strategy

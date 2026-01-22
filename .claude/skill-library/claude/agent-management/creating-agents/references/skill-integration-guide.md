@@ -76,10 +76,10 @@
 skills: developing-with-tdd, gateway-frontend, verifying-before-completion
 
 # ❌ WRONG - library path in frontmatter
-skills: .claude/skill-library/development/frontend/frontend-tanstack/SKILL.md
+skills: .claude/skill-library/development/frontend/using-tanstack-query/SKILL.md
 
 # ❌ WRONG - library skill name in frontmatter
-skills: frontend-tanstack-query
+skills: using-tanstack-query
 ```
 
 **Why**: Frontmatter references skills that auto-load. Library skills load on-demand via body references.

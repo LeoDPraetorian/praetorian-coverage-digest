@@ -8,16 +8,16 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 
 ## Overview Table
 
-| Platform   | Latest Version           | Control Count | Last Updated | Native Tool              |
-| ---------- | ------------------------ | ------------- | ------------ | ------------------------ |
-| AWS        | v3.0.0                   | 43            | May 2024     | AWS Security Hub         |
-| Azure      | v5.0.0 / v2.0.0          | 100+          | 2024         | Azure Policy             |
-| GCP        | v4.0.0 / v2.0.0          | 50-100        | 2024         | Security Command Center  |
-| Linux RHEL | v1.0.1 / v2.0.0          | Distro-spec   | 2025         | OpenSCAP                 |
-| Linux Ubuntu | LTS-aligned (24.04, 22.04) | Distro-spec   | Ongoing      | Ubuntu Security Guide    |
-| Windows    | 2025 v1.0.0, 2022 v4.0.0 | OS-specific   | 2025         | CIS-CAT Pro              |
-| Kubernetes | v1.9 (K8s v1.27-v1.29)   | Section 5.2+  | 2023         | kube-bench               |
-| Docker     | v1.7.0                   | 27 updated    | July 2024    | docker-bench-security    |
+| Platform     | Latest Version             | Control Count | Last Updated | Native Tool             |
+| ------------ | -------------------------- | ------------- | ------------ | ----------------------- |
+| AWS          | v3.0.0                     | 43            | May 2024     | AWS Security Hub        |
+| Azure        | v5.0.0 / v2.0.0            | 100+          | 2024         | Azure Policy            |
+| GCP          | v4.0.0 / v2.0.0            | 50-100        | 2024         | Security Command Center |
+| Linux RHEL   | v1.0.1 / v2.0.0            | Distro-spec   | 2025         | OpenSCAP                |
+| Linux Ubuntu | LTS-aligned (24.04, 22.04) | Distro-spec   | Ongoing      | Ubuntu Security Guide   |
+| Windows      | 2025 v1.0.0, 2022 v4.0.0   | OS-specific   | 2025         | CIS-CAT Pro             |
+| Kubernetes   | v1.9 (K8s v1.27-v1.29)     | Section 5.2+  | 2023         | kube-bench              |
+| Docker       | v1.7.0                     | 27 updated    | July 2024    | docker-bench-security   |
 
 **Versioning Pattern**: CIS uses semantic versioning (vX.Y.Z), NOT year-based.
 
@@ -30,6 +30,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 **Control Numbering**: Service-based format `[Service.Number]`
 
 **Service Categories** (9 total):
+
 1. Identity and Access Management (IAM)
 2. Storage (S3, EBS, RDS, EFS)
 3. Logging and Monitoring (CloudTrail, Config, VPC)
@@ -38,6 +39,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ### Key Control Examples
 
 #### Identity and Access Management
+
 ```
 [IAM.4] - IAM root user access key should not exist
 [IAM.9] - MFA should be enabled for the root user
@@ -47,6 +49,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Storage
+
 ```
 [S3.1], [S3.8] - S3 block public access settings enabled
 [S3.5] - S3 buckets should require SSL
@@ -57,6 +60,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Logging and Monitoring
+
 ```
 [CloudTrail.1] - CloudTrail enabled with multi-region trail
 [CloudTrail.4] - CloudTrail log file validation enabled
@@ -68,6 +72,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Networking
+
 ```
 [EC2.21] - Network ACLs should not allow ingress from 0.0.0.0/0 to port 22/3389
 [EC2.53], [EC2.54] - Security groups should not allow ingress from 0.0.0.0/0
@@ -92,6 +97,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 **Control Numbering**: Hierarchical format `X.Y` or `X.Y.Z`
 
 **Major Domains** (9 total):
+
 1. Identity and Access Management (Azure AD/Entra ID)
 2. Microsoft Defender for Cloud (Security Center)
 3. Storage Security
@@ -105,12 +111,14 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ### Key Control Examples
 
 #### Identity and Access Management
+
 ```
 1.5 - Ensure Guest Users Are Reviewed Regularly
 1.23 - Ensure No Custom Subscription Administrator Roles Exist
 ```
 
 #### Microsoft Defender for Cloud (15+ services)
+
 ```
 2.1.1 - Microsoft Defender for Servers
 2.1.2 - Microsoft Defender for App Services
@@ -121,6 +129,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Storage Security
+
 ```
 3.1 - Secure transfer required (HTTPS)
 3.7 - Disable Public Access on Blob Containers
@@ -129,6 +138,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Database Security
+
 ```
 4.1.5 - SQL TDE (Transparent Data Encryption) enabled
 4.3.7 - PostgreSQL disable public network access
@@ -136,6 +146,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 ```
 
 #### Logging and Monitoring
+
 ```
 5.1.2 - Activity Log diagnostic settings capture categories
 5.1.6 - NSG (Network Security Group) Flow Logs captured
@@ -159,6 +170,7 @@ This reference provides detailed platform-specific CIS Benchmark information inc
 **Control Numbering**: Category-based format `Category X.Y`
 
 **Key Sections**:
+
 - Section 2: Cloud SQL, BigQuery
 - Section 3: Cloud DNS (DNSSEC)
 - Section 4: VPC networking (firewalls, routes, flow logs)
@@ -198,18 +210,21 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 **Versions**: 24.04 LTS, 22.04 LTS, 20.04 LTS (LTS-aligned)
 
 **Profile Structure**:
+
 - `cis_level1_workstation` - Basic workstation security
 - `cis_level1_server` - Basic server security
 - `cis_level2_workstation` - Enhanced workstation hardening
 - `cis_level2_server` - Enhanced server hardening
 
 **Implementation**:
+
 - **Tool**: Ubuntu Security Guide (USG)
 - **Package**: `usg-benchmarks-1`
 - **Automation**: Automated audit and compliance scanning
 - **Vendor Support**: Canonical actively participates in benchmark development
 
 **Key Features**:
+
 - AppArmor security framework integration
 - APT package management considerations
 - Ubuntu-specific default configurations
@@ -217,23 +232,27 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 ### Red Hat Enterprise Linux (RHEL)
 
 **Versions by RHEL Release**:
+
 - RHEL 10: CIS Benchmark v1.0.1 (SCAP Security Guide 0.1.75+)
 - RHEL 9: CIS Benchmark v2.0.0 (SCAP Security Guide 0.1.75+)
 - RHEL 8: CIS Benchmark v2.0.0 (SCAP Security Guide 0.1.75+)
 
 **Profile IDs**:
+
 - Level 2 Server: `xccdf_org.ssgproject.content_profile_cis`
 - Level 1 Server: `xccdf_org.ssgproject.content_profile_cis_server_l1`
 - Level 1 Workstation: `xccdf_org.ssgproject.content_profile_cis_workstation_l1`
 - Level 2 Workstation: `xccdf_org.ssgproject.content_profile_cis_workstation_l2`
 
 **Implementation Methods**:
+
 1. Image Builder (pre-hardened RHEL images with OpenSCAP)
 2. Kickstart Installation (hardened deployment during setup)
 3. Image Mode (security hardening for bootable images)
 4. Runtime Scanning (OpenSCAP command-line tools)
 
 **Key Features**:
+
 - SELinux security framework integration
 - RPM package management considerations
 - Built-in compliance tools using OpenSCAP
@@ -241,14 +260,14 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 
 ### Distribution Differences
 
-| Aspect               | Ubuntu                                  | RHEL                                         |
-| -------------------- | --------------------------------------- | -------------------------------------------- |
-| Security Framework   | AppArmor                                | SELinux                                      |
-| Package Manager      | APT (deb)                               | RPM (yum/dnf)                                |
-| Automation Tool      | Ubuntu Security Guide (USG)             | OpenSCAP                                     |
-| Vendor Support       | Canonical participation                 | Red Hat compliance tools                     |
-| Profile Format       | Named (cis_level1_server)               | XCCDF IDs (xccdf_org.ssgproject.content...) |
-| Remediation          | Ansible playbooks                       | Ansible + Bash scripts                       |
+| Aspect             | Ubuntu                      | RHEL                                        |
+| ------------------ | --------------------------- | ------------------------------------------- |
+| Security Framework | AppArmor                    | SELinux                                     |
+| Package Manager    | APT (deb)                   | RPM (yum/dnf)                               |
+| Automation Tool    | Ubuntu Security Guide (USG) | OpenSCAP                                    |
+| Vendor Support     | Canonical participation     | Red Hat compliance tools                    |
+| Profile Format     | Named (cis_level1_server)   | XCCDF IDs (xccdf_org.ssgproject.content...) |
+| Remediation        | Ansible playbooks           | Ansible + Bash scripts                      |
 
 ### Linux-Specific Patterns
 
@@ -270,9 +289,9 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 
 ### Profile Levels
 
-| Level   | Purpose                                   |
-| ------- | ----------------------------------------- |
-| Level 1 | Foundational settings, minimal impact     |
+| Level   | Purpose                                     |
+| ------- | ------------------------------------------- |
+| Level 1 | Foundational settings, minimal impact       |
 | Level 2 | Enhanced security, may impact compatibility |
 
 ### Key Control Areas
@@ -289,11 +308,13 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 ### Implementation
 
 **Assessment Tools**:
+
 - **CIS-CAT Pro Assessor**: Automated compliance scanning
 - **HTML Reports**: CIS Controls v8 mappings in output
 - **Group Policy Objects (GPOs)**: Primary deployment mechanism
 
 **Automation**:
+
 - PowerShell DSC (Desired State Configuration)
 - Group Policy-based implementation
 - Integration with Microsoft security baselines
@@ -316,42 +337,46 @@ CIS provides **separate benchmarks** for each distribution, NOT a single univers
 ### Control Numbering
 
 Format: `X.Y.Z`
+
 - Section 5: Kubernetes Policies
 - Subsection 2: Pod Security
 - Control: Specific recommendation
 
 ### Key Pod Security Controls (Section 5.2)
 
-| Control ID | Description                                      | Policy Setting                        |
-| ---------- | ------------------------------------------------ | ------------------------------------- |
-| 5.2.1      | Minimize admission of privileged containers      | `privileged: false`                   |
-| 5.2.2      | Minimize admission of containers with hostPID    | `hostPID: false`                      |
-| 5.2.3      | Minimize admission of containers with hostIPC    | `hostIPC: false`                      |
+| Control ID | Description                                       | Policy Setting                        |
+| ---------- | ------------------------------------------------- | ------------------------------------- |
+| 5.2.1      | Minimize admission of privileged containers       | `privileged: false`                   |
+| 5.2.2      | Minimize admission of containers with hostPID     | `hostPID: false`                      |
+| 5.2.3      | Minimize admission of containers with hostIPC     | `hostIPC: false`                      |
 | 5.2.4      | Minimize admission of containers with hostNetwork | `hostNetwork: false`                  |
-| 5.2.5      | Minimize admission with privilege escalation     | `allowPrivilegeEscalation: false`     |
-| 5.2.6      | Minimize admission of root containers            | `runAsUser: rule: 'MustRunAsNonRoot'` |
-| 5.2.7-9    | Minimize admission with added capabilities       | `requiredDropCapabilities: [ALL]`     |
+| 5.2.5      | Minimize admission with privilege escalation      | `allowPrivilegeEscalation: false`     |
+| 5.2.6      | Minimize admission of root containers             | `runAsUser: rule: 'MustRunAsNonRoot'` |
+| 5.2.7-9    | Minimize admission with added capabilities        | `requiredDropCapabilities: [ALL]`     |
 
 ### Benchmark Sections
 
-| Section | Focus Area                       |
-| ------- | -------------------------------- |
-| 1.1     | Control Plane Node Configuration |
-| 1.2     | API Server                       |
-| 3.x     | Control Plane Configuration      |
-| 4.x     | Worker Node Configuration        |
+| Section | Focus Area                         |
+| ------- | ---------------------------------- |
+| 1.1     | Control Plane Node Configuration   |
+| 1.2     | API Server                         |
+| 3.x     | Control Plane Configuration        |
+| 4.x     | Worker Node Configuration          |
 | 5.x     | Kubernetes Policies (Pod Security) |
 
 ### Platform-Specific Implementations
 
 **CIS Amazon EKS Benchmark**:
+
 - AWS-specific guidance for Elastic Kubernetes Service
 
 **CIS GKE Benchmark**:
+
 - Google Cloud Platform-specific (v1.5.1, v1.7.1)
 - Policy Controller for automated enforcement
 
 **CIS AKS Benchmark**:
+
 - Microsoft Azure-specific for Azure Kubernetes Service
 
 ### Distribution-Specific Guides
@@ -376,15 +401,15 @@ Format: `X.Y.Z`
 
 ### Benchmark Sections
 
-| Section | Focus Area                          |
-| ------- | ----------------------------------- |
-| 1       | Host Configuration                  |
-| 2       | Docker Daemon Configuration         |
-| 3       | Docker Daemon Configuration Files   |
-| 4       | Container Images and Build Files    |
-| 5       | Container Runtime                   |
-| 6       | Docker Security Operations          |
-| 7       | Docker Swarm Configuration          |
+| Section | Focus Area                        |
+| ------- | --------------------------------- |
+| 1       | Host Configuration                |
+| 2       | Docker Daemon Configuration       |
+| 3       | Docker Daemon Configuration Files |
+| 4       | Container Images and Build Files  |
+| 5       | Container Runtime                 |
+| 6       | Docker Security Operations        |
+| 7       | Docker Swarm Configuration        |
 
 ### Section 4: Container Images Focus
 
@@ -393,11 +418,13 @@ Format: `X.Y.Z`
 ### Automated Testing Tools
 
 **docker-bench-security**:
+
 - Repository: github.com/docker/docker-bench-security
 - Based on: CIS Docker Benchmark v1.6.0 (lags behind v1.7.0)
 - Deployment: `docker run docker/docker-bench-security`
 
 **InSpec Profile**:
+
 - Repository: github.com/dev-sec/cis-docker-benchmark
 - Based on: CIS Docker 1.13.0 Benchmark
 - Use case: CI/CD pipeline integration
@@ -420,24 +447,25 @@ Format: `X.Y.Z`
 
 ### Common Service Patterns
 
-| Service Type              | AWS             | Azure                  | GCP                |
-| ------------------------- | --------------- | ---------------------- | ------------------ |
-| Identity                  | IAM             | Azure AD / Entra ID    | Cloud IAM          |
-| Logging                   | CloudTrail      | Azure Monitor          | Cloud Logging      |
-| Encryption (Key Mgmt)     | KMS             | Key Vault              | Cloud KMS          |
-| Compute                   | EC2             | Virtual Machines       | Compute Engine     |
-| Object Storage            | S3              | Blob Storage           | Cloud Storage      |
-| Block Storage             | EBS             | Managed Disks          | Persistent Disk    |
-| Relational Database       | RDS             | Azure SQL Database     | Cloud SQL          |
-| NoSQL Database            | DynamoDB        | Cosmos DB              | Firestore/Bigtable |
-| Network Firewall          | Security Groups | Network Security Groups | Firewall Rules     |
-| Monitoring                | CloudWatch      | Azure Monitor          | Cloud Monitoring   |
-| Secrets Management        | Secrets Manager | Key Vault              | Secret Manager     |
-| Container Orchestration   | EKS             | AKS                    | GKE                |
+| Service Type            | AWS             | Azure                   | GCP                |
+| ----------------------- | --------------- | ----------------------- | ------------------ |
+| Identity                | IAM             | Azure AD / Entra ID     | Cloud IAM          |
+| Logging                 | CloudTrail      | Azure Monitor           | Cloud Logging      |
+| Encryption (Key Mgmt)   | KMS             | Key Vault               | Cloud KMS          |
+| Compute                 | EC2             | Virtual Machines        | Compute Engine     |
+| Object Storage          | S3              | Blob Storage            | Cloud Storage      |
+| Block Storage           | EBS             | Managed Disks           | Persistent Disk    |
+| Relational Database     | RDS             | Azure SQL Database      | Cloud SQL          |
+| NoSQL Database          | DynamoDB        | Cosmos DB               | Firestore/Bigtable |
+| Network Firewall        | Security Groups | Network Security Groups | Firewall Rules     |
+| Monitoring              | CloudWatch      | Azure Monitor           | Cloud Monitoring   |
+| Secrets Management      | Secrets Manager | Key Vault               | Secret Manager     |
+| Container Orchestration | EKS             | AKS                     | GKE                |
 
 ### Third-Party CSPM Tools
 
 Organizations use platforms for cross-platform compliance:
+
 - Sophos Cloud Optix (CIS-certified for AWS, Azure, GCP)
 - Prisma Cloud, Wiz, Orca
 - Cloud security posture management (CSPM) platforms
@@ -491,15 +519,15 @@ Organizations use platforms for cross-platform compliance:
 
 ## Update Cadence
 
-| Platform   | Release Frequency    | Pattern                       |
-| ---------- | -------------------- | ----------------------------- |
-| AWS        | 12-18 months         | Major version updates         |
-| Azure      | 12-18 months         | Service coverage expansion    |
-| GCP        | 12-18 months         | Automation additions          |
-| Linux      | LTS releases (~2 yr) | Distribution version-aligned  |
-| Windows    | 6-12 months          | OS version + CIS Controls v8  |
-| Kubernetes | 6-12 months          | K8s version alignment         |
-| Docker     | 12-18 months         | Docker version alignment      |
+| Platform   | Release Frequency    | Pattern                      |
+| ---------- | -------------------- | ---------------------------- |
+| AWS        | 12-18 months         | Major version updates        |
+| Azure      | 12-18 months         | Service coverage expansion   |
+| GCP        | 12-18 months         | Automation additions         |
+| Linux      | LTS releases (~2 yr) | Distribution version-aligned |
+| Windows    | 6-12 months          | OS version + CIS Controls v8 |
+| Kubernetes | 6-12 months          | K8s version alignment        |
+| Docker     | 12-18 months         | Docker version alignment     |
 
 **CIS Benchmark Update Announcements**: Monthly blogs ("CIS Benchmarks [Month] [Year] Update")
 
@@ -510,16 +538,19 @@ Organizations use platforms for cross-platform compliance:
 ### When Multiple Platforms Apply
 
 **Cloud (AWS/Azure/GCP)**:
+
 - Use platform-specific benchmarks for resources deployed on that platform
 - No unified multi-cloud benchmark exists
 - CSPM tools provide cross-platform compliance view
 
 **Linux (Distribution Choice)**:
+
 - Use distribution-specific benchmark matching your deployment
 - Distribution Independent Linux (DIL) v2.0.0 available for general guidance
 - Consider automation tool availability (USG vs OpenSCAP)
 
 **Containers (Kubernetes/Docker)**:
+
 - Use Kubernetes benchmark for orchestrated environments
 - Use Docker benchmark for standalone containers or Docker-specific controls
 - Both may apply in Kubernetes environments (K8s + underlying Docker)

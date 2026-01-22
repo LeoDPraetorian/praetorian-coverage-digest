@@ -1,4 +1,4 @@
-## 2  THE WINDOWS KERNEL
+## 2 THE WINDOWS KERNEL
 
 ![Figure](figures/WindowsSecurityInternals_page_053_figure_001.png)
 
@@ -28,13 +28,11 @@ Table 2-1: API Prefix-to-Subsystem Mapping
 
 <table><tr><td>Prefix</td><td>Subsystem</td><td>Example</td></tr><tr><td>Nt or Zw</td><td>System call interface</td><td>NtOpenFile / ZwOpenFile</td></tr><tr><td>Se</td><td>Security Reference Monitor</td><td>SeAccessCheck</td></tr><tr><td>Ob</td><td>Object manager</td><td>ObReferenceObjectByHandle</td></tr></table>
 
-
-24    Chapter 2
+24 Chapter 2
 
 ---
 
 <table><tr><td>Prefix</td><td>Subsystem</td><td>Example</td></tr><tr><td>Ps</td><td>Process and thread manager</td><td>PsGetCurrentProcess</td></tr><tr><td>Cm</td><td>Configuration manager</td><td>CmRegisterCallback</td></tr><tr><td>Mm</td><td>Memory manager</td><td>MmMapIoSpace</td></tr><tr><td>IO</td><td>Input/output manager</td><td>IO>CreateFile</td></tr><tr><td>C1</td><td>Code integrity</td><td>C1ValidateFileObject</td></tr></table>
-
 
 We'll explore all of these subsystems in the sections that follow.
 
@@ -68,11 +66,11 @@ Listing 2-1: Querying the SID of the Users group using Get-NtSid
 We pass the name of the Users group to Get-NTSid, which returns the fully qualified name, with the local domain BUILTIN attached. The BUILTIN\Users\SDI is always the same between different Windows systems. The output also contains the SDI in SDDL format, which can be broken down into the following dash-separated parts:
 
 - • The 5 character prefix. This indicates that what follows is an SDDI, SID.
-• The version of the SID structure in decimal. This has a fixed value of 1.
-• The security authority. Authority 5 indicates the built-in NT authority.
-• Two relative identifiers (RIDs), in decimal. The RIDs (here, 32 and 545)
-represent the NT authority group.
-We can also use Get-MSD to perform the reverse operation, converting an SDDL SID back to a name, as shown in Listing 2-2.
+  • The version of the SID structure in decimal. This has a fixed value of 1.
+  • The security authority. Authority 5 indicates the built-in NT authority.
+  • Two relative identifiers (RIDs), in decimal. The RIDs (here, 32 and 545)
+  represent the NT authority group.
+  We can also use Get-MSD to perform the reverse operation, converting an SDDL SID back to a name, as shown in Listing 2-2.
 
 ```bash
 PS> Get-NTSid -S5dld "S-1-5-32-545"
@@ -85,7 +83,7 @@ Listing 2-2. Using Get-NtSid to find the name associated with a SID
 
 I'll describe the SRM and its functions in much greater depth in Chapters 4 through 9, and we'll revisit the SID structure in Chapter 5, when
 
-26    Chapter 2
+26 Chapter 2
 
 ---
 
@@ -156,7 +154,6 @@ Listing 2-4: Listing the root OMNS directory
 
 Listing 2-4 shows a short snippet of the root OMNS directory. By default, this output includes the name of each object and its type. We can see a few
 
-
 Directory objects; you can list them if you have permission to do so. We can also see another important type, $ymboliclink. You can use symbolic links to redirect one OMNS path to another. A $ymboliclink object contains a
 
 $ymbolicLinkTarget property, which itself contains the target that the link should open. For example, Listing 2-5 shows the target for a symbolic link in the root of the OMNS.
@@ -169,7 +166,7 @@ SymbolicLinkTarget
 \Device\DfsClient
 ```
 
-28    Chapter 2
+28 Chapter 2
 
 ---
 
@@ -191,7 +188,6 @@ Windows preconfigures several important object directories, shown in Table 2-2.
 Table 2-2: Well-Known Object Directories and Descriptions
 
 <table><tr><td>Path</td><td>Description</td></tr><tr><td>\BaseNamedObjects</td><td>Global directory for user objects</td></tr><tr><td>\Device</td><td>Directory containing devices such as mounted filesystems</td></tr><tr><td>\GLOBAL??</td><td>Global directory for symbolic links, including drive mappings</td></tr><tr><td>\KnownDlls</td><td>Directory containing special, known DLL mappings</td></tr><tr><td>\ObjectTypes</td><td>Directory containing named object types</td></tr><tr><td>\Sessions</td><td>Directory for separate console sessions</td></tr><tr><td>\Windows</td><td>Directory for objects related to the Window Manager</td></tr><tr><td>\RPC Control</td><td>Directory for remote procedure call endpoints</td></tr></table>
-
 
 The first directory in Table 2-2, BaseNamedObjects (BNO), is important in the context of the object manager. It allows any user to create named kernel objects. This single directory allows the sharing of resources between different users on the local system. Note that you don't have to create objects in the BNO directory; it's only a convention.
 
@@ -221,9 +217,7 @@ SetInformation Sets object information and properties.
 
 Certain system calls perform type-specific operations. For example,
 
-
 tQueryDirectoryFile is used to query the entries in a File object directory.
-
 
 Let's look at the C-language prototype for the NtCreateMutant system call to understand what parameters need to be passed to a typical call. As shown in Listing 2-6, the NtCreateMutant system call creates a new Mutant object.
 
@@ -246,7 +240,7 @@ Next is DesiredAccess, which represents the operations the caller wants to be ab
 
 Third is the ObjectAttributes parameter, which defines the attributes for the object to open or create. The OBJECT_ATTRIBUTES structure is defined as shown in Listing 2-7.
 
-30    Chapter 2
+30 Chapter 2
 
 ---
 
@@ -285,7 +279,7 @@ The second length field represents the maximum length of the string pointed to b
 
 To specify the name of an object, you have two options; you can set ObjectName to an absolute path of, for example, \BaseNamedObjectsABC, or
 
-The Windows Kernel  31
+The Windows Kernel 31
 
 ---
 
@@ -297,7 +291,6 @@ Table 2-3: Object Attribute Flags and Descriptions
 
 <table><tr><td>PowerShell name</td><td>Description</td></tr><tr><td>Inherit</td><td>Marks the handle as inheritable.</td></tr><tr><td>Permanent</td><td>Marks the handle as permanent.</td></tr><tr><td>Exclusive</td><td>Marks the handle as exclusive if creating a new object. Only the same process can open a handle to the object.</td></tr><tr><td>CaseInsensitive</td><td>Looks up the object name in a case-insensitive manner.</td></tr><tr><td>OpenIf</td><td>If using a Create call, opens a handle to an existing object if available.</td></tr><tr><td>OpenLink</td><td>Opens the object if it&#x27;s a link to another object; otherwise, follows the link. This is used only by the configuration manager.</td></tr><tr><td>KernelHandle</td><td>Opens the handle as a kernel handle when used in kernel mode. This prevents user-mode applications from accessing the handle directly.</td></tr><tr><td>ForceAccessCheck</td><td>When used in kernel mode, ensures all access checks are performed, even if calling the Zw version of the system call.</td></tr><tr><td>IgnoreImpersonatedDeviceMap</td><td>Disables the device map when impersonating.</td></tr><tr><td>DontReparse</td><td>Indicates not to follow any path that contains a symbolic link.</td></tr></table>
 
-
 The final two fields in the OBJECT_ATTRIBUTES structure allow the caller to specify the Security Quality of Service (SQoS) and security descriptor for the object. We'll come back to SQoS in Chapter 4 and the security descriptor in Chapter 5.
 
 Next in the It!Create@ntant system call in Listing 2-6 is the InitialOwner Boolean parameter, which is specific to this type. In this case, it represents whether the created Mount is owned by the caller or not. Many other system calls, especially for files, have more complex parameters, which we'll discuss in more detail later in the book.
@@ -306,7 +299,7 @@ Next in the It!Create@ntant system call in Listing 2-6 is the InitialOwner Boole
 
 All system calls return a 32-bit NTSTATUS code. This status code is composed of multiple components packed into the 32 bits, as shown in Figure 2-3.
 
-32   Chapter 2
+32 Chapter 2
 
 ---
 
@@ -320,7 +313,6 @@ Table 2-4: NT Status Severity Codes
 
 <table><tr><td>Severity name</td><td>Value</td></tr><tr><td>STATUS_SEVERITY_SUCCESS</td><td>0</td></tr><tr><td>STATUS_SEVERITY_INFOATIONAL</td><td>1</td></tr><tr><td>STATUS_SEVERITY_WARNING</td><td>2</td></tr><tr><td>STATUS_SEVERITY_ERROR</td><td>3</td></tr></table>
 
-
 If the severity level indicates a warning or error, then bit 31 of the status code will be set to 1 . If the status code is treated as a signed 32-bit integer, this bit represents a negative value. It's a common coding practice to assume that if the status code is negative it represents an error, and if it's positive it represents a success. As we can see from the table, this assumption isn't completely true—the negative status code could also be a warning—but it works well enough in practice.
 
 The next component in Figure 2-3, CC, is the customer code. This is a single-bit flag that indicates whether the status code is defined by Microsoft (a value of 0) or defined by a third party (a value of 1). Third parties are not obliged to follow this specification, so don't treat it as fact.
@@ -332,7 +324,6 @@ The next 12 bits indicate the facility—that is, the component or subsystem ass
 Table 2-5: Common Status Facility Values
 
 <table><tr><td>Facility name</td><td>Value</td><td>Description</td></tr><tr><td>FACILITY_DEFAULT</td><td>0</td><td>The default used for common status codes</td></tr><tr><td>FACILITY_DEBUGGER</td><td>1</td><td>Used for codes associated with the debugger</td></tr><tr><td>FACILITY_NTWIN32</td><td>7</td><td>Used for codes that originated from the Win32 APIs</td></tr></table>
-
 
 The final component, the status code, is a 16-bit number chosen to be unique for the facility. It's up to the implementer to define what each
 
@@ -389,7 +380,7 @@ directory
 
 In Listing 2-10, we use Get-NTDirectory to open the nonexistent path THISDOESNOTEXIST. This generates the NTSTATUS@0000034 exception, shown here along with the decoded message ❶. If you want more information about the status code, you can pass it to Get-NTStatus and format the
 
-34    Chapter 2
+34 Chapter 2
 
 ---
 
@@ -400,9 +391,9 @@ output as a list to view all its properties, including Facility and Severity. Th
 The object manager deals with pointers to kernel memory. A user-mode application cannot directly read or write to kernel memory, so how can it access an object? It does this using the handle returned by a system call, as discussed in the previous section. Each running process has an associated handle table containing three pieces of information:
 
 - • The handle's numeric identifier
-• The granted access to the handle; for example, read or write
-• The pointer to the object structure in kernel memory
-Before the kernel can use a handle, the system call implementation must look up the kernel object pointer from the handle table using a kernel API such as QReferenceObjectByHandle. By providing this handle indirectly, a kernel component can return the handle number to the user-mode application without exposing the kernel object directly. Figure 2-4 shows the handle lookup process.
+  • The granted access to the handle; for example, read or write
+  • The pointer to the object structure in kernel memory
+  Before the kernel can use a handle, the system call implementation must look up the kernel object pointer from the handle table using a kernel API such as QReferenceObjectByHandle. By providing this handle indirectly, a kernel component can return the handle number to the user-mode application without exposing the kernel object directly. Figure 2-4 shows the handle lookup process.
 
 ![Figure](figures/WindowsSecurityInternals_page_065_figure_005.png)
 
@@ -434,21 +425,21 @@ Working backward, the standard access component of the access mask defines opera
 
 Delete Removes the object; for example, by deleting it from disk or from the registry.
 
-ReadControl  Reads the security descriptor information for the object
+ReadControl Reads the security descriptor information for the object
 
 WriteData Writes the security descriptor's discretionary access control (DAC) to the object
 
 ---
 
-WriteOwner   Writes the owner information to the object
+WriteOwner Writes the owner information to the object
 
-Synchronize   Waits on the object; for example, waits for a process to exit or a mutant to be unlocked
+Synchronize Waits on the object; for example, waits for a process to exit or a mutant to be unlocked
 
 We'll cover security-related access in more detail in Chapters 5 and 6.
 
 Before this are the reserved and special access bits. Most of these bits are reserved, but they include two access values:
 
-AccessSystemSecurity  Reads or writes audit information on the object
+AccessSystemSecurity Reads or writes audit information on the object
 
 MaximumAllowed Requests the maximum access to an object when performing an access check
 
@@ -619,7 +610,7 @@ If the kernel object structure is no longer referenced, either through a handle 
 
 It is possible to get the kernel to mark an object as permanent, preventing the object from being destroyed when all handles close and allowing its name to remain in the OMNIS. To make an object permanent, you need to either specify the Permanent attribute flag when creating the object or use the system call RtlMakePermanentObject, which is mapped to the MakePermanent call on any object handle returned by a Get or New command. You need a special privilege, SeCreatePermanentPrivilege, to do this; we'll discuss privileges in Chapter 4.
 
-40    Chapter 2
+40 Chapter 2
 
 ---
 
@@ -699,7 +690,7 @@ A kernel object typically stores information about its state. For example, a Pro
 
 Instead, the kernel implements generic Query and Set information system calls whose parameters follow a common pattern for all kernel object types. Listing 2-19 shows the Query information system call's pattern, using the Process type as an example; for other types, just replace Process with the name of the kernel type.
 
-42    Chapter 2
+42 Chapter 2
 
 ---
 
@@ -788,7 +779,7 @@ Also, for many information classes the handle object already exposes properties 
 
 You can easily inspect properties by accessing them on the object or using the Format-List command. For example, Listing 2-23 lists all the properties on a Process object, then queries for the formatted CreationTime.
 
-44    Chapter 2
+44 Chapter 2
 
 ---
 
@@ -805,7 +796,7 @@ Saturday, October 24, 17:12:58
 
 Listing 2-23: Querying a handle object for properties and inspecting the CreationTime
 
-The QueryInformation and SetInformation classes for a type typically have the same enumerated values. The kernel can restrict the information class's enumerated values to one type of operation, returning the STATUS_INVALID _INFO_CLASS status code if it's not a valid value. For some types, such as registry keys, the information class differs between querying and setting, as you can see in Listing 2-24.
+The QueryInformation and SetInformation classes for a type typically have the same enumerated values. The kernel can restrict the information class's enumerated values to one type of operation, returning the STATUS_INVALID \_INFO_CLASS status code if it's not a valid value. For some types, such as registry keys, the information class differs between querying and setting, as you can see in Listing 2-24.
 
 ```bash
 PS> Get-NtObjectInformationClass Key
@@ -856,7 +847,6 @@ PS> ls NtObject\Device
 Listing 2-25: Displaying the Device objects
 
 In the output, we can see that the objects' type names are all Device.
-
 
 However, if you go looking for a system call with Device in the name, you'll come up empty. That's because we don't interact with the I/O manager using dedicated system calls; rather, we use file object system calls such as %tCreateFile. We can access these system calls through New-File and Get-File, which create and open files, respectively, as shown in Listing 2-26.
 
@@ -957,7 +947,7 @@ When you open a Process or Thread object using its ID, you'll receive a handle. 
 
 Note that the security of a process and its threads is independent. If you know the ID of a thread, it's possible to access the thread handle inside a process even if you can't access the process itself.
 
-48    Chapter 2
+48 Chapter 2
 
 ---
 
@@ -1031,7 +1021,7 @@ Free Indicates that the virtual memory region is unused. Using a free memory reg
 
 You may wonder what the difference is between Reserve and Free, if using both reserved and free memory regions will cause a crash. The Reserve state allows you to reserve virtual memory regions for later use so that nothing else can allocate memory within that range of memory addresses. You can later convert the Reserve state to Commit by re-calling NTAllocateVirtualMemory. The Free state indicates regions freely available for
 
-50    Chapter 2
+50 Chapter 2
 
 ---
 
@@ -1050,9 +1040,9 @@ Finally, we free the memory using Remove-NtVirtualMemory and verify that the mem
 Another way of allocating virtual memory is through Section objects. A Section object is a kernel type that implements memory-mapped files. We can use Section objects for two related purposes:
 
 - • Reading or writing a file as if it were all read into memory
-• Sharing memory between processes so that the modification in one
-process is reflected in the other
-We can create a Section object via the ntCreateSection system call or the New-ntSection PowerShell command. We must specify the size of the mapping, the protection for the memory, and an optional file handle; in return, we get a handle to the section.
+  • Sharing memory between processes so that the modification in one
+  process is reflected in the other
+  We can create a Section object via the ntCreateSection system call or the New-ntSection PowerShell command. We must specify the size of the mapping, the protection for the memory, and an optional file handle; in return, we get a handle to the section.
 
 However, creating a section doesn't automatically allow us to access the memory; we first need to map it into the virtual memory address space using NMAPView05ection or Add-N3Section. Listing 2-31 provides an example in which we create an anonymous section and map it into memory.
 
@@ -1092,7 +1082,7 @@ The second dependency is the access granted to the section handle you're mapping
 
 It's possible to map a section into another process by specifying a process handle to Add-NtSection. We don't need to specify the process to Remove-NtSection, as the mapping object knows what process it was mapped in. In the memory information output, the Name column would be populated by the name of the backing file, if it exists.
 
-52    Chapter 2
+52 Chapter 2
 
 ---
 
@@ -1165,14 +1155,13 @@ Listing 2-34: Displaying the Authenticode signature for a kernel driver
 
 Here, we query the signing status of the notepad.exe executable file, formatting the command's output as a list. The output starts with information
 
-54    Chapter 2
+54 Chapter 2
 
 ---
 
 about the signer's X.509 certificate. Here, I've shown only the subject name, which clearly indicates that this file is signed by Microsoft.
 
 Next is the status of the signature; in this case, the status indicates that the file is valid and that the signature has been verified. It's possible to have a signed file whose signature is invalid; for example, when the certificate has been revoked. In that case, the status is likely to show an error, such as
-
 
 NotSigned.
 
@@ -1252,7 +1241,7 @@ Using PowerShell, you can easily change this book's example scripts to do many d
 
 In these examples, I'll also highlight times where I've discovered security vulnerabilities using this tooling. This should give you a clear indication of what to look for in Microsoft or third-party applications if you're a security researcher; likewise, for developers, it will help you avoid certain pitfalls.
 
-56    Chapter 2
+56 Chapter 2
 
 ---
 
@@ -1325,15 +1314,13 @@ Next, we want to find Section objects that can be mapped as writable. We first c
 
 Now that we have potential candidates for shared sections, we need to work out which meet the criterion that we can access only one of the processes containing the section handle. We're making another assumption here: if we can open only one of the two processes that share the handle for D@pHandle access, then we've got a section shared between a privileged and a low-privileged process. After all, if you had D@pHandle access to both processes, you could already compromise the processes by stealing all
 
-58    Chapter 2
+58 Chapter 2
 
 ---
 
 their handles or duplicating their process handles, and if you couldn't get
 
-
 DupHandle access to either process, then you couldn't get access to the section
-
 
 handle at all.
 
@@ -1388,7 +1375,7 @@ In Windows, for a process to execute instructions, the memory must be marked as 
 
 Listing 2-40 shows how to check for memory in a process that is both writable and executable. Finding such memory might indicate that something malicious is going on, although in most cases this memory will be benign. For example, the .NET runtime creates writable and executable
 
-60    Chapter 2
+60 Chapter 2
 
 ---
 
@@ -1425,7 +1412,4 @@ A user doesn't directly interact with the kernel; instead, user-mode application
 
 ---
 
-
-
 ---
-

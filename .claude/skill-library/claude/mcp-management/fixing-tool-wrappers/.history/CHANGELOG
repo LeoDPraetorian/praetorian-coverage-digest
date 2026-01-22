@@ -1,0 +1,35 @@
+# Changelog: fixing-tool-wrappers
+
+## 2026-01-17 - Initial Creation
+
+**Type:** Library skill (Process/Pattern)
+**Category:** claude/mcp-management
+**Location:** `.claude/skill-library/claude/mcp-management/fixing-tool-wrappers/`
+
+**RED Phase Documentation:**
+
+**Gap identified:** No dedicated skill for MCP tool wrapper fix operations. The `managing-tool-wrappers` core skill routes fix operations, but there's no library skill documenting:
+- Which compliance phases can be auto-fixed vs manual
+- Commands for preview (--dry-run) and apply modes
+- Special handling for Phase 12 (Service Metadata) requiring user input
+- The audit → preview → fix → verify workflow
+
+**Failure scenario:** User asks "How do I fix Phase 2 compliance issues in my tool wrapper?"
+
+**Agent behavior WITHOUT skill (verbatim from agent afb1075):**
+- "Without knowing the specific Phase 2 issues, I would NOT suggest specific fix commands yet"
+- "I would NOT mention preview vs apply modes unless I found evidence in the documentation"
+- Multi-step manual investigation (grep through multiple files, read docs, then maybe suggest)
+- No awareness of fix command automation or workflow
+
+**Created:** 450-line SKILL.md with:
+- Quick reference table mapping phases to fix capabilities
+- Auto-fixable phases (2, 4, 11) with commands
+- Partial auto-fix workflow for Phase 12 (interactive description prompt)
+- Manual fix guidance for phases 1, 3, 5-10
+- Preview --dry-run as mandatory step
+- Complete audit → preview → fix → verify workflow
+
+**Integration:** Routes from `managing-tool-wrappers`, calls `auditing-tool-wrappers`
+
+**Next:** Phase 6 (Research), Phase 7 (Gateway update), Phase 8 (GREEN), Phase 9 (REFACTOR)

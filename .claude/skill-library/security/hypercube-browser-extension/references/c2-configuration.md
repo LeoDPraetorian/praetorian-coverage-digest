@@ -62,6 +62,7 @@
 ```
 
 **Rule explanation:**
+
 - `clients/` - Extensions can write their own UID, operator can read all
 - `requests/` - Operator writes, extensions read their own UID
 - `responses/` - Extensions write, operator reads
@@ -90,7 +91,7 @@ const firebaseConfig = {
   projectId: "project-id",
   storageBucket: "project.appspot.com",
   messagingSenderId: "123456789",
-  appId: "1:123:web:abc"
+  appId: "1:123:web:abc",
 };
 ```
 
@@ -139,6 +140,7 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 ### Encryption Layer
 
 **All Firebase data encrypted:**
+
 - Curve25519 keypair generated at build time
 - Shared secret derived between extension and proxy
 - AES-GCM encryption for all payloads
@@ -153,11 +155,13 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 **CRITICAL**: Use separate Firebase project per engagement
 
 **Why:**
+
 - Prevents cross-engagement contamination
 - Enables clean closure (delete project after engagement)
 - Reduces blast radius if compromised
 
 **Don't:**
+
 - Reuse Firebase projects across engagements
 - Use personal Firebase account
 - Leave projects running after engagement closure
@@ -165,6 +169,7 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 ### Payment Isolation
 
 **Use virtual cards** (privacy.com) for Firebase billing:
+
 - First-name-only cardholder names allowed
 - Disposable card numbers
 - No link to personal identity
@@ -172,6 +177,7 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 ### Project Naming
 
 **Naming convention:**
+
 - Format: `<engagement>-<client>-<year>`
 - Example: `redteam-acmecorp-2026`
 - Avoid: Real company names, obvious security terms
@@ -194,18 +200,21 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 ### Extension Can't Connect to Firebase
 
 **Check:**
+
 1. `client.json` credentials correct
 2. Anonymous auth enabled in Firebase Console
 3. Database rules allow anonymous read/write to `clients/`
 4. Network connectivity (firewall/proxy issues)
 
 **Console errors to look for:**
+
 - "Firebase: Error (auth/operation-not-allowed)" → Anonymous auth not enabled
 - "PERMISSION_DENIED" → Database rules incorrect
 
 ### Operator Proxy Can't Authenticate
 
 **Check:**
+
 1. `serviceAccountKey.json` from correct Firebase project
 2. Service account has Firebase Admin role
 3. API key in `serviceAccountKey.json` matches project
@@ -214,6 +223,7 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 ### Database Rules Rejecting Access
 
 **Debug:**
+
 1. Firebase Console → Realtime Database → Rules tab
 2. Check "Simulator" to test rules
 3. Test anonymous auth: `auth.provider === 'anonymous'`
@@ -231,6 +241,7 @@ serviceAccountKey.json → cmd/proxy/config.json → proxy binary
 4. **Cloud Functions** for HTTP-based C2
 
 **Trade-offs:**
+
 - Firebase is free, managed, reliable
 - Alternatives require more infrastructure
 - Hypercube-ng designed for Firebase (code changes needed)

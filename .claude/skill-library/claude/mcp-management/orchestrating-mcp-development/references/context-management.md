@@ -1,5 +1,9 @@
 # Context Management
 
+## Inherits From
+
+- `orchestrating-multi-agent-workflows/references/context-monitoring.md` (token thresholds, JSONL analysis, compaction triggers)
+
 ## Fresh Subagent Per Task
 
 Each Task dispatch creates a **NEW agent instance**. This is intentional:
@@ -43,7 +47,7 @@ Do NOT try to guide the failed agent through fixes.
 
 ## Fresh Context Per Batch
 
-When implementing tools in batches (Phase 6):
+When implementing tools in batches (Phase 8):
 
 1. **Load shared context** from architecture.md and shared-infrastructure.md
 2. **Spawn fresh agents** for batch tools (3-5 tools per batch)
@@ -94,7 +98,7 @@ Each agent receives:
 3. **Shared infrastructure** - Common utilities and patterns
 4. **No tool bleeding** - No details from other tools' implementations
 
-```markdown
+````markdown
 ## Agent Prompt Structure
 
 ### ✅ CORRECT: Isolated context
@@ -110,6 +114,7 @@ TOOL SCHEMA:
   "inputSchema": {...}
 }
 ```
+````
 
 SHARED ARCHITECTURE:
 [Paste architecture decisions]
@@ -118,6 +123,7 @@ SHARED INFRASTRUCTURE:
 [Paste common utilities]
 
 DO NOT reference other tools. Focus only on get-issue.
+
 ```
 
 ### ❌ WRONG: Context bleeding
@@ -150,10 +156,7 @@ orchestratorState = {
   currentBatch: 2,
   toolsCompleted: ["get-issue", "list-issues", "create-issue"],
   cumulativeIssues: 2,
-  sharedDecisions: [
-    "Use Result type for error handling",
-    "Token budget: 2000 per wrapper",
-  ],
+  sharedDecisions: ["Use Result type for error handling", "Token budget: 2000 per wrapper"],
 };
 ```
 
@@ -164,6 +167,48 @@ orchestratorState = {
   listIssuesCode: "...", // NO
 };
 // This pollutes orchestrator context and prevents parallel work
+```
+
+## Token Monitoring
+
+For services with >10 tools, monitor context usage per orchestrating-multi-agent-workflows:
+
+- **70% (140k tokens)**: Warning, consider batch size reduction
+- **85% (170k tokens)**: Mandatory compaction before next batch
+- **95% (190k tokens)**: Emergency checkpoint, persist progress
+
+> See `orchestrating-multi-agent-workflows/references/context-monitoring.md` for JSONL parsing script and implementation details.
+
+### MCP-Specific Token Guidance
+
+**Per-Batch Budget Recommendation:**
+
+- **Small services (3-5 tools):** ~15k tokens per batch
+- **Medium services (6-10 tools):** ~12k tokens per batch
+- **Large services (>10 tools):** ~10k tokens per batch
+
+**Cross-Session Persistence Triggers:**
+
+Use `persisting-progress-across-sessions` skill when:
+
+- Service has **>15 tools** (will exceed single session capacity)
+- Estimated duration **>2 hours** (risk of interruption)
+- Token usage reaches **85%** mid-workflow (mandatory checkpoint)
+
+**Budget Calculation Example:**
+
+```typescript
+// Service with 18 tools
+const TOOLS_COUNT = 18;
+const TOKEN_BUDGET = 200_000; // Total session budget
+const SAFETY_MARGIN = 0.15; // Reserve 15% for overhead
+const USABLE_BUDGET = TOKEN_BUDGET * (1 - SAFETY_MARGIN); // 170k tokens
+
+const BATCH_SIZE = 3;
+const BATCHES = Math.ceil(TOOLS_COUNT / BATCH_SIZE); // 6 batches
+const TOKEN_PER_BATCH = USABLE_BUDGET / BATCHES; // ~28k per batch
+
+// Monitor: If any batch exceeds 28k, reduce BATCH_SIZE to 2
 ```
 
 ## Why This Matters
@@ -193,7 +238,7 @@ Agent 2: [Fresh agent, no knowledge of get-issue]
 
 ## Related References
 
-- [Phase 5: Schema Discovery](../SKILL.md#phase-5-red-gate-failing-tests) - Schema per tool
-- [Phase 6: Implementation](../SKILL.md#phase-6-green-gate-implementation) - Batch isolation
+- [Phase 7: Schema Discovery](../SKILL.md#phase-5-red-gate-failing-tests) - Schema per tool
+- [Phase 8: Implementation](../SKILL.md#phase-6-green-gate-implementation) - Batch isolation
 - [Agent Prompts](agent-prompts.md) - Context boundaries
 - [Troubleshooting](troubleshooting.md) - Context loss recovery

@@ -1,415 +1,251 @@
-# Progress File Templates
+# MANIFEST.yaml Templates
 
 Ready-to-use templates for different orchestration complexities.
 
-## Minimal Template (3-4 Phases)
+## Minimal Template (Ad-hoc Agent Work)
 
-Use for simple orchestrations with clear linear flow.
+Use for standalone agent tasks without orchestration.
 
-````markdown
-# Orchestration: <Feature Name>
+```yaml
+feature_name: "<Feature Name>"
+feature_slug: "<kebab-case-slug>"
+created_at: "<ISO timestamp>"
+created_by: "<agent-name>"
+description: |
+  Brief description of what this accomplishes.
 
-## Status: in_progress
+status: "in-progress" # in-progress | complete | blocked
 
-## Last Updated: <ISO timestamp>
+agents_contributed:
+  - agent: "<agent-name>"
+    artifact: "<agent-name>-<output-type>.md"
+    timestamp: "<ISO timestamp>"
+    status: "in_progress"
 
-## Completed
-
-- [x] <Phase 1> - <brief result>
-- [x] <Phase 2> - <brief result>
-
-## Current
-
-- [ ] <Phase 3> - <what's happening>
-
-## Pending
-
-- [ ] <Phase 4>
-
-## Context
-
-- Key file: <path>
-- API: <endpoint>
-- Pattern: <chosen approach>
-
-## Latest Agent Output
-
-```json
-{
-  "status": "complete",
-  "summary": "...",
-  "files_created": [...]
-}
+artifacts:
+  - path: "<agent-name>-<output-type>.md"
+    type: "<output-type>"
+    agent: "<agent-name>"
 ```
-````
 
-````
+### Example: Quick Bug Fix
+
+```yaml
+feature_name: "Auth Token Refresh Fix"
+feature_slug: "auth-token-refresh-fix"
+created_at: "2026-01-15T14:30:22Z"
+created_by: "backend-developer"
+description: |
+  Fix token refresh race condition in auth middleware.
+
+status: "complete"
+
+agents_contributed:
+  - agent: "backend-developer"
+    artifact: "backend-developer-implementation.md"
+    timestamp: "2026-01-15T14:35:00Z"
+    status: "complete"
+
+artifacts:
+  - path: "backend-developer-implementation.md"
+    type: "implementation"
+    agent: "backend-developer"
+```
 
 ### Example: Component Implementation
 
-```markdown
-# Orchestration: Asset Filter Component
+```yaml
+feature_name: "Asset Filter Component"
+feature_slug: "asset-filter"
+created_at: "2026-01-15T09:00:00Z"
+created_by: "frontend-lead"
+description: |
+  Implement asset filtering with status, severity, and date filters.
+  Uses TanStack Query for data fetching.
 
-## Status: in_progress
-## Last Updated: 2024-01-15T14:30:00Z
+status: "in-progress"
 
-## Completed
-- [x] Architecture - Tier 2 component, local state only
-- [x] Implementation - AssetFilter.tsx with 3 filter types
+agents_contributed:
+  - agent: "frontend-lead"
+    artifact: "frontend-lead-architecture.md"
+    timestamp: "2026-01-15T09:15:00Z"
+    status: "complete"
+  - agent: "frontend-developer"
+    artifact: "frontend-developer-implementation.md"
+    timestamp: "2026-01-15T10:30:00Z"
+    status: "in_progress"
 
-## Current
-- [ ] Testing - Unit tests for filter logic
-
-## Pending
-- [ ] Review - Code quality check
-
-## Context
-- Component: src/sections/assets/components/AssetFilter.tsx
-- API: GET /my?resource=asset&status=A,F&class=ipv4
-- State: useState for filter values, TanStack Query for data
-
-## Latest Agent Output
-```json
-{
-  "status": "complete",
-  "summary": "Created AssetFilter component with status, severity, and date filters",
-  "files_created": [
-    "src/sections/assets/components/AssetFilter.tsx",
-    "src/sections/assets/hooks/useAssetFilters.ts"
-  ]
-}
-````
-
-````
-
-## Full Template (5+ Phases)
-
-Use for complex orchestrations with multiple agents and coordination needs.
-
-```markdown
-# Orchestration: <Feature Name>
-
-## Status: in_progress | complete | blocked
-## Started: <ISO timestamp>
-## Last Updated: <ISO timestamp>
-
-## Overview
-
-<2-3 sentence description of what this orchestration accomplishes and why it was needed.>
-
----
-
-## Completed Phases
-
-- [x] **Phase 1: <Name>** - <result summary>
-  - Agent: <agent-name>
-  - Completed: <timestamp>
-  - Key outputs: <list important decisions/files>
-
-- [x] **Phase 2: <Name>** - <result summary>
-  - Agent: <agent-name>
-  - Completed: <timestamp>
-  - Key outputs: <list>
-
-## Current Phase
-
-- [ ] **Phase 3: <Name>** - <what's in progress>
-  - Agent: <agent-name> (in progress)
-  - Started: <timestamp>
-  - Progress: <percentage or description>
-  - Notes: <any blockers or context>
-
-## Pending Phases
-
-- [ ] **Phase 4: <Name>** - <planned approach>
-- [ ] **Phase 5: <Name>** - <planned approach>
-- [ ] **Phase 6: <Name>** - <planned approach>
-
----
-
-## Context for Resume
-
-### Architecture Decisions
-- **Pattern**: <chosen architecture pattern>
-- **Database**: <schema/table design choices>
-- **API Design**: <endpoint contracts>
-- **State Management**: <frontend state approach>
-
-### Key File Paths
-| Purpose | Path |
-|---------|------|
-| Handler | `pkg/handler/handlers/<domain>/<file>.go` |
-| Service | `pkg/service/<domain>/service.go` |
-| Component | `src/sections/<section>/components/<file>.tsx` |
-| Tests | `<test file paths>` |
-
-### API Endpoints
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| GET | `/api/<resource>` | List resources |
-| POST | `/api/<resource>` | Create resource |
-
-### Dependencies
-- **Depends on**: <upstream services/features that must exist>
-- **Blocks**: <downstream work waiting on this>
-
-### Environment
-- Branch: `feature/<branch-name>`
-- Related PR: <if any>
-- Deployment: <environment if deployed>
-
-### Blockers
-- [ ] <Blocker 1 description> - Status: <pending/resolved>
-- [ ] <Blocker 2 description> - Status: <pending/resolved>
-
----
-
-## Agent Outputs
-
-### <agent-name> (Phase 1 - completed)
-```json
-{
-  "status": "complete",
-  "summary": "<what was accomplished>",
-  "decisions": {
-    "<decision-1>": "<choice>",
-    "<decision-2>": "<choice>"
-  },
-  "files_created": [
-    "<path-1>",
-    "<path-2>"
-  ],
-  "next_steps": ["<recommended follow-up>"]
-}
-````
-
-### <agent-name> (Phase 2 - completed)
-
-```json
-{
-  "status": "complete",
-  "summary": "<what was accomplished>",
-  "files_created": ["<paths>"],
-  "tests_passing": true
-}
+artifacts:
+  - path: "frontend-lead-architecture.md"
+    type: "architecture"
+    agent: "frontend-lead"
+  - path: "frontend-developer-implementation.md"
+    type: "implementation"
+    agent: "frontend-developer"
 ```
 
-### <agent-name> (Phase 3 - in_progress)
+## Full Template (Orchestrated Workflows)
 
-```json
-{
-  "status": "in_progress",
-  "started": "<timestamp>",
-  "partial_output": "<description of work done so far>",
-  "remaining": "<what's left to do>"
-}
+Use for complex orchestrations with multiple phases and agents.
+
+```yaml
+feature_name: "<Feature Name>"
+feature_slug: "<kebab-case-slug>"
+created_at: "<ISO timestamp>"
+created_by: "<orchestration-skill-or-agent>"
+description: |
+  Detailed feature description.
+  Explains what this orchestration accomplishes and why.
+
+status: "in-progress" # in-progress | complete | blocked
+current_phase: "<current-phase-name>"
+
+# Phase tracking (orchestrated workflows only)
+phases:
+  setup:
+    status: "complete"
+    timestamp: "<ISO timestamp>"
+  brainstorming:
+    status: "complete"
+    timestamp: "<ISO timestamp>"
+    approved: true
+  architecture:
+    status: "complete"
+    timestamp: "<ISO timestamp>"
+    agent: "<architect-agent>"
+  implementation:
+    status: "in_progress"
+    timestamp: "<ISO timestamp>"
+    agent: "<developer-agent>"
+  review:
+    status: "pending"
+    retry_count: 0
+  testing:
+    status: "pending"
+
+# Verification results (orchestrated workflows only)
+verification:
+  build: "PASS" # PASS | FAIL | NOT_RUN
+  tests: "NOT_RUN" # Free-form test results
+  review: "PENDING" # APPROVED | REJECTED | PENDING
+
+agents_contributed:
+  - agent: "<agent-1>"
+    artifact: "<filename-1>.md"
+    timestamp: "<ISO timestamp>"
+    status: "complete"
+  - agent: "<agent-2>"
+    artifact: "<filename-2>.md"
+    timestamp: "<ISO timestamp>"
+    status: "in_progress"
+
+artifacts:
+  - path: "<filename-1>.md"
+    type: "<output-type>"
+    agent: "<agent-1>"
+  - path: "<filename-2>.md"
+    type: "<output-type>"
+    agent: "<agent-2>"
 ```
-
----
-
-## Error Log
-
-### <timestamp> - <Error Category>
-
-- **Phase**: <which phase>
-- **Agent**: <which agent>
-- **Error**: <exact error message or description>
-- **Root Cause**: <why it happened>
-- **Resolution**: <how it was fixed, or "pending">
-- **Prevention**: <how to avoid in future>
-
----
-
-## Notes
-
-### User Preferences
-
-- <Any stated preferences about implementation>
-- <Style/pattern preferences>
-
-### Constraints Discovered
-
-- <Technical limitations found during implementation>
-- <Business rules learned>
-
-### Performance Targets
-
-- <Response time requirements>
-- <Scale requirements>
-
-### Future Improvements
-
-- <Ideas for follow-up work>
-- <Technical debt to address>
-
-````
 
 ### Example: Backend API Implementation
 
-```markdown
-# Orchestration: Job Processing Pipeline
+```yaml
+feature_name: "Job Processing Pipeline"
+feature_slug: "job-processing-pipeline"
+created_at: "2026-01-15T09:00:00Z"
+created_by: "orchestrating-feature-development"
+description: |
+  Implement a job processing pipeline with retry logic,
+  dead-letter queue handling, and full test coverage.
+  Supports async operations for long-running security scans.
 
-## Status: in_progress
-## Started: 2024-01-15T09:00:00Z
-## Last Updated: 2024-01-15T16:45:00Z
+status: "in-progress"
+current_phase: "testing"
 
-## Overview
+phases:
+  setup:
+    status: "complete"
+    timestamp: "2026-01-15T09:00:00Z"
+  brainstorming:
+    status: "complete"
+    timestamp: "2026-01-15T09:15:00Z"
+    approved: true
+  architecture:
+    status: "complete"
+    timestamp: "2026-01-15T10:30:00Z"
+    agent: "backend-lead"
+  implementation:
+    status: "complete"
+    timestamp: "2026-01-15T12:00:00Z"
+    agent: "backend-developer"
+  review:
+    status: "complete"
+    timestamp: "2026-01-15T14:00:00Z"
+    agent: "backend-reviewer"
+  testing:
+    status: "in_progress"
+    timestamp: "2026-01-15T14:30:00Z"
+    agent: "backend-tester"
+  security_review:
+    status: "pending"
 
-Implement a job processing pipeline with retry logic, dead-letter queue handling, and full test coverage. This supports async operations for long-running security scans.
+verification:
+  build: "PASS"
+  tests: "8/15 passed"
+  review: "APPROVED"
 
----
+agents_contributed:
+  - agent: "backend-lead"
+    artifact: "backend-lead-architecture.md"
+    timestamp: "2026-01-15T10:30:00Z"
+    status: "complete"
+  - agent: "backend-developer"
+    artifact: "backend-developer-implementation.md"
+    timestamp: "2026-01-15T12:00:00Z"
+    status: "complete"
+  - agent: "backend-reviewer"
+    artifact: "backend-reviewer-code-review.md"
+    timestamp: "2026-01-15T14:00:00Z"
+    status: "complete"
+  - agent: "backend-tester"
+    artifact: "backend-tester-test-plan.md"
+    timestamp: "2026-01-15T14:30:00Z"
+    status: "in_progress"
 
-## Completed Phases
-
-- [x] **Phase 1: Architecture** - Designed SQS-based pipeline with DLQ
-  - Agent: backend-architect
-  - Completed: 2024-01-15T10:30:00Z
-  - Key outputs: Queue design, retry strategy (exponential backoff 1s/2s/4s/8s)
-
-- [x] **Phase 2: Infrastructure** - CloudFormation deployed
-  - Agent: aws-infrastructure-specialist
-  - Completed: 2024-01-15T12:00:00Z
-  - Key outputs: job-processing-queue, job-processing-dlq created
-
-- [x] **Phase 3: Implementation** - Handler and service complete
-  - Agent: backend-developer
-  - Completed: 2024-01-15T14:30:00Z
-  - Key outputs: pkg/jobs/processor.go with retry logic
-
-## Current Phase
-
-- [ ] **Phase 4: Testing** - Unit and integration tests
-  - Agent: backend-tester (in progress)
-  - Started: 2024-01-15T14:45:00Z
-  - Progress: 8/15 tests complete
-  - Notes: Mock setup for DynamoDB took longer than expected
-
-## Pending Phases
-
-- [ ] **Phase 5: Acceptance Tests** - E2E with real queues
-- [ ] **Phase 6: Code Review** - Quality and patterns
-- [ ] **Phase 7: Security Review** - Input validation, error handling
-
----
-
-## Context for Resume
-
-### Architecture Decisions
-- **Pattern**: SQS consumer with Lambda trigger
-- **Database**: DynamoDB job status table with GSI on status
-- **Retry**: Exponential backoff (1s, 2s, 4s, 8s), max 3 retries
-- **DLQ**: After 3 failures, move to dead-letter queue for manual review
-
-### Key File Paths
-| Purpose | Path |
-|---------|------|
-| Processor | `pkg/jobs/processor.go` |
-| Handler | `pkg/handler/handlers/job/process.go` |
-| Service | `pkg/service/job/service.go` |
-| Unit Tests | `pkg/jobs/processor_test.go` |
-| CloudFormation | `infrastructure/job-processing.yaml` |
-
-### API Endpoints
-| Method | Endpoint | Purpose |
-|--------|----------|---------|
-| POST | `/api/jobs` | Create new job |
-| GET | `/api/jobs/:id` | Get job status |
-| POST | `/api/jobs/:id/retry` | Manually retry failed job |
-
-### Dependencies
-- **Depends on**: SQS queues (deployed), DynamoDB table (exists)
-- **Blocks**: Frontend job status UI, webhook notifications
-
-### Blockers
-- None currently
-
----
-
-## Agent Outputs
-
-### backend-architect (Phase 1 - completed)
-```json
-{
-  "status": "complete",
-  "summary": "Designed job processing architecture with SQS and DLQ",
-  "decisions": {
-    "queue_type": "SQS Standard",
-    "retry_strategy": "exponential_backoff",
-    "max_retries": 3,
-    "dlq_retention": "14 days"
-  }
-}
-````
-
-### backend-developer (Phase 3 - completed)
-
-```json
-{
-  "status": "complete",
-  "summary": "Implemented job processor with retry logic and DLQ routing",
-  "files_created": [
-    "pkg/jobs/processor.go",
-    "pkg/jobs/retry.go",
-    "pkg/handler/handlers/job/process.go"
-  ],
-  "tests_passing": true
-}
-```
-
-### backend-tester (Phase 4 - in_progress)
-
-```json
-{
-  "status": "in_progress",
-  "started": "2024-01-15T14:45:00Z",
-  "partial_output": "Created 8/15 tests. Happy path and basic error cases done.",
-  "remaining": "DLQ routing tests, concurrent processing tests, edge cases"
-}
-```
-
----
-
-## Error Log
-
-### 2024-01-15T11:30:00Z - Infrastructure Deployment
-
-- **Phase**: Infrastructure
-- **Agent**: aws-infrastructure-specialist
-- **Error**: CloudFormation stack creation failed - IAM role missing
-- **Root Cause**: Lambda execution role not included in template
-- **Resolution**: Added LambdaExecutionRole resource to template
-- **Prevention**: Use infrastructure checklist before deployment
-
----
-
-## Notes
-
-### User Preferences
-
-- Prefers detailed logging over minimal output
-- Wants comprehensive error messages for debugging
-
-### Constraints Discovered
-
-- SQS message visibility timeout must be longer than expected processing time
-- DynamoDB strongly consistent reads needed for job status checks
-
-### Performance Targets
-
-- Job processing: <30 seconds per job
-- Throughput: 100 jobs/minute sustained
-
+artifacts:
+  - path: "backend-lead-architecture.md"
+    type: "architecture"
+    agent: "backend-lead"
+  - path: "backend-developer-implementation.md"
+    type: "implementation"
+    agent: "backend-developer"
+  - path: "backend-reviewer-code-review.md"
+    type: "code-review"
+    agent: "backend-reviewer"
+  - path: "backend-tester-test-plan.md"
+    type: "test-plan"
+    agent: "backend-tester"
 ```
 
 ## Choosing a Template
 
-| Orchestration Type | Template | Phases | Agents |
-|--------------------|----------|--------|--------|
-| Simple component | Minimal | 3-4 | 2-3 |
-| Feature implementation | Minimal | 4-5 | 3-4 |
-| Complex backend system | Full | 5-7 | 4-6 |
-| Full-stack feature | Full | 6-8 | 5-8 |
-| Major refactoring | Full | 5-10 | 4-8 |
+| Scenario                      | Template | Phases | agents_contributed |
+| ----------------------------- | -------- | ------ | ------------------ |
+| Single agent quick task       | Minimal  | -      | 1                  |
+| Ad-hoc multi-agent (no orch)  | Minimal  | -      | 2-4                |
+| Orchestrated feature workflow | Full     | 5+     | 4-8                |
+| Orchestrated capability       | Full     | 6+     | 3-6                |
+| Complex integration           | Full     | 8+     | 5-10               |
 
-**Rule of thumb**: If you need to track architecture decisions, dependencies, or coordinate 4+ agents, use the full template.
-```
+**Rule of thumb**: If orchestration skill is coordinating phases (brainstorm → architecture → implement → review → test), use the full template with phases and verification objects.
+
+## Field Reference
+
+See [persisting-agent-outputs/references/manifest-structure.md](../../persisting-agent-outputs/references/manifest-structure.md) for complete field definitions.
+
+## Related
+
+- [Resume Checklist](resume-checklist.md) - How to resume from MANIFEST.yaml
+- [Compaction Protocol](compaction-protocol.md) - Context management
+- [Lifecycle Flowchart](lifecycle-flowchart.md) - Visual lifecycle

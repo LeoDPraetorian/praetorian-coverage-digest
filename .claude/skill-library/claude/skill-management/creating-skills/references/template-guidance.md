@@ -103,7 +103,7 @@ For skills that wrap MCP server tools.
 
 **SKILL.md** = overview, quick examples, core workflow, critical rules (target: 300-450 lines)
 
-**references/** = detailed explanations, API docs, advanced patterns (no line limit)
+**references/** = detailed explanations, API docs, advanced patterns (<400 lines each)
 
 **Distribution guidelines:**
 
@@ -153,6 +153,26 @@ my-skill/
 - SKILL.md: 293 lines (overview + quick reference)
 - references/: 7 files with 16KB detailed content
 - Total: Comprehensive coverage, scannable entry point
+
+---
+
+### Reference Depth Limit (MANDATORY)
+
+**Keep all references ONE level deep from SKILL.md.**
+
+Claude may partially read deeply nested files (using `head -100` preview), missing critical content at the end.
+
+```
+❌ WRONG (too deep):
+SKILL.md → refs/guide.md → refs/details.md → actual-info.md
+
+✅ CORRECT (one level):
+SKILL.md → refs/guide.md
+SKILL.md → refs/details.md
+SKILL.md → refs/api-reference.md
+```
+
+All referenced files should be directly accessible from SKILL.md links.
 
 ---
 
@@ -249,6 +269,19 @@ allowed-tools: Read, Grep, Glob
 ```
 
 Tool access control prevents unintended side effects. Always specify.
+
+### ❌ Deeply Nested References
+
+```markdown
+❌ WRONG:
+See [advanced.md](references/advanced.md) which links to [details.md](references/details.md)
+
+✅ CORRECT:
+See [advanced.md](references/advanced.md) for patterns
+See [details.md](references/details.md) for implementation
+```
+
+Claude may not fully read files referenced from other reference files.
 
 ### ❌ First/Second Person Descriptions
 

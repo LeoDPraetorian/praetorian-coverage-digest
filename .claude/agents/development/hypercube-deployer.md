@@ -120,11 +120,13 @@ Automates Firebase infrastructure setup, credential management, and build execut
 ### Step 1A: Verify GCloud Account
 
 1. **Display Active Google Account**:
+
    ```bash
    gcloud auth list
    ```
 
 2. **Show account prominently in output**:
+
    ```
    ⚠️  ACCOUNT VERIFICATION REQUIRED
 
@@ -150,6 +152,7 @@ Automates Firebase infrastructure setup, credential management, and build execut
 **🚨 Chrome DevTools automation requires isolated Chrome profile:**
 
 1. **Start Chrome with dedicated profile** (isolated from personal browsing):
+
    ```bash
    # macOS
    /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
@@ -164,6 +167,7 @@ Automates Firebase infrastructure setup, credential management, and build execut
    **Profile:** `hypercube-firebase-automation` (hardcoded, persistent across deployments)
 
 2. **Open Firebase Console and wait for user login**:
+
    ```bash
    # Use Chrome DevTools to navigate
    npx tsx -e "(async () => {
@@ -209,41 +213,41 @@ Automates Firebase infrastructure setup, credential management, and build execut
 ```typescript
 // Navigate to auth settings
 await chromeDevTools.page.navigate.execute({
-  url: `https://console.firebase.google.com/project/${projectId}/authentication/providers`
+  url: `https://console.firebase.google.com/project/${projectId}/authentication/providers`,
 });
 
 // Wait for page load
 await chromeDevTools.browser.waitFor.execute({
-  selector: 'firemat-data-table',
-  timeout: 10000
+  selector: "firemat-data-table",
+  timeout: 10000,
 });
 
 // Find and click Anonymous provider row
 await chromeDevTools.interact.click.execute({
-  selector: '[data-sign-in-method="anonymous"]'
+  selector: '[data-sign-in-method="anonymous"]',
 });
 
 // Wait for modal to appear
 await chromeDevTools.browser.waitFor.execute({
-  selector: 'mat-dialog-container',
-  timeout: 5000
+  selector: "mat-dialog-container",
+  timeout: 5000,
 });
 
 // Click Enable toggle
 await chromeDevTools.interact.click.execute({
-  selector: 'mat-slide-toggle[ng-reflect-name="enabled"]'
+  selector: 'mat-slide-toggle[ng-reflect-name="enabled"]',
 });
 
 // Click Save button
 await chromeDevTools.interact.click.execute({
-  selector: 'button[type="submit"]'
+  selector: 'button[type="submit"]',
 });
 
 // Verify success (wait for modal to close)
 await chromeDevTools.browser.waitFor.execute({
-  selector: 'mat-dialog-container',
-  state: 'hidden',
-  timeout: 5000
+  selector: "mat-dialog-container",
+  state: "hidden",
+  timeout: 5000,
 });
 ```
 
@@ -252,50 +256,50 @@ await chromeDevTools.browser.waitFor.execute({
 ```typescript
 // Navigate to database page
 await chromeDevTools.page.navigate.execute({
-  url: `https://console.firebase.google.com/project/${projectId}/database`
+  url: `https://console.firebase.google.com/project/${projectId}/database`,
 });
 
 // Click "Create Database" button
 await chromeDevTools.interact.click.execute({
-  selector: 'button:has-text("Create Database")'
+  selector: 'button:has-text("Create Database")',
 });
 
 // Wait for region selection modal
 await chromeDevTools.browser.waitFor.execute({
-  selector: 'mat-dialog-container',
-  timeout: 5000
+  selector: "mat-dialog-container",
+  timeout: 5000,
 });
 
 // Select us-central1 region (default)
 await chromeDevTools.interact.click.execute({
-  selector: 'mat-radio-button[value="us-central1"]'
+  selector: 'mat-radio-button[value="us-central1"]',
 });
 
 // Click Next
 await chromeDevTools.interact.click.execute({
-  selector: 'button:has-text("Next")'
+  selector: 'button:has-text("Next")',
 });
 
 // Wait for security rules step
 await chromeDevTools.browser.waitFor.execute({
-  text: 'Security rules for Realtime Database',
-  timeout: 5000
+  text: "Security rules for Realtime Database",
+  timeout: 5000,
 });
 
 // Select "Start in locked mode"
 await chromeDevTools.interact.click.execute({
-  selector: 'mat-radio-button[value="locked"]'
+  selector: 'mat-radio-button[value="locked"]',
 });
 
 // Click Enable
 await chromeDevTools.interact.click.execute({
-  selector: 'button:has-text("Enable")'
+  selector: 'button:has-text("Enable")',
 });
 
 // Wait for database creation (can take 30-60 seconds)
 await chromeDevTools.browser.waitFor.execute({
-  text: 'Data',
-  timeout: 90000
+  text: "Data",
+  timeout: 90000,
 });
 ```
 
@@ -304,17 +308,17 @@ await chromeDevTools.browser.waitFor.execute({
 ```typescript
 // Navigate to rules editor
 await chromeDevTools.page.navigate.execute({
-  url: `https://console.firebase.google.com/project/${projectId}/database/${projectId}-default-rtdb/rules`
+  url: `https://console.firebase.google.com/project/${projectId}/database/${projectId}-default-rtdb/rules`,
 });
 
 // Wait for Monaco editor to load
 await chromeDevTools.browser.waitFor.execute({
-  selector: '.monaco-editor',
-  timeout: 10000
+  selector: ".monaco-editor",
+  timeout: 10000,
 });
 
 // Read rules from local file
-const rules = fs.readFileSync('modules/hypercube-ng/database.rules.json', 'utf8');
+const rules = fs.readFileSync("modules/hypercube-ng/database.rules.json", "utf8");
 
 // Inject rules into Monaco editor
 await chromeDevTools.extract.evaluateScript.execute({
@@ -326,18 +330,18 @@ await chromeDevTools.extract.evaluateScript.execute({
       return { success: true };
     }
     return { success: false, error: 'Monaco editor not found' };
-  `
+  `,
 });
 
 // Click Publish button
 await chromeDevTools.interact.click.execute({
-  selector: 'button[aria-label="Publish"]'
+  selector: 'button[aria-label="Publish"]',
 });
 
 // Wait for success confirmation
 await chromeDevTools.browser.waitFor.execute({
-  text: 'Rules published',
-  timeout: 10000
+  text: "Rules published",
+  timeout: 10000,
 });
 ```
 
@@ -373,14 +377,15 @@ Test Firebase connectivity, verify WASM loading and service worker initializatio
 
 **✨ Chrome DevTools Automation eliminates 3 manual Console steps:**
 
-| Step | Before (Manual) | After (Automated) | Time Saved |
-|------|----------------|-------------------|------------|
-| **Anonymous Auth** | Copy Console URL → Navigate → Click 5 times → Type "done" | Fully automated via Chrome DevTools | ~2 minutes |
-| **Database Creation** | Copy Console URL → Navigate → Select region → Click 3 times → Wait → Type "done" | Fully automated via Chrome DevTools | ~3 minutes |
-| **Rules Deployment** | Copy Console URL → Copy rules file → Paste in Monaco → Click Publish | Fully automated via Chrome DevTools | ~2 minutes |
-| **Total** | 7 minutes + context switching | **0 minutes** (runs in background) | **100% reduction** |
+| Step                  | Before (Manual)                                                                  | After (Automated)                   | Time Saved         |
+| --------------------- | -------------------------------------------------------------------------------- | ----------------------------------- | ------------------ |
+| **Anonymous Auth**    | Copy Console URL → Navigate → Click 5 times → Type "done"                        | Fully automated via Chrome DevTools | ~2 minutes         |
+| **Database Creation** | Copy Console URL → Navigate → Select region → Click 3 times → Wait → Type "done" | Fully automated via Chrome DevTools | ~3 minutes         |
+| **Rules Deployment**  | Copy Console URL → Copy rules file → Paste in Monaco → Click Publish             | Fully automated via Chrome DevTools | ~2 minutes         |
+| **Total**             | 7 minutes + context switching                                                    | **0 minutes** (runs in background)  | **100% reduction** |
 
 **Additional Benefits:**
+
 - ✅ **No context switching** - Agent handles Console interaction
 - ✅ **No copy/paste errors** - Direct DOM manipulation
 - ✅ **Verifiable** - Wait for success messages before continuing

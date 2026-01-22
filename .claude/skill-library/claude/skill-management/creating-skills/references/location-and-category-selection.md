@@ -4,9 +4,9 @@
 
 ---
 
-## Phase 2: Location Selection
+## Phase 3: Location Selection
 
-**Note**: Gateways skip this phase - they're always created in Core. See [references/gateway-creation.md](references/gateway-creation.md).
+**Note**: Gateways skip location/category selection - they're always created in Core. See [references/gateway-creation.md](references/gateway-creation.md).
 
 Ask the user via AskUserQuestion:
 
@@ -33,9 +33,9 @@ Options:
 
 ---
 
-## Phase 3: Category Selection (Library Only)
+### Category Selection (Library Only)
 
-**Note**: Gateways skip this phase - they don't belong to library categories. See [references/gateway-creation.md](references/gateway-creation.md).
+**Note**: Gateways skip category selection - they don't belong to library categories. See [references/gateway-creation.md](references/gateway-creation.md).
 
 If library selected, discover available categories:
 

@@ -6,10 +6,10 @@ Camera event handling and animation patterns for Sigma.js.
 
 ```typescript
 interface CameraState {
-  x: number;         // Center X coordinate
-  y: number;         // Center Y coordinate
-  ratio: number;     // Zoom level (0.1 = zoomed out, 5 = zoomed in)
-  angle: number;     // Rotation in radians
+  x: number; // Center X coordinate
+  y: number; // Center Y coordinate
+  ratio: number; // Zoom level (0.1 = zoomed out, 5 = zoomed in)
+  angle: number; // Rotation in radians
 }
 ```
 
@@ -20,14 +20,11 @@ interface CameraState {
 **Solution:** Debounce camera updates to 100-150ms intervals:
 
 ```typescript
-import { useState, useEffect, useRef } from 'react';
-import { useSigma } from '@react-sigma/core';
-import type { Sigma } from 'sigma';
+import { useState, useEffect, useRef } from "react";
+import { useSigma } from "@react-sigma/core";
+import type { Sigma } from "sigma";
 
-export const useDebouncedCameraState = (
-  sigma: Sigma,
-  delay = 150
-) => {
+export const useDebouncedCameraState = (sigma: Sigma, delay = 150) => {
   const [state, setState] = useState(() => sigma.getCamera().getState());
   const timerRef = useRef<number | null>(null);
 
@@ -45,10 +42,10 @@ export const useDebouncedCameraState = (
       }, delay);
     };
 
-    camera.on('updated', handleUpdate);
+    camera.on("updated", handleUpdate);
 
     return () => {
-      camera.off('updated', handleUpdate);
+      camera.off("updated", handleUpdate);
       if (timerRef.current) {
         clearTimeout(timerRef.current);
       }
@@ -66,33 +63,33 @@ export const useDebouncedCameraState = (
 ### Animate to Position
 
 ```typescript
-import { useCallback } from 'react';
-import { useSigma } from '@react-sigma/core';
+import { useCallback } from "react";
+import { useSigma } from "@react-sigma/core";
 
 export const useCameraAnimation = () => {
   const sigma = useSigma();
 
-  const animateToNode = useCallback((nodeId: string) => {
-    const camera = sigma.getCamera();
-    const graph = sigma.getGraph();
+  const animateToNode = useCallback(
+    (nodeId: string) => {
+      const camera = sigma.getCamera();
+      const graph = sigma.getGraph();
 
-    const nodePosition = {
-      x: graph.getNodeAttribute(nodeId, 'x'),
-      y: graph.getNodeAttribute(nodeId, 'y'),
-    };
+      const nodePosition = {
+        x: graph.getNodeAttribute(nodeId, "x"),
+        y: graph.getNodeAttribute(nodeId, "y"),
+      };
 
-    camera.animate(
-      { x: nodePosition.x, y: nodePosition.y, ratio: 0.5 },
-      { duration: 500, easing: 'quadraticInOut' }
-    );
-  }, [sigma]);
+      camera.animate(
+        { x: nodePosition.x, y: nodePosition.y, ratio: 0.5 },
+        { duration: 500, easing: "quadraticInOut" }
+      );
+    },
+    [sigma]
+  );
 
   const resetCamera = useCallback(() => {
     const camera = sigma.getCamera();
-    camera.animate(
-      { x: 0.5, y: 0.5, ratio: 1, angle: 0 },
-      { duration: 300 }
-    );
+    camera.animate({ x: 0.5, y: 0.5, ratio: 1, angle: 0 }, { duration: 300 });
   }, [sigma]);
 
   return { animateToNode, resetCamera };
@@ -110,8 +107,10 @@ export const useZoomToFit = () => {
     const graph = sigma.getGraph();
 
     // Calculate graph bounds
-    let minX = Infinity, maxX = -Infinity;
-    let minY = Infinity, maxY = -Infinity;
+    let minX = Infinity,
+      maxX = -Infinity;
+    let minY = Infinity,
+      maxY = -Infinity;
 
     graph.forEachNode((_, attrs) => {
       minX = Math.min(minX, attrs.x);
@@ -127,10 +126,7 @@ export const useZoomToFit = () => {
     const height = maxY - minY;
     const ratio = Math.min(1 / width, 1 / height) * 0.8; // 0.8 for padding
 
-    camera.animate(
-      { x: centerX, y: centerY, ratio },
-      { duration: 500 }
-    );
+    camera.animate({ x: centerX, y: centerY, ratio }, { duration: 500 });
   }, [sigma]);
 
   return zoomToFit;
@@ -209,8 +205,8 @@ const settings = {
   zoomingRatio: 1.5, // Default: 1.5, Lower = slower zoom
 
   // Min/max zoom limits
-  minCameraRatio: 0.1,  // How far out
-  maxCameraRatio: 5.0,  // How far in
+  minCameraRatio: 0.1, // How far out
+  maxCameraRatio: 5.0, // How far in
 };
 ```
 
@@ -220,12 +216,12 @@ Complete list of camera events:
 
 ```typescript
 // All camera events
-camera.on('updated', handler);  // Any camera change (most common)
+camera.on("updated", handler); // Any camera change (most common)
 
 // Specific events
-camera.on('zoom', handler);     // Zoom only
-camera.on('pan', handler);      // Pan only
-camera.on('rotate', handler);   // Rotation only
+camera.on("zoom", handler); // Zoom only
+camera.on("pan", handler); // Pan only
+camera.on("rotate", handler); // Rotation only
 ```
 
 **Best practice:** Use `'updated'` event for most use cases - it fires for all changes.
@@ -243,7 +239,7 @@ camera.on('rotate', handler);   // Rotation only
 
 ```typescript
 // Causes 60+ re-renders per second
-camera.on('updated', () => {
+camera.on("updated", () => {
   setZoomLevel(camera.getState().ratio);
 });
 ```
@@ -260,7 +256,7 @@ useEffect(() => {
 ❌ **Don't:** Calculate viewport on every frame
 
 ```typescript
-camera.on('updated', () => {
+camera.on("updated", () => {
   const bounds = calculateViewport(); // Expensive
   setCulledNodes(getNodesInViewport(bounds));
 });
@@ -270,10 +266,7 @@ camera.on('updated', () => {
 
 ```typescript
 const bounds = useViewportBounds(); // Debounced + memoized
-const culledNodes = useMemo(
-  () => getNodesInViewport(bounds),
-  [bounds]
-);
+const culledNodes = useMemo(() => getNodesInViewport(bounds), [bounds]);
 ```
 
 ## See Also

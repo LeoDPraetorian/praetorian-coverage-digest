@@ -1,6 +1,6 @@
 ---
 name: developing-with-tdd
-description: Use when implementing any feature or bugfix, before writing implementation code - write the test first, watch it fail, write minimal code to pass; ensures tests actually verify behavior by requiring failure first
+description: Use when implementing features or bugfixes - write test first, watch it fail, write minimal code to pass
 allowed-tools: "Read, Bash, Grep, Glob"
 ---
 
@@ -244,12 +244,13 @@ func getExcludeSeverity(full bool) string {
 }
 
 // Test calls ACTUAL function
-func TestGetExcludeSeverity(t *testing.T) {
-    result := getExcludeSeverity(true)  // Calls real code
-    assert.Equal(t, "unknown", result)
+func TestGetExcludeSeverity(t \*testing.T) {
+result := getExcludeSeverity(true) // Calls real code
+assert.Equal(t, "unknown", result)
 }
 // Delete production code → test fails to compile. Correct.
-```
+
+````
 </Good>
 
 **The rule:** If logic is buried in untestable code, extract it to a testable function. Then test the function.
@@ -357,7 +358,7 @@ test("rejects empty email", async () => {
   const result = await submitForm({ email: "" });
   expect(result.error).toBe("Email required");
 });
-```
+````
 
 **Verify RED**
 
@@ -425,3 +426,36 @@ Otherwise → not TDD
 ```
 
 No exceptions without your human partner's permission.
+
+## Integration
+
+### Called By
+
+- `orchestrating-capability-development` (Phase 5 - developer prompts, Phase 8.2 - tester prompts)
+- `orchestrating-integration-development` (Phase 4 - implementation, Phase 7 - testing)
+- `orchestrating-feature-development` (developer/tester agent prompts)
+- `orchestrating-fingerprintx-development` (developer/tester agent prompts)
+- `debugging-systematically` - REQUIRED SUB-SKILL (Phase 4, Step 1 - creating failing test)
+- `developing-with-subagents` - Subagents implementing tasks should follow TDD
+- All \*-developer agents (frontend-developer, backend-developer, capability-developer, integration-developer, tool-developer)
+- All \*-tester agents (frontend-tester, backend-tester, capability-tester, tool-tester)
+
+### Requires (invoke before starting)
+
+| Skill                   | When | Purpose                                             |
+| ----------------------- | ---- | --------------------------------------------------- |
+| None - standalone skill | -    | Foundational methodology requiring no prerequisites |
+
+### Calls (during execution)
+
+| Skill                 | Phase/Step | Purpose                                            |
+| --------------------- | ---------- | -------------------------------------------------- |
+| None - terminal skill | -          | Describes methodology, doesn't invoke other skills |
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                      | Purpose                                           |
+| ----------------------------- | ---------------------------- | ------------------------------------------------- |
+| `verifying-before-completion` | After TDD cycle completes    | Verify all tests pass before claiming complete    |
+| `debugging-systematically`    | Bug found during development | Create failing test reproducing bug before fixing |
+| `using-todowrite`             | Multi-test TDD sessions      | Track RED-GREEN-REFACTOR phases externally        |

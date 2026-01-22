@@ -1,386 +1,177 @@
 # Agent Output Validation
 
-**Enforce mandatory skill invocation by validating agent outputs against compliance requirements.**
+**Comprehensive 4-tier skill hierarchy validation with gateway routing and library skill verification.**
 
 ## Overview
 
-Orchestrating skills embed mandatory skills in agent prompts, but agents may skip them during execution. This validation protocol detects non-compliance and triggers corrective action.
+Orchestrating skills embed mandatory skills in agent prompts, but agents may skip them during execution. This validation protocol detects non-compliance across all 4 tiers of the skill hierarchy and triggers corrective action.
 
-**Gap identified in**: `.claude/docs/orchestration/MULTI-AGENT-ORCHESTRATION-ARCHITECTURE.md`
+**Why comprehensive validation matters:**
 
-**Why it matters:**
+Without 4-tier validation:
 
-Without validation:
-- Agents receive mandatory skills in prompts but may skip them
-- Orchestrators have no way to detect non-compliance
-- Quality degrades silently
+- Agents skip universal core skills (using-skills, semantic-code-operations, etc.)
+- Gateway routing is bypassed (agents don't read library skills)
+- Testing quality suffers (gateway-testing mandatory skills ignored)
+- Task-specific patterns are missed (TanStack Query, form validation, etc.)
 
-With validation:
-- Non-compliance is detected immediately
-- Agents get explicit retry with clear requirements
-- Persistent non-compliance escalates to user
+With 4-tier validation:
 
-## Mandatory Skills by Agent Type
+- All universal skills enforced (8 skills, non-negotiable)
+- Gateway invocation verified (correct domain gateways per agent type)
+- Library skills read and incorporated (via gateway routing tables)
+- Task-specific patterns validated (keyword-based skill matching)
 
-These skills MUST appear in every agent's `skills_invoked` array:
+---
 
-| Agent Type          | Mandatory Skills                                                            |
-| ------------------- | --------------------------------------------------------------------------- |
-| \*-lead (architects) | adhering-to-dry, adhering-to-yagni, persisting-agent-outputs                |
-| \*-developer         | developing-with-tdd, verifying-before-completion, persisting-agent-outputs  |
-| \*-tester            | developing-with-tdd, verifying-before-completion, persisting-agent-outputs  |
-| \*-reviewer          | persisting-agent-outputs                                                    |
-| \*-security          | persisting-agent-outputs                                                    |
-| test-lead            | persisting-agent-outputs                                                    |
-| Explore              | persisting-agent-outputs                                                    |
+## Navigation
 
-**Pattern matching**: Replace `*` with the domain prefix (e.g., `frontend-developer` matches `*-developer` row).
+This document is split for progressive loading. Load sections as needed:
 
-## Validation Protocol
+| Section          | File                                                                         | Content                                            |
+| ---------------- | ---------------------------------------------------------------------------- | -------------------------------------------------- |
+| Main (this file) | agent-output-validation.md                                                   | Overview, Tier 1-4, Gateway Matrix, Output Schema  |
+| Algorithm        | [agent-output-validation-algorithm.md](agent-output-validation-algorithm.md) | 7-step validation code, gateway routing tables     |
+| Templates        | [agent-output-validation-templates.md](agent-output-validation-templates.md) | Re-spawn template, validation matrix, retry policy |
+| Examples         | [agent-output-validation-examples.md](agent-output-validation-examples.md)   | Success/failure examples, rationale, limitations   |
 
-After EVERY Task agent returns, the orchestrator MUST:
+---
 
-1. Read the agent's output file (not just the response summary)
-2. Parse the metadata JSON block at the end
-3. Check that `skills_invoked` array exists and is non-empty
-4. Compare `skills_invoked` against the mandatory skills table for that agent type
-5. If ANY mandatory skill is missing → re-spawn with explicit instruction
-6. If validation passes → proceed to next phase
+## Section 1: Skill Hierarchy Overview
 
-### Validation Pseudo-Code
+### Tier 1: Universal Core Skills (ALL agents, Step 1)
 
-```javascript
-function validateAgentOutput(agentType, outputFile) {
-    metadata = parseMetadataFromFile(outputFile)
+Every agent MUST invoke these 8 skills FIRST:
 
-    if (!metadata.skills_invoked) {
-        return { valid: false, missing: getAllMandatorySkills(agentType) }
-    }
+| Skill                             | Why                                                                       | Validation Check                                              |
+| --------------------------------- | ------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| using-skills                      | Non-negotiable first read, 1% threshold, skill discovery                  | `skills_invoked` contains "using-skills"                      |
+| discovering-reusable-code         | Search for reusable patterns before implementing                          | `skills_invoked` contains "discovering-reusable-code"         |
+| semantic-code-operations          | Core code tool - routes to Serena MCP for semantic search/editing         | `skills_invoked` contains "semantic-code-operations"          |
+| calibrating-time-estimates        | Prevents 'no time to read skills' rationalization                         | `skills_invoked` contains "calibrating-time-estimates"        |
+| enforcing-evidence-based-analysis | Prevents hallucinations - confidence without evidence = failure           | `skills_invoked` contains "enforcing-evidence-based-analysis" |
+| gateway-[domain]                  | Routes to mandatory + task-specific library skills (1-3 per agent)        | `skills_invoked` contains at least one "gateway-\*"           |
+| persisting-agent-outputs          | Defines WHERE to write output - discovery protocol, file naming, MANIFEST | `skills_invoked` contains "persisting-agent-outputs"          |
+| verifying-before-completion       | Ensures outputs are verified before claiming done                         | `skills_invoked` contains "verifying-before-completion"       |
 
-    mandatory = getMandatorySkills(agentType)
-    missing = mandatory.filter(s => !metadata.skills_invoked.includes(s))
+**CRITICAL**: ALL 8 must be present. If any are missing, validation FAILS.
 
-    if (missing.length > 0) {
-        return { valid: false, missing: missing }
-    }
+### Tier 2: Role-Specific Core Skills (Step 1 additions)
 
-    return { valid: true, missing: [] }
-}
-```
+Additional mandatory skills based on agent role:
 
-### Implementation Steps
+| Role           | Additional Core Skills       | Validation Check                 |
+| -------------- | ---------------------------- | -------------------------------- |
+| Lead/Architect | brainstorming, writing-plans | Both present in `skills_invoked` |
+| Developer      | developing-with-tdd          | Present in `skills_invoked`      |
+| Tester         | developing-with-tdd          | Present in `skills_invoked`      |
+| Reviewer       | (none - only Tier 1)         | No additional check              |
 
-**Step 1: Read output file**
+**Note**: gateway-testing is a gateway skill (Tier 1), NOT a Tier 2 skill.
 
-```bash
-cat .claude/.output/[workflow]/[agent]-output.md
-```
+### Tier 3: Gateway Mandatory Library Skills (Step 3)
 
-**Step 2: Extract metadata block**
+Skills the gateway marks as mandatory for ANY task in that domain. Agent must Read() these after invoking the gateway.
 
-Every agent output ends with JSON metadata (per persisting-agent-outputs):
+**From gateway-testing (mandatory for ALL test tasks):**
+
+| Library Skill                      | Path                                                                        | Validation Check                 |
+| ---------------------------------- | --------------------------------------------------------------------------- | -------------------------------- |
+| testing-anti-patterns              | `.claude/skill-library/testing/testing-anti-patterns/SKILL.md`              | Present in `library_skills_read` |
+| behavior-vs-implementation-testing | `.claude/skill-library/testing/behavior-vs-implementation-testing/SKILL.md` | Present in `library_skills_read` |
+| condition-based-waiting            | `.claude/skill-library/testing/condition-based-waiting/SKILL.md`            | Present in `library_skills_read` |
+| avoiding-low-value-tests           | `.claude/skill-library/testing/avoiding-low-value-tests/SKILL.md`           | Present in `library_skills_read` |
+
+**From gateway-frontend Testing Quality section (mandatory for frontend testing):**
+
+- Same 4 skills as above (applies when agent is frontend-tester)
+
+**Validation**: If agent type is `*-tester`, verify ALL 4 library skills are in `library_skills_read` array.
+
+### Tier 4: Task-Specific Library Skills (Step 3 via routing)
+
+Skills found via gateway intent detection tables based on task keywords. Training data is stale - agents MUST use gateway routing to find current patterns.
+
+**Validation approach**: Extract keywords from `original_task` and `files_modified`, match against gateway routing tables (see [algorithm](agent-output-validation-algorithm.md#section-5-gateway-routing-reference-condensed)), build expected skills list, verify against `library_skills_read`.
+
+**Examples:**
+
+- Task contains 'TanStack Query', 'cache', or 'fetch' → Expect `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md`
+- Task contains 'form' or 'validation' → Expect `.claude/skill-library/development/frontend/implementing-react-hook-form-zod/SKILL.md`
+- Files modified include `.go` files + keywords 'test' → Expect `.claude/skill-library/development/backend/implementing-golang-tests/SKILL.md`
+
+---
+
+## Section 2: Complete Gateway Matrix
+
+This table defines which gateways each agent type MUST invoke (Tier 1 validation).
+
+| Agent Type            | Required Gateways                                           | Validation Check                             |
+| --------------------- | ----------------------------------------------------------- | -------------------------------------------- |
+| frontend-lead         | gateway-frontend                                            | `skills_invoked` contains "gateway-frontend" |
+| frontend-developer    | gateway-frontend                                            | `skills_invoked` contains "gateway-frontend" |
+| frontend-tester       | gateway-frontend, gateway-testing                           | Both present in `skills_invoked`             |
+| frontend-reviewer     | gateway-frontend                                            | `skills_invoked` contains "gateway-frontend" |
+| backend-lead          | gateway-backend                                             | `skills_invoked` contains "gateway-backend"  |
+| backend-developer     | gateway-backend                                             | `skills_invoked` contains "gateway-backend"  |
+| backend-tester        | gateway-backend, gateway-testing                            | Both present in `skills_invoked`             |
+| backend-reviewer      | gateway-backend                                             | `skills_invoked` contains "gateway-backend"  |
+| tool-lead             | gateway-mcp-tools, gateway-typescript, gateway-integrations | All 3 present in `skills_invoked`            |
+| tool-developer        | gateway-mcp-tools, gateway-typescript, gateway-integrations | All 3 present in `skills_invoked`            |
+| tool-tester           | gateway-mcp-tools, gateway-typescript, gateway-testing      | All 3 present in `skills_invoked`            |
+| tool-reviewer         | gateway-mcp-tools, gateway-typescript                       | Both present in `skills_invoked`             |
+| capability-lead       | gateway-capabilities, gateway-backend                       | Both present in `skills_invoked`             |
+| capability-developer  | gateway-capabilities, gateway-backend, gateway-integrations | All 3 present in `skills_invoked`            |
+| capability-tester     | gateway-capabilities, gateway-backend, gateway-testing      | All 3 present in `skills_invoked`            |
+| capability-reviewer   | gateway-capabilities, gateway-backend                       | Both present in `skills_invoked`             |
+| integration-lead      | gateway-integrations, gateway-backend                       | Both present in `skills_invoked`             |
+| integration-developer | gateway-integrations, gateway-backend                       | Both present in `skills_invoked`             |
+| integration-tester    | gateway-integrations, gateway-backend, gateway-testing      | All 3 present in `skills_invoked`            |
+| security-\*           | gateway-security + domain gateway                           | Both present in `skills_invoked`             |
+
+---
+
+## Section 3: Agent Output Schema
+
+Required output fields for validation:
 
 ```json
 {
   "agent": "frontend-developer",
-  "skills_invoked": ["developing-with-tdd", "verifying-before-completion", "persisting-agent-outputs"],
-  "source_files_verified": ["path:lines"],
+  "task": "Implement user profile component with TanStack Query",
+  "skills_invoked": [
+    "using-skills",
+    "discovering-reusable-code",
+    "semantic-code-operations",
+    "calibrating-time-estimates",
+    "enforcing-evidence-based-analysis",
+    "gateway-frontend",
+    "persisting-agent-outputs",
+    "verifying-before-completion",
+    "developing-with-tdd"
+  ],
+  "library_skills_read": [
+    ".claude/skill-library/development/frontend/using-tanstack-query/SKILL.md",
+    ".claude/skill-library/development/frontend/using-shadcn-ui/SKILL.md"
+  ],
+  "files_modified": ["src/components/UserProfile.tsx", "src/hooks/useUserProfile.ts"],
   "status": "complete"
 }
 ```
 
-**Step 3: Look up mandatory skills**
+**Required fields:**
 
-```javascript
-agentType = metadata.agent
-mandatory = MANDATORY_SKILLS_TABLE[agentType]
-```
-
-**Step 4: Compare arrays**
-
-```javascript
-missing = mandatory.filter(skill => !metadata.skills_invoked.includes(skill))
-
-if (missing.length > 0) {
-    // Trigger re-spawn
-}
-```
-
-## Re-spawn Template
-
-When validation fails, re-spawn the agent with this template appended to the original prompt:
-
-```markdown
----
-COMPLIANCE FAILURE - RETRY REQUIRED
-
-Your previous attempt did not invoke these mandatory skills: [LIST MISSING SKILLS]
-
-Before completing this task, you MUST:
-1. Invoke each missing skill listed above
-2. Follow the skill's instructions completely
-3. Document ALL invoked skills in your output metadata
-
-Your output metadata MUST include:
-{
-  "skills_invoked": ["skill-1", "skill-2", ...],
-  // ... other required fields
-}
-
-This is your FINAL attempt. Failure to invoke mandatory skills will escalate to user.
----
-```
-
-### Re-spawn Example
-
-```typescript
-Task({
-  subagent_type: "frontend-developer",
-  description: "Retry implementation with compliance",
-  prompt: `
-    [ORIGINAL TASK DESCRIPTION]
-
-    ---
-    COMPLIANCE FAILURE - RETRY REQUIRED
-
-    Your previous attempt did not invoke these mandatory skills:
-    - developing-with-tdd
-    - verifying-before-completion
-
-    Before completing this task, you MUST:
-    1. Invoke each missing skill listed above
-    2. Follow the skill's instructions completely
-    3. Document ALL invoked skills in your output metadata
-
-    Your output metadata MUST include:
-    {
-      "skills_invoked": ["developing-with-tdd", "verifying-before-completion", "persisting-agent-outputs"],
-      // ... other required fields
-    }
-
-    This is your FINAL attempt. Failure to invoke mandatory skills will escalate to user.
-    ---
-  `
-})
-```
-
-## Max Retry Policy
-
-Prevent infinite loops with a three-attempt limit:
-
-| Attempt | Behavior                                                |
-| ------- | ------------------------------------------------------- |
-| 1       | Normal prompt with mandatory skills listed              |
-| 2       | Re-spawn with compliance failure template (after validation detects missing skills) |
-| 3       | Escalate to user via AskUserQuestion with full context  |
-
-### Retry Tracking
-
-Track attempts in TodoWrite or progress file:
-
-```json
-{
-  "phase": "implementation",
-  "agent": "frontend-developer",
-  "attempt": 2,
-  "max_attempts": 3,
-  "validation_failures": ["developing-with-tdd", "verifying-before-completion"]
-}
-```
-
-### Escalation After Max Retries
-
-```typescript
-AskUserQuestion({
-  questions: [{
-    question: "Agent failed skill compliance after 2 attempts. How to proceed?",
-    header: "Compliance",
-    multiSelect: false,
-    options: [
-      {
-        label: "Review agent output",
-        description: "Show me what the agent did and didn't do"
-      },
-      {
-        label: "Proceed anyway",
-        description: "Accept current state, document known gaps"
-      },
-      {
-        label: "Revise requirements",
-        description: "Modify mandatory skills list"
-      },
-      {
-        label: "Cancel",
-        description: "Stop workflow"
-      }
-    ]
-  }]
-})
-```
-
-## Integration with Orchestration Skills
-
-The following skills should reference this validation protocol after each Task dispatch phase:
-
-### orchestrating-feature-development
-
-**Integration point**: After Phase 6 (Implementation) completes, before Phase 7 (Plan Completion Review)
-
-```markdown
-### Phase 6: Implementation
-
-1. Spawn developer agents (per-task or batch mode)
-2. Wait for all agents to complete
-3. **VALIDATE OUTPUTS** (per agent-output-validation.md)
-4. If validation fails → re-spawn with compliance template
-5. If validation passes → proceed to Phase 7
-```
-
-### orchestrating-capability-development
-
-**Integration point**: After Phase 5 (Implementation) completes, before Phase 6 (Review)
-
-```markdown
-### Phase 5: Implementation
-
-1. Spawn capability-developer agent
-2. Wait for agent to complete
-3. **VALIDATE OUTPUT** (per agent-output-validation.md)
-4. If validation fails → re-spawn with compliance template
-5. If validation passes → proceed to Phase 6
-```
-
-### orchestrating-integration-development
-
-**Integration point**: After Phase 4 (Implementation) completes, before Phase 5 (P0 Validation)
-
-```markdown
-### Phase 4: Implementation
-
-1. Spawn integration-developer agent
-2. Wait for agent to complete
-3. **VALIDATE OUTPUT** (per agent-output-validation.md)
-4. If validation fails → re-spawn with compliance template
-5. If validation passes → proceed to Phase 5
-```
-
-## Complete Validation Example
-
-### Scenario
-
-Orchestrator spawns frontend-developer for implementation phase.
-
-**Agent prompt includes:**
-
-```markdown
-MANDATORY SKILLS (invoke ALL before completing):
-- developing-with-tdd: Write tests before implementation
-- verifying-before-completion: Verify all exit criteria
-- persisting-agent-outputs: Write output to designated file
-```
-
-### Agent Returns
-
-Orchestrator receives Task completion and reads output file:
-
-```bash
-cat .claude/.output/features/2026-01-16/frontend-developer-implementation.md
-```
-
-### Output File Content (End)
-
-```markdown
-... [implementation details] ...
+- `agent` - Agent type (for lookup in Gateway Matrix)
+- `task` - Original task description (for keyword extraction)
+- `skills_invoked` - Array of core skill names
+- `library_skills_read` - Array of full paths to library skill files
+- `files_modified` - Array of file paths (for technology detection)
+- `status` - Completion status ("complete" or "blocked")
 
 ---
-METADATA
----
-{
-  "agent": "frontend-developer",
-  "skills_invoked": ["persisting-agent-outputs"],
-  "source_files_verified": ["src/components/AssetFilter.tsx:47"],
-  "status": "complete"
-}
-```
 
-### Validation
+## Next Steps
 
-```javascript
-mandatory = ["developing-with-tdd", "verifying-before-completion", "persisting-agent-outputs"]
-invoked = ["persisting-agent-outputs"]
-missing = ["developing-with-tdd", "verifying-before-completion"]
-
-validation = { valid: false, missing: missing }
-```
-
-### Orchestrator Action
-
-```markdown
-❌ Validation FAILED for frontend-developer
-Missing skills: developing-with-tdd, verifying-before-completion
-
-→ Re-spawning with compliance template (Attempt 2/3)
-```
-
-### Re-spawn
-
-```typescript
-Task({
-  subagent_type: "frontend-developer",
-  description: "Retry with skill compliance",
-  prompt: `
-    [ORIGINAL TASK]
-
-    ---
-    COMPLIANCE FAILURE - RETRY REQUIRED
-
-    Your previous attempt did not invoke these mandatory skills:
-    - developing-with-tdd
-    - verifying-before-completion
-
-    [REST OF COMPLIANCE TEMPLATE]
-  `
-})
-```
-
-## Why This Protocol Exists
-
-**Real failure scenario:**
-
-1. Orchestrator spawns developer with TDD mandate
-2. Developer completes task, returns summary: "Implementation complete"
-3. Orchestrator reads summary, marks phase complete
-4. No tests were written (agent skipped TDD)
-5. Quality degraded silently
-
-**With validation:**
-
-1. Orchestrator spawns developer with TDD mandate
-2. Developer completes task
-3. Orchestrator reads output file, parses metadata
-4. `skills_invoked` array missing `developing-with-tdd`
-5. Validation fails → re-spawn with explicit requirement
-6. Developer writes tests on second attempt
-7. Validation passes → proceed
-
-## Limitations
-
-This validation protocol detects **if** agents invoked skills, but cannot verify **how well** they followed skill instructions. An agent could:
-
-- Invoke a skill but skip key steps
-- Mark skill as invoked in metadata dishonestly
-- Follow the letter but not the spirit of the skill
-
-**Mitigation strategies:**
-
-1. Human checkpoints at critical phases
-2. Code review by reviewer agents
-3. Quality scoring framework (see quality-scoring.md)
-4. Explicit exit criteria verification (see verifying-before-completion skill)
-
-## Related
-
-- [Post-Completion Verification Protocol](../SKILL.md#post-completion-verification-protocol-mandatory) - Manual verification process
-- [persisting-agent-outputs](../../persisting-agent-outputs/SKILL.md) - Metadata format specification
-- [Agent Routing Table](../SKILL.md#agent-routing-table) - What to do when agents are blocked
-- [Retry Limits with Escalation](../SKILL.md#retry-limits-with-escalation) - Max retry defaults
+- **For validation algorithm**: See [agent-output-validation-algorithm.md](agent-output-validation-algorithm.md)
+- **For re-spawn templates**: See [agent-output-validation-templates.md](agent-output-validation-templates.md)
+- **For complete examples**: See [agent-output-validation-examples.md](agent-output-validation-examples.md)

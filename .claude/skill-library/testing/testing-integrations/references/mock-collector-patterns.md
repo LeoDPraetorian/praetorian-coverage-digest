@@ -38,6 +38,7 @@ task := NewCapability(job, target, base.WithHTTPCollector(c))
 ### URL Matching: Exact vs Pattern
 
 **Exact Matching** (no regex):
+
 ```go
 c.MustRegisterHTTP("GET", "https://api.github.com/orgs/my-org", response)
 // Matches exactly: GET https://api.github.com/orgs/my-org
@@ -45,6 +46,7 @@ c.MustRegisterHTTP("GET", "https://api.github.com/orgs/my-org", response)
 ```
 
 **Pattern Matching** (regex):
+
 ```go
 c.MustRegisterHTTPPattern("POST", `https://api\.example\.com/users/.*`, response)
 // Matches: POST https://api.example.com/users/123
@@ -95,6 +97,7 @@ func (task *MyCapability) MockCollectors(asset *model.Integration) []base.Option
 ```
 
 Usage in tests:
+
 ```go
 task := NewMyCapability(job, target, mock.MockCollectors(target, &MyCapability{})...)
 ```
@@ -116,7 +119,7 @@ Capability ---job.Send(asset)---> Job Internal Queue
                     |                  |                  |
                     v                  v                  v
             MockGraph.Insert()  MockTable.Insert()  MockQueue.Enqueue()
-            
+
 Invoker enforces 1-second timeout (catches unmocked I/O)
 ```
 
@@ -135,7 +138,7 @@ func TestCapability_BasicDiscovery(t *testing.T) {
 
     // SECTION 2: Create mocked capability
     task := NewService(job, &integration, mock.MockCollectors(&integration, &Service{})...)
-    
+
     // SECTION 3: Create mock AWS services
     aws := mock.NewMockAWS("user@example.com")
 

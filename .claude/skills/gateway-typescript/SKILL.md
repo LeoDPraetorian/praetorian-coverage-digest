@@ -1,6 +1,6 @@
 ---
 name: gateway-typescript
-description: Routes TypeScript tasks to library skills. Intent detection + progressive loading.
+description: Use when working with TypeScript - routes to type patterns, Zod schemas, branded types, and TS configuration skills via progressive loading.
 allowed-tools: Read
 ---
 

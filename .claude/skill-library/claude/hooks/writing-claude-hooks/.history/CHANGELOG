@@ -1,0 +1,59 @@
+# Changelog
+
+## [2026-01-17] - Integration Section Added (Compliance Fix)
+
+### Added
+- Integration section documenting skill relationships (Phase 28 compliance)
+  - Called By: gateway-claude routes hook development tasks
+  - Requires: None (self-contained documentation)
+  - Calls: None (reference skill)
+  - Pairs With: None (standalone)
+
+### Changed
+- Compressed "Known Issues and Limitations" section (removed - not essential)
+- Compressed "Hybrid Approach" table into compact text format
+- Compressed "Additional Resources" section
+
+### Technical Details
+- File size after fix: 493 lines (under 500-line limit)
+- Resolves Phase 28 audit finding
+- Improves skill discoverability and relationship documentation
+- Extraction saved 38 lines to maintain compliance with line count limits
+
+### Why This Change
+Phase 28 requires Integration section to document how skills integrate with the broader skill ecosystem. This enables better skill discovery and workflow understanding.
+
+---
+
+## [2026-01-17] - Enforced Iteration Limits Pattern
+
+### Added
+- New section "## Enforced Iteration Limits" documenting deterministic iteration limit enforcement using Stop hooks
+- Complete bash script example for iteration-counter-stop.sh with state file tracking
+- State file initialization pattern and JSON schema
+- Hook configuration example for Stop hooks with iteration blocking
+- Hybrid approach table showing 4-layer architecture (Skill, State file, Stop hook, Scratchpad)
+- Key points about activation, deactivation, and parallel hook compatibility
+- Attribution to community research sources (Ralph Wiggum, Continuous-Claude-v3, claude-code-hooks-mastery)
+
+### Changed
+- Extracted verbose content to references/ to maintain line count under 500:
+  - Security Best Practices → references/security.md
+  - Hook Input Format → references/hook-input-format.md
+  - Performance Considerations → references/performance.md
+  - Lifecycle and Debugging → references/lifecycle-debugging.md
+  - Temporarily Active Hooks → references/advanced.md (appended)
+  - Implementation Workflow → references/patterns.md (prepended)
+- Condensed Plugin Hook Configuration section with reference link
+- Condensed Matchers section with reference link
+- Compressed Best Practices and Additional Resources sections
+
+### Technical Details
+- Original file size: 740 lines
+- Extracted content: 355 lines total
+- Added content: 93 lines (Enforced Iteration Limits section)
+- Final file size: 478 lines (under 500-line limit)
+- Pattern enables deterministic enforcement of max_iterations from skills like iterating-to-completion
+
+### Why This Change
+Skills document max_iterations as guidance, but Claude can rationalize around these limits. Stop hooks with state files provide deterministic enforcement that cannot be bypassed. This pattern bridges the gap between documented best practices (skills) and runtime behavior enforcement (hooks).

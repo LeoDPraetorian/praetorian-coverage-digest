@@ -39,8 +39,8 @@ Check multiple systems before proceeding.
 ```typescript
 const updateVisualization = () => {
   // Check all dependent systems
-  const layout = graph.getAttribute('layout');
-  const animation = graph.getAttribute('animation');
+  const layout = graph.getAttribute("layout");
+  const animation = graph.getAttribute("animation");
   const userInteraction = interactionManager.getState();
 
   // Guard: Layout must be stable
@@ -69,7 +69,7 @@ Provide degraded functionality instead of skipping entirely.
 
 ```typescript
 const renderGraph = () => {
-  const layout = graph.getAttribute('layout');
+  const layout = graph.getAttribute("layout");
 
   if (layout?.isRunning()) {
     // Guard failed - use simpler rendering
@@ -126,15 +126,15 @@ enum SystemReadiness {
   READY = 2,
 }
 
-const performOperation = (level: 'read' | 'write' | 'critical') => {
+const performOperation = (level: "read" | "write" | "critical") => {
   const readiness = system.getReadinessLevel();
 
   // Graduated guards based on operation criticality
-  if (level === 'critical' && readiness < SystemReadiness.READY) {
+  if (level === "critical" && readiness < SystemReadiness.READY) {
     return; // Critical ops require full readiness
   }
 
-  if (level === 'write' && readiness < SystemReadiness.PARTIAL) {
+  if (level === "write" && readiness < SystemReadiness.PARTIAL) {
     return; // Writes need partial readiness
   }
 
@@ -151,7 +151,7 @@ const performOperation = (level: 'read' | 'write' | 'critical') => {
 
 ```typescript
 const updateNode = () => {
-  const layout = graph.getAttribute('layout');
+  const layout = graph.getAttribute("layout");
   if (layout.isRunning()) return;
 
   // TIME PASSES - layout could start here!
@@ -163,7 +163,7 @@ const updateNode = () => {
 
 ```typescript
 const updateNode = () => {
-  const layout = graph.getAttribute('layout');
+  const layout = graph.getAttribute("layout");
 
   // Lock or mark as "in update" atomically
   if (!layout.acquireUpdateLock()) return;
@@ -190,8 +190,8 @@ if (system.isBusy()) return;
 
 ```typescript
 if (system.isBusy()) {
-  console.debug('[Guard] Skipped update - system busy', {
-    operation: 'updateNode',
+  console.debug("[Guard] Skipped update - system busy", {
+    operation: "updateNode",
     systemState: system.getState(),
     timestamp: Date.now(),
   });
@@ -240,11 +240,11 @@ if (canProceed()) {
 Verify operation is skipped when guard fails.
 
 ```typescript
-test('skips update when layout is running', () => {
+test("skips update when layout is running", () => {
   const layout = mockLayout({ isRunning: true });
-  graph.setAttribute('layout', layout);
+  graph.setAttribute("layout", layout);
 
-  const spy = vi.spyOn(graph, 'updateNode');
+  const spy = vi.spyOn(graph, "updateNode");
   updateVisualization();
 
   expect(spy).not.toHaveBeenCalled();
@@ -256,11 +256,11 @@ test('skips update when layout is running', () => {
 Verify operation proceeds when guard passes.
 
 ```typescript
-test('performs update when layout is idle', () => {
+test("performs update when layout is idle", () => {
   const layout = mockLayout({ isRunning: false });
-  graph.setAttribute('layout', layout);
+  graph.setAttribute("layout", layout);
 
-  const spy = vi.spyOn(graph, 'updateNode');
+  const spy = vi.spyOn(graph, "updateNode");
   updateVisualization();
 
   expect(spy).toHaveBeenCalled();
@@ -272,14 +272,14 @@ test('performs update when layout is idle', () => {
 Verify all guards must pass.
 
 ```typescript
-test('requires all systems idle', () => {
+test("requires all systems idle", () => {
   const layout = mockLayout({ isRunning: false });
   const animation = mockAnimation({ isActive: true }); // Still animating
 
-  graph.setAttribute('layout', layout);
-  graph.setAttribute('animation', animation);
+  graph.setAttribute("layout", layout);
+  graph.setAttribute("animation", animation);
 
-  const spy = vi.spyOn(graph, 'updateNode');
+  const spy = vi.spyOn(graph, "updateNode");
   updateVisualization();
 
   expect(spy).not.toHaveBeenCalled(); // Blocked by animation
@@ -315,10 +315,7 @@ const useGuardCache = (checkFn: () => boolean, deps: any[]) => {
 };
 
 // Only recompute when layout changes
-const layoutReady = useGuardCache(
-  () => !layout?.isRunning(),
-  [layout]
-);
+const layoutReady = useGuardCache(() => !layout?.isRunning(), [layout]);
 ```
 
 ## Integration with Other Patterns
@@ -333,7 +330,7 @@ const useCoordinatedUpdate = () => {
 
   // Event: Wait for layout complete
   useEffect(() => {
-    const layout = graph.getAttribute('layout');
+    const layout = graph.getAttribute("layout");
     if (!layout) return;
 
     const checkComplete = () => {

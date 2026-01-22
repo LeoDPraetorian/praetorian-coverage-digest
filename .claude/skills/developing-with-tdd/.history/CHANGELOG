@@ -1,0 +1,27 @@
+# Changelog
+
+## 2026-01-19
+
+**Fixed**: Phase 1 compliance - Shortened description from 223 to 108 characters to meet <120 character guideline.
+
+**Method**: Claude-Automated (semantic reasoning to preserve core concepts while meeting length constraint)
+
+**Impact**: Improved discoverability and compliance. Description now concise while maintaining key trigger terms: "implementing features or bugfixes", "write test first", "watch it fail", "minimal code to pass".
+
+**Previous**: "Use when implementing any feature or bugfix, before writing implementation code - write the test first, watch it fail, write minimal code to pass; ensures tests actually verify behavior by requiring failure first" (223 chars)
+
+**Current**: "Use when implementing features or bugfixes - write test first, watch it fail, write minimal code to pass" (108 chars)
+
+## 2026-01-18
+
+**Added**: Phase 28 compliance - Created Integration section documenting skill relationships.
+
+**Method**: Claude-Automated (codebase search found 313 references across skills, agents, and orchestration workflows)
+
+**Impact**: Skill dependencies now explicit. Documents that this is a foundational methodology skill called by all developer/tester agents and multiple orchestration workflows.
+
+**Integration section includes:**
+- Called By: 8+ orchestration skills, debugging-systematically, developing-with-subagents, all developer/tester agents
+- Requires: None (standalone foundational skill)
+- Calls: None (terminal skill - describes methodology)
+- Pairs With: verifying-before-completion, debugging-systematically, using-todowrite

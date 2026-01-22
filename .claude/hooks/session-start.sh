@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 # SessionStart hook for Chariot
 # Injects using-skills content so Claude uses skill-search CLI + Read tool pattern
+# Resets state files for fresh session
 # Starts Serena in SSE mode for persistent session-long connection
 
 set -euo pipefail
@@ -8,6 +9,33 @@ set -euo pipefail
 # Set SERENA_HOME to project-local config (version-controlled, shared between developers)
 SCRIPT_DIR_EARLY="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")" && pwd)"
 export SERENA_HOME="${SCRIPT_DIR_EARLY}/../.serena"
+
+# =============================================================================
+# STATE FILE CLEANUP (fresh session = fresh state)
+# =============================================================================
+# Reset iteration and modification state for new sessions
+# This ensures limits are enforced per-session, not accumulated across sessions
+#
+# Files reset (session-specific patterns to avoid cross-terminal conflicts):
+#   - iteration-state-*.json: Iteration counter for iterating-to-completion
+#   - modification-state-*.json: File modification tracking for quality gates
+#   - feedback-loop-state-*.json: Inter-phase feedback loop state
+#   - escalation-context-*.json: Escalation context for external LLM analysis
+#
+# Note: Using wildcards to clean ALL session state files since each session
+# gets a unique ID. Old session files are always stale.
+# =============================================================================
+
+HOOKS_DIR="${SCRIPT_DIR_EARLY}"
+rm -f "${HOOKS_DIR}"/iteration-state-*.json 2>/dev/null || true
+rm -f "${HOOKS_DIR}"/modification-state-*.json 2>/dev/null || true
+rm -f "${HOOKS_DIR}"/feedback-loop-state-*.json 2>/dev/null || true
+rm -f "${HOOKS_DIR}"/escalation-context-*.json 2>/dev/null || true
+# Also clean legacy non-session-specific files
+rm -f "${HOOKS_DIR}/iteration-state.json" 2>/dev/null || true
+rm -f "${HOOKS_DIR}/modification-state.json" 2>/dev/null || true
+rm -f "${HOOKS_DIR}/feedback-loop-state.json" 2>/dev/null || true
+rm -f "${HOOKS_DIR}/escalation-context.json" 2>/dev/null || true
 
 # =============================================================================
 # SERENA DISABLED (2026-01-04)

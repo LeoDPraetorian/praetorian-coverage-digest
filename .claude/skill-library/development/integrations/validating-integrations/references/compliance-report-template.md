@@ -4,7 +4,7 @@
 
 ## Report Structure
 
-```markdown
+````markdown
 # Integration Compliance Report: {vendor-name}
 
 **Date**: {YYYY-MM-DD}
@@ -22,15 +22,15 @@
 
 ## Requirements Matrix
 
-| # | Requirement | Status | Evidence | Notes |
-|---|-------------|--------|----------|-------|
-| 1 | VMFilter | ✅ / ❌ / N/A | file.go:line | |
-| 2 | CheckAffiliation | ✅ / ❌ / N/A | file.go:line | |
-| 3 | ValidateCredentials | ✅ / ❌ / N/A | file.go:line | |
-| 4 | errgroup Safety | ✅ / ❌ / N/A | file.go:line | |
-| 5 | Error Handling | ✅ / ❌ | file.go:line | |
-| 6 | Pagination Safety | ✅ / ❌ / N/A | file.go:line | |
-| 7 | File Size | ✅ / ❌ | {lines} lines | |
+| #   | Requirement         | Status        | Evidence      | Notes |
+| --- | ------------------- | ------------- | ------------- | ----- |
+| 1   | VMFilter            | ✅ / ❌ / N/A | file.go:line  |       |
+| 2   | CheckAffiliation    | ✅ / ❌ / N/A | file.go:line  |       |
+| 3   | ValidateCredentials | ✅ / ❌ / N/A | file.go:line  |       |
+| 4   | errgroup Safety     | ✅ / ❌ / N/A | file.go:line  |       |
+| 5   | Error Handling      | ✅ / ❌       | file.go:line  |       |
+| 6   | Pagination Safety   | ✅ / ❌ / N/A | file.go:line  |       |
+| 7   | File Size           | ✅ / ❌       | {lines} lines |       |
 
 ---
 
@@ -41,6 +41,7 @@
 **Status**: ✅ PASS / ❌ FAIL / N/A
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Issue** (if FAIL):
@@ -54,6 +55,7 @@
 **Status**: ✅ PASS / ❌ FAIL / N/A
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Issue** (if FAIL):
@@ -67,6 +69,7 @@
 **Status**: ✅ PASS / ❌ FAIL / N/A
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Issue** (if FAIL):
@@ -80,6 +83,7 @@
 **Status**: ✅ PASS / ❌ FAIL / N/A
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Issue** (if FAIL):
@@ -93,6 +97,7 @@
 **Status**: ✅ PASS / ❌ FAIL
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Violations Found** (if FAIL):
@@ -108,6 +113,7 @@
 **Status**: ✅ PASS / ❌ FAIL / N/A
 
 **Evidence**:
+
 - {file.go}:{line} - `{code snippet or description}`
 
 **Issue** (if FAIL):
@@ -121,6 +127,7 @@
 **Status**: ✅ PASS / ❌ FAIL
 
 **Evidence**:
+
 - Main file: {vendor.go} - {lines} lines
 - Split files: {list or "None"}
 
@@ -135,12 +142,15 @@
 ## Recommendations
 
 ### Priority 1 (Critical)
+
 1. {Critical fix needed}
 
 ### Priority 2 (High)
+
 1. {High priority improvement}
 
 ### Priority 3 (Medium)
+
 1. {Medium priority improvement}
 
 ---
@@ -171,7 +181,9 @@ grep -n 'maxPages\|MaxPages' {vendor}/{vendor}.go
 # File Size
 wc -l {vendor}/{vendor}.go
 ```
-```
+````
+
+````
 
 ---
 
@@ -245,7 +257,7 @@ wc -l {vendor}/{vendor}.go
 ### 7. File Size
 **Status**: ✅ PASS
 **Evidence**: github.go - 285 lines (under 400 limit)
-```
+````
 
 ---
 
@@ -269,21 +281,22 @@ wc -l {vendor}/{vendor}.go
 
 ## Requirements Matrix
 
-| # | Requirement | Status | Evidence | Notes |
-|---|-------------|--------|----------|-------|
-| 1 | VMFilter | ✅ | xpanse.go:390 | filter.Asset() before Send |
-| 2 | CheckAffiliation | ❌ | base default | Uses base class stub |
-| 3 | ValidateCredentials | ✅ | xpanse.go:108 | Validates headers |
-| 4 | errgroup Safety | ✅ | xpanse.go:390 | SetLimit(10) |
-| 5 | Error Handling | ❌ | xpanse.go:158,256,352,448 | 4 json.Marshal ignored |
-| 6 | Pagination Safety | ✅ | cursor-based with retry | Uses cursor pagination |
-| 7 | File Size | ❌ | 509 lines | 27% over 400 limit |
+| #   | Requirement         | Status | Evidence                  | Notes                      |
+| --- | ------------------- | ------ | ------------------------- | -------------------------- |
+| 1   | VMFilter            | ✅     | xpanse.go:390             | filter.Asset() before Send |
+| 2   | CheckAffiliation    | ❌     | base default              | Uses base class stub       |
+| 3   | ValidateCredentials | ✅     | xpanse.go:108             | Validates headers          |
+| 4   | errgroup Safety     | ✅     | xpanse.go:390             | SetLimit(10)               |
+| 5   | Error Handling      | ❌     | xpanse.go:158,256,352,448 | 4 json.Marshal ignored     |
+| 6   | Pagination Safety   | ✅     | cursor-based with retry   | Uses cursor pagination     |
+| 7   | File Size           | ❌     | 509 lines                 | 27% over 400 limit         |
 
 ---
 
 ## Recommendations
 
 ### Priority 1 (Critical)
+
 1. **Fix ignored JSON errors** (4 instances)
    - xpanse.go:158 - Add error check for json.Marshal
    - xpanse.go:256 - Add error check for json.Marshal
@@ -295,6 +308,7 @@ wc -l {vendor}/{vendor}.go
    - Extract client methods to xpanse_client.go (~100 lines)
 
 ### Priority 2 (High)
+
 1. **Implement real CheckAffiliation** if Xpanse API supports single-asset query
 ```
 
@@ -302,16 +316,16 @@ wc -l {vendor}/{vendor}.go
 
 ## Status Definitions
 
-| Status | Meaning |
-|--------|---------|
-| ✅ PASS | Requirement met with evidence |
-| ❌ FAIL | Requirement not met, remediation needed |
-| N/A | Requirement not applicable to this integration type |
+| Status  | Meaning                                             |
+| ------- | --------------------------------------------------- |
+| ✅ PASS | Requirement met with evidence                       |
+| ❌ FAIL | Requirement not met, remediation needed             |
+| N/A     | Requirement not applicable to this integration type |
 
 ## Severity Definitions
 
-| Severity | Criteria | Example |
-|----------|----------|---------|
-| CRITICAL | Breaks functionality or causes data issues | Ignored errors, missing VMFilter |
-| WARNING | Reduces maintainability or violates best practice | File size, suboptimal patterns |
-| INFO | Minor improvement opportunity | Documentation, code style |
+| Severity | Criteria                                          | Example                          |
+| -------- | ------------------------------------------------- | -------------------------------- |
+| CRITICAL | Breaks functionality or causes data issues        | Ignored errors, missing VMFilter |
+| WARNING  | Reduces maintainability or violates best practice | File size, suboptimal patterns   |
+| INFO     | Minor improvement opportunity                     | Documentation, code style        |

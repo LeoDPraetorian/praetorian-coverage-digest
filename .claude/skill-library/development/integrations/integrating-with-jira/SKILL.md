@@ -16,6 +16,20 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch, WebSearch
 - Security: Never commit API tokens to repositories
 - Rate limit awareness (varies by Jira edition and hosting type)
 
+## Chariot Integration Requirements
+
+This skill documents Jira API patterns. For implementing Jira integrations in Chariot, you MUST also follow:
+
+- **P0 Requirements**: See `developing-integrations` skill for mandatory patterns
+- **VMFilter**: Required for multi-tenancy - filter all assets/risks by job owner
+- **CheckAffiliation**: Required for ownership verification before processing
+- **ValidateCredentials**: Required fail-fast pattern at integration start
+- **errgroup**: Required for safe concurrent pagination with SetLimit()
+
+Cross-reference: `.claude/skill-library/development/integrations/developing-integrations/SKILL.md`
+
+**See:** [references/chariot-integration.md](references/chariot-integration.md) for complete implementation patterns.
+
 ## Critical 2026 Breaking Changes
 
 **Action required for existing integrations:**
@@ -443,9 +457,26 @@ This skill focuses on **Jira-specific patterns**. For general integration patter
 - `integrating-with-bugcrowd` - Security platform integration patterns
 - `integrating-with-hackerone` - Vulnerability platform integration patterns
 
+## Integration
+
+### Called By
+
+- `orchestrating-integration-development` - Phase 5 implementation
+- `integration-developer` agent
+
+### Requires
+
+- `developing-integrations` (LIBRARY) - P0 compliance requirements (VMFilter, CheckAffiliation, ValidateCredentials, errgroup) - `Read(".claude/skill-library/development/integrations/developing-integrations/SKILL.md")`
+
+### Pairs With
+
+- `validating-integrations` (LIBRARY) - P0 compliance verification - `Read(".claude/skill-library/development/integrations/validating-integrations/SKILL.md")`
+- `testing-integrations` (LIBRARY) - Mock patterns and test coverage - `Read(".claude/skill-library/development/integrations/testing-integrations/SKILL.md")`
+
 ## References
 
 - [references/authentication.md](references/authentication.md) - Complete authentication patterns by edition (OAuth 2.0, API tokens, PAT)
+- [references/chariot-integration.md](references/chariot-integration.md) - Chariot P0 integration patterns (VMFilter, CheckAffiliation, ValidateCredentials, errgroup, Asset Mapping)
 - [references/pagination.md](references/pagination.md) - Pagination strategies (offset vs token-based, migration guide)
 - [references/rate-limiting.md](references/rate-limiting.md) - Rate limit patterns (Feb 2026 points-based system)
 - [references/jql-reference.md](references/jql-reference.md) - JQL syntax and advanced queries

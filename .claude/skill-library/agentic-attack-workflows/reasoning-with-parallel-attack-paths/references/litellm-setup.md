@@ -11,6 +11,7 @@ pip install litellm
 ```
 
 **Version requirements:**
+
 - Python 3.8+
 - litellm >= 1.0.0
 
@@ -43,6 +44,7 @@ export GOOGLE_APPLICATION_CREDENTIALS="/path/to/service-account-key.json"
 ```
 
 **Setup:**
+
 1. Create service account in Google Cloud Console
 2. Enable Vertex AI API
 3. Grant "Vertex AI User" role
@@ -62,12 +64,12 @@ export DEEPSEEK_API_KEY="sk-..."
 
 LiteLLM uses provider-prefixed model identifiers:
 
-| Provider   | Model Identifier                     | Context Window | Cost (per 1M tokens) |
-| ---------- | ------------------------------------ | -------------- | -------------------- |
-| Anthropic  | `anthropic/claude-sonnet-4-20250514` | 200K           | $3.00 / $15.00       |
-| OpenAI     | `openai/gpt-4-turbo`                 | 128K           | $10.00 / $30.00      |
-| Google     | `vertex_ai/gemini-1.5-pro`           | 1M             | $1.25 / $5.00        |
-| DeepSeek   | `deepseek/deepseek-chat`             | 64K            | $0.14 / $0.28        |
+| Provider  | Model Identifier                     | Context Window | Cost (per 1M tokens) |
+| --------- | ------------------------------------ | -------------- | -------------------- |
+| Anthropic | `anthropic/claude-sonnet-4-20250514` | 200K           | $3.00 / $15.00       |
+| OpenAI    | `openai/gpt-4-turbo`                 | 128K           | $10.00 / $30.00      |
+| Google    | `vertex_ai/gemini-1.5-pro`           | 1M             | $1.25 / $5.00        |
+| DeepSeek  | `deepseek/deepseek-chat`             | 64K            | $0.14 / $0.28        |
 
 **Note:** Costs shown as input / output per 1M tokens. Actual pricing may vary.
 
@@ -115,6 +117,7 @@ async def parallel_analysis():
 ```
 
 **Key points:**
+
 - Use `asyncio.gather()` for parallel execution
 - Set `return_exceptions=True` to handle failures gracefully
 - Models run concurrently, not sequentially
@@ -148,6 +151,7 @@ async def robust_parallel_analysis():
 ```
 
 **Common errors:**
+
 - `RateLimitError` - Too many requests, implement backoff
 - `AuthenticationError` - Invalid API key
 - `TimeoutError` - Increase timeout parameter
@@ -173,6 +177,7 @@ response = await acompletion(
 ```
 
 **Best practices:**
+
 - Set reasonable timeouts (60-120s for complex analysis)
 - Use exponential backoff for retries
 - Monitor rate limit headers in responses
@@ -241,6 +246,7 @@ asyncio.run(test_setup())
 ```
 
 **Expected output:**
+
 ```
 ✅ anthropic/claude-sonnet-4-20250514: OK
 ✅ openai/gpt-4-turbo: OK
@@ -280,6 +286,7 @@ load_dotenv()
 ### "Authentication failed"
 
 **Solution:** Verify API keys are set correctly:
+
 ```bash
 echo $ANTHROPIC_API_KEY
 echo $OPENAI_API_KEY
@@ -292,6 +299,7 @@ echo $OPENAI_API_KEY
 ### "Rate limit exceeded"
 
 **Solution:** Implement exponential backoff:
+
 ```python
 import time
 
@@ -307,6 +315,7 @@ for attempt in range(3):
 ### "Timeout"
 
 **Solution:** Increase timeout parameter:
+
 ```python
 response = await acompletion(
     ...,

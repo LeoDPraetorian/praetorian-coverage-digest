@@ -173,8 +173,8 @@ For complete review document template with examples, see [references/review-docu
 
 ## Escalation Protocol
 
-| Situation                   | Recommend            |
-| --------------------------- | -------------------- |
+| Situation                   | Recommend        |
+| --------------------------- | ---------------- |
 | Fixes needed                | `tool-developer` |
 | Plan unclear/missing        | `tool-lead`      |
 | Architecture changes needed | `tool-lead`      |

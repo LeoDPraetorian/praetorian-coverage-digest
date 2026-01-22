@@ -6,7 +6,7 @@
 
 **Complexity analysis:**
 
-- ≥3 steps? YES (5+ distinct phases)
+- ≥2 steps? YES (5+ distinct phases)
 - ≥5 phases? YES
 - > 10 minutes? YES (estimated 45 minutes)
 - Context drift risk? YES (multiple files, design decisions)

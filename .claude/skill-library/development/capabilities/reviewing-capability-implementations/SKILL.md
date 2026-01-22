@@ -19,13 +19,13 @@ Use this skill when:
 
 ## Quick Reference
 
-| Step | Purpose                         | Critical Elements                          |
-| ---- | ------------------------------- | ------------------------------------------ |
-| 1    | Locate Architecture Plan        | Feature directory or docs/plans/           |
-| 2    | Review Against Plan (Primary)   | Architecture, structure, detection logic   |
-| 3    | Review Code Quality (Secondary) | Capability-specific quality standards      |
-| 4    | Run Verification Commands       | Syntax check, validation, tests, build     |
-| 5    | Write Review Document           | Findings, severity, verdict                |
+| Step | Purpose                         | Critical Elements                        |
+| ---- | ------------------------------- | ---------------------------------------- |
+| 1    | Locate Architecture Plan        | Feature directory or docs/plans/         |
+| 2    | Review Against Plan (Primary)   | Architecture, structure, detection logic |
+| 3    | Review Code Quality (Secondary) | Capability-specific quality standards    |
+| 4    | Run Verification Commands       | Syntax check, validation, tests, build   |
+| 5    | Write Review Document           | Findings, severity, verdict              |
 
 ## Step 1: Locate the Architecture Plan
 
@@ -47,14 +47,14 @@ ls docs/plans/*-architecture.md
 
 Compare implementation to plan's specifications:
 
-| Plan Section           | What to Check                               |
-| ---------------------- | ------------------------------------------- |
-| Architecture Decisions | Did developer follow the chosen approach?   |
-| Capability Structure   | Do files match the specified organization?  |
-| Detection Logic        | Is the specified detection strategy used?   |
-| Implementation Steps   | Were all steps completed?                   |
-| Acceptance Criteria    | Are all criteria met?                       |
-| Review Checklist       | Check each item the architect specified     |
+| Plan Section           | What to Check                              |
+| ---------------------- | ------------------------------------------ |
+| Architecture Decisions | Did developer follow the chosen approach?  |
+| Capability Structure   | Do files match the specified organization? |
+| Detection Logic        | Is the specified detection strategy used?  |
+| Implementation Steps   | Were all steps completed?                  |
+| Acceptance Criteria    | Are all criteria met?                      |
+| Review Checklist       | Check each item the architect specified    |
 
 **Deviations from plan require justification or are flagged as issues.**
 
@@ -64,51 +64,51 @@ Independent of plan, check capability-specific quality standards:
 
 ### VQL Capabilities
 
-| Issue                                | Severity | Standard                 |
-| ------------------------------------ | -------- | ------------------------ |
-| Missing error handling in queries    | CRITICAL | Add error boundaries     |
-| Hardcoded paths (not cross-platform) | HIGH     | Use path abstraction     |
-| No artifact schema validation        | HIGH     | Validate before emit     |
-| Inefficient queries (full scans)     | MEDIUM   | Add filters and indexes  |
-| Missing query timeouts               | MEDIUM   | Add timeout constraints  |
+| Issue                                | Severity | Standard                |
+| ------------------------------------ | -------- | ----------------------- |
+| Missing error handling in queries    | CRITICAL | Add error boundaries    |
+| Hardcoded paths (not cross-platform) | HIGH     | Use path abstraction    |
+| No artifact schema validation        | HIGH     | Validate before emit    |
+| Inefficient queries (full scans)     | MEDIUM   | Add filters and indexes |
+| Missing query timeouts               | MEDIUM   | Add timeout constraints |
 
 ### Nuclei Templates
 
-| Issue                                    | Severity | Standard                |
-| ---------------------------------------- | -------- | ----------------------- |
+| Issue                                   | Severity | Standard                |
+| --------------------------------------- | -------- | ----------------------- |
 | Overly broad matchers (false positives) | CRITICAL | Tighten matching        |
-| Missing CVE/CWE mapping                  | HIGH     | Add classification      |
-| Missing severity classification          | MEDIUM   | Add severity tag        |
-| No negative test cases                   | HIGH     | Add false-negative test |
-| Unsafe request configuration             | CRITICAL | Review unsafe flags     |
+| Missing CVE/CWE mapping                 | HIGH     | Add classification      |
+| Missing severity classification         | MEDIUM   | Add severity tag        |
+| No negative test cases                  | HIGH     | Add false-negative test |
+| Unsafe request configuration            | CRITICAL | Review unsafe flags     |
 
 ### Janus Tool Chains
 
-| Issue                           | Severity | Standard                 |
-| ------------------------------- | -------- | ------------------------ |
-| No timeout handling             | CRITICAL | Add context timeout      |
-| Error swallowing in pipeline    | CRITICAL | Propagate errors         |
-| Missing result aggregation      | HIGH     | Aggregate properly       |
-| No retry logic for transient    | MEDIUM   | Add exponential backoff  |
+| Issue                            | Severity | Standard                 |
+| -------------------------------- | -------- | ------------------------ |
+| No timeout handling              | CRITICAL | Add context timeout      |
+| Error swallowing in pipeline     | CRITICAL | Propagate errors         |
+| Missing result aggregation       | HIGH     | Aggregate properly       |
+| No retry logic for transient     | MEDIUM   | Add exponential backoff  |
 | Missing cleanup (goroutine leak) | CRITICAL | Add lifecycle management |
 
 ### Fingerprintx Modules
 
-| Issue                          | Severity | Standard             |
-| ------------------------------ | -------- | -------------------- |
-| Incorrect protocol detection   | CRITICAL | Fix probe logic      |
-| Missing version extraction     | MEDIUM   | Add version parsing  |
-| Inefficient probe patterns     | MEDIUM   | Optimize probe count |
-| No protocol fallback handling  | HIGH     | Add fallback chain   |
+| Issue                         | Severity | Standard             |
+| ----------------------------- | -------- | -------------------- |
+| Incorrect protocol detection  | CRITICAL | Fix probe logic      |
+| Missing version extraction    | MEDIUM   | Add version parsing  |
+| Inefficient probe patterns    | MEDIUM   | Optimize probe count |
+| No protocol fallback handling | HIGH     | Add fallback chain   |
 
 ### Scanner Integrations (All Types)
 
-| Issue                           | Severity | Standard              |
-| ------------------------------- | -------- | --------------------- |
-| No input sanitization           | CRITICAL | Sanitize all inputs   |
-| Credential leakage in logs      | CRITICAL | Mask sensitive data   |
-| Missing rate limiting           | HIGH     | Add backoff/throttle  |
-| No result normalization         | HIGH     | Normalize to schema   |
+| Issue                           | Severity | Standard               |
+| ------------------------------- | -------- | ---------------------- |
+| No input sanitization           | CRITICAL | Sanitize all inputs    |
+| Credential leakage in logs      | CRITICAL | Mask sensitive data    |
+| Missing rate limiting           | HIGH     | Add backoff/throttle   |
+| No result normalization         | HIGH     | Normalize to schema    |
 | Error messages expose internals | MEDIUM   | Generic error messages |
 
 ## Step 4: Run Verification Commands
@@ -197,8 +197,8 @@ Follow `persisting-agent-outputs` skill for file output location. Write review f
 
 ## Escalation Protocol
 
-| Situation                      | Recommend             |
-| ------------------------------ | --------------------- |
+| Situation                      | Recommend              |
+| ------------------------------ | ---------------------- |
 | Fixes needed                   | `capability-developer` |
 | Architecture concerns          | `capability-lead`      |
 | No plan exists (design needed) | `capability-lead`      |
@@ -225,18 +225,18 @@ Report: "Blocked: [issue]. Attempted: [what]. Recommend: [agent] for [capability
 
 ### Calls (during execution)
 
-| Skill                      | Phase/Step | Purpose                      |
-| -------------------------- | ---------- | ---------------------------- |
-| `adhering-to-dry`          | Step 3     | Detect code duplication      |
-| `adhering-to-yagni`        | Step 3     | Identify scope creep         |
+| Skill                      | Phase/Step | Purpose                           |
+| -------------------------- | ---------- | --------------------------------- |
+| `adhering-to-dry`          | Step 3     | Detect code duplication           |
+| `adhering-to-yagni`        | Step 3     | Identify scope creep              |
 | `debugging-systematically` | Step 4     | Root cause analysis if tests fail |
 
 ### Pairs With (conditional)
 
-| Skill                             | Trigger                    | Purpose                       |
-| --------------------------------- | -------------------------- | ----------------------------- |
-| `verifying-before-completion`     | Before marking complete    | Final validation checklist    |
-| `discovering-reusable-code`       | New code detected          | Check for reusable patterns   |
+| Skill                         | Trigger                 | Purpose                     |
+| ----------------------------- | ----------------------- | --------------------------- |
+| `verifying-before-completion` | Before marking complete | Final validation checklist  |
+| `discovering-reusable-code`   | New code detected       | Check for reusable patterns |
 
 ## Related Skills
 

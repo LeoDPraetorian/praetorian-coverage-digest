@@ -10,7 +10,7 @@ argument-hint: <credential-type>
 
 ## Action
 
-Invoke the `creating-noseyparker-rules` skill to handle this rule creation request.
+Read and follow `.claude/skill-library/development/capabilities/creating-noseyparker-rules/SKILL.md` exactly as it is written.
 
 **Why use skill (not spawn agent)?**
 - Rule creation requires human-in-the-loop at 2 checkpoints (GitHub validation + final approval)

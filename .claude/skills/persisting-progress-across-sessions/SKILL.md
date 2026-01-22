@@ -48,197 +48,153 @@ Progress file management involves multiple steps (check, create, update, cleanup
 - No agent coordination needed
 - Quick bug fix or small feature
 
+## Integration Note
+
+**This skill provides the PROTOCOL for cross-session persistence.** The FILE FORMAT is defined by `persisting-agent-outputs` (MANIFEST.yaml schema). Always invoke `persisting-agent-outputs` skill to discover/create the output directory.
+
 ## Quick Reference
 
-| Lifecycle Stage     | Action                                  | Location                                 |
-| ------------------- | --------------------------------------- | ---------------------------------------- |
-| Start orchestration | Create progress file                    | `.claude/progress/<domain>-<feature>.md` |
-| After each phase    | Update completed phases + agent outputs | Same file                                |
-| On blocker          | Document blocker + context              | Same file                                |
-| On completion       | Mark complete, archive or delete        | Move to `archived/` or delete            |
-| On session resume   | Read file, restore context, continue    | From current phase                       |
+| Lifecycle Stage     | Action                                  | Location                                    |
+| ------------------- | --------------------------------------- | ------------------------------------------- |
+| Start orchestration | Create output directory + MANIFEST.yaml | `.claude/.output/{type}/{id}/MANIFEST.yaml` |
+| After each phase    | Update MANIFEST.yaml phases + agents    | Same file                                   |
+| On blocker          | Update status to "blocked"              | Same file                                   |
+| On completion       | Mark status "complete", cleanup         | Delete directory or keep for reference      |
+| On session resume   | Find MANIFEST.yaml, restore context     | From current_phase                          |
 
 ## Progress File Location
 
-```
-.claude/progress/<domain>-<feature-name>.md
-
-Examples:
-- .claude/progress/frontend-asset-filtering.md
-- .claude/progress/backend-job-processing.md
-- .claude/progress/fullstack-user-auth.md
-```
-
-**Directory structure:**
+State is persisted in MANIFEST.yaml within output directories:
 
 ```
-.claude/progress/
-├── frontend-asset-filtering.md    # Active orchestrations
-├── backend-job-processing.md
-└── archived/                       # Completed (kept for reference)
-    └── frontend-dashboard-2024-01.md
+.claude/.output/{type}/{id}/MANIFEST.yaml
+
+Where {type} is:
+- features/       # Feature development workflows
+- capabilities/   # Capability development workflows
+- research/       # Research tasks
+- mcp-wrappers/   # MCP wrapper development
+- agents/         # Standalone agent outputs (fallback)
 ```
 
-## Progress File Structure
+**Directory structure example:**
 
-````markdown
-# Orchestration: <Feature Name>
-
-## Status: in_progress | complete | blocked
-
-## Started: <ISO timestamp>
-
-## Last Updated: <ISO timestamp>
-
-## Overview
-
-Brief description of what this orchestration is accomplishing.
-
----
-
-## Completed Phases
-
-- [x] **Phase 1: Architecture** - <result summary>
-  - Agent: backend-architect
-  - Completed: <timestamp>
-  - Key decisions: [list]
-
-- [x] **Phase 2: Implementation** - <result summary>
-  - Agent: backend-developer
-  - Completed: <timestamp>
-  - Files created: [list]
-
-## Current Phase
-
-- [ ] **Phase 3: Testing** - <what's in progress>
-  - Agent: backend-tester (in progress)
-  - Started: <timestamp>
-  - Notes: [any context]
-
-## Pending Phases
-
-- [ ] **Phase 4: Code Review**
-- [ ] **Phase 5: Security Review**
-
----
-
-## Context for Resume
-
-Critical information needed to resume from current phase:
-
-### Architecture Decisions
-
-- Pattern: [chosen pattern]
-- Database: [schema decisions]
-- API: [endpoint design]
-
-### Key File Paths
-
-- Handler: pkg/handler/handlers/asset/create.go
-- Service: pkg/service/asset/service.go
-- Tests: pkg/handler/handlers/asset/create_test.go
-
-### Dependencies
-
-- Depends on: [services/features]
-- Blocks: [downstream work]
-
-### Blockers
-
-- None currently
-- OR: Waiting for [specific thing]
-
----
-
-## Agent Outputs
-
-### <agent-name> (completed)
-
-```json
-{
-  "status": "complete",
-  "summary": "...",
-  "files_created": [...]
-}
 ```
-````
-
-### <agent-name> (in_progress)
-
-```json
-{
-  "status": "in_progress",
-  "partial_output": "..."
-}
+.claude/.output/features/2026-01-15-143022-asset-filter/
+├── MANIFEST.yaml                              # Cross-session state
+├── frontend-lead-architecture.md              # Agent artifacts
+├── frontend-developer-implementation.md
+└── frontend-tester-test-plan.md
 ```
 
----
+## Progress File Structure (MANIFEST.yaml)
 
-## Error Log
+Cross-session state is stored in MANIFEST.yaml. Schema defined by `persisting-agent-outputs`.
 
-### <timestamp> - <Error Type>
+```yaml
+# MANIFEST.yaml - Cross-session state
+feature_name: "Asset Filter Component"
+feature_slug: "asset-filter"
+created_at: "2026-01-15T14:30:22Z"
+created_by: "orchestrating-feature-development"
+description: |
+  Implement asset filtering with status, severity, and date filters.
 
-- Phase: [phase name]
-- Agent: [agent name]
-- Error: [description]
-- Resolution: [how resolved or pending]
+status: "in-progress" # in-progress | complete | blocked
+current_phase: "implementation"
 
----
+# Phase tracking (orchestrated workflows)
+phases:
+  setup:
+    status: "complete"
+    timestamp: "2026-01-15T14:30:22Z"
+  brainstorming:
+    status: "complete"
+    timestamp: "2026-01-15T14:45:00Z"
+    approved: true
+  architecture:
+    status: "complete"
+    timestamp: "2026-01-15T15:00:00Z"
+    agent: "frontend-lead"
+  implementation:
+    status: "in_progress"
+    timestamp: "2026-01-15T15:30:00Z"
+    agent: "frontend-developer"
+  review:
+    status: "pending"
+  testing:
+    status: "pending"
 
-## Notes
+# Verification results
+verification:
+  build: "PASS"
+  tests: "NOT_RUN"
+  review: "PENDING"
 
-Additional context for future sessions:
+# Agent contributions (all workflows)
+agents_contributed:
+  - agent: "frontend-lead"
+    artifact: "architecture.md"
+    timestamp: "2026-01-15T15:00:00Z"
+    status: "complete"
+  - agent: "frontend-developer"
+    artifact: "frontend-developer-implementation.md"
+    timestamp: "2026-01-15T15:30:00Z"
+    status: "in_progress"
 
-- User preferences
-- Constraints discovered
-- Performance targets
+# Artifact index
+artifacts:
+  - path: "architecture.md"
+    type: "architecture"
+    agent: "frontend-lead"
+  - path: "frontend-developer-implementation.md"
+    type: "implementation"
+    agent: "frontend-developer"
+```
 
-````
-
-See [references/file-templates.md](references/file-templates.md) for minimal and detailed templates.
+**See:** [references/file-templates.md](references/file-templates.md) for minimal and full templates.
+**See:** [persisting-agent-outputs/references/manifest-structure.md](../persisting-agent-outputs/references/manifest-structure.md) for complete field definitions.
 
 ## Resume Protocol
 
 ### At Session Start
 
-**Check for existing progress files:**
+**Check for MANIFEST.yaml files (recent work):**
 
 ```bash
-ls .claude/progress/*.md 2>/dev/null
-````
+# Find MANIFEST.yaml files modified in last 24 hours
+find .claude/.output -name 'MANIFEST.yaml' -mmin -1440 2>/dev/null
+```
 
-**If progress file exists:**
+**If MANIFEST.yaml found:**
 
-1. **Read the file** - Understand current state
-2. **Check status** - `in_progress`, `blocked`, or needs restart
-3. **Read Context for Resume** - Key decisions, file paths, dependencies
-4. **Review Agent Outputs** - What has each agent produced
-5. **Check Error Log** - Any unresolved issues
-6. **Create TodoWrite** - From pending phases
-7. **Resume from current phase** - Don't repeat completed work
+1. **Read MANIFEST.yaml** - Get `current_phase` and `phases` status
+2. **Check status** - `in-progress`, `blocked`, or `complete`
+3. **Reconstruct TodoWrite** - From phases with status != 'complete'
+4. **Load artifacts** - From `agents_contributed` array
+5. **Resume from current_phase** - Don't repeat completed phases
 
 ### After Each Phase
 
-1. **Mark phase complete** in progress file
-2. **Add agent output** to Agent Outputs section
-3. **Update current phase** to next pending
-4. **Update "Last Updated"** timestamp
+1. **Update MANIFEST.yaml phases** - Set phase status to "complete"
+2. **Add to agents_contributed** - Record agent and artifact
+3. **Update current_phase** - To next pending phase
+4. **Update verification** - If build/tests ran
 5. **Mark TodoWrite item complete**
 
 ### On Blocker
 
-1. **Update status** to `blocked`
-2. **Document blocker** in Blockers section
-3. **Add to Error Log** if error-related
-4. **Escalate** via AskUserQuestion if needed
+1. **Update status** to `blocked` in MANIFEST.yaml
+2. **Document blocker** in blocked agent's metadata (blocked_reason field)
+3. **Escalate** via AskUserQuestion if needed
 
 ### On Completion
 
-1. **Update status** to `complete`
-2. **Add final summary** to Overview
-3. **Decision: Archive or Delete**
-   - Archive if reference value (move to `archived/`)
-   - Delete if no future value
+1. **Update status** to `complete` in MANIFEST.yaml
+2. **Update verification** with final results
+3. **Decision: Keep or Delete**
+   - Keep if reference value
+   - Delete directory if no future value
 4. **Clean up TodoWrite** - Mark all complete
 
 ## Context Compaction Protocol
@@ -249,10 +205,10 @@ From Anthropic research: "Token usage accounts for 80% of performance variance."
 
 ### Compaction vs Persistence
 
-| Concern     | Purpose                                      | When           |
-| ----------- | -------------------------------------------- | -------------- |
-| Persistence | Save state to FILES for session resume      | Between sessions |
-| Compaction  | Reduce CONTEXT WINDOW to prevent degradation | During session |
+| Concern     | Purpose                                      | When             |
+| ----------- | -------------------------------------------- | ---------------- |
+| Persistence | Save state to FILES for session resume       | Between sessions |
+| Compaction  | Reduce CONTEXT WINDOW to prevent degradation | During session   |
 
 Both are needed. Persistence without compaction leads to context rot. Compaction without persistence loses state on interruption.
 
@@ -260,24 +216,26 @@ Both are needed. Persistence without compaction leads to context rot. Compaction
 
 Initiate context compaction when ANY of these occur:
 
-| Trigger           | Threshold        | Action                               |
-| ----------------- | ---------------- | ------------------------------------ |
-| Message count     | > 40 messages    | Summarize completed phases           |
-| Phase completion  | Every 3 phases   | Archive phase details to file        |
-| Agent output size | > 1000 tokens    | Summarize, store full in progress file |
-| Approaching limit | ~80% context used | Aggressive compaction                |
+| Trigger           | Threshold         | Action                                 |
+| ----------------- | ----------------- | -------------------------------------- |
+| Message count     | > 40 messages     | Summarize completed phases             |
+| Phase completion  | Every 3 phases    | Archive phase details to file          |
+| Agent output size | > 1000 tokens     | Summarize, store full in progress file |
+| Approaching limit | ~80% context used | Aggressive compaction                  |
 
 ### Compaction Protocol
 
 **Step 1: Identify Compactable Content**
 
 Content that CAN be compacted:
+
 - Completed phase outputs (keep 2-3 line summary)
 - Old agent handoff details (keep key decisions only)
 - Discovery findings (reference file path instead)
 - Architecture rationale (keep decision, not reasoning)
 
 Content that MUST stay in context:
+
 - Current phase details
 - Immediate prior phase decisions
 - Active blockers
@@ -287,6 +245,7 @@ Content that MUST stay in context:
 **Step 2: Summarize Completed Phases**
 
 Before compaction:
+
 ```
 Phase 3 (Architecture) completed:
 - Agent: frontend-lead
@@ -297,6 +256,7 @@ Phase 3 (Architecture) completed:
 ```
 
 After compaction:
+
 ```
 Phase 3 (Architecture): Complete
 - Decision: Compound component pattern with Zustand
@@ -314,6 +274,7 @@ After: "See .claude/.output/features/{id}/discovery.md for full findings. Key pa
 **Step 4: Update Progress File**
 
 When compacting, ALWAYS update progress file first:
+
 1. Write full content to progress file
 2. Verify write succeeded
 3. Then summarize in context
@@ -323,12 +284,12 @@ When compacting, ALWAYS update progress file first:
 
 Monitor for these warning signs:
 
-| Warning Sign          | Indicator                                  | Action                              |
-| --------------------- | ------------------------------------------ | ----------------------------------- |
-| Response quality drop | Vague or repetitive responses              | Immediate compaction                |
-| Missed context        | Agent asks about already-discussed topics  | Compaction + re-inject key facts    |
-| Instruction drift     | Not following established patterns         | Re-inject critical instructions     |
-| Slow responses        | Noticeably longer response times           | Compaction                          |
+| Warning Sign          | Indicator                                 | Action                           |
+| --------------------- | ----------------------------------------- | -------------------------------- |
+| Response quality drop | Vague or repetitive responses             | Immediate compaction             |
+| Missed context        | Agent asks about already-discussed topics | Compaction + re-inject key facts |
+| Instruction drift     | Not following established patterns        | Re-inject critical instructions  |
+| Slow responses        | Noticeably longer response times          | Compaction                       |
 
 ### Compaction Checklist
 
@@ -345,94 +306,90 @@ Before major phase transitions, verify:
 
 ## Integration with TodoWrite
 
-Progress files complement TodoWrite:
+MANIFEST.yaml complements TodoWrite:
 
 - **TodoWrite**: Real-time task tracking within session
-- **Progress file**: Cross-session persistence
+- **MANIFEST.yaml**: Cross-session persistence
 
 ### At Session Start
 
 ```markdown
-1. Read progress file
-2. Create TodoWrite todos from pending phases:
-   - [ ] Phase 3: Testing (from progress file)
-   - [ ] Phase 4: Code Review (from progress file)
-3. Mark completed phases based on progress file
+1. Read MANIFEST.yaml (current_phase, phases)
+2. Create TodoWrite todos from phases where status != "complete":
+   - [ ] Phase: implementation (from phases.implementation.status)
+   - [ ] Phase: review (from phases.review.status)
+3. Mark completed phases based on MANIFEST.yaml
 ```
 
 ### At Phase Completion
 
 ```markdown
 1. Mark TodoWrite todo complete
-2. Update progress file:
-   - Move phase from Current to Completed
-   - Add agent output
-   - Update timestamp
+2. Update MANIFEST.yaml:
+   - Set phases.{phase}.status = "complete"
+   - Add to agents_contributed array
+   - Update current_phase to next pending
 ```
 
-## Minimal vs Full Progress Files
+## Minimal vs Full MANIFEST.yaml
 
-### Minimal (Simple Orchestrations)
+### Minimal (Ad-hoc Agent Work)
 
-For 3-4 phase orchestrations:
+For standalone agent tasks without orchestration:
 
-```markdown
-# Orchestration: <Feature Name>
+```yaml
+feature_name: "Quick Bug Fix"
+feature_slug: "auth-token-refresh-fix"
+created_at: "2026-01-15T14:30:22Z"
+created_by: "backend-developer"
+description: Fix token refresh race condition.
+status: "complete"
 
-## Status: in_progress
+agents_contributed:
+  - agent: "backend-developer"
+    artifact: "backend-developer-implementation.md"
+    timestamp: "2026-01-15T14:35:00Z"
+    status: "complete"
 
-## Last Updated: <timestamp>
-
-## Completed
-
-- [x] Architecture - Tier 2 component pattern
-- [x] Implementation - AssetFilter.tsx created
-
-## Current
-
-- [ ] Testing - Unit tests in progress
-
-## Context
-
-- Component: src/sections/assets/components/AssetFilter.tsx
-- API: GET /my?resource=asset&status=...
-
-## Agent Output (latest)
-
-{last agent's JSON output}
+artifacts:
+  - path: "backend-developer-implementation.md"
+    type: "implementation"
+    agent: "backend-developer"
 ```
 
-### Full (Complex Orchestrations)
+### Full (Orchestrated Workflows)
 
-For 5+ phase orchestrations with multiple agents, use the full template from the Progress File Structure section above.
+For 5+ phase orchestrations with multiple agents, include optional orchestration fields (phases, current_phase, verification). See Progress File Structure section above.
 
 ## Lifecycle Management
 
 ### Creation Triggers
 
-Create progress file when:
+Create output directory + MANIFEST.yaml when:
 
 - Starting orchestration with 3+ phases
 - User explicitly requests progress tracking
 - Task estimated to exceed context window
 - Previous session was interrupted mid-task
 
+**Creation:** Orchestration skill creates `.claude/.output/{type}/{id}/` and initial MANIFEST.yaml.
+
 ### Update Triggers
 
-Update progress file:
+Update MANIFEST.yaml:
 
-- After each agent completes
-- When blockers encountered
-- When scope changes
-- After resolving errors
+- After each agent completes (agents_contributed array)
+- After each phase completes (phases object)
+- When blockers encountered (status → "blocked")
+- When verification runs (verification object)
 - Every 30 minutes during long phases
 
 ### Cleanup Triggers
 
-**Archive (keep for reference):**
+**Keep (reference value):**
 
-- Similar task may occur again
 - Contains valuable architecture decisions
+- May need to resume interrupted work
 - User requests retention
 
 **Delete:**
@@ -440,19 +397,22 @@ Update progress file:
 - Simple task with no reference value
 - Information captured elsewhere (PR, commit)
 - User requests deletion
+- `rm -rf .claude/.output/{type}/{id}/`
 
 ## Anti-Patterns
 
-1. **Creating for simple tasks** - Don't create progress files for single-agent work
-2. **Forgetting to update** - Update after EVERY phase completion
-3. **Missing Context for Resume** - Always include enough to restart without reading all code
-4. **Skipping Error Log** - Document all errors for debugging patterns
-5. **Never cleaning up** - Archive or delete completed orchestrations
-6. **Not reading on resume** - Always read progress file at session start
+1. **Creating for simple tasks** - Don't create output directories for single-agent quick tasks
+2. **Forgetting to update** - Update MANIFEST.yaml after EVERY phase completion
+3. **Missing phases field** - Always include phases for orchestrated workflows
+4. **Separate metadata files** - Use MANIFEST.yaml as single source of truth (no progress.json)
+5. **Never cleaning up** - Delete completed output directories when no longer needed
+6. **Not reading on resume** - Always find and read MANIFEST.yaml at session start
 
 ## Related Skills
 
+- **persisting-agent-outputs** (CORE) - Defines MANIFEST.yaml schema and directory discovery protocol. Always invoke this skill to discover/create output directories.
 - **orchestrating-feature-development** - Uses this skill for progress tracking AND context compaction during 12-phase workflow
+- **orchestrating-capability-development** - Uses this skill for progress tracking during capability workflows
 - **orchestrating-integration-development** - Uses this skill for progress tracking AND context compaction during 9-phase workflow
 - **orchestrating-multi-agent-workflows** - Multi-agent coordination patterns
 - **dispatching-parallel-agents** - Parallel agent execution
@@ -461,7 +421,8 @@ Update progress file:
 
 ## References
 
-- [File Templates](references/file-templates.md) - Minimal and full progress file templates
+- [File Templates](references/file-templates.md) - Minimal and full MANIFEST.yaml templates
 - [Resume Checklist](references/resume-checklist.md) - Step-by-step resume protocol
 - [Lifecycle Flowchart](references/lifecycle-flowchart.md) - Visual lifecycle diagram
 - [Compaction Protocol](references/compaction-protocol.md) - Detailed context compaction examples and workflows
+- [MANIFEST Structure](../persisting-agent-outputs/references/manifest-structure.md) - Complete MANIFEST.yaml field definitions

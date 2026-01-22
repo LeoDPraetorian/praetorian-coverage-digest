@@ -263,7 +263,10 @@ async function searchIssues(
 ): Promise<IssueCandidate[]> {
   try {
     const filter: any = {
-      title: { contains: query },
+      or: [
+        { title: { contains: query } },
+        { description: { contains: query } }
+      ],
     };
 
     if (team) {

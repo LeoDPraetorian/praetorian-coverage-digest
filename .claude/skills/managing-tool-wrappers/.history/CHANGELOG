@@ -30,3 +30,49 @@ When Phase 11 was added, these weren't updated:
    - CLI validation auto-updates (if made dynamic)
 
 4. **Consider**: Add script to find all 'N phase' references for future audits
+
+## 2026-01-17 - Add 'list' operation routing to listing-tools
+
+**Changes:**
+- Added 'List' operation to 'Other Operations' quick reference table
+- Created new 'Delegation Map' section showing routing for list requests
+- Added listing-tools to Related Skills with library access pattern
+- Updated description to include 'listing' alongside other operations
+- Extracted verbose "Why Per-Wrapper Test Files Matter" section to save 20 lines (487→467→476 final)
+
+**Motivation:**
+listing-tools skill expects to be called by managing-tool-wrappers (line 209 of listing-tools), but managing-tool-wrappers had no knowledge of this relationship. This created a broken contract where list requests had no handling.
+
+**Pattern Reference:**
+Follows managing-skills pattern where library skills are accessed via Read tool and routing is documented in Delegation Map.
+## [Refactor] - 2026-01-17
+
+### Changed
+- Refactored to pure router pattern matching managing-skills architecture
+- Reduced from 425 lines to 284 lines (141 lines removed)
+- Removed inline "TDD Workflow (ENFORCED)" section (now in updating-tool-wrappers)
+- Removed inline "The 12 Audit Phases" table (now in auditing-tool-wrappers)
+- Added Two-Tier Skill Access table showing all library skills
+- Updated Delegation Map with complete routing for all operations
+- Updated Related Skills section with all library skills in table format
+- Updated Progressive Disclosure to reference library skills
+- Updated Key Principles to emphasize router pattern
+
+### Added
+- Understanding This Skill section explaining two-tier system
+- Router Architecture section
+- Tool Usage section distinguishing router vs delegated tools
+- Library skill access instructions with IMPORTANT block
+
+### Removed
+- Verbose CLI command examples (moved to library skills)
+- Detailed implementation procedures (moved to library skills)
+- Inline Phase 12 description (moved to auditing-tool-wrappers)
+- Audit checklist details (moved to auditing-tool-wrappers)
+- Per-wrapper test file rationale (moved to testing-tool-wrappers)
+
+### Rationale
+Makes managing-tool-wrappers consistent with managing-skills as a pure router.
+Each operation has detailed documentation in its dedicated library skill, and
+the router provides navigation and delegation logic only.
+

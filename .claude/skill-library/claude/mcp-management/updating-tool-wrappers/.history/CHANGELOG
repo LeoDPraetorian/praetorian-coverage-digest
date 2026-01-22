@@ -1,0 +1,30 @@
+# Changelog
+
+## 2026-01-17 - Initial Creation
+
+**Type**: Initial creation
+**Category**: claude/mcp-management (library)
+**Skill Type**: Process/Pattern
+
+**RED Phase Documentation:**
+- **Gap**: No structured TDD workflow for updating MCP tool wrappers
+- **Test Scenario**: Add "priority" field to Linear get-issue wrapper
+- **Failure Observed**: Agent created 14-step plan but wrote tests in Step 8 (test-last approach)
+- **Key Violations**:
+  - No RED phase (jumped to implementation)
+  - Tests created after implementation designed
+  - No `npm run verify-red` to prove tests fail
+  - No schema discovery with edge cases
+  - No regression prevention gates
+  - No audit re-run after changes
+
+**Content Structure:**
+- 6 phases: RED, Discovery, GREEN, Regression, Coverage, Re-audit
+- 3 common update scenarios: Adding field, changing filtering, fixing bugs
+- Quick reference table with commands
+- Integration section documenting relationships
+- 5 reference files planned (TDD workflow, schema discovery, update patterns, regression prevention, audit requirements)
+
+**Compliance Target**: Must pass auditing-skills validation (28 phases)
+
+**Line Count**: 489 lines (within limit)

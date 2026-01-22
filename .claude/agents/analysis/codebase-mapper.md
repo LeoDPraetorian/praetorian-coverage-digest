@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file paths, verify with reads                                     |
-| `gateway-security`                  | Routes to codebase-mapping library skill (6-step methodology)                                        |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST                 |
-| `using-todowrite`                   | Track 6-step workflow progress                                                                       |
-| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                                                  |
+| Skill                               | Why Always Invoke                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure.     |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing          |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                   |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file paths, verify with reads                     |
+| `gateway-security`                  | Routes to codebase-mapping library skill (6-step methodology)                        |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST |
+| `using-todowrite`                   | Track 6-step workflow progress                                                       |
+| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                                  |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 

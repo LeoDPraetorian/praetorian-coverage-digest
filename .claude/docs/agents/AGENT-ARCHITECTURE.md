@@ -126,12 +126,12 @@ When you spawn `Task(frontend-orchestrator)`:
 
 ### Orchestration Commands
 
-| Command         | Invokes                                           | Works Because      |
-| --------------- | ------------------------------------------------- | ------------------ |
-| `/feature`      | `Skill("orchestrating-feature-development")`      | Skill runs in main |
-| `/capability`   | `Skill("orchestrating-capability-development")`   | Skill runs in main |
-| `/fingerprintx` | `Skill("orchestrating-fingerprintx-development")` | Skill runs in main |
-| `/research`     | `Skill("orchestrating-research")`                 | Skill runs in main |
+| Command         | Invokes                                                                                                | Works Because      |
+| --------------- | ------------------------------------------------------------------------------------------------------ | ------------------ |
+| `/feature`      | `Skill("orchestrating-feature-development")`                                                           | Skill runs in main |
+| `/capability`   | `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")` | Skill runs in main |
+| `/fingerprintx` | `Skill("orchestrating-fingerprintx-development")`                                                      | Skill runs in main |
+| `/research`     | `Skill("orchestrating-research")`                                                                      | Skill runs in main |
 
 ---
 
@@ -415,6 +415,7 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 | Skill                               | Why Always Invoke                                                                                    |
 | ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
+| `discovering-reusable-code`         | **Search before implementing** - exhaustively search for reusable patterns before writing new code   |
 | `semantic-code-operations`          | **Core code tool** - routes to Serena MCP for semantic search/editing                                |
 | `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
 | `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this                            |
@@ -564,6 +565,7 @@ When creating an agent, add role-specific skills to the Step 1 table with approp
 | `gateway-typescript`   | Zod, error handling, TypeScript patterns             |
 | `gateway-mcp-tools`    | MCP wrapper development patterns                     |
 | `gateway-capabilities` | VQL, Nuclei, scanner integration patterns            |
+| `gateway-integrations` | Third-party APIs, Chariot integration patterns       |
 
 ### Line Count Targets
 
@@ -1083,11 +1085,13 @@ Once an agent is spawned, it runs to completion. Design agent prompts carefullyt
 ## References
 
 ### Internal
+
 - **Agent Manager**: `.claude/skills/managing-agents/SKILL.md`
 - **Agent Management Skills**: `.claude/skill-library/claude/agent-management/`
 - **Gold Standard**: `.claude/agents/architecture/tool-lead.md`
 
 ### Anthropic Official Guidance
+
 Agent Skills Overview
 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
 
@@ -1110,6 +1114,7 @@ Claude 4 Best Practices (IGNORE. PROVEN INCORRECT)
 https://platform.claude.com/docs/en/build-with-claude/prompt-engineering/claude-4-best-practices
 
 ### Community Resources
+
 Multi-Agent Orchestration: 10 Claude Instances in Parallel
 https://dev.to/bredmond1019/multi-agent-orchestration-running-10-claude-instances-in-parallel-part-3-29da
 

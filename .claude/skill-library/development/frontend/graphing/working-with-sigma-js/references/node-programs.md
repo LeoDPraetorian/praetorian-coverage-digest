@@ -6,25 +6,25 @@ Custom node rendering programs for Sigma.js.
 
 Sigma.js provides several built-in node programs:
 
-| Program              | Import                                    | Use Case                |
-| -------------------- | ----------------------------------------- | ----------------------- |
-| `NodeCircleProgram`  | `sigma/rendering`                         | Default, fastest        |
-| `NodeImageProgram`   | `@sigma/node-image`                       | Icons, avatars          |
-| `NodeBorderProgram`  | `@sigma/node-border`                      | Circles with borders    |
-| `NodePointProgram`   | `sigma/rendering/webgl/programs/node`     | Minimal point rendering |
+| Program             | Import                                | Use Case                |
+| ------------------- | ------------------------------------- | ----------------------- |
+| `NodeCircleProgram` | `sigma/rendering`                     | Default, fastest        |
+| `NodeImageProgram`  | `@sigma/node-image`                   | Icons, avatars          |
+| `NodeBorderProgram` | `@sigma/node-border`                  | Circles with borders    |
+| `NodePointProgram`  | `sigma/rendering/webgl/programs/node` | Minimal point rendering |
 
 ## Configuring Node Programs
 
 ```typescript
-import { NodeCircleProgram } from 'sigma/rendering';
-import { NodeImageProgram } from '@sigma/node-image';
+import { NodeCircleProgram } from "sigma/rendering";
+import { NodeImageProgram } from "@sigma/node-image";
 
 const settings = {
   nodeProgramClasses: {
     circle: NodeCircleProgram,
     image: NodeImageProgram,
   },
-  defaultNodeType: 'circle',
+  defaultNodeType: "circle",
 };
 ```
 
@@ -32,17 +32,17 @@ const settings = {
 
 ```typescript
 // Add node with image type
-graph.addNode('node1', {
+graph.addNode("node1", {
   x: 0,
   y: 0,
   size: 10,
-  label: 'Server',
-  type: 'image',
-  image: '/icons/server.png',
+  label: "Server",
+  type: "image",
+  image: "/icons/server.png",
 });
 
 // Switch node type at runtime
-graph.setNodeAttribute('node1', 'type', 'circle');
+graph.setNodeAttribute("node1", "type", "circle");
 sigma.refresh();
 ```
 
@@ -60,8 +60,8 @@ sigma.refresh();
 ## Custom Node Program Example
 
 ```typescript
-import { NodeDisplayData } from 'sigma/types';
-import { AbstractNodeProgram } from 'sigma/rendering';
+import { NodeDisplayData } from "sigma/types";
+import { AbstractNodeProgram } from "sigma/rendering";
 
 export class NodeSquareProgram extends AbstractNodeProgram {
   constructor(gl: WebGLRenderingContext, renderer: Sigma) {
@@ -69,11 +69,7 @@ export class NodeSquareProgram extends AbstractNodeProgram {
     // Initialize WebGL buffers
   }
 
-  process(
-    nodeData: NodeDisplayData,
-    hidden: boolean,
-    offset: number
-  ): void {
+  process(nodeData: NodeDisplayData, hidden: boolean, offset: number): void {
     // Write node data to buffer
     const array = this.array;
     const i = offset * this.STRIDE;
@@ -107,22 +103,22 @@ export class NodeSquareProgram extends AbstractNodeProgram {
 ```typescript
 // Icon atlas with limited set
 const iconMap = {
-  server: '/atlas.png#server',
-  database: '/atlas.png#database',
-  user: '/atlas.png#user',
+  server: "/atlas.png#server",
+  database: "/atlas.png#database",
+  user: "/atlas.png#user",
 };
 
 // Assign icon by type
 graph.forEachNode((nodeId, attrs) => {
   const iconKey = iconMap[attrs.category] || iconMap.default;
-  graph.setNodeAttribute(nodeId, 'image', iconKey);
+  graph.setNodeAttribute(nodeId, "image", iconKey);
 });
 ```
 
 ## Node Border Program
 
 ```typescript
-import { NodeBorderProgram } from '@sigma/node-border';
+import { NodeBorderProgram } from "@sigma/node-border";
 
 const settings = {
   nodeProgramClasses: {
@@ -131,13 +127,13 @@ const settings = {
 };
 
 // Add node with border
-graph.addNode('node1', {
+graph.addNode("node1", {
   x: 0,
   y: 0,
   size: 10,
-  color: '#ff0000',
-  type: 'bordered',
-  borderColor: '#000000',
+  color: "#ff0000",
+  type: "bordered",
+  borderColor: "#000000",
   borderSize: 2,
 });
 ```
@@ -153,9 +149,9 @@ const useDynamicNodeProgram = () => {
 
   useEffect(() => {
     if (ratio < 0.5) {
-      sigma.setSetting('defaultNodeType', 'circle');
+      sigma.setSetting("defaultNodeType", "circle");
     } else {
-      sigma.setSetting('defaultNodeType', 'image');
+      sigma.setSetting("defaultNodeType", "image");
     }
     sigma.refresh();
   }, [sigma, ratio]);

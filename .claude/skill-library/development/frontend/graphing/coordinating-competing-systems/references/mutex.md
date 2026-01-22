@@ -90,7 +90,7 @@ const useTryLock = () => {
 // Usage: Skip operation if can't get lock immediately
 const tryUpdate = () => {
   if (!lock.tryAcquire()) {
-    console.debug('Update skipped - lock held');
+    console.debug("Update skipped - lock held");
     return;
   }
 
@@ -109,9 +109,7 @@ Wait for lock with timeout.
 ```typescript
 const useTimedLock = () => {
   const locked = useRef(false);
-  const waiters = useRef<Array<{ resolve: () => void; reject: () => void }>>(
-    []
-  );
+  const waiters = useRef<Array<{ resolve: () => void; reject: () => void }>>([]);
 
   const acquire = useCallback((timeoutMs: number = 5000): Promise<void> => {
     if (!locked.current) {
@@ -126,7 +124,7 @@ const useTimedLock = () => {
         if (index >= 0) {
           waiters.current.splice(index, 1);
         }
-        reject(new Error('Lock timeout'));
+        reject(new Error("Lock timeout"));
       }, timeoutMs);
 
       waiters.current.push({
@@ -250,9 +248,7 @@ Same owner can acquire multiple times.
 const useReentrantLock = () => {
   const owner = useRef<string | null>(null);
   const count = useRef(0);
-  const waiters = useRef<
-    Array<{ id: string; resolve: () => void }>
-  >([]);
+  const waiters = useRef<Array<{ id: string; resolve: () => void }>>([]);
 
   const acquire = useCallback((ownerId: string): Promise<void> => {
     // Already own the lock
@@ -276,7 +272,7 @@ const useReentrantLock = () => {
 
   const release = useCallback((ownerId: string) => {
     if (owner.current !== ownerId) {
-      throw new Error('Not lock owner');
+      throw new Error("Not lock owner");
     }
 
     count.current--;
@@ -303,7 +299,7 @@ const useReentrantLock = () => {
 
 // Usage: Nested locks work
 const reentrantLock = useReentrantLock();
-const taskId = 'task-123';
+const taskId = "task-123";
 
 const outerOperation = async () => {
   await reentrantLock.acquire(taskId);
@@ -361,7 +357,7 @@ const acquireWithBackoff = async (locks: Mutex[]) => {
       // Try to acquire all
       for (const lock of locks) {
         if (!lock.tryAcquire()) {
-          throw new Error('Could not acquire all locks');
+          throw new Error("Could not acquire all locks");
         }
         acquired.push(lock);
       }
@@ -384,10 +380,7 @@ const acquireWithBackoff = async (locks: Mutex[]) => {
 Release all locks if can't acquire within timeout.
 
 ```typescript
-const acquireWithTimeout = async (
-  locks: Mutex[],
-  timeoutMs: number = 5000
-) => {
+const acquireWithTimeout = async (locks: Mutex[], timeoutMs: number = 5000) => {
   const acquired: Mutex[] = [];
   const startTime = Date.now();
 
@@ -395,7 +388,7 @@ const acquireWithTimeout = async (
     for (const lock of locks) {
       const remaining = timeoutMs - (Date.now() - startTime);
       if (remaining <= 0) {
-        throw new Error('Timeout acquiring locks');
+        throw new Error("Timeout acquiring locks");
       }
 
       await lock.acquire(remaining);
@@ -416,7 +409,7 @@ const acquireWithTimeout = async (
 Verify only one operation in critical section.
 
 ```typescript
-test('prevents concurrent access', async () => {
+test("prevents concurrent access", async () => {
   const mutex = useMutex();
   const inCriticalSection = { count: 0 };
 
@@ -444,7 +437,7 @@ test('prevents concurrent access', async () => {
 Verify waiters wake in order.
 
 ```typescript
-test('wakes waiters in FIFO order', async () => {
+test("wakes waiters in FIFO order", async () => {
   const mutex = useMutex();
   const order: number[] = [];
 
@@ -472,7 +465,7 @@ test('wakes waiters in FIFO order', async () => {
 Verify deadlock prevention strategies work.
 
 ```typescript
-test('prevents deadlock with lock ordering', async () => {
+test("prevents deadlock with lock ordering", async () => {
   const lock1 = useMutex();
   const lock2 = useMutex();
 
@@ -500,7 +493,7 @@ test('prevents deadlock with lock ordering', async () => {
   await Promise.race([
     Promise.all([taskA(), taskB()]),
     delay(5000).then(() => {
-      throw new Error('Deadlock detected');
+      throw new Error("Deadlock detected");
     }),
   ]);
 });
@@ -653,11 +646,11 @@ const inner = async () => {
 const reentrantLock = useReentrantLock();
 
 const outer = async () => {
-  await reentrantLock.acquire('task-id');
+  await reentrantLock.acquire("task-id");
   try {
     await inner(); // OK, same owner
   } finally {
-    reentrantLock.release('task-id');
+    reentrantLock.release("task-id");
   }
 };
 ```

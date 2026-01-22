@@ -1,7 +1,7 @@
 ---
 name: executing-plans
-description: Use when partner provides a complete implementation plan to execute in controlled batches with review checkpoints - handles both single-file and phased plans, loads plan, reviews critically, executes tasks in batches, reports for review between batches
-allowed-tools: "Read, Write, Edit, Bash, Grep, Glob, TodoWrite"
+description: Use when executing implementation plans in batches with checkpoints - supports single-file and phased plans with mandatory verification
+allowed-tools: "Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion"
 ---
 
 # Executing Plans
@@ -49,6 +49,8 @@ fi
 
 **Default: First 3 tasks**
 
+**IMPORTANT:** Use TodoWrite to track task progress.
+
 For each task:
 
 1. Mark as in_progress
@@ -71,6 +73,7 @@ When batch complete:
 **CRITICAL: DO NOT proceed to Step 4 without human confirmation.**
 
 This is a blocking checkpoint. The human must respond before you continue. Do not:
+
 - Assume silence means approval
 - Proceed after a timeout
 - Batch multiple checkpoints together
@@ -106,7 +109,7 @@ Real failure: Agent executed 4 batches without stopping, claimed 118 files updat
 After all tasks complete and verified:
 
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch
+- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch (LIBRARY)
 - Follow that skill to verify tests, present options, execute choice
 
 ## When to Stop and Ask for Help
@@ -214,6 +217,8 @@ cat docs/plans/YYYY-MM-DD-feature/phase-N-name.md
 
 **Same batch execution as single-file plans:**
 
+**IMPORTANT:** Create TodoWrite with all tasks from current phase before starting.
+
 1. Create TodoWrite with all tasks from current phase
 2. Execute first 3 tasks
 3. Mark tasks as in_progress/completed
@@ -314,6 +319,7 @@ Ready to continue with Phase 2?
 **CRITICAL: DO NOT proceed to Step 9 without human confirmation.**
 
 Phase transitions are mandatory checkpoints. The human must explicitly approve before you:
+
 - Start the next phase
 - Mark the current phase complete in PLAN.md
 - Update progress tracking
@@ -338,7 +344,7 @@ Phase transitions are mandatory checkpoints. The human must explicitly approve b
 - Verify all phases marked complete in PLAN.md
 - Run full test suite
 - Announce: "I'm using the finishing-a-development-branch skill to complete this work."
-- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch
+- **REQUIRED SUB-SKILL:** Use finishing-a-development-branch (LIBRARY)
 
 ---
 
@@ -393,11 +399,38 @@ Phase 0 (Foundation) → Phase 1 (Component A) → Phase 3 (Integration)
 
 ---
 
+## Integration
+
+### Called By
+
+- `/plan-execute` command - Direct command execution
+- `writing-plans` skill - After plan creation for immediate execution
+- Manual invocation when partner provides implementation plan
+
+### Requires (invoke before starting)
+
+None - Standalone execution skill (requires existing plan file as input)
+
+### Calls (during execution)
+
+| Skill                                      | Phase/Step | Purpose                                   |
+| ------------------------------------------ | ---------- | ----------------------------------------- |
+| `finishing-a-development-branch` (LIBRARY) | Step 5     | Complete development after all tasks done |
+
+### Pairs With (conditional)
+
+| Skill                      | Trigger                | Purpose                       |
+| -------------------------- | ---------------------- | ----------------------------- |
+| `debugging-systematically` | When blocked mid-batch | Systematic blocker resolution |
+| `writing-plans`            | Plan needs updates     | Revise plan based on feedback |
+
+---
+
 ## Reference
 
 **For complete phase structure details:**
 
-See [writing-plans/references/plan-decomposition.md](../writing-plans/references/plan-decomposition.md)
+See [writing-plans/references/plan-decomposition.md](.claude/skills/writing-plans/references/plan-decomposition.md)
 
 **Includes:**
 

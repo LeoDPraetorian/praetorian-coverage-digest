@@ -13,6 +13,7 @@
 ### Enable CloudTrail in All Regions (CIS AWS [CloudTrail.1])
 
 **AWS CLI**:
+
 ```bash
 # Create S3 bucket for CloudTrail logs
 aws s3 mb s3://my-org-cloudtrail-logs --region us-east-1
@@ -34,6 +35,7 @@ aws cloudtrail start-logging --name my-org-trail
 ```
 
 **Terraform**:
+
 ```hcl
 resource "aws_cloudtrail" "main" {
   name                          = "my-org-trail"
@@ -52,6 +54,7 @@ resource "aws_cloudtrail" "main" {
 ### Enable EBS Default Encryption (CIS AWS [EC2.7])
 
 **AWS CLI**:
+
 ```bash
 # Enable EBS encryption by default
 aws ec2 enable-ebs-encryption-by-default --region us-east-1
@@ -63,6 +66,7 @@ aws ec2 modify-ebs-default-kms-key-id \
 ```
 
 **Terraform**:
+
 ```hcl
 resource "aws_ebs_encryption_by_default" "main" {
   enabled = true
@@ -72,6 +76,7 @@ resource "aws_ebs_encryption_by_default" "main" {
 ### Block S3 Bucket Public Access (CIS AWS [S3.1], [S3.8])
 
 **AWS CLI**:
+
 ```bash
 # Block public access at account level
 aws s3control put-public-access-block \
@@ -93,6 +98,7 @@ aws s3api put-public-access-block \
 ### Enable Storage Account Secure Transfer (CIS Azure 3.1)
 
 **Azure CLI**:
+
 ```bash
 # Enable HTTPS-only access
 az storage account update \
@@ -102,6 +108,7 @@ az storage account update \
 ```
 
 **PowerShell**:
+
 ```powershell
 Set-AzStorageAccount `
   -ResourceGroupName "myresourcegroup" `
@@ -112,6 +119,7 @@ Set-AzStorageAccount `
 ### Set Storage Minimum TLS Version 1.2 (CIS Azure 3.15)
 
 **Azure CLI**:
+
 ```bash
 az storage account update \
   --name mystorageaccount \
@@ -122,6 +130,7 @@ az storage account update \
 ### Enable SQL Database TDE (CIS Azure 4.1.5)
 
 **Azure CLI**:
+
 ```bash
 # Enable TDE for SQL Database
 az sql db tde set \
@@ -138,6 +147,7 @@ az sql db tde set \
 ### Enable VPC Flow Logs (CIS GCP Logging)
 
 **gcloud CLI**:
+
 ```bash
 # Enable flow logs on subnet
 gcloud compute networks subnets update my-subnet \
@@ -151,6 +161,7 @@ gcloud compute networks subnets update my-subnet \
 ### Enforce Private IP for Cloud SQL (CIS GCP 6.2.9)
 
 **gcloud CLI**:
+
 ```bash
 # Create Cloud SQL instance with private IP only
 gcloud sql instances create my-instance \
@@ -168,6 +179,7 @@ gcloud sql instances create my-instance \
 ### Ensure SSH Protocol 2 (CIS Linux 5.2.1)
 
 **Remediation**:
+
 ```bash
 # Edit SSH configuration
 sudo sed -i 's/#Protocol 2/Protocol 2/' /etc/ssh/sshd_config
@@ -184,6 +196,7 @@ sudo systemctl restart sshd
 ### Disable Root Login Over SSH (CIS Linux 5.2.x)
 
 **Remediation**:
+
 ```bash
 # Disable root login
 sudo sed -i 's/#PermitRootLogin yes/PermitRootLogin no/' /etc/ssh/sshd_config
@@ -196,6 +209,7 @@ sudo systemctl restart sshd
 ### Configure Password Policy (CIS Linux 5.x)
 
 **Ubuntu/Debian**:
+
 ```bash
 # Install PAM password quality module
 sudo apt-get install -y libpam-pwquality
@@ -211,6 +225,7 @@ EOF
 ```
 
 **RHEL/CentOS**:
+
 ```bash
 # Edit PAM configuration
 sudo authconfig --passminlen=14 \
@@ -226,6 +241,7 @@ sudo authconfig --passminlen=14 \
 ### Enable auditd (CIS Linux 4.x)
 
 **Remediation**:
+
 ```bash
 # Install auditd
 sudo apt-get install -y auditd audispd-plugins  # Ubuntu/Debian
@@ -256,6 +272,7 @@ sudo augenrules --load
 ### Configure Password Policy (CIS Windows)
 
 **Group Policy (PowerShell)**:
+
 ```powershell
 # Minimum password length
 secedit /export /cfg C:\secpol.cfg
@@ -271,6 +288,7 @@ secedit /configure /db C:\Windows\security\local.sdb /cfg C:\secpol.cfg /areas S
 ### Disable Guest Account (CIS Windows)
 
 **PowerShell**:
+
 ```powershell
 # Disable Guest account
 Disable-LocalUser -Name "Guest"
@@ -282,6 +300,7 @@ Get-LocalUser -Name "Guest" | Select-Object Name, Enabled
 ### Enable Windows Firewall (CIS Windows)
 
 **PowerShell**:
+
 ```powershell
 # Enable firewall for all profiles
 Set-NetFirewallProfile -Profile Domain,Public,Private -Enabled True
@@ -297,16 +316,17 @@ Get-NetFirewallProfile | Select-Object Name, Enabled
 ### Ensure No Privileged Containers (CIS Kubernetes 5.2.1)
 
 **Pod Security Policy**:
+
 ```yaml
 apiVersion: policy/v1beta1
 kind: PodSecurityPolicy
 metadata:
   name: restrictive-psp
 spec:
-  privileged: false  # No privileged containers
+  privileged: false # No privileged containers
   hostNetwork: false # No host network
-  hostIPC: false     # No host IPC
-  hostPID: false     # No host PID
+  hostIPC: false # No host IPC
+  hostPID: false # No host PID
   allowPrivilegeEscalation: false
   requiredDropCapabilities:
     - ALL
@@ -317,15 +337,16 @@ spec:
   fsGroup:
     rule: RunAsAny
   volumes:
-    - 'configMap'
-    - 'emptyDir'
-    - 'projected'
-    - 'secret'
-    - 'downwardAPI'
-    - 'persistentVolumeClaim'
+    - "configMap"
+    - "emptyDir"
+    - "projected"
+    - "secret"
+    - "downwardAPI"
+    - "persistentVolumeClaim"
 ```
 
 **Pod Security Standards (PSS) - Restricted**:
+
 ```yaml
 apiVersion: v1
 kind: Namespace
@@ -340,6 +361,7 @@ metadata:
 ### Ensure Containers Run as Non-Root (CIS Kubernetes 5.2.6)
 
 **Deployment Example**:
+
 ```yaml
 apiVersion: apps/v1
 kind: Deployment
@@ -360,14 +382,14 @@ spec:
         runAsUser: 1000
         fsGroup: 2000
       containers:
-      - name: app
-        image: myapp:latest
-        securityContext:
-          allowPrivilegeEscalation: false
-          capabilities:
-            drop:
-              - ALL
-          readOnlyRootFilesystem: true
+        - name: app
+          image: myapp:latest
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
 ```
 
 ---
@@ -377,6 +399,7 @@ spec:
 ### Create Non-Root User in Container (CIS Docker 4.x)
 
 **Dockerfile**:
+
 ```dockerfile
 FROM ubuntu:22.04
 
@@ -396,6 +419,7 @@ CMD ["/app/start.sh"]
 ### Enable Docker Content Trust (CIS Docker 2.x)
 
 **Shell Configuration**:
+
 ```bash
 # Enable Docker Content Trust
 export DOCKER_CONTENT_TRUST=1
@@ -411,6 +435,7 @@ docker push myrepo/myimage:v1.0
 ### Limit Container Memory (CIS Docker 5.x)
 
 **Docker Run**:
+
 ```bash
 # Run container with memory limit
 docker run --memory=512m --memory-swap=512m myimage:latest
@@ -420,18 +445,19 @@ docker run --memory=512m --cpus=1.0 myimage:latest
 ```
 
 **Docker Compose**:
+
 ```yaml
-version: '3.8'
+version: "3.8"
 services:
   app:
     image: myimage:latest
     deploy:
       resources:
         limits:
-          cpus: '1.0'
+          cpus: "1.0"
           memory: 512M
         reservations:
-          cpus: '0.5'
+          cpus: "0.5"
           memory: 256M
 ```
 
@@ -475,22 +501,22 @@ services:
     - name: Ensure SSH Protocol 2
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^#?Protocol'
-        line: 'Protocol 2'
+        regexp: "^#?Protocol"
+        line: "Protocol 2"
         state: present
 
     - name: Disable root login
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^#?PermitRootLogin'
-        line: 'PermitRootLogin no'
+        regexp: "^#?PermitRootLogin"
+        line: "PermitRootLogin no"
         state: present
 
     - name: Disable password authentication
       lineinfile:
         path: /etc/ssh/sshd_config
-        regexp: '^#?PasswordAuthentication'
-        line: 'PasswordAuthentication no'
+        regexp: "^#?PasswordAuthentication"
+        line: "PasswordAuthentication no"
         state: present
 
     - name: Restart SSH service
@@ -572,11 +598,13 @@ aws cloudtrail update-trail --name my-trail --no-enable-log-file-validation
 ### 3. Use Configuration Management
 
 **Prefer**:
+
 - Terraform / CloudFormation / ARM templates
 - Ansible / Chef / Puppet playbooks
 - GitOps workflows with version control
 
 **Over**:
+
 - Manual CLI commands
 - One-off scripts
 - Undocumented changes

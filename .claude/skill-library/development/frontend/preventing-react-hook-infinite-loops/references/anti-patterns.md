@@ -15,7 +15,7 @@
 function Component() {
   useEffect(() => {
     fetchData();
-  }, [{ api: '/endpoint' }]); // New object reference each render
+  }, [{ api: "/endpoint" }]); // New object reference each render
 }
 
 function Component2({ items }) {
@@ -26,14 +26,16 @@ function Component2({ items }) {
 ```
 
 **Detection**:
+
 - ESLint exhaustive-deps will warn: "The '{ api: '/endpoint' }' object makes dependencies change on every render"
 - Code review: Look for inline object/array literals in dependency arrays
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Memoize the object/array
 function Component() {
-  const config = useMemo(() => ({ api: '/endpoint' }), []);
+  const config = useMemo(() => ({ api: "/endpoint" }), []);
   useEffect(() => {
     fetchData();
   }, [config]);
@@ -65,17 +67,16 @@ function Component({ userId }) {
 ```
 
 **Detection**:
+
 - ESLint: "The 'fetchUser' function makes dependencies change on every render"
 - Runtime: Browser freezes, "Maximum update depth exceeded" error
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Memoize with useCallback
 function Component({ userId }) {
-  const fetchUser = useCallback(
-    () => fetch(`/api/users/${userId}`),
-    [userId]
-  );
+  const fetchUser = useCallback(() => fetch(`/api/users/${userId}`), [userId]);
 
   useEffect(() => {
     fetchUser();
@@ -99,10 +100,12 @@ function Component(props) {
 ```
 
 **Detection**:
+
 - ESLint: "Spreading props in dependencies is not recommended"
 - Code smell: `[...props]` or `[...state]` in dependency array
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: List specific props
 function Component({ userId, userName, userEmail }) {
@@ -128,18 +131,17 @@ function Component({ config }) {
 ```
 
 **Detection**:
+
 - ESLint: "The '{ ...config }' object makes dependencies change on every render"
 - Symptoms: Child components re-render unnecessarily
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Serialize or use ref
 // Option 1: Serialize
 function Component({ config }) {
-  const configKey = useMemo(
-    () => JSON.stringify(config),
-    [config]
-  );
+  const configKey = useMemo(() => JSON.stringify(config), [config]);
   const handleSubmit = useCallback(() => {
     submit(config);
   }, [configKey]);
@@ -173,10 +175,12 @@ function Component({ items }) {
 ```
 
 **Detection**:
+
 - ESLint: "Arrow functions in dependencies will always change"
 - Unusual syntax: Function as dependency is code smell
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Extract to useCallback
 function Component({ items }) {
@@ -199,24 +203,26 @@ function Component({ items }) {
 // ❌ ANTI-PATTERN: Anonymous default
 function Component({ items = [] }) {
   useEffect(() => {
-    console.log('Items changed');
+    console.log("Items changed");
   }, [items]); // New empty array every render when items undefined
 }
 ```
 
 **Detection**:
+
 - Silent bug: ESLint doesn't catch this
 - Symptoms: Effect runs on every render even when prop unchanged
 - High prevalence: Found in 15+ GitHub issues
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Define default outside component
 const DEFAULT_ITEMS = [];
 
 function Component({ items = DEFAULT_ITEMS }) {
   useEffect(() => {
-    console.log('Items changed');
+    console.log("Items changed");
   }, [items]); // Stable reference when items undefined
 }
 ```
@@ -239,10 +245,12 @@ function Component() {
 ```
 
 **Detection**:
+
 - Runtime: "Maximum update depth exceeded"
 - Pattern: useEffect depends on state it modifies
 
 **Fix**:
+
 ```typescript
 // ✅ CORRECT: Use functional updates or remove dependency
 function Component() {
@@ -250,7 +258,7 @@ function Component() {
 
   useEffect(() => {
     // Option 1: Functional update (no count in deps)
-    setCount(c => c + 1);
+    setCount((c) => c + 1);
   }, []); // Runs once
 
   // Option 2: Use different trigger
@@ -269,6 +277,7 @@ function Component() {
 ### Strategy 1: Static Analysis with ESLint
 
 **Setup**:
+
 ```json
 {
   "plugins": ["react-hooks"],
@@ -280,12 +289,14 @@ function Component() {
 ```
 
 **What it catches**:
+
 - Missing dependencies
 - Unnecessary dependencies
 - Objects/functions in dependencies without memoization
 - Stale closures
 
 **What it misses**:
+
 - Anonymous default values (`items = []`)
 - Performance implications of memoization
 - Complex dependency chains
@@ -295,17 +306,19 @@ function Component() {
 ### Strategy 2: Runtime Detection with why-did-you-render
 
 **Setup**:
+
 ```javascript
-if (process.env.NODE_ENV === 'development') {
-  const whyDidYouRender = require('@welldone-software/why-did-you-render');
+if (process.env.NODE_ENV === "development") {
+  const whyDidYouRender = require("@welldone-software/why-did-you-render");
   whyDidYouRender(React, {
     trackAllPureComponents: true,
-    trackHooks: true
+    trackHooks: true,
   });
 }
 ```
 
 **What it catches**:
+
 - Actual re-renders with explanations
 - Which props/state/hooks caused re-render
 - Avoidable re-renders
@@ -315,6 +328,7 @@ if (process.env.NODE_ENV === 'development') {
 ### Strategy 3: Visual Profiling with React DevTools
 
 **Workflow**:
+
 1. Open React DevTools Profiler
 2. Click "Record" button
 3. Interact with component
@@ -325,12 +339,14 @@ if (process.env.NODE_ENV === 'development') {
    - "Why did this render?" annotation
 
 **What it shows**:
+
 - Render timeline
 - Component render tree
 - "Hooks changed" indicator
 - Render duration
 
 **Limitations**:
+
 - Doesn't show which specific hook changed (only hook index)
 - Limited detail for complex hook chains
 
@@ -359,10 +375,7 @@ Use this checklist during code reviews:
 // package.json
 {
   "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ]
+    "*.{js,jsx,ts,tsx}": ["eslint --fix", "prettier --write"]
   }
 }
 ```
@@ -381,13 +394,13 @@ npx lint-staged
 
 ## Performance Impact of Anti-Patterns
 
-| Anti-Pattern | Performance Impact | Detection Difficulty | Fix Complexity |
-|--------------|-------------------|---------------------|----------------|
-| Inline objects/arrays | High (frequent re-renders) | Easy (ESLint) | Low |
-| Functions without useCallback | Medium-High | Easy (ESLint) | Low |
-| Anonymous defaults | High (silent bug) | Hard (no ESLint rule) | Low |
-| State dependency loops | Critical (infinite loop) | Medium (runtime error) | Medium |
-| Spreading props | Medium | Easy (code smell) | Low |
+| Anti-Pattern                  | Performance Impact         | Detection Difficulty   | Fix Complexity |
+| ----------------------------- | -------------------------- | ---------------------- | -------------- |
+| Inline objects/arrays         | High (frequent re-renders) | Easy (ESLint)          | Low            |
+| Functions without useCallback | Medium-High                | Easy (ESLint)          | Low            |
+| Anonymous defaults            | High (silent bug)          | Hard (no ESLint rule)  | Low            |
+| State dependency loops        | Critical (infinite loop)   | Medium (runtime error) | Medium         |
+| Spreading props               | Medium                     | Easy (code smell)      | Low            |
 
 ---
 

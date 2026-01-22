@@ -1,6 +1,6 @@
 ---
 name: gateway-integrations
-description: Routes integration tasks to library skills. Intent detection + progressive loading.
+description: Use when building integrations - routes to third-party API, Chariot patterns, and external service skills via progressive loading.
 allowed-tools: Read
 ---
 
@@ -83,11 +83,12 @@ This gateway implements 3-tier loading:
 
 ### Patterns & Testing
 
-| Skill                    | Path                                                                               | Triggers                                                    |
-| ------------------------ | ---------------------------------------------------------------------------------- | ----------------------------------------------------------- |
-| Developing Integrations  | `.claude/skill-library/development/integrations/developing-integrations/SKILL.md`  | create integration, new integration                         |
-| Validating Integrations  | `.claude/skill-library/development/integrations/validating-integrations/SKILL.md`  | validate integration, P0 compliance, verify integration     |
-| Integration Tests        | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`           | integration test, API test                                  |
+| Skill                                 | Path                                                                                            | Triggers                                                         |
+| ------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Developing Integrations               | `.claude/skill-library/development/integrations/developing-integrations/SKILL.md`               | create integration, new integration                              |
+| Orchestrating Integration Development | `.claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md` | integration workflow, P0 compliance, third-party API integration |
+| Validating Integrations               | `.claude/skill-library/development/integrations/validating-integrations/SKILL.md`               | validate integration, P0 compliance, verify integration          |
+| Integration Tests                     | `.claude/skill-library/testing/writing-integration-tests-first/SKILL.md`                        | integration test, API test                                       |
 
 ### Testing (Cross-Domain)
 
@@ -103,6 +104,7 @@ This gateway implements 3-tier loading:
 | ------------------------------ | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | AWS                            | `.claude/skill-library/development/integrations/integrating-with-aws/SKILL.md`                 | AWS, Lambda, DynamoDB, S3, CloudFormation, SDK v2                                                                                           |
 | Azure                          | `.claude/skill-library/development/integrations/integrating-with-azure/SKILL.md`               | Azure, Microsoft Azure, Key Vault, managed identity, DefaultAzureCredential, RBAC, service principal, Terraform Azure, Bicep, ARM templates |
+| Azure DevOps                   | `.claude/skill-library/development/integrations/integrating-with-azuredevops/SKILL.md`         | Azure DevOps, ADO, DevOps API, PR automation, WIQL, work items, pipelines, repositories                                                     |
 | Bitbucket                      | `.claude/skill-library/development/integrations/integrating-with-bitbucket/SKILL.md`           | Bitbucket, Bitbucket API, API tokens                                                                                                        |
 | Bugcrowd                       | `.claude/skill-library/development/integrations/integrating-with-bugcrowd/SKILL.md`            | Bugcrowd, bug bounty                                                                                                                        |
 | FeatureBase                    | `.claude/skill-library/development/integrations/integrating-with-featurebase/SKILL.md`         | FeatureBase API, feedback board, product roadmap, API integration, posts, changelog, articles, comments, votes, users, webhooks             |

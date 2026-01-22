@@ -15,15 +15,17 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 - Chariot platform access for asset/risk mapping
 - Go 1.24+ or Python 3.x for implementation
 
+> **IMPORTANT**: Use TodoWrite to track implementation progress across all 6 steps of this integration workflow.
+
 ## Configuration
 
 ### Authentication Methods
 
-| Method                    | Use Case                 | Security                        |
-| ------------------------- | ------------------------ | ------------------------------- |
-| Personal Access Token     | Service accounts, CI/CD  | ✅ Scoped permissions           |
-| OAuth 2.0                 | User-driven integrations | ✅ Short-lived tokens           |
-| Service Principal (Azure) | Azure resource access    | ✅ Federated credentials        |
+| Method                    | Use Case                 | Security                 |
+| ------------------------- | ------------------------ | ------------------------ |
+| Personal Access Token     | Service accounts, CI/CD  | ✅ Scoped permissions    |
+| OAuth 2.0                 | User-driven integrations | ✅ Short-lived tokens    |
+| Service Principal (Azure) | Azure resource access    | ✅ Federated credentials |
 
 **Environment Variables:**
 
@@ -37,16 +39,16 @@ See [references/authentication.md](references/authentication.md) for detailed se
 
 ## Quick Reference
 
-| Operation             | Endpoint Pattern                                                             | Notes                         |
-| --------------------- | ---------------------------------------------------------------------------- | ----------------------------- |
-| List repositories     | `GET /{org}/{project}/_apis/git/repositories?api-version=7.1`                | Returns all repos in project  |
-| Get PR details        | `GET /{org}/{project}/_apis/git/repositories/{repo}/pullrequests/{pr_id}`    | Includes status and reviewers |
-| Create webhook        | `POST /{org}/_apis/hooks/subscriptions?api-version=7.1`                      | Supports multiple events      |
-| List pipelines        | `GET /{org}/{project}/_apis/pipelines?api-version=7.1`                       | CI/CD pipeline definitions    |
-| Get work item         | `GET /{org}/_apis/wit/workitems/{id}?api-version=7.1`                        | Issue/task/epic details       |
-| Query work items      | `POST /{org}/{project}/_apis/wit/wiql?api-version=7.1`                       | WIQL query language           |
-| List pipeline runs    | `GET /{org}/{project}/_apis/pipelines/{pipeline}/runs?api-version=7.1`       | Execution history             |
-| Get pipeline run logs | `GET /{org}/{project}/_apis/build/builds/{buildId}/logs?api-version=7.1`     | Detailed run logs             |
+| Operation             | Endpoint Pattern                                                          | Notes                         |
+| --------------------- | ------------------------------------------------------------------------- | ----------------------------- |
+| List repositories     | `GET /{org}/{project}/_apis/git/repositories?api-version=7.1`             | Returns all repos in project  |
+| Get PR details        | `GET /{org}/{project}/_apis/git/repositories/{repo}/pullrequests/{pr_id}` | Includes status and reviewers |
+| Create webhook        | `POST /{org}/_apis/hooks/subscriptions?api-version=7.1`                   | Supports multiple events      |
+| List pipelines        | `GET /{org}/{project}/_apis/pipelines?api-version=7.1`                    | CI/CD pipeline definitions    |
+| Get work item         | `GET /{org}/_apis/wit/workitems/{id}?api-version=7.1`                     | Issue/task/epic details       |
+| Query work items      | `POST /{org}/{project}/_apis/wit/wiql?api-version=7.1`                    | WIQL query language           |
+| List pipeline runs    | `GET /{org}/{project}/_apis/pipelines/{pipeline}/runs?api-version=7.1`    | Execution history             |
+| Get pipeline run logs | `GET /{org}/{project}/_apis/build/builds/{buildId}/logs?api-version=7.1`  | Detailed run logs             |
 
 ## When to Use
 
@@ -110,7 +112,7 @@ func (c *AzureDevOpsClient) Request(method, endpoint string, body io.Reader) (*h
 - Handle rate limiting (varies by resource type, typically 200-5000 requests per user per hour)
 - Use API version 7.1 (latest stable as of 2025)
 
-See [references/client-implementation.md](references/client-implementation.md) for complete examples.
+See client implementation guides: [Go](references/client-implementation-go.md) | [Python](references/client-implementation-python.md) | [Common Patterns](references/client-implementation-common.md)
 
 ### Step 2: Repository Discovery
 
@@ -343,17 +345,20 @@ func (c *AzureDevOpsClient) CreateWebhook(subscription WebhookSubscription) erro
 **Supported event types:**
 
 **Git events:**
+
 - `git.push` - Code changes (trigger scans)
 - `git.pullrequest.created` - New PR (initiate review)
 - `git.pullrequest.updated` - PR changes (re-run checks)
 - `git.pullrequest.merged` - PR merged (update assets)
 
 **Build/Pipeline events:**
+
 - `build.complete` - Build finished (analyze logs, detect secrets)
 - `ms.vss-pipelines.stage-state-changed` - Pipeline stage events
 - `ms.vss-pipelines.run-state-changed` - Pipeline run events
 
 **Work Item events:**
+
 - `workitem.created` - New work item (link to findings)
 - `workitem.updated` - Work item changes (track remediation)
 - `workitem.commented` - Comments added (collaboration)
@@ -362,13 +367,13 @@ See [references/webhook-events.md](references/webhook-events.md) for complete ev
 
 ## Error Handling
 
-| Error Code            | Cause                       | Solution                                  |
-| --------------------- | --------------------------- | ----------------------------------------- |
-| 401 Unauthorized      | Invalid PAT or expired      | Regenerate PAT, check scopes              |
-| 403 Forbidden         | Insufficient permissions    | Grant required permissions in Azure DevOps|
-| 404 Not Found         | Project/repository missing  | Verify org URL, project name              |
-| 429 Too Many Requests | Rate limit exceeded         | Implement backoff, cache responses        |
-| 400 Bad Request       | Invalid API version/params  | Verify API version (use 7.1)              |
+| Error Code            | Cause                      | Solution                                   |
+| --------------------- | -------------------------- | ------------------------------------------ |
+| 401 Unauthorized      | Invalid PAT or expired     | Regenerate PAT, check scopes               |
+| 403 Forbidden         | Insufficient permissions   | Grant required permissions in Azure DevOps |
+| 404 Not Found         | Project/repository missing | Verify org URL, project name               |
+| 429 Too Many Requests | Rate limit exceeded        | Implement backoff, cache responses         |
+| 400 Bad Request       | Invalid API version/params | Verify API version (use 7.1)               |
 
 **Rate Limiting Strategy:**
 
@@ -440,32 +445,35 @@ See [references/testing-guide.md](references/testing-guide.md) for test patterns
 
 ### Requires (invoke before starting)
 
-| Skill                    | When  | Purpose                              |
-| ------------------------ | ----- | ------------------------------------ |
-| `using-skills`           | Start | Skill discovery and invocation       |
-| `adhering-to-dry`        | Start | Prevent code duplication             |
-| `discovering-reusable-code` | Start | Check for existing Azure DevOps code |
+| Skill                               | When  | Purpose                                                                                                                                                              |
+| ----------------------------------- | ----- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `using-skills`                      | Start | Skill discovery and invocation                                                                                                                                       |
+| `adhering-to-dry`                   | Start | Prevent code duplication                                                                                                                                             |
+| `discovering-reusable-code`         | Start | Check for existing Azure DevOps code                                                                                                                                 |
+| `developing-integrations` (LIBRARY) | Start | P0 compliance patterns (VMFilter, CheckAffiliation, ValidateCredentials) - `Read(".claude/skill-library/development/integrations/developing-integrations/SKILL.md")` |
 
 ### Calls (during execution)
 
-| Skill                              | Phase/Step | Purpose                        |
-| ---------------------------------- | ---------- | ------------------------------ |
-| `implementing-graphql-clients`     | Step 1     | If using GraphQL instead of REST |
-| `developing-with-tdd`              | Testing    | Test-driven development        |
-| `verifying-before-completion`      | Completion | Verify integration works       |
+| Skill                          | Phase/Step | Purpose                          |
+| ------------------------------ | ---------- | -------------------------------- |
+| `implementing-graphql-clients` | Step 1     | If using GraphQL instead of REST |
+| `developing-with-tdd`          | Testing    | Test-driven development          |
+| `verifying-before-completion`  | Completion | Verify integration works         |
 
 ### Pairs With (conditional)
 
-| Skill                            | Trigger                      | Purpose                         |
-| -------------------------------- | ---------------------------- | ------------------------------- |
-| `integrating-with-azure`         | Azure resource access needed | Azure service principal auth    |
-| `implementing-go-plugin-registries` | Go implementation          | Plugin registry patterns        |
+| Skill                               | Trigger                      | Purpose                      |
+| ----------------------------------- | ---------------------------- | ---------------------------- |
+| `integrating-with-azure`            | Azure resource access needed | Azure service principal auth |
+| `implementing-go-plugin-registries` | Go implementation            | Plugin registry patterns     |
 
 ## References
 
 - [references/api-reference.md](references/api-reference.md) - Complete Azure DevOps API documentation
 - [references/authentication.md](references/authentication.md) - PAT, OAuth, Service Principal setup
-- [references/client-implementation.md](references/client-implementation.md) - Go and Python client examples
+- [references/client-implementation-go.md](references/client-implementation-go.md) - Go SDK implementation
+- [references/client-implementation-python.md](references/client-implementation-python.md) - Python SDK implementation
+- [references/client-implementation-common.md](references/client-implementation-common.md) - Common patterns and best practices
 - [references/pagination-patterns.md](references/pagination-patterns.md) - Handling continuation tokens
 - [references/pr-automation.md](references/pr-automation.md) - Pull request workflows
 - [references/pipeline-integration.md](references/pipeline-integration.md) - CI/CD pipeline patterns

@@ -1,4 +1,4 @@
-## 11  ACTIVE DIRECTORY
+## 11 ACTIVE DIRECTORY
 
 ![Figure](figures/WindowsSecurityInternals_page_371_figure_001.png)
 
@@ -38,7 +38,7 @@ We can interact with the Active Directory server through PowerShell's ActiveDire
 
 Therefore, you might need to install RSAT before running the example scripts in this chapter. If you're running a version of Windows older than Windows 10, version 1809, you must download RSAT from the Microsoft website. If you're using a newer version of Windows, you can install RSAT by running the commands in Listing 11-1 from an administrator PowerShell console.
 
-Active Directory   343
+Active Directory 343
 
 ---
 
@@ -55,7 +55,6 @@ Note that the examples in this section won't work unless you run the commands on
 ## Basic Forest and Domain Information
 
 Let's start by gathering some basic information about the forest and domain we're connected to. You can follow along by executing the commands in
-
 
 Listing 11-2 on a computer in the root mineral.local domain of the example forest.
 
@@ -89,7 +88,7 @@ Listing 11-2: Listing some basic information about the forest and domain
 
 We first request information about the current forest using the Get-AO forest command ❶ . The returned object has many properties, but here we focus on two of them. The Domains property returns a list of the Domain Name System (DNS) names for the domains in the forest ❷ . In this example, it matches the forest in Figure 11-1. We also inspect the GlobalCatalogs property, which lists all systems that maintain a copy of the shared global catalog ❸ . We can use these to inspect the forest-level configuration.
 
-344    Chapter 11
+344 Chapter 11
 
 ---
 
@@ -118,11 +117,11 @@ alice              True S-1-5-21-1195776225-527706947-2538775957-1110
 
 Listing 11-3: Displaying the Active Directory server's users
 
-Active Directory   345
+Active Directory 345
 
 ---
 
-Using Get-Advertiser is like using Get-Localizer, except that you need to specify a filter. In Listing 11-3 we specify * to get all users, but on a real network you'll find filtering important to reduce the output, as the Active Directory server could contain hundreds or thousands of users.
+Using Get-Advertiser is like using Get-Localizer, except that you need to specify a filter. In Listing 11-3 we specify \* to get all users, but on a real network you'll find filtering important to reduce the output, as the Active Directory server could contain hundreds or thousands of users.
 
 The output shows each user's plain username (in the $NAME@Name column), whether the user is enabled, and their SID. As with the local users, each SID has a common prefix that should match the domain SID from Listing 11-2.
 
@@ -168,7 +167,6 @@ Listing 11-4: Displaying the Active Directory server's groups
 Notice that the output includes both BUILTIN groups, such as Administrators, and domain groups, such as Enterprise Admins. You can easily distinguish these group types based on the domain SID used as the prefix of a group's SID. In this example, the domain SID prefix is $-1-5-21-119576025-522706947-2538775937.
 
 The system uses the BUILTIN groups only when a user authenticates to the domain controller. For example, adding a user to the BUILTIN\
-
 
 Administrators group would grant that user administrator access to the database on the domain controller, but not on any other machine in the network. On the other hand, the domain groups get added to the user's token when they authenticate, and they can be used for access checks on the local computer.
 
@@ -265,7 +263,7 @@ PS> Get-LsaPrivateData $SMACHINE.ACC | Out-HexDump -ShowAll
 00000010:  89 EA AA 35 03 00 00 00 00 00 00 00 00 94 B1 CD 81 - ... .5............
 ```
 
-348    Chapter 11
+348 Chapter 11
 
 ---
 
@@ -298,7 +296,7 @@ DC The domain component
 
 O The organization name
 
-Active Directory   349
+Active Directory 349
 
 ---
 
@@ -332,7 +330,7 @@ schemaNamingContext        : CN=Schema,CN=Configuration,DC=mineral,DC=local
 
 Listing 11-8: Inspecting the RootDSE entry for the current domain
 
-350    Chapter 11
+350 Chapter 11
 
 ---
 
@@ -368,15 +366,15 @@ First we get the root domain naming context from the RootDSE ❶ . This naming c
 
 We then use the Get-AllObject command to query the child objects of the root ❹. The command takes various options to limit the scope of the child objects to return. The first is the SearchBase parameter, which returns only the children of a certain object (in this case, only the default naming context). We've supplied the default value here, which is unnecessary, but the parameter is useful in other cases.
 
-The second option is the SearchScope parameter, which determines how recursive the search should be. We specify OneLevel to search only the immediate children of the search base. Other values include Base, which returns only the search base object, and Subtree, which recursively searches all child objects. The Filter parameter limits the values returned. In this case, we use * to return everything.
+The second option is the SearchScope parameter, which determines how recursive the search should be. We specify OneLevel to search only the immediate children of the search base. Other values include Base, which returns only the search base object, and Subtree, which recursively searches all child objects. The Filter parameter limits the values returned. In this case, we use \* to return everything.
 
 The output includes the DistinguishedName and ObjectClass attributes . The ObjectClass attribute represents the name of the schema type, which we'll come back to in "The Schema" on page 353. We can select a specific distinguished name by specifying it as the value of the Identity parameter. The object returned contains a list of the directory object's attributes as PowerShell properties. For example, we can see the objec GUID attribute, which represents the object's unique identifier.
 
-Active Directory      351
+Active Directory 351
 
 ---
 
-In this case, the command returns only four values. For performance reasons, it queries for a small set of attributes, as some of the attribute values can be quite large. To query for more attributes, specify the Properties parameter, passing it either a list of attribute names or * to return all attributes.
+In this case, the command returns only four values. For performance reasons, it queries for a small set of attributes, as some of the attribute values can be quite large. To query for more attributes, specify the Properties parameter, passing it either a list of attribute names or \* to return all attributes.
 
 ## Accessing Objects in Other Domains
 
@@ -414,7 +412,7 @@ The first option is to explicitly specify the target domain using Get-AP Object 
 
 The second option is to query the global catalog. As Listing 11-2 showed, servers in the domain manage this catalog using data copied from other Active Directory servers. Select the global catalog by specifying the well-known port 3288 as the Server parameter ❹ . In this example, we specify no domain or server name, which selects the global catalog in the current
 
-352    Chapter 11
+352 Chapter 11
 
 ---
 
@@ -438,7 +436,7 @@ All schema class types derive from a base type, the top class ❶ and each class
 
 Each class type can also include a list of the attributes that an instance of the class can contain . This list is split into mustContain, for required attributes, and maybeContain, for optional ones. In Figure 11 - 3 , for example, the mustContain attribute has the required groupType attribute, used to indicate
 
-Active Directory     353
+Active Directory 353
 
 ---
 
@@ -456,7 +454,7 @@ Each class has an objectClassCategory attribute to define how the class can be u
 
 Structural The class can be used as an object.
 
-Abstract  The class can be used for inheritance only.
+Abstract The class can be used for inheritance only.
 
 Auxiliary The class can be used as an auxiliary only.
 
@@ -525,7 +523,7 @@ The returned class objects appear in the console, where I've highlighted some of
 
 Note that the schemaIDGUID won't match the objectGUID attribute assigned to the object. The objectGUID should be unique in the directory, but it won't
 
-Active Directory   355
+Active Directory 355
 
 ---
 
@@ -562,7 +560,7 @@ Depending on the complexity of the schema and speed of the network, querying for
 
 Listing 11-14 shows how to inspect the account type using the module's commands.
 
-356     Chapter 11
+356 Chapter 11
 
 ---
 
@@ -692,7 +690,7 @@ When might you choose to use one technique over the other? The Win32 security de
 
 The difference comes from the fact that the ActiveDirectorySecurity class, which the Get-ADObject command uses to return the security descriptor
 
-Active Directory   359
+Active Directory 359
 
 ---
 
@@ -780,7 +778,7 @@ PS> $root_dn = (Get-ADRootDSE).defaultNamingContext
 
 Listing 11-18: Creating a new object security descriptor
 
-Active Directory      361
+Active Directory 361
 
 ---
 
@@ -794,7 +792,7 @@ Domain Admins Set for any object in the default naming context under the domain 
 
 Enterprise Admins Set for any object in the configuration naming context
 
-Schema Admins   Set for any object in the schema naming context
+Schema Admins Set for any object in the schema naming context
 
 Changing the owner and group SIDs to one of these values ensures that the resources across a forest have appropriate owners. For example, if Enterprise Admins weren't the default owner for configuration objects, an administrator from a different domain in the forest might create an object that an administrator in another domain wouldn't be able to access, even if they were in the correct group.
 
@@ -885,7 +883,7 @@ First, we get the current security descriptor for the object. In this case I've 
 
 We then use the modified security descriptor as the creator security descriptor, using the parent security descriptor and the target object's class information for inheritance . We specify some additional auto-inherit
 
-364    Chapter 11
+364 Chapter 11
 
 ---
 
@@ -951,7 +949,7 @@ ReadProp
 Listing 11-23: Searching for the source of inherited ACEs
 ```
 
-Active Directory   365
+Active Directory 365
 
 ---
 
@@ -965,7 +963,6 @@ Now that we can query an object's security descriptor, we can perform an access 
 
 <table><tr><td>CreateChild</td><td>Enables creating a new child object</td></tr><tr><td>DeleteChild</td><td>Enables deleting a child object</td></tr><tr><td>List</td><td>Enables listing child objects</td></tr><tr><td>Self</td><td>Enables writing an attribute value (which the server will verify)</td></tr><tr><td>ReadProp</td><td>Enables reading an attribute value</td></tr><tr><td>WriteProp</td><td>Enables writing an attribute value</td></tr><tr><td>DeleteTree</td><td>Enables deleting a tree of objects</td></tr><tr><td>ListObject</td><td>Enables listing a specific object</td></tr><tr><td>ControlAccess</td><td>Grants access to a directory operation</td></tr></table>
 
-
 Some of these access rights require more explanation than others. In the following sections, we'll walk through the various operations they represent and how they're used to determine what a user can do on the directory server. Note that the behaviors of these access rights also apply to ACEs specified in an object's SACL, meaning you should be able to take the descriptions presented here and apply them to the generation of audit events.
 
 ### Creating Objects
@@ -974,7 +971,7 @@ If a user is granted the CreateChild access right, they can create a child objec
 
 CreateChild access right for a specific object type.
 
-366    Chapter 11
+366 Chapter 11
 
 ---
 
@@ -1010,7 +1007,7 @@ Finally, we repeat the access check but instead specify the container class . Th
 
 If an object's security descriptor contains an ACE that grants the CreateChild access right with no object type specified, the user can create any child object. However, limitations still exist. First, the user can only create new objects of structural classes; the server should reject the creation of an object from an abstract or auxiliary class. Second, each schema class has a list of possible parent classes, or superiors , stored in the posSuperiors and
 
-Active Directory      367
+Active Directory 367
 
 ---
 
@@ -1031,7 +1028,6 @@ ms-net-ieee-8023-GroupPolicy 99a03a6a-bb19-4446-9350-0c8b78ed2ddb 3
 Listing 11-25: Listing inferior classes of the user_schema class
 
 Listing 11-25 shows the four child classes allowed for a user object.
-
 
 Trying to create an object of a class that isn't in the list of children will result in an error and abort the creation operation. An administrator can change this list by adding the user class to another class's possSuperiors attribute.
 
@@ -1081,7 +1077,7 @@ PS> (Get-DsHeuristics).DoListObject
 
 If the output is True, the ListObject access right is enabled.
 
-Active Directory   369
+Active Directory 369
 
 ---
 
@@ -1220,7 +1216,6 @@ Listing 11-30: Getting extended rights and grouping them by the validAccesses at
 
 An object can specify a particular type of extended right in its valid
 
-
 Accesses attribute, which stores an integer representing directory object
 
 access rights. We convert the attribute to an access rights enumeration
@@ -1231,9 +1226,7 @@ the extended right is a property set.
 
 To simplify the analysis of extended rights and property sets, the NutObject
 
-
 Manager module implements the Get-DSExtendedRight PowerShell command, as
-
 
 shown in Listing 11-31.
 
@@ -1243,7 +1236,7 @@ shown in Listing 11-31.
 # PS: $prop_set
 ```
 
-Active Directory      373
+Active Directory 373
 
 ---
 
@@ -1326,7 +1319,7 @@ We pass the object type tree and security descriptor to the access check ❶ , a
 
 As you can see, if the security descriptor granted writeProp access to every attribute in the set, the access would propagate to the property set node at level 1. Therefore, if the server merely checked the property
 
-Active Directory   375
+Active Directory 375
 
 ---
 
@@ -1371,7 +1364,7 @@ An Active Directory server administrator can add their own property sets to the 
 
 The second type of extended right, control access rights, don't necessarily correspond to any object attribute; instead, they tell the Active Directory server whether the user can perform a particular operation. Let's start by listing a subset of the control access rights, as shown in Listing 11-34.
 
-376    Chapter 11
+376 Chapter 11
 
 ---
 
@@ -1429,7 +1422,7 @@ Listing 11-35: Checking for the User-Change-Password control access right
 
 First, we create a new security descriptor, get the control access right, and add an ACE to the security descriptor granting the ControlAccess access right for User-Change-Password ❶ . Next, we query for the user schema class
 
-Active Directory   377
+Active Directory 377
 
 ---
 
@@ -1472,11 +1465,11 @@ A write-validated access right grants a user the ability to write to certain att
 
 The name of the access right, Self, is likely derived from its use as a mechanism for self-group membership. Over time, its use has been expanded to cover a few additional attributes. Microsoft's Active Directory
 
-378    Chapter 11
+378 Chapter 11
 
 ---
 
-Technical Specification (MS-ADTS, available online) refers to it as RIGHT_DS _WRITE_PROPERTY_EXTENDED, which is a slightly better description.
+Technical Specification (MS-ADTS, available online) refers to it as RIGHT_DS \_WRITE_PROPERTY_EXTENDED, which is a slightly better description.
 
 We won't perform an example access check for write-validated access because it's the same as the check shown in Listing 11-35 for control access rights; simply change the extended right you query and check that Self access is granted. As with ControlAccess, it's possible for a non-object ACE to grant Self access without having a specific ACE for the write-validated access right.
 
@@ -1504,7 +1497,7 @@ There are multiple ways of accessing the attribute. The simplest is to use eithe
 
 You can also use a command that comes with the NOTeManager module: Get-Doc01@Ccl51d, which requires the full distinguished name of the object to query. The main advantage of this command is that it returns a Sid class you can use in the access check without converting the value into the correct
 
-Active Directory      379
+Active Directory 379
 
 ---
 
@@ -1592,7 +1585,7 @@ We'll discuss Kerberos delegation and the use of these settings in more detail i
 
 The root domain of the directory shares its domain configuration and schema with the entire forest, meaning changes to a user in other domains will eventually be replicated in the root domain. But allowing a child
 
-Active Directory      381
+Active Directory 381
 
 ---
 
@@ -1644,7 +1637,6 @@ The next property is the distinguished name of the schema attribute from which t
 
 Finally, we display the list of schema classes to which this claim applies.
 
-
 In this case, only the user schema class appears in the listing. If this list contained the distinguished name of the computer class, it would be a device claim, not a user claim, although claims can apply to both users and computers.
 
 Listing 11-43 shows how to display the properties of a central access policy in the directory.
@@ -1667,7 +1659,7 @@ Listing 11-43: Displaying properties of a central access policy
 
 Administrators deploy central access policies to a domain's computers and servers based on the group policy configuration. This allows them to selectively deploy a policy to a specific subset of systems in the domain. The policy's configuration is stored in the directory, however.
 
-Active Directory   383
+Active Directory 383
 
 ---
 
@@ -1691,7 +1683,7 @@ Figure 11-6 shows how a domain network configures group policies.
 
 Figure 11-6: The configuration of group policies
 
-384    Chapter 11
+384 Chapter 11
 
 ---
 
@@ -1748,7 +1740,6 @@ First, we query for organizational unit objects in the directory using the Get-A
 
 We could now take the group policy object's distinguished names from the gLink attribute and manually look up each one. Instead, let's simply search for all objects of class groupPolicyContainer using the Get-AObject
 
-
 PowerShell command . This shows us the name of each policy object, as well as the path to the real policy store on the SYSVOL file server.
 
 We can also list the contents of the policy directory on the file server ❸. Depending on how complex the policy is, the file share might contain many different files. A group policy can apply to a particular machine, as well as on a per-user basis, which is why there are separate MACHINE and USER directories.
@@ -1759,7 +1750,7 @@ As a minor example of information leakage, you could determine which SIDs would 
 
 In Listing 11-44, we retrieve the Default Domain Controllers Policy ❶ , the only policy applied in our simple environment. We then extract the privileges from the file using a simple string selection. In this example, we find the default configuration: Authenticated Users is granted SetMachineAccountPrivilege , and BUILTIN Administrators is granted SetEnableDelegation Privilege ❷ .
 
-386    Chapter 11
+386 Chapter 11
 
 ---
 
@@ -1789,7 +1780,7 @@ We can build an authorization context for a domain user based only on informatio
                 Add-Member $Set $group:MemberOf
 ```
 
-Active Directory   387
+Active Directory 387
 
 ---
 
@@ -1841,7 +1832,7 @@ Listing 11-45: Building an authorization context for the access check
 
 In the directory, user and group objects have a member attribute that lists the distinguished names of the group objects that the user or group is a member of. We can use this list to recursively inspect the directory to find all groups. This is what the Add-Member function is doing.
 
-388    Chapter 11
+388 Chapter 11
 
 ---
 
@@ -1870,7 +1861,7 @@ PS> $ctx.User
 
 (continued)
 
-Active Directory   389
+Active Directory 389
 
 ---
 
@@ -1891,15 +1882,14 @@ These commands could replace the entirety of Listing 11-45. To use the remote ac
 
 With the authorization context in hand, we can begin the access check.
 
-
 We'll use the Get-Auth2GrantedAccess command, which works almost the same as Get-NetGrantedAccess but relies on the context we've created. We'll start by gathering information about the object we want to check. We need the following details:
 
 - • The security descriptor of the object
-• The object SID, if present, for the principal SID
-• All schema classes, including auxiliary and child classes
-• Allowed schema attributes and associated property sets
-• Applicable control and write-validated access rights
-Listing 11-46 implements the Get-ObjectInformation function, which gathers this information about an object based on its distinguished name.
+  • The object SID, if present, for the principal SID
+  • All schema classes, including auxiliary and child classes
+  • Allowed schema attributes and associated property sets
+  • Applicable control and write-validated access rights
+  Listing 11-46 implements the Get-ObjectInformation function, which gathers this information about an object based on its distinguished name.
 
 ```bash
 PS> function Get-ObjectInformation($Name) {
@@ -1953,7 +1943,6 @@ SecurityDescriptor : O:BAG:BAD:AI(OA;CIO;RP;4c164200-2000-11d0-...
 Listing 11-47: Gathering object information
 
 In this example, we request the information for the root domain object.
-
 
 You could cache most of the returned information about the schema class, as only the security descriptor and object SID typically change between objects. However, for simplicity, we'll gather the information for every request.
 
@@ -2052,7 +2041,7 @@ One thing to note is that we use the dummy identifier as the root object type. I
 
 We run a similar access check for control access rights ❷ and writevalidated access rights ❸, requesting ControlAccess and Self, respectively. Finally, we package all the results into a custom object to return to the caller ❹.
 
-Active Directory   393
+Active Directory 393
 
 ---
 
@@ -2135,7 +2124,7 @@ Next, we discussed how the Active Directory server secures objects through a man
 
 Once we understood how an object's security descriptor is configured, we explored how the directory server determines what access a user has to an object and its attributes. This access check process uses unique identifiers taken from the schema representation to build object type trees. These
 
-Active Directory  395
+Active Directory 395
 
 ---
 
@@ -2183,7 +2172,7 @@ Next, the Winlogon process sends the credentials to the LSA's LSalogfon user API
 
 The lsatoolmgr API directly supports the most common type of creational, a username and password pair. However, Windows allows many other local authentication factors as well, such as biometric data (for example, a scanning of the user's face) or a simple PIN. To handle these,
 
-398    Chapter 12
+398 Chapter 12
 
 ---
 
@@ -2201,21 +2190,20 @@ The latest versions of Windows don't use the SAS as the Logon UI by default, alt
 
 We know the basics of how to create a desktop on Windows. Now let's dig into how the LsaLogCluster API implements the interactive authentication service for Winlogon and other applications on the local system. This API
 
-Interactive Authentication  399
+Interactive Authentication 399
 
 ---
 
 might seem quite complex, but it really requires only three pieces of information from an application to authenticate a user:
 
 - • The logon type requested
-• The security package identifier
-• The user's credentials
-The API uses the logon type to accommodate different authentication scenarios. Table 12-1 lists the logon types most commonly used by applications.
+  • The security package identifier
+  • The user's credentials
+  The API uses the logon type to accommodate different authentication scenarios. Table 12-1 lists the logon types most commonly used by applications.
 
 Table 12-1: Common Logon Types
 
 <table><tr><td>Logon type</td><td>Description</td></tr><tr><td>Interactive</td><td>Interact with a local desktop.</td></tr><tr><td>Batch</td><td>Run as a background process, even if no desktop is available.</td></tr><tr><td>Service</td><td>Run as a system service.</td></tr><tr><td>Network</td><td>Interact with the system from a network client.</td></tr><tr><td>NetworkCleartext</td><td>Perform network authentication, but store the user&#x27;s credentials for later use.</td></tr><tr><td>NewCredentials</td><td>Clone the caller&#x27;s token and change network user credentials.</td></tr><tr><td>RemoteInteractive</td><td>Interact with a desktop via the Remote Desktop Protocol.</td></tr><tr><td>Unlock</td><td>Verify the user&#x27;s credentials for unlocking the desktop.</td></tr></table>
-
 
 Unlock is a special type that Winlogon uses to verify a user's credentials on the lock screen, and it isn't typically used by applications directly. We'll come back to some of the other logon types later in the chapter.
 
@@ -2263,9 +2251,7 @@ The supported credential types depend on the security package being used for the
 
 Let's explore how the IsetaogonUser API authenticates a user in more detail.
 
-
 Figure 12-2 gives an overview of this process for a user in the local SAM
-
 
 database.
 
@@ -2286,7 +2272,6 @@ Now that the security package knows the user's group membership and account deta
 Table 12-2: Logon Types and Associated Allow and Deny Account Rights
 
 <table><tr><td>Logon type</td><td>Allow account right</td><td>Deny account right</td></tr><tr><td>Interactive</td><td>SeInteractiveLogonRight</td><td>SeDenyInteractiveLogonRight</td></tr><tr><td>Batch</td><td>SeBatchLogonRight</td><td>SeDenyBatchLogonRight</td></tr><tr><td>Service</td><td>SeServiceLogonRight</td><td>SeDenyServiceLogonRight</td></tr><tr><td>Network</td><td>SeNetworkLogonRight</td><td>SeDenyNetworkLogonRight</td></tr><tr><td>NetworkCleartext</td><td>SeNetworkLogonRight</td><td>SeDenyNetworkLogonRight</td></tr><tr><td>NewCredentials</td><td>N/A</td><td>N/A</td></tr><tr><td>RemoteInteractive</td><td>SeRemoteInteractiveLogonRight</td><td>SeDenyRemoteInteractiveLogonRight</td></tr><tr><td>Unlock</td><td>The same as Interactive or RemoteInteractive</td><td>The same as Interactive or RemoteInteractive</td></tr></table>
-
 
 If the user doesn't have the necessary account right granted or is explicitly denied the right, the authentication will fail. There can be other limitations on authentication, as well; for example, you could configure a user so that they're allowed to authenticate only between certain times, or even only on certain days of the week. If the user doesn't meet one of the policy requirements, the security package will reject the authentication.
 
@@ -2336,7 +2321,7 @@ Once the LSalogout API has verified the user's credentials, it can create an ini
 
 Let's begin by querying the LSA for all current logon sessions using the Get-MtLogonSession PowerShell command, as shown in Listing 12-2. You should run this command as an administrator to display all the logon sessions on the system.
 
-404     Chapter 12
+404 Chapter 12
 
 ---
 
@@ -2403,7 +2388,7 @@ Figure 12-4: The console and logon sessions
 
 Notice that console session 0 contains the service logon sessions, such as those for the local system, the network service, and the local service. The local system logon session is also used for the LogonUI process running in console session 2. At the bottom right is console session 1, which contains two user logon sessions: one for the UAC administrator and one for the filtered non-administrator.
 
-406     Chapter 12
+406 Chapter 12
 
 ---
 
@@ -2437,16 +2422,13 @@ Table 12-3: Groups Added to an Interactive Token on a Domain-Joined System
 
 <table><tr><td>Group name</td><td>Group source</td></tr><tr><td>MINERAL\alice</td><td>Domain user account</td></tr><tr><td>MINERAL\Domain Users</td><td rowspan="3">Domain group membership</td></tr><tr><td>Authentication authority asserted identity</td></tr><tr><td>NT AUTHORITY\Claims Valid</td></tr><tr><td>MINERAL\Local Resource</td><td>Domain-local resource group membership</td></tr><tr><td>BUILTIN\Administrators</td><td rowspan="2">Local group membership</td></tr><tr><td>BUILTIN\Users</td></tr><tr><td></td><td>(continued)</td></tr><tr><td></td><td>Interactive Authentication 407</td></tr></table>
 
-
 ---
 
 Table 12-3: Groups Added to an Interactive Token on a Domain-Joined System (continued)
 
 <table><tr><td>Group name</td><td>Group source</td></tr><tr><td>NT AUTHORITY:INTERACTIVE</td><td rowspan="4">Automatic LSA groups</td></tr><tr><td>NT AUTHORITY:Authenticated Users</td></tr><tr><td>Everyone</td></tr><tr><td>Mandatory Label\High Mandatory Level</td></tr><tr><td>NT AUTHORITY:</td><td rowspan="3">Winlogon groups</td></tr><tr><td>LogonSessionId_0_6077548</td></tr><tr><td>LOCAL</td></tr></table>
 
-
 As you can see, the groups added to the token come from six sources.
-
 
 The first entry comes from the domain user account. (In a local authentica
 
@@ -2458,9 +2440,7 @@ The following source includes the groups with the DomainLocal scope. These domai
 
 Next, any local groups the user is a member of are added to the token.
 
-
 These local groups can be selected based on the domain SIDs provided
-
 
 during the authentication process.
 
@@ -2470,13 +2450,11 @@ Table 12-4: The SIDs Added to the Token for Each Logon T ype
 
 <table><tr><td>Logon type</td><td>Name</td><td>SID</td></tr><tr><td>Interactive</td><td>NT AUTHORITY\INTERACTIVE</td><td>5-1-5-4</td></tr><tr><td>Batch</td><td>NT AUTHORITY\BATCH</td><td>5-1-5-3</td></tr></table>
 
-
-408     Chapter 12
+408 Chapter 12
 
 ---
 
 <table><tr><td>Logon type</td><td>Name</td><td>SID</td></tr><tr><td>Service</td><td>NT AUTHORITY:SERVICE</td><td>S-1-5-6</td></tr><tr><td>Network</td><td>NT AUTHORITY:NETWORK</td><td>S-1-5-2</td></tr><tr><td>NetworkCleartext</td><td>NT AUTHORITY:NETWORK</td><td>S-1-5-2</td></tr><tr><td>NewCredentials</td><td>The same as that of the original token</td><td>N/A</td></tr><tr><td rowspan="2">RemoteInteractive</td><td>NT AUTHORITY:INTERACTIVE</td><td>S-1-5-4</td></tr><tr><td>NT AUTHORITY:REMOTE INTERACTIVE LOGON</td><td>S-1-5-14</td></tr><tr><td>Unlock</td><td>The same as the logon session that is being unlocked</td><td>N/A</td></tr></table>
-
 
 Providing a unique SID for each logon type allows a security descriptor to secure resources depending on the type of logon. For example, a security descriptor could explicitly deny access to the NT AUTHORITY_NETWORK SID, meaning a user authenticated from the network would be denied access to the resource, while other authenticated users would be granted access.
 
@@ -2520,9 +2498,7 @@ Listing 12-4: Authenticating a user
 
 It's best not to enter passwords on the command line. Instead, we use
 
-
 Read-Host with the AsSecureString property to read the password as a secure
-
 
 string:
 
@@ -2539,7 +2515,6 @@ The logon type also determines what type of token isalogonoller will return base
 Table 12-5: Logon Types Mapped to Token Types
 
 <table><tr><td>Logon type</td><td>Token type</td></tr><tr><td>Interactive</td><td>Primary</td></tr><tr><td>Batch</td><td>Primary</td></tr><tr><td>Service</td><td>Primary</td></tr><tr><td>Network</td><td>Impersonation</td></tr><tr><td>NetworkCleartext</td><td>Impersonation</td></tr><tr><td>NewCredentials</td><td>Primary</td></tr><tr><td>RemoteInteractive</td><td>Primary</td></tr><tr><td>Unlock</td><td>Primary</td></tr></table>
-
 
 In Listing 12-4, the command returned an impersonation token. You might be wondering: Are we allowed to impersonate the token without having SetImpersonatePrivilege enabled, especially if the token belongs to a different user? The LSA sets the new token's origin ID to the caller's authentication ID, so based on the rules for impersonation covered in Chapter 4, we can, even if the token belongs to a different user.
 
@@ -2629,7 +2604,6 @@ The API will return a process and thread handle to use. For example, we can quer
 
 The API doesn't allow you to specify the logon type of the user (it defaults to Interactive), but you can specify the NetCredentialsOnly flag to the
 
-
 LogonFlags parameter to use the NewCredentials logon type instead.
 
 ## The Service Logon Type
@@ -2638,14 +2612,13 @@ Let's wrap up this chapter by talking a little more about the Service logon type
 
 However, the LSA also supports four well-known local service accounts that are not stored in the SAM database. We can create them using lsaglogn User by specifying the domain name as NT AUTHORITY with the Service logon type and one of the usernames in Table 12-6, which also shows the user SIDs.
 
-Interactive Authentication   413
+Interactive Authentication 413
 
 ---
 
 Table 12-6: Usernames and SIDs for the Service Logon Type
 
 <table><tr><td>Username</td><td>User SID</td></tr><tr><td>IUSR</td><td>S-1-5-17</td></tr><tr><td>SYSTEM</td><td>S-1-5-18</td></tr><tr><td>LOCAL SERVICE or LocalService</td><td>S-1-5-19</td></tr><tr><td>NETWORK SERVICE or NetworkService</td><td>S-1-5-20</td></tr></table>
-
 
 The SYSTEM user is the only administrator of the four users; the other three are not members of the Administrators group, but they do have highlevel privileges such as SelPersonalPrivilege, which makes them effectively equivalent to an administrator.
 
@@ -2683,7 +2656,7 @@ Even as an administrator you don't receive SetchbPrivileges by default, so the c
 
 Let's walk through some examples that demonstrate how to use the various commands introduced in this chapter in security research or systems analysis.
 
-414    Chapter 12
+414 Chapter 12
 
 ---
 
@@ -2734,7 +2707,7 @@ PS> $password = Read-Host -AsSecureString -Prompt "Password"
   Mandatory : True
 ```
 
-Interactive Authentication   415
+Interactive Authentication 415
 
 ---
 
@@ -2768,13 +2741,11 @@ In certain scenarios, you might want to start a process inside a different conso
 
 To successfully create a process on another desktop, you need SetCb
 
-
 Privilege to change a token's session ID and SetAssignPrimaryTokenPrivilege to
-
 
 create the process. By default, an administrator user has neither of these
 
-416    Chapter 12
+416 Chapter 12
 
 ---
 
@@ -2819,7 +2790,7 @@ We can verify that we've created the process in the target session by comparing 
 
 In Chapter 10, I mentioned that you can create your own SID-to-name mappings in the LSA using the Add-NSIDname command. Once you've set up a
 
-Interactive Authentication   417
+Interactive Authentication 417
 
 ---
 
@@ -2890,7 +2861,4 @@ Finally, we looked briefly at the Service logon type and the four accounts that 
 
 ---
 
-
-
 ---
-

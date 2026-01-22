@@ -182,7 +182,10 @@ Every agent output file ends with:
 }
 ```
 
-Note: When blocked, `handoff.next_agent` should be `null` - the orchestrator determines routing using the `orchestrating-multi-agent-workflows` skill's agent routing table based on `blocked_reason`.
+Note: When blocked, `handoff.next_agent` routing depends on execution context:
+
+- **Orchestrated**: Set to `null` - orchestrator determines routing using [blocked-agent-routing.md](blocked-agent-routing.md) based on `blocked_reason` (orchestrators may override)
+- **Direct CLI**: Agent sets `next_agent` using [blocked-agent-routing.md](blocked-agent-routing.md) routing table
 
 ## Validation
 

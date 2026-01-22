@@ -121,9 +121,10 @@ This reference provides detailed mapping tables for common security findings acr
 ### Primary vs. Supporting Categories
 
 - **Primary Category**: Where the finding is discovered/detected (usually ID.RA for scanners)
-- **Supporting Category**: Where the control should be implemented to remediate (PR.*, DE.*)
+- **Supporting Category**: Where the control should be implemented to remediate (PR._, DE._)
 
 **Example:**
+
 - Finding: "Unpatched CVE-2024-1234"
 - Primary: ID.RA-01 (Vulnerability identification via scanner)
 - Supporting: PR.IP-12 (Patch management to remediate)

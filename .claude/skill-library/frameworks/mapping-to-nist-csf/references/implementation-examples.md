@@ -8,18 +8,18 @@
 
 ### Chariot Platform Capabilities
 
-| Capability Type        | Example                    | Primary CSF Category | Secondary CSF Category | Notes                                |
-| ---------------------- | -------------------------- | -------------------- | ---------------------- | ------------------------------------ |
-| Asset Discovery        | DNS enumeration, port scan | ID.AM-01             | ID.RA-01               | Hardware/software inventory          |
-| Vulnerability Scanner  | CVE detection (Nuclei)     | ID.RA-01             | PR.IP-12               | Vuln identification → patching       |
-| Cloud Misconfiguration | AWS security group audit   | ID.RA-01             | PR.AC-05               | Network segregation gaps             |
-| Secret Scanner         | GitHub token detection     | ID.RA-01             | PR.DS-08               | Secrets management integrity         |
-| Certificate Analysis   | Weak TLS detection         | ID.RA-01             | PR.DS-02               | Data in transit protection           |
-| IAM Policy Audit       | Overprivileged IAM         | ID.RA-01             | PR.AA-04               | Least privilege assessment           |
-| Container Security     | Dockerfile linting         | ID.RA-01             | PR.PS-01               | Baseline configuration               |
-| SIEM Integration       | Log forwarding             | DE.CM-01             | DE.AE-01               | Continuous monitoring + baseline     |
-| Threat Intelligence    | IOC correlation            | DE.AE-02             | RS.AN-05               | Threat intel → incident analysis     |
-| Incident Response      | Automated containment      | RS.MI-01             | RS.MA-01               | Mitigation → incident management     |
+| Capability Type        | Example                    | Primary CSF Category | Secondary CSF Category | Notes                            |
+| ---------------------- | -------------------------- | -------------------- | ---------------------- | -------------------------------- |
+| Asset Discovery        | DNS enumeration, port scan | ID.AM-01             | ID.RA-01               | Hardware/software inventory      |
+| Vulnerability Scanner  | CVE detection (Nuclei)     | ID.RA-01             | PR.IP-12               | Vuln identification → patching   |
+| Cloud Misconfiguration | AWS security group audit   | ID.RA-01             | PR.AC-05               | Network segregation gaps         |
+| Secret Scanner         | GitHub token detection     | ID.RA-01             | PR.DS-08               | Secrets management integrity     |
+| Certificate Analysis   | Weak TLS detection         | ID.RA-01             | PR.DS-02               | Data in transit protection       |
+| IAM Policy Audit       | Overprivileged IAM         | ID.RA-01             | PR.AA-04               | Least privilege assessment       |
+| Container Security     | Dockerfile linting         | ID.RA-01             | PR.PS-01               | Baseline configuration           |
+| SIEM Integration       | Log forwarding             | DE.CM-01             | DE.AE-01               | Continuous monitoring + baseline |
+| Threat Intelligence    | IOC correlation            | DE.AE-02             | RS.AN-05               | Threat intel → incident analysis |
+| Incident Response      | Automated containment      | RS.MI-01             | RS.MA-01               | Mitigation → incident management |
 
 ---
 
@@ -28,16 +28,19 @@
 ### GOVERN (GV) Examples
 
 **GV.OC - Organizational Context**
+
 - **Chariot Use Case**: Asset inventory tagged by business criticality (crown jewels identified)
 - **Implementation**: Assets tagged with `business_criticality: high/medium/low` metadata
 - **CSF Mapping**: GV.OC-04 (Critical objectives/services communicated)
 
 **GV.RM - Risk Management Strategy**
+
 - **Chariot Use Case**: Risk appetite thresholds (auto-escalate Critical CVEs to leadership)
 - **Implementation**: Findings with CVSS ≥9.0 trigger board notification workflow
 - **CSF Mapping**: GV.RM-02 (Risk appetite and tolerance defined)
 
 **GV.SC - Supply Chain Risk**
+
 - **Chariot Use Case**: Third-party dependency scanning (npm, Go modules, Docker images)
 - **Implementation**: Dependency scanner → GV.SC-07 (ongoing supplier monitoring)
 - **Tools**: Snyk, GitHub Dependabot, Trivy for container images
@@ -47,6 +50,7 @@
 ### IDENTIFY (ID) Examples
 
 **ID.AM - Asset Management**
+
 - **Chariot Use Case**: Automated asset discovery via network scanning, cloud API enumeration
 - **Implementation**:
   - DNS enumeration → ID.AM-01 (hardware inventory)
@@ -55,6 +59,7 @@
 - **Tools**: Nmap, AWS Config, Azure Resource Graph
 
 **ID.RA - Risk Assessment**
+
 - **Chariot Use Case**: Vulnerability scanning with prioritization
 - **Implementation**:
   - Nuclei templates → ID.RA-01 (vulnerability identification)
@@ -68,6 +73,7 @@
 ### PROTECT (PR) Examples
 
 **PR.AA - Identity Management, Authentication, and Access Control**
+
 - **Chariot Use Case**: IAM policy auditing for least privilege
 - **Implementation**:
   - AWS IAM policy analysis → PR.AA-05 (access permissions managed)
@@ -76,6 +82,7 @@
 - **Tools**: AWS IAM Access Analyzer, Azure AD Identity Protection
 
 **PR.DS - Data Security**
+
 - **Chariot Use Case**: Encryption compliance scanning
 - **Implementation**:
   - S3 bucket encryption check → PR.DS-01 (data at rest protected)
@@ -84,6 +91,7 @@
 - **Tools**: CloudSploit, Prowler, custom VQL capabilities
 
 **PR.PS - Platform Security**
+
 - **Chariot Use Case**: Configuration baseline scanning and patch management
 - **Implementation**:
   - CIS benchmark compliance → PR.PS-01 (configuration management)
@@ -96,6 +104,7 @@
 ### DETECT (DE) Examples
 
 **DE.AE - Anomalies and Events**
+
 - **Chariot Use Case**: Anomaly detection via behavior analysis
 - **Implementation**:
   - Network traffic baseline → DE.AE-01 (baseline established)
@@ -104,6 +113,7 @@
 - **Tools**: Zeek, Suricata, CrowdStrike, Darktrace
 
 **DE.CM - Continuous Monitoring**
+
 - **Chariot Use Case**: 24/7 security monitoring and logging
 - **Implementation**:
   - Network monitoring → DE.CM-01 (networks monitored)
@@ -116,6 +126,7 @@
 ### RESPOND (RS) Examples
 
 **RS.MA - Incident Management**
+
 - **Chariot Use Case**: Automated incident response workflows
 - **Implementation**:
   - Critical finding detection → auto-create incident ticket → RS.MA-01
@@ -123,6 +134,7 @@
 - **Tools**: PagerDuty, ServiceNow, Jira Service Management
 
 **RS.MI - Incident Mitigation**
+
 - **Chariot Use Case**: Automated containment for high-severity findings
 - **Implementation**:
   - Auto-quarantine compromised EC2 instance → RS.MI-01 (incidents contained)
@@ -135,6 +147,7 @@
 ### RECOVER (RC) Examples
 
 **RC.RP - Incident Recovery Plan Execution**
+
 - **Chariot Use Case**: Automated backup restoration testing
 - **Implementation**:
   - Scheduled backup validation → RC.RP-01 (recovery plan executed)
@@ -143,6 +156,7 @@
 - **Tools**: AWS Backup, Veeam, Commvault
 
 **RC.CO - Incident Recovery Communication**
+
 - **Chariot Use Case**: Stakeholder notification during recovery
 - **Implementation**:
   - Auto-notify customers via status page → RC.CO-01 (public relations managed)
@@ -157,18 +171,19 @@
 
 ### Current Coverage
 
-| Function   | Categories Covered     | Gap Categories                | Coverage % |
-| ---------- | ---------------------- | ----------------------------- | ---------- |
-| **GV**     | GV.OC, GV.RM, GV.SC    | GV.RR, GV.PO, GV.OV           | 50%        |
-| **ID**     | ID.AM, ID.RA           | ID.IM                         | 67%        |
-| **PR**     | PR.AA, PR.DS, PR.PS    | PR.AT, PR.IR                  | 60%        |
-| **DE**     | DE.AE, DE.CM           | None                          | 100%       |
-| **RS**     | RS.MA, RS.MI           | RS.AN, RS.CO                  | 50%        |
-| **RC**     | RC.RP                  | RC.CO                         | 50%        |
+| Function | Categories Covered  | Gap Categories      | Coverage % |
+| -------- | ------------------- | ------------------- | ---------- |
+| **GV**   | GV.OC, GV.RM, GV.SC | GV.RR, GV.PO, GV.OV | 50%        |
+| **ID**   | ID.AM, ID.RA        | ID.IM               | 67%        |
+| **PR**   | PR.AA, PR.DS, PR.PS | PR.AT, PR.IR        | 60%        |
+| **DE**   | DE.AE, DE.CM        | None                | 100%       |
+| **RS**   | RS.MA, RS.MI        | RS.AN, RS.CO        | 50%        |
+| **RC**   | RC.RP               | RC.CO               | 50%        |
 
 ### Prioritized Gap Remediation
 
 **Priority 1 (High Impact):**
+
 1. **ID.IM (Improvement)** - No lessons learned process
    - **Action**: Implement post-incident review workflow
    - **Effort**: 2 weeks
@@ -179,22 +194,22 @@
    - **Effort**: 4 weeks
    - **CSF Mapping**: GV.PO-01, GV.PO-02
 
-**Priority 2 (Medium Impact):**
-3. **PR.AT (Awareness and Training)** - No security training program
-   - **Action**: Implement security awareness campaigns, phishing simulations
-   - **Effort**: 3 weeks
-   - **CSF Mapping**: PR.AT-01, PR.AT-02
+**Priority 2 (Medium Impact):** 3. **PR.AT (Awareness and Training)** - No security training program
+
+- **Action**: Implement security awareness campaigns, phishing simulations
+- **Effort**: 3 weeks
+- **CSF Mapping**: PR.AT-01, PR.AT-02
 
 4. **RS.AN (Incident Analysis)** - Limited forensics capabilities
    - **Action**: Deploy forensics tools, train SOC analysts
    - **Effort**: 6 weeks
    - **CSF Mapping**: RS.AN-01, RS.AN-02, RS.AN-03
 
-**Priority 3 (Low Impact):**
-5. **RC.CO (Recovery Communication)** - No formal recovery communication plan
-   - **Action**: Create communication templates, integrate with status page
-   - **Effort**: 2 weeks
-   - **CSF Mapping**: RC.CO-01, RC.CO-02, RC.CO-03
+**Priority 3 (Low Impact):** 5. **RC.CO (Recovery Communication)** - No formal recovery communication plan
+
+- **Action**: Create communication templates, integrate with status page
+- **Effort**: 2 weeks
+- **CSF Mapping**: RC.CO-01, RC.CO-02, RC.CO-03
 
 ---
 

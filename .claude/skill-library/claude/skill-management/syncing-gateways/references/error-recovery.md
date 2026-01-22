@@ -111,7 +111,8 @@ ERROR: Cannot parse routing table in gateway-frontend
 
 - SKIP this gateway (do not attempt auto-fix)
 - Report to user for manual intervention
-- Suggest running `npm run audit -- gateway-frontend` to identify issues
+- Suggest loading `auditing-skills` workflow to identify issues:
+  `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
 
 ### Permission Denied
 

@@ -25,16 +25,18 @@ require.NoError(t, err)  // Use require for must-pass assertions
 ```
 
 **Why testify is mandatory:**
+
 - Consistent assertion style across codebase
 - Better failure messages with clear diffs
 - Mock support for interfaces
 - Table-driven test utilities
 
 **If you write `t.Error`, `t.Errorf`, `t.Fatal`, or `t.Fatalf`:**
+
 - STOP immediately
 - Rewrite using testify assertions
 - Review ALL test functions for violations
-</CRITICAL>
+  </CRITICAL>
 
 ## When to Use
 

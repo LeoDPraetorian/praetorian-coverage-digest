@@ -1,4 +1,4 @@
-## CHAPTER 3  Processes and jobs
+## CHAPTER 3 Processes and jobs
 
 In this chapter, we'll explain the data structures and algorithms that deal with processes and jobs in Windows. First we'll take a general look at process creation. Then we'll examine the internal structures that make up a process. Next we'll look at protected processes and how they differ from non-protected ones. After that we outline the steps involved in creating a process (and its initial thread). The chapter concludes with a description of jobs.
 
@@ -12,7 +12,6 @@ Other process creation functions include CreateProcessWithToken() and CreateProc
 
 101
 
-
 ---
 
 Figure 3-1 shows the call graph described above.
@@ -21,17 +20,18 @@ Figure 3-1 shows the call graph described above.
 
 FIGURE 3-1 Process creation functions. Functions marked with dotted boxes are internal.
 
-All the above documented functions expect a proper Portable Executable (PE) file (although the EXE extension is not strictly required), batch file, or 16-bit COM application. Beyond that, they have no knowledge of how to connect files with certain extensions (for example, .txt) to an executable (for example, Notepad). This is something that is provided by the Windows Shell, in functions such as ShellExecute and She11ExecuteEx. These functions can accept any file (not just executables) and try to locate the executable to run based on the file extensions and the registry settings at HKEY_CLASSES_ ROOT. (See Chapter 9, "Management mechanisms, " in Windows Internals Part 2 for more on this.) Eventually, She11Execute(Ex) calls CreateProcess with a proper executable and appends appropriate arguments on the command line to achieve the user's intention (such as editing a TXT file by appending the file name to Notepad.exe).
+All the above documented functions expect a proper Portable Executable (PE) file (although the EXE extension is not strictly required), batch file, or 16-bit COM application. Beyond that, they have no knowledge of how to connect files with certain extensions (for example, .txt) to an executable (for example, Notepad). This is something that is provided by the Windows Shell, in functions such as ShellExecute and She11ExecuteEx. These functions can accept any file (not just executables) and try to locate the executable to run based on the file extensions and the registry settings at HKEY*CLASSES* ROOT. (See Chapter 9, "Management mechanisms, " in Windows Internals Part 2 for more on this.) Eventually, She11Execute(Ex) calls CreateProcess with a proper executable and appends appropriate arguments on the command line to achieve the user's intention (such as editing a TXT file by appending the file name to Notepad.exe).
 
 Ultimately, all these execution paths lead to a common internal function, CreateProcessInternal, which starts the actual work of creating a user-mode Windows process. Eventually (if all goes well), CreateProcessInternal calls NtCreateUserProcess in Ntdll.dll to make the transition to kernel mode and continue the kernel-mode part of process creation in the function with the same name (NtCreateUserProcess), part of the Executive.
 
-## CreateProcess* functions arguments
+## CreateProcess\* functions arguments
 
 It's worthwhile to discuss the arguments to the CreateProcess* family of functions, some of which will be referred to in the section on the flow of CreateProcess. A process created from user mode is always created with one thread within it. This is the thread that eventually will execute the main function of the executable. Here are the important arguments to the CreateProcess* functions:
 
 - ■ For CreateProcessAsUser and CreateProcessWithToken#, the token handle under which the
-new process should execute. Similarly, for CreateProcessWithLogon#, the username, domain
-and password are required.
+  new process should execute. Similarly, for CreateProcessWithLogon#, the username, domain
+  and password are required.
+
 ---
 
 <table><tr><td>■ The executable path and command-line arguments.</td></tr><tr><td>■ Optional security attributes applied to the new process and thread object that's about to be created.</td></tr><tr><td>■ A Boolean flag indicating whether all handles in the current (creating) process that are marked inheritable should be inherited (copied) to the new process. (See Chapter 8, "System mecha-nisms," in Part 2 for more on handles and handle inheritance.)</td></tr><tr><td>■ Various flags that affect process creation. Here are some examples. (Check the Windows SDK documentation for a complete list.)</td></tr><tr><td>■ CREATE_SUSPENDED This creates the initial thread of the new process in the suspended state. A later call to ResumeThread will cause the thread to begin execution.</td></tr><tr><td>■ DEBUG_PROCESS The creating process is declaring itself to be a debugger, creating the new process under its control.</td></tr><tr><td>■ EXTENDED_STARTUPINFO_PRESENT The extended STARTUPINFOEX structure is provided instead of STARTUPINFO (described below).</td></tr><tr><td>■ An optional environment block for the new process (specifying environment variables). If not specified, it will be inherited from the creating process.</td></tr><tr><td>■ An optional current directory for the new process. (If not specified, it uses the one from the creating process.) The created process can later call SetCurrentDirectory to set a different one. The current directory of a process is used in various non-full paths searches (such as when loading a DLL with a filename only).</td></tr><tr><td>■ A STARTUPINFO or STARTUPINFOEX structure that provides more configuration for process-cre-ation. STARTUPINFOEX contains an additional opaque field that represents a set of process and thread attributes that are essentially an array of key/value pairs. These attributes are filled by calling UpdateProcThreadAttributes once for each attribute that's needed. Some of these at-titudes are undocumented and used internally, such as when creating store apps, as described in the next section.</td></tr><tr><td>■ A PROCESS_INFORMATION structure that is the output of a successful process creation. This structure holds the new unique process ID, the new unique thread ID, a handle to the new pro-cess and a handle to the new thread. The handles are useful for the creating process if it wants to somehow manipulate the new process or thread in some way after creation.</td></tr><tr><td>Creating Windows modern processes</td></tr><tr><td>Chapter 3 described the new types of applications available starting from Windows 8 and Windows 8000. The names of these apps have changed over time, but we'll refer to them as modern apps, UWP apps, or immersive processes, to distinguish them from the classic, also known as desktop, applications.</td></tr><tr><td>CHAPTER 3 Processes and jobs 103</td></tr><tr><td>From the Library of Michael Weber</td></tr></table>
@@ -108,7 +108,6 @@ FIGURE 3-3 Important fields of the kernel process structure.
 
 For a list of the fields that make up an EPROCESS structure and their offsets in hexadecimal, type
 
-
 dt ntl_eprocess in the kernel debugger. (See Chapter 1 for more information on the kernel
 
 debugger and how to perform kernel debugging on the local system.) The output (truncated for
@@ -135,8 +134,7 @@ tkd> dt ntl_eProcess
      +0x768 SharedCommitLinks : :LIST_ENTRY
 ```
 
-CHAPTER 3   Processes and jobs      107
-
+CHAPTER 3 Processes and jobs 107
 
 ---
 
@@ -174,7 +172,7 @@ process structure in the same way as the EPROCESS:
 
 The dt command also enables you to view the specific contents of one field or multiple fields by typing their names following the structure name. For example, typing dt ntl_eprocess UniqueProcessId displays the process ID field. In the case of a field that represents a structure— such as the Pcb field of EPROCESS, which contains the KPROCESS substructure—adding a period after the field name will cause the debugger to display the substructure. For example, an alternative way to see the KPROCESS is to type dt ntl_eprocess Pcb. You can continue to recurse this way by adding more field names (within KPROCESS) and so on. Finally, the -r switch of the dt command allows you to recurse through all the substructures. Adding a number after the switch controls the depth of recursion the command will follow.
 
-The dt command used as shown earlier shows the format of the selected structure, not the contents of any particular instance of that structure type. T o show an instance of an actual process, you can specify the address of an EPROCESS structure as an argument to the dt command. You can get the addresses of almost all of the EPROCESS structures in the system by using the !process 0 0 command (the exception being the system idle process). Because the KPROCESS is the first thing in the EPROCESS, the address of an EPROCESS will also work as the address of a KPROCESS with dt _kprocess.
+The dt command used as shown earlier shows the format of the selected structure, not the contents of any particular instance of that structure type. T o show an instance of an actual process, you can specify the address of an EPROCESS structure as an argument to the dt command. You can get the addresses of almost all of the EPROCESS structures in the system by using the !process 0 0 command (the exception being the system idle process). Because the KPROCESS is the first thing in the EPROCESS, the address of an EPROCESS will also work as the address of a KPROCESS with dt \_kprocess.
 
 ---
 
@@ -255,8 +253,7 @@ FIGURE 3-4 Important fields of the Process Environment Block.
 
 You can dump the PEB structure with the !peb command in the kernel debugger, which displays the PEB of the process that owns the currently running thread on CPU 0. By using the information in the previous experiment, you can also use the PEB pointer as an argument to the command.
 
-110   CHAPTER 3 Processes and jobs
-
+110 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -296,8 +293,7 @@ in more detail later in this chapter.
 
 FIGURE 3-5 Fields of the CSR process structure.
 
-CHAPTER 3   Processes and jobs      111
-
+CHAPTER 3 Processes and jobs 111
 
 ---
 
@@ -332,7 +328,6 @@ The /p switch changes the process context of the debugger to the provided proces
 
 (EPROCESS, mostly needed in live debugging) and /r requests loading of user mode symbols.
 
-
 Now you can look at the modules themselves using the 1m command or look at the CSR_PROCESS
 
 structure:
@@ -361,8 +356,7 @@ structure:
   +0x088 ServerDllPerProcessData : [1] Ptr64 Void
 ```
 
-112   CHAPTER 3 Processes and jobs
-
+112 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -380,8 +374,7 @@ This logical behavior (which helps ensure that administrators will always have f
 
 Protected processes can be created by any application. However, the operating system will allow a process to be protected only if the image file has been digitally signed with a special Windows Media Certificate. The Protected Media Path (PMP) in Windows makes use of protected processes to provide protection for high-value media, and developers of applications such as DVD players can make use of protected processes by using the Media Foundation (MF) API.
 
-CHAPTER 3   Processes and jobs      113
-
+CHAPTER 3 Processes and jobs 113
 
 ---
 
@@ -429,7 +422,6 @@ TABLE 3-1 Valid protection values for processes
 
 <table><tr><td>Internal Protection Process Level Symbol</td><td>Protection Type</td><td>Signer</td></tr><tr><td>PS_PROTECTED_SYSTEM (0x72)</td><td>Protected</td><td>WinSystem</td></tr><tr><td>PS_PROTECTED_WINTCB (0x62)</td><td>Protected</td><td>WinTcb</td></tr><tr><td>PS_PROTECTED_WINTCB_LIGHT (0x61)</td><td>Protected Light</td><td>WinTcb</td></tr><tr><td>PS_PROTECTED_WINDOWS (0x52)</td><td>Protected</td><td>Windows</td></tr><tr><td>PS_PROTECTED_WINDOWS_LIGHT (0x51)</td><td>Protected Light</td><td>Windows</td></tr><tr><td>PS_PROTECTED_LSA_LIGHT (0x41)</td><td>Protected Light</td><td>Lsa</td></tr><tr><td>PS_PROTECTED_ANTIMALWARE_LIGHT (0x31)</td><td>Protected Light</td><td>Anti-malware</td></tr><tr><td>PS_PROTECTED_AUTHENICODE (0x21)</td><td>Protected</td><td>Authenicode</td></tr><tr><td>PS_PROTECTED_AUTHENICODE_LIGHT (0x11)</td><td>Protected Light</td><td>Authenicode</td></tr><tr><td>PS_PROTECTED_NONE (0x00)</td><td>None</td><td>None</td></tr></table>
 
-
 As shown in Table 3-1, there are several signers defined, from high to low power. WinSystem is the
 
 highest-priority signer and used for the System process and minimal processes such as the Memory
@@ -440,15 +432,13 @@ highest-priority signer and leveraged to protect critical processes that the ker
 
 CHAPTER 3 Processes and jobs 115
 
-
 ---
 
-of and might reduce its security boundary toward. When interpreting the power of a process, keep in mind that first, protected processes always trump PPLs, and that next, higher-value signer processes have access to lower ones, but not vice versa. Table 3-2 shows the signer levels (higher values denote the signer is more powerful) and some examples of their usage. You can also dump these in the debugger with the _PS_PROTECTED_SIGNER type.
+of and might reduce its security boundary toward. When interpreting the power of a process, keep in mind that first, protected processes always trump PPLs, and that next, higher-value signer processes have access to lower ones, but not vice versa. Table 3-2 shows the signer levels (higher values denote the signer is more powerful) and some examples of their usage. You can also dump these in the debugger with the \_PS_PROTECTED_SIGNER type.
 
 TABLE 3-2 Signers and levels
 
 <table><tr><td>Signer Name (PS_PROTECTED_SIGNER)</td><td>Level</td><td>Used For</td></tr><tr><td>PsProtectedSignerWinSystem</td><td>7</td><td>System and minimal processes (including Pico processes).</td></tr><tr><td>PsProtectedSignerWinTcb</td><td>6</td><td>Critical Windows components. PROCESS_TERMINATE is denied.</td></tr><tr><td>PsProtectedSignerWindows</td><td>5</td><td>Important Windows components handling sensitive data.</td></tr><tr><td>PsProtectedSignerLsa</td><td>4</td><td>Lsas.exe (if configured to run protected).</td></tr><tr><td>PsProtectedSignerAntimalware</td><td>3</td><td>Anti-malware services and processes, including third party. PROCESS_TERMINATE is denied.</td></tr><tr><td>PsProtectedSignerCodeGen</td><td>2</td><td>NGEN (.NET native code generation).</td></tr><tr><td>PsProtectedSignerAuthenticode</td><td>1</td><td>Hosting DRM content or loading user-mode fonts.</td></tr><tr><td>PsProtectedSignerNone</td><td>0</td><td>Not valid (no protection).</td></tr></table>
-
 
 At this point you may be wondering what prohibits a malicious process from claiming it is a protected process and shielding itself from anti-malware (AM) applications. Because the Windows Media DRM Certificate is no longer necessary to run as a protected process, Microsoft extended its Code Integrity module to understand two special enhanced key usage (EKU) OIDs that can be encoded in a digital code signing certificate: 1.3.6.1.4.1.3110.3.22 and 1.3.6.1.4.1.3110.3.20. Once one of these EKUs is present, hardcoded Signer and Issuer strings in the certificate, combined with additional possible EKUs, are then associated with the various Protected Signer values. For example, the Microsoft Windows Issuer can grant the PsProtectedSignerWindows protected signer value, but only if the EKU for Windows System Component Verification (1.3.6.1.4.1.3110.3.6) is also present. As an example, Figure 3-7 shows the certificate for Smss.exe, which is permitted to run as WinNTc-Light.
 
@@ -490,8 +480,7 @@ protected. More information on such protected services will be described in Chap
 
 The fact that these core system binaries run as TCB is critical to the security of the system. For example, Cssr.exe has access to certain private APIs implemented by the Window Manager (Win32x.sys), which could give an attacker with Administrator rights access to sensitive parts of the kernel. Similarly, Smss exe and Wininit.exe implement system startup and management logic that is critical to perform without possible interference from an administrator. Windows guarantees that these binaries will always run as WinTcb-Lite such that, for example, it is not possible for someone to launch them without specifying the correct process protection level in the process attributes when calling CreateProcess. This guarantee is known as the minimum TCB list and forces any processes with the names in Table 3-3 that are in a System path to have a minimum protection level and/or signing level regardless of the caller's input.
 
-CHAPTER 3   Processes and jobs      117
-
+CHAPTER 3 Processes and jobs 117
 
 ---
 
@@ -499,16 +488,13 @@ TABLE 3-3 Minimum TCB
 
 <table><tr><td>Process Name</td><td>Minimum Signature Level</td><td>Minimum Protection Level</td></tr><tr><td>Smss.exe</td><td>Inferred from protection level</td><td>WinTcb-Lite</td></tr><tr><td>Csss.exe</td><td>Inferred from protection level</td><td>WinTcb-Lite</td></tr><tr><td>Wininit.exe</td><td>Inferred from protection level</td><td>WinTcb-Lite</td></tr><tr><td>Services.exe</td><td>Inferred from protection level</td><td>WinTcb-Lite</td></tr><tr><td>Werfaultsecure.exe</td><td>Inferred from protection level</td><td>WinTcb-Full</td></tr><tr><td>Spsvc.exe</td><td>Inferred from protection level</td><td>Windows-Full</td></tr><tr><td>Genvalobj.exe</td><td>Inferred from protection level</td><td>Windows-Full</td></tr><tr><td>Lsass.exe</td><td>SE_SIGNING_LEVEL_WINDOWS</td><td>0</td></tr><tr><td>Userinit.exe</td><td>SE_SIGNING_LEVEL_WINDOWS</td><td>0</td></tr><tr><td>Winlogon.exe</td><td>SE_SIGNING_LEVEL_WINDOWS</td><td>0</td></tr><tr><td>Autochk.exe</td><td>SE_SIGNING_LEVEL_WINDOWS*</td><td>0</td></tr></table>
 
-
-*Only on UEFI firmware systems
+\*Only on UEFI firmware systems
 
 EXPERIMENT: Viewing protected processes in Process Explorer
 
 In this experiment, we'll look at how Process Explorer shows protected processes (of either type).
 
-
 Run Process Explorer and select the Protection check box in the Process Image tab to view the
-
 
 Protection column:
 
@@ -518,8 +504,7 @@ Now sort by the Protection column in descending order and scroll to the top. You
 
 protected processes with their protection type. Here's a screenshot from a Windows 10 x64 machine:
 
-118   CHAPTER 3  Processes and jobs
-
+118 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -554,8 +539,7 @@ be possible, and no process termination would be allowed, meaning that the AM so
 
 better protected from malware that does not employ kernel-level exploits.
 
-CHAPTER 3 Processes and jobs     119
-
+CHAPTER 3 Processes and jobs 119
 
 ---
 
@@ -610,8 +594,7 @@ Windows Subsystem for Linux (WSL) optional feature that was also described in Ch
 
 install an inbox Pico Provider composed of the Lxss.sys and LxCore.sys drivers.
 
-120    CHAPTER 3   Processes and jobs
-
+120 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -626,15 +609,15 @@ When a Pico provider calls the registration API, it receives a set of function p
 create and manage Pico processes:
 
 - ■ One function to create a Pico process and one to create a Pico thread.
-■ One function to get the context (an arbitrary pointer that the provider can use to store specific
-data) of a Pico process, one to set it, and another pair of functions to do the same for Pico
-threads. This will populate the Pi coContext field in ETHEAD and/or EPROCESS.
-■ One function to get the CPU context structure (CONTEXT) of a Pico thread and one to set it.
-■ A function to change the FS and/or GS segments of a Pico thread, which are normally used by
-user-mode code to point to some thread local structure (such as the TEB on Windows).
-■ One function to terminate a Pico thread and one to do the same to a Pico process.
-■ One function to suspend a Pico thread and one to resume it.
-As you can see, through these functions, the Pico provider can now create fully custom processes and
+  ■ One function to get the context (an arbitrary pointer that the provider can use to store specific
+  data) of a Pico process, one to set it, and another pair of functions to do the same for Pico
+  threads. This will populate the Pi coContext field in ETHEAD and/or EPROCESS.
+  ■ One function to get the CPU context structure (CONTEXT) of a Pico thread and one to set it.
+  ■ A function to change the FS and/or GS segments of a Pico thread, which are normally used by
+  user-mode code to point to some thread local structure (such as the TEB on Windows).
+  ■ One function to terminate a Pico thread and one to do the same to a Pico process.
+  ■ One function to suspend a Pico thread and one to resume it.
+  As you can see, through these functions, the Pico provider can now create fully custom processes and
 
 threads for whom it controls the initial starting state, segment registers, and associate data. However,
 
@@ -648,7 +631,6 @@ certain activities of interest will be performed by a Pico thread or process.
 
 • A callback whenever an exception is raised from a Pico thread
 CHAPTER 3 Processes and jobs 121
-
 
 ---
 
@@ -690,25 +672,23 @@ As covered in Chapter 2, Windows contains new virtualization-based security (VBS
 To begin with, although Trustlets are regular Windows Portable Executables (PE) files, they contain some IUM-specific properties:
 
 - ■ They can import only from a limited set of Windows system DLLs (CC/C++ Runtime, KernelBase,
-Advapi, RPC Runtime, CNG Base Crypto, and NTDLL) due to the restricted number of system
-calls that are available to Trustlets. Note that mathematical DLLs that operate only on data
-structures (such as NTLM, ASN1, etc.) are also usable, as they don't perform any system calls.
-■ They can import from an IUM-specific system DLL that is made available to them, called
-Iumbase, which provides the Base IUM System API, containing support for mailslots, storage
-boxes, cryptography, and more. This library ends up calling into lundll.dll, which is the VTL 1
-version of Ntdll.dll, and contains secure system calls (system calls that are implemented by the
-Secure Kernel, and not passed on to the Normal VTL 0 Kernel).
-■ They contain a PE section named .tpb1-cv with an exported global variable named
-s_IumPol1cycMetadata. This serves as metadata for the Secure Kernel to implement policy
-settings around permitting VTL 0 access to the Trustlet (such as allowing debugging, crash
-dump support, etc).
-■ They are signed with a certificate that contains the Isolated User Mode EKU (1.3.6.1.4.1.311.10.3.37).
-Figure 3-9 shows the certificate data for Lsalso.exe, showing its IUM EKU.
-Additionally, Trustlets must be launched by using a specific process attribute when using
-
+  Advapi, RPC Runtime, CNG Base Crypto, and NTDLL) due to the restricted number of system
+  calls that are available to Trustlets. Note that mathematical DLLs that operate only on data
+  structures (such as NTLM, ASN1, etc.) are also usable, as they don't perform any system calls.
+  ■ They can import from an IUM-specific system DLL that is made available to them, called
+  Iumbase, which provides the Base IUM System API, containing support for mailslots, storage
+  boxes, cryptography, and more. This library ends up calling into lundll.dll, which is the VTL 1
+  version of Ntdll.dll, and contains secure system calls (system calls that are implemented by the
+  Secure Kernel, and not passed on to the Normal VTL 0 Kernel).
+  ■ They contain a PE section named .tpb1-cv with an exported global variable named
+  s_IumPol1cycMetadata. This serves as metadata for the Secure Kernel to implement policy
+  settings around permitting VTL 0 access to the Trustlet (such as allowing debugging, crash
+  dump support, etc).
+  ■ They are signed with a certificate that contains the Isolated User Mode EKU (1.3.6.1.4.1.311.10.3.37).
+  Figure 3-9 shows the certificate data for Lsalso.exe, showing its IUM EKU.
+  Additionally, Trustlets must be launched by using a specific process attribute when using
 
 CreateProcess—both to request their execution in IUM as well as to specify launch properties.
-
 
 We will describe both the policy metadata and the process attributes in the following sections.
 
@@ -720,22 +700,19 @@ FIGURE 3-9 Trustlet EKU in the certificate.
 
 ## Trustlet policy metadata
 
-The policy metadata includes various options for configuring how "accessible" the Trustlet will be from VTL 0. It is described by a structure present at the $_iumPolicyMetadata export mentioned earlier, and contains a version number (currently set to 1) as well as the Trustlet ID, which is a unique number that identifies this specific Trustlet among the ones that are known to exist (for example, BioIso.exe is Trustlet ID 4). Finally, the metadata has an array of policy options. Currently, the options listed in Table 3-4 are supported. It should be obvious that as these policies are part of the signed executable data, attempting to modify them would invalidate the IUM signature and prohibit execution.
+The policy metadata includes various options for configuring how "accessible" the Trustlet will be from VTL 0. It is described by a structure present at the $\_iumPolicyMetadata export mentioned earlier, and contains a version number (currently set to 1) as well as the Trustlet ID, which is a unique number that identifies this specific Trustlet among the ones that are known to exist (for example, BioIso.exe is Trustlet ID 4). Finally, the metadata has an array of policy options. Currently, the options listed in Table 3-4 are supported. It should be obvious that as these policies are part of the signed executable data, attempting to modify them would invalidate the IUM signature and prohibit execution.
 
 TABLE 3-4 Trustlet policy options
 
 <table><tr><td>Policy</td><td>Meaning</td><td>More Information</td></tr><tr><td>ETW</td><td>Enables or Disables ETW</td><td></td></tr><tr><td>Debug</td><td>Configures debugging</td><td>Debug can be enabled at all times, only when SecureBoot is disabled, or using an on-demand challenge/response mechanism.</td></tr><tr><td>Crash Dump</td><td>Enables or disables crash dump</td><td></td></tr><tr><td>Crash Dump Key</td><td>Specifies Public Key for Encrypting Crash Dump</td><td>Dumps can be submitted to Microsoft Product Team, which has the private key for decryption</td></tr><tr><td>Crash Dump GUID</td><td>Specifies identifier for crash dump key</td><td>This allows multiple keys to be used/identified by the product team.</td></tr></table>
 
-
-124   CHAPTER 3   Processes and jobs
-
+124 CHAPTER 3 Processes and jobs
 
 ---
 
-TABLE 3-4   Trustlet policy options (continued)
+TABLE 3-4 Trustlet policy options (continued)
 
 <table><tr><td>Policy</td><td>Meaning</td><td>More Information</td></tr><tr><td>Parent Security Descriptor</td><td>SDDL format</td><td>This is used to validate that the owner/parent process is expected.</td></tr><tr><td>Parent Security Descriptor Revision</td><td>SDDL format revision ID</td><td>This is used to validate that the owner/parent process is expected.</td></tr><tr><td>SVN</td><td>Security version</td><td>This is a unique number that can be used by the Trustlet (along its identity) when encrypting AES256/GCM messages.</td></tr><tr><td>Device ID</td><td>Secure device PCI identifier</td><td>The Trustlet can only communicate with a Secure Device whose PCI ID matches.</td></tr><tr><td>Capability</td><td>Enables powerful VTL 1 capabilities</td><td>This enables access to the Create Secure Section API, DMA and user-mode MMIO access to Secure Devices, and Secure Storage APIs.</td></tr><tr><td>Scenario ID</td><td>Specifies the scenario ID for this binary</td><td>Encoded as a GUID, this must be specified by Trustlets when creating secure image sections to ensure it is for a known scenario.</td></tr></table>
-
 
 ## Trustlet attributes
 
@@ -744,7 +721,6 @@ Launching a Trustlet requires correct usage of the PS_CP_SECURE_PROCESS attribut
 TABLE 3-5 Trustlet attributes
 
 <table><tr><td>Attribute</td><td>Meaning</td><td>More information</td></tr><tr><td>Mailbox Key</td><td>Used to retrieve mailbox data</td><td>Mailbox allow the Trustlet to share data with the VTL 0 world as long as the Trustlet key is known.</td></tr><tr><td>Collaboration ID</td><td>Sets the collaboration ID to use when using the Secure Storage IUM API</td><td>Secure Storage allows Trustlets to share data among each other, as long as they have the same collaboration ID. If no collaboration ID is present, the Trustlet instance ID will be used instead.</td></tr><tr><td>TK Session ID</td><td>Identifies the session ID used during Crypto</td><td></td></tr></table>
-
 
 ## System built-in Trustlets
 
@@ -756,35 +732,35 @@ TABLE 3-6 Built-in Trustlets
 
 <table><tr><td>Binary Name (Trustlet ID)</td><td>Description</td><td>Policy Options</td></tr><tr><td>Lsalo.exe (1)</td><td>Credential and Key Guard Trustlet</td><td>Allow ETW, Disable Debugging, Allow Encrypted Crash Dump</td></tr><tr><td>Vmsp.exe (2)</td><td>Secure Virtual Machine Worker (vTPM Trustlet)</td><td>Allow ETW, Disable Debugging, Disable Crash Dump, Enable Secure Storage Capability, Verify Parent Security Descriptor is 5-1-5-83-0 (NT VIRTUAL MACHINE/Virtual Machines)</td></tr><tr><td>Unknown (3)</td><td>vTPM Key Enrollment Trustlet</td><td>Unknown</td></tr><tr><td>Biolso.exe (4)</td><td>Secure Biometrics Trustlet</td><td>Allow ETW, Disable Debugging, Allow Encrypted Crash Dump</td></tr><tr><td>Fsiso.exe (5)</td><td>Secure Frame Server Trustlet</td><td>Disable ETW, Allow Debugging, Enable Create Secure Section Capability, Use Scenario ID (AE53FCF6-8D89-4488-9D2E-4D00873TC5FD)</td></tr></table>
 
-
 ## Trustlet identity
 
 Trustlets have multiple forms of identity that they can use on the system:
 
-- ■  Trustlet identifier or Trustlet ID   This is a hard-coded integer in the Trustlet's policy metada-
-ta, which also must be used in the Trustlet process-creation attributes. It ensures that the system
-knows there are only a handful of Trustlets, and that the callers are launching the expected one.
+- ■ Trustlet identifier or Trustlet ID This is a hard-coded integer in the Trustlet's policy metada-
+  ta, which also must be used in the Trustlet process-creation attributes. It ensures that the system
+  knows there are only a handful of Trustlets, and that the callers are launching the expected one.
 
-■  Trustlet instance  This is a cryptographically secure 16-byte random number generated by
+■ Trustlet instance This is a cryptographically secure 16-byte random number generated by
 the Secure Kernel. Without the use of a collaboration ID, the Trustlet instance is what's used to
 guarantee that Secure Storage APIs will only allow this one instance of the Trustlet to get/put
 data into its storage blob.
 
-■  Collaboration ID  This is used when a Trustlet would like to allow other Trustlets with the
+■ Collaboration ID This is used when a Trustlet would like to allow other Trustlets with the
 same ID, or other instances of the same Trustlet, to share access to the same Secure Storage
 blob. When this ID is present, the instance ID of the Trustlet will be ignored when calling the
 Get or Put APIs.
 
-■  Security version (SVN)  This is used for Trustlets that require strong cryptographic proof of
+■ Security version (SVN) This is used for Trustlets that require strong cryptographic proof of
 provenance of signed or encrypted data. It is used when encrypting AES256/GCM data by
 Credential and Key Guard, and is also used by the Cryptograph Report service.
 
-■  Scenario ID  This is used for Trustlets that create named (identity-based) secure kernel ob-
+■ Scenario ID This is used for Trustlets that create named (identity-based) secure kernel ob-
 jects, such as secure sections. This GUID validates that the Trustlet is creating such objects as
 part of a predetermined scenario, by tagging them in the namespace with this GUID. As such,
 other Trustlets wishing to open the same named objects would thus have to have the same sce-
 nario ID. Note that more than one scenario ID can actually be present, but no Trustlets currently
 use more than one.
+
 ---
 
 Isolated user-mode services
@@ -795,7 +771,6 @@ The benefits of running as a Trustlet not only include protection from attacks f
 
 CHAPTER 3 Processes and jobs 127
 
-
 ---
 
 - ■ Secure Storage (IumSecureStorageGet, IumSecureStoragePut) This allows Trustlets that
@@ -805,28 +780,29 @@ have the Secure Storage capability (described earlier in the "Trustlet policy me
 to store arbitrarily sized storage blobs and to later retrieve them, either based on their unique
 
 Trustlet instance or by sharing the same collaboration ID as another Trustlet.
+
 ## Trustlet-accessible system calls
 
 As the Secure Kernel attempts to minimize its attack surface and exposure, it only provides a subset (less than 50) of all of the hundreds of system calls that a normal (VTL0) application can use. These system calls are the strict minimum necessary for compatibility with the system DLLs that Trustlets can use (refer to the section "Trustlet structure" to see these), as well as the specific services required to support the RPC runtime (Rpcrt4.dll) and ETW tracing.
 
 - ■ Worker Factory and Thread APIs These support the Thread Pool API (used by RPC) and TLS
-Slots used by the Loader.
-■ Process Information API This supports TLS Slots and Thread Stack Allocation.
-■ Event, Semaphore, Wait, and Completion APIs These support Thread Pool and
-Synchronization.
-■ Advanced Local Procedure Call (ALPC) APIs These support Local RPC over the ncalrpc
-transport.
-■ System Information API This supports reading Secure Boot information, basic and NUMA
-system information for Kernel32.dll and Thread Pool scaling, performance, and subsets of time
-information.
-■ Token API This provides minimal support for RPC impersonation.
-■ Virtual Memory Allocation APIs These support allocations by the User-Mode Heap
-Manager.
-■ Section APIs These support the Loader (for DLL Images) as well as the Secure Section
-functionality (once created/exposed through secure system calls shown earlier).
-■ Trace Control API This supports ETW.
-■ Exception and Continue API This supports Structured Exception Handling (SEH).
-It should be evident from this list that support for operations such as Device I/O, whether on files or actual physical devices, is not possible (there is no CreateFile API, to begin with), as is also the case for Registry I/O. Nor is the creation of other processes, or any sort of graphics API usage (there is no Win32k.sys driver in VTL 1). As such, Trustlets are meant to be isolated workhorse back-ends (in VTL 1) of their complex front-ends (in VTL 0), having only ALPC as a communication mechanism, or exposed secure sections (whose handle would have to had been communicated to them through ALPC). In
+  Slots used by the Loader.
+  ■ Process Information API This supports TLS Slots and Thread Stack Allocation.
+  ■ Event, Semaphore, Wait, and Completion APIs These support Thread Pool and
+  Synchronization.
+  ■ Advanced Local Procedure Call (ALPC) APIs These support Local RPC over the ncalrpc
+  transport.
+  ■ System Information API This supports reading Secure Boot information, basic and NUMA
+  system information for Kernel32.dll and Thread Pool scaling, performance, and subsets of time
+  information.
+  ■ Token API This provides minimal support for RPC impersonation.
+  ■ Virtual Memory Allocation APIs These support allocations by the User-Mode Heap
+  Manager.
+  ■ Section APIs These support the Loader (for DLL Images) as well as the Secure Section
+  functionality (once created/exposed through secure system calls shown earlier).
+  ■ Trace Control API This supports ETW.
+  ■ Exception and Continue API This supports Structured Exception Handling (SEH).
+  It should be evident from this list that support for operations such as Device I/O, whether on files or actual physical devices, is not possible (there is no CreateFile API, to begin with), as is also the case for Registry I/O. Nor is the creation of other processes, or any sort of graphics API usage (there is no Win32k.sys driver in VTL 1). As such, Trustlets are meant to be isolated workhorse back-ends (in VTL 1) of their complex front-ends (in VTL 0), having only ALPC as a communication mechanism, or exposed secure sections (whose handle would have to had been communicated to them through ALPC). In
 
 Chapter 7 (Security), we'll look in more detail into the implementation of a specific Trustlet—Lsalo.exe, which provides Credential and Key Guard.
 
@@ -878,8 +854,7 @@ Windows executive, and the Windows subsystem process (CSSR). Because of the mult
 
 subsystem architecture of Windows, creating an executive process object (which other subsystems can
 
-CHAPTER 3 Processes and jobs     129
-
+CHAPTER 3 Processes and jobs 129
 
 ---
 
@@ -894,7 +869,7 @@ functions. The operations performed in each stage are described in detail in the
 Note Many steps of CreateProcess are related to the setup of the process virtual address space and therefore refer to many memory-management terms and structures that are defined in Chapter 5.
 
 - 1. Validate parameters; convert Windows subsystem flags and options to their native counter-
-parts; parse, validate, and convert the attribute list to its native counterpart.
+     parts; parse, validate, and convert the attribute list to its native counterpart.
 
 2. Open the image file (.exe) to be executed inside the process.
 
@@ -907,15 +882,14 @@ parts; parse, validate, and convert the attribute list to its native counterpart
 6. Start execution of the initial thread (unless the CREATE_SUSPENDED flag was specified).
 
 7. In the context of the new process and thread, complete the initialization of the address space
-(for example, load required DLLs) and begin execution of the program's entry point.
-Figure 3-10 shows an overview of the stages Windows follows to create a process.
+   (for example, load required DLLs) and begin execution of the program's entry point.
+   Figure 3-10 shows an overview of the stages Windows follows to create a process.
 
 ![Figure](figures/Winternals7thPt1_page_147_figure_006.png)
 
 FIGURE 3-10 The main stages of process creation.
 
-130    CHAPTER 3   Processes and jobs
-
+130 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -972,7 +946,7 @@ list are listed in Table 3-7, including their documented Windows API counterpart
 
 ![Figure](figures/Winternals7thPt1_page_148_figure_010.png)
 
-Note The attribute list passed on CreateProcess* calls permits passing back to the caller information beyond a simple status code, such as the TEB address of the initial thread or information on the image section. This is necessary for protected processes because the parent cannot query this information after the child is created.
+Note The attribute list passed on CreateProcess\* calls permits passing back to the caller information beyond a simple status code, such as the TEB address of the initial thread or information on the image section. This is necessary for protected processes because the parent cannot query this information after the child is created.
 
 ---
 
@@ -980,60 +954,56 @@ TABLE 3-7 Process attributes
 
 <table><tr><td>Native Attribute</td><td>Equivalent Win32 Attribute</td><td>Type</td><td>Description</td></tr><tr><td>PS_CP_PARENT_PROCESS</td><td>PROC_THREAD_ATTRIBUTE_PARENT_PROCESS. Also used when elevating.</td><td>Input</td><td>Handle to the parent process.</td></tr><tr><td>PS_CP_DEBUG_OBJECT</td><td>N/A. Used when using DEBUG_PROCESS as a flag.</td><td>Input</td><td>Debug object if process is being started debugged.</td></tr><tr><td>PS_CP_PRIMARY_TOKEN</td><td>N/A. Used when using CreateProcessAsUser/WithToken.</td><td>Input</td><td>Process token if CreateProcessAsUser was used.</td></tr><tr><td>PS_CP_CLIENT_ID</td><td>N/A. Returned by Win32 API as a parameter (PROCESS_INFORMATION).</td><td>Output</td><td>Returns the TID and PID of the initial thread and the process.</td></tr><tr><td>PS_CP_TEB_ADDRESS</td><td>N/A. Internally used and not exposed.</td><td>Output</td><td>Returns the address of the TEB for the initial thread.</td></tr><tr><td>PS_CP_FILENAME</td><td>N/A. Used as a parameter in CreateProcess APIs.</td><td>Input</td><td>The name of the process that should be created.</td></tr><tr><td>PS_CP_IMAGE_INFO</td><td>N/A. Internally used and not exposed.</td><td>Output</td><td>Returns SECTION_IMAGE_INFORMATION, which contains information on the version, flags, and subsystems of the executable, as well as the stack size and entry point.</td></tr><tr><td>PS_CP_MEMreserve</td><td>N/A. Internally used by SMS5 and CSRSS.</td><td>Input</td><td>An array of virtual memory reservations that should be made during initial process address space creation, always guaranteed availability because no other allocations have taken place yet.</td></tr><tr><td>PS_CP_PRIORITY_CLASS</td><td>N/A. Passed in as a parameter to the CreateProcess API.</td><td>Input</td><td>Priority class that the process should be given.</td></tr><tr><td>PS_CP_ERROR_MODE</td><td>N/A. Passed in through the CREATE_DEFAULT_ERROR_MODE flag.</td><td>Input</td><td>Hard error-processing mode for the process.</td></tr><tr><td>PS_CP_STD_HANDLE_INFO</td><td>None. Used internally.</td><td>Input</td><td>Specifies whether standard handles should be duplicated or new handles should be created.</td></tr><tr><td>PS_CP_HANDLE_LIST</td><td>PROC_THREAD_ATTRIBUTE_HANDLE_LIST</td><td>Input</td><td>A list of handles belonging to the parent process that should be inherited by the new process.</td></tr><tr><td>PS_CP_GROUP_AFFINITY</td><td>PROC_THREAD_ATTRIBUTE_group_AFFINITY</td><td>Input</td><td>Processor group(s) the thread should be allowed to run on.</td></tr><tr><td>PS_CP_PREFERRED_NODE</td><td>PROC_THREAD_ATTRIBUTES_PREFERRED_NODE</td><td>Input</td><td>The preferred (ideal) NUMA node that should be associated with the process. It affects the node on which the initial process heap and thread stack will be created (see Chapter 5).</td></tr><tr><td>PS_CP_IDEAL_PROCESSOR</td><td>PROC_THREAD_ATTRIBUTE_ID_EAL_PROCESSOR</td><td>Input</td><td>The preferred (ideal) processor that the thread should be scheduled on.</td></tr><tr><td>PS_CP_UMS_THREAD</td><td>PROC_THREAD_ATTRIBUTE_UMS_THREAD</td><td>Input</td><td>Contains the UMS attributes, completion list, and context.</td></tr></table>
 
-
-132   CHAPTER 3   Processes and jobs
-
+132 CHAPTER 3 Processes and jobs
 
 ---
 
 <table><tr><td>PS_CP_MITIGATION_OPTIONS</td><td>PROC_THREAD_MITIGATION_POLICY</td><td>Input</td><td>Contains information on which miti-gations (SEHOP, ATL Emulation, NX) should be enabled/disabled for the process.</td></tr><tr><td>PS_CP_PROTECTION_LEVEL</td><td>PROC_THREAD_ATTRIBUTE_PROTECTION_LEVEL</td><td>Input</td><td>Must point to one of the allowed process protection values shown in Table 3-1 or the value PROTECT_LEVEL_SAME to indicate the same protection level as the parent.</td></tr><tr><td>PS_CP_SECURE_PROCESS</td><td>None. Used internally.</td><td>Input</td><td>Indicates the process should run as an Isolated User Mode (IUM) Trustlet. See Chapter 8 in Part 2 for more details.</td></tr><tr><td>PS_CP_JOB_LIST</td><td>None. Used internally.</td><td>Input</td><td>Assigns the process to a list of jobs.</td></tr><tr><td>PS_CP_CHILD_PROCESS_POLICY</td><td>PROC_THREAD_ATTRIBUTE_CHILD_PROCESS_POLICY</td><td>Input</td><td>Specifies whether the new process is allowed to create child processes, either directly or indirectly (such as by using WMJ).</td></tr><tr><td>PS_CP_ALL_APPLICATION_PACKAGES_POLICY</td><td>PROC_THREAD_ATTRIBUTE_ALL_APPLICATION_PACKAGES_POLICY</td><td>Input</td><td>Specifies if the AppContainer token should be excluded from ACL checks that include the ALL APPLICATION PACKAGES group. The ALL RESTRICTED APPLICATION PACKAGES group will be used in-stead.</td></tr><tr><td>PS_CP_WIN32K_FILTER</td><td>PROC_THREAD_ATTRIBUTE_WIN32K_FILTER</td><td>Input</td><td>Indicates if the process will have many of its GDI/USER system calls to Win32k.sys filtered out (blocked), or if they will be permitted but audited. Used by a Microsoft Edge browser to reduce attack chance.</td></tr><tr><td>PS_CP_SAFE_OPEN_PROMPT_ORIGIN_CLAIM</td><td>None. Used internally.</td><td>Input</td><td>Used by the Mark of the Web functionality to indicate the file came from an untrusted source.</td></tr><tr><td>PS_CP_BNO_ISOLATION</td><td>PROC_THREAD_ATTRIBUTE_BNO_ISOLATION</td><td>Input</td><td>Causes the primary token of the pro-cess to be associated with an isolated BaseNamedObjects directory. (See Chapter 8 in Part 2 for more information on named objects.)</td></tr><tr><td>PS_CP_DESKTOP_APP_POLICY</td><td>PROC_THREAD_ATTRIBUTE_DESKTOP_APP_POLICY</td><td>Input</td><td>Indicates if the modern application will be allowed to launch legacy desktop applications, and if so, in what way.</td></tr><tr><td>None—used internally</td><td>PROC_THREAD_ATTRIBUTE_SECURITY_CAPABILITIES</td><td>Input</td><td>Specifies a pointer to a SECURITY_CAPABILITIES structure, which is used to create the AppContainer token for the process before calling NtCreateUserProcess.</td></tr></table>
 
-
 6. If the process is part of a job object, but the creation flags requested a separate virtual DOS machine (VDM), the flag is ignored.
 
 CHAPTER 3 Processes and jobs 133
 
-
 ---
 
 - 7. The security attributes for the process and initial thread that were supplied to the CreateProcess
-function are converted to their internal representation (OBJECT_ATTRIBUTES structures, docu-
-mented in the WDK).
+     function are converted to their internal representation (OBJECT_ATTRIBUTES structures, docu-
+     mented in the WDK).
 
 8. CreateProcessInternalW checks whether the process should be created as modern. The
-process is to be created modern if specified so by an attribute (PROC_THREAD_ATTRIBUTE_
-PACKAGE_FULL_NAME) with the full package name or the creator is itself modern (and a parent
-process has not been explicitly specified by the PROC_THREAD_ATTRIBUTE_PARENT_PROCESS
-attribute). If so, a call is made to the internal BaseAppExtension to gather more contextual
-information on the modern app parameters described by a structure called APPX_PROCESS_
-CONTEXT. This structure holds information such as the package name (internally referred to as
-package moniker), the capabilities associated with the app, the current directory for the process,
-and whether the app should have full trust. The option of creating full trust modern apps is not
-publicly exposed, and is reserved for apps that have the modern look and feel but perform system-
-level operations. A canonical example is the Settings app in Windows 10 (SystemSettings.exe).
+   process is to be created modern if specified so by an attribute (PROC*THREAD_ATTRIBUTE*
+   PACKAGE*FULL_NAME) with the full package name or the creator is itself modern (and a parent
+   process has not been explicitly specified by the PROC_THREAD_ATTRIBUTE_PARENT_PROCESS
+   attribute). If so, a call is made to the internal BaseAppExtension to gather more contextual
+   information on the modern app parameters described by a structure called APPX_PROCESS*
+   CONTEXT. This structure holds information such as the package name (internally referred to as
+   package moniker), the capabilities associated with the app, the current directory for the process,
+   and whether the app should have full trust. The option of creating full trust modern apps is not
+   publicly exposed, and is reserved for apps that have the modern look and feel but perform system-
+   level operations. A canonical example is the Settings app in Windows 10 (SystemSettings.exe).
 
-9. If the process is to be created as modern, the security capabilities (if provided by PROC_THREAD_
-ATTRIBUTE_SECURITY_CAPABILITIES) are recorded for the initial token creation by calling the
-internal BaseAppCreateLowBox function. The term LowBox refers to the sandbox (AppContainer)
-under which the process is to be executed. Note that although creating modern processes by
-directly calling CreateProcess is not supported (instead, the COM interfaces described earlier
-should be used), the Windows SDK and MSDN do document the ability to create AppContainer
-legacy desktop applications by passing this attribute.
+9. If the process is to be created as modern, the security capabilities (if provided by PROC*THREAD*
+   ATTRIBUTE_SECURITY_CAPABILITIES) are recorded for the initial token creation by calling the
+   internal BaseAppCreateLowBox function. The term LowBox refers to the sandbox (AppContainer)
+   under which the process is to be executed. Note that although creating modern processes by
+   directly calling CreateProcess is not supported (instead, the COM interfaces described earlier
+   should be used), the Windows SDK and MSDN do document the ability to create AppContainer
+   legacy desktop applications by passing this attribute.
 
 10. If a modern process is to be created, then a flag is set to indicate to the kernel to skip embedded
-manifest detection. Modern processes should never have an embedded manifest as it's simply
-not needed. (A modern app has a manifest of its own, unrelated to the embedded manifest
-referenced here.)
+    manifest detection. Modern processes should never have an embedded manifest as it's simply
+    not needed. (A modern app has a manifest of its own, unrelated to the embedded manifest
+    referenced here.)
 
 11. If the debug flag has been specified (DEBUG_PROCESS), then the Debugger value under the Image
-File Execution Options registry key (discussed in the next section) for the executable is marked to
-be skipped. Otherwise, a debugger will never be able to create its debugger process because the
-creation will enter an infinite loop (trying to create the debugger process over and over again).
+    File Execution Options registry key (discussed in the next section) for the executable is marked to
+    be skipped. Otherwise, a debugger will never be able to create its debugger process because the
+    creation will enter an infinite loop (trying to create the debugger process over and over again).
 
 12. All windows are associated with desktops, the graphical representation of a workspace. If no
-desktop is specified in the STARTUPINFO structure, the process is associated with the caller's
-current desktop.
-![Figure](figures/Winternals7thPt1_page_151_figure_001.png)
+    desktop is specified in the STARTUPINFO structure, the process is associated with the caller's
+    current desktop.
+    ![Figure](figures/Winternals7thPt1_page_151_figure_001.png)
 
 Note The Windows 10 Virtual Desktop feature does not use multiple desktop objects (in the kernel object sense). There is still one desktop, but windows are shown and hidden as required. This is in contrast to the Systrans Desktops.exe tool, which really creates up to four desktop objects. The difference can be felt when trying to move a window from one desktop to another. In the case of desktops.exe, it can't be done, as such an operation is not supported in Windows. On the other hand, Windows 10's Virtual Desktop allows it, since there is no real "moving" going on.
 
@@ -1065,21 +1035,20 @@ At this point, the creating thread has switched into kernel mode and continues t
 NTCreateUserProcess system call implementation.
 
 - 1. NtCreateUserProcess first validates arguments and builds an internal structure to hold all
-creation information. The reason for validating arguments again is to make sure the call to the
-executive did not originate from a hack that managed to simulate the way Ntdll.dll makes the
-transition to the kernel with bogus or malicious arguments.
+     creation information. The reason for validating arguments again is to make sure the call to the
+     executive did not originate from a hack that managed to simulate the way Ntdll.dll makes the
+     transition to the kernel with bogus or malicious arguments.
 
 2. As illustrated in Figure 3-11, the next stage in NtCreateUserProcess is to find the appropriate
-Windows image that will run the executable file specified by the caller and to create a section
-object to later map it into the address space of the new process. If the call fails for any reason, it
-returns to CreateProcessInternalW with a failure state (look ahead to Table 3-8) that causes
-CreateProcessInternalW to attempt execution again.
-![Figure](figures/Winternals7thPt1_page_152_figure_005.png)
+   Windows image that will run the executable file specified by the caller and to create a section
+   object to later map it into the address space of the new process. If the call fails for any reason, it
+   returns to CreateProcessInternalW with a failure state (look ahead to Table 3-8) that causes
+   CreateProcessInternalW to attempt execution again.
+   ![Figure](figures/Winternals7thPt1_page_152_figure_005.png)
 
 FIGURE 3-11 Choosing a Windows image to activate.
 
-CHAPTER 3 Processes and jobs     135
-
+CHAPTER 3 Processes and jobs 135
 
 ---
 
@@ -1113,17 +1082,16 @@ TABLE 3-8 Decision tree for stage 1 of CreateProcess
 
 <table><tr><td>If the Image...</td><td>Create State Code</td><td>This Image Will Run...</td><td>...and This Will Happen</td></tr><tr><td>Is an MS-DOS application with an .exe, .com, or .pif extension</td><td>PsCreateFailOnSectionCreate</td><td>Ntvdm.exe</td><td>CreateProcessInternalW restarts stage 1.</td></tr><tr><td>Is a Win64 application</td><td>PsCreateFailOnSectionCreate</td><td>Ntvdm.exe</td><td>CreateProcessInternalW restarts stage 1.</td></tr><tr><td>Is a Win64 application on a 32-bit system (or a PPC, MIPS, or Alpha binary)</td><td>PsCreateFailMachineMismatch</td><td>N/A</td><td>CreateProcessInternalW will fail.</td></tr><tr><td>Has a Debugger value with another image name</td><td>PsCreateFailExeName</td><td>Name specified in the Debugger value</td><td>CreateProcessInternalW restarts stage 1.</td></tr><tr><td>Is an invalid or damaged Windows EXE</td><td>PsCreateFailExeFormat</td><td>N/A</td><td>CreateProcessInternalW will fail.</td></tr><tr><td>Cannot be opened</td><td>PsCreateFailOnFileOpen</td><td>N/A</td><td>CreateProcessInternalW will fail.</td></tr><tr><td>Is a command procedure (application with a .bat or .cmd extension)</td><td>PsCreateFailOnSectionCreate</td><td>Cmd.exe</td><td>CreateProcessInternalW restarts Stage 1.</td></tr></table>
 
-
 Specifically, the decision tree that CreateProcessInternalW goes through to run an image is as follows:
 
 - • If it's x86 32-bit Windows, and the image is an MS-DOS application with an .exe, .com, or .pdf
-extension, a message is sent to the Windows subsystem to check whether an MS-DOS sup-
-port process (Ntvdm.exe, specified in the HKLM\SYSTEM\CurrentControlSet\Control\WOW\
-cmdline registry value) has already been created for this session. If a support process has
-been created, it is used to run the MS-DOS application. (The Windows subsystem sends the
-message to the virtual DOS machine (VDM) process to run the new image.) Then Create-
-ProcessInternalW returns. If a support process hasn't been created, the image to be run
-changes to Ntvdm.exe and CreateProcessInternalW restarts at stage 1.
+  extension, a message is sent to the Windows subsystem to check whether an MS-DOS sup-
+  port process (Ntvdm.exe, specified in the HKLM\SYSTEM\CurrentControlSet\Control\WOW\
+  cmdline registry value) has already been created for this session. If a support process has
+  been created, it is used to run the MS-DOS application. (The Windows subsystem sends the
+  message to the virtual DOS machine (VDM) process to run the new image.) Then Create-
+  ProcessInternalW returns. If a support process hasn't been created, the image to be run
+  changes to Ntvdm.exe and CreateProcessInternalW restarts at stage 1.
 
 • If the file to run has a .bat or .cmd extension, the image to be run becomes Cmd.exe, the
 Windows command prompt, and CreateProcessInternalW restarts at stage 1. (The name
@@ -1132,11 +1100,10 @@ of the batch file is passed as the second parameter to Cmd.exe after the /c swit
 • For an x86 Windows system, if the image is a Win16 (Windows 3.1) executable, CreateProcess-
 InternalW must decide whether a new VDM process must be created to run it or whether
 it should use the default session-wide shared VDM process (which might not yet have been
-created). The CreateProcess flags CREATE_SEPARATOR_LOW_VDM and CREATE_SHARED_LOW_
+created). The CreateProcess flags CREATE*SEPARATOR_LOW_VDM and CREATE_SHARED_LOW*
 VDM control this decision. If these flags aren't specified, the HKLM\SYSTEM\CurrentControlSet\
 Control\WOW\DefaultSeparateVDM registry value dictates the default behavior. If the
-CHAPTER 3 Processes and jobs      137
-
+CHAPTER 3 Processes and jobs 137
 
 ---
 
@@ -1180,6 +1147,7 @@ This sub-stage involves the following steps:
 default page priority (5) and I/O priority (Normal) are used.
 
 4. Set the new process exit status to STATUS_PENDING.
+
 ---
 
 5. Choose the hard error processing mode selected by the attribute list. Otherwise, inherit the parent's processing mode if none was given. If no parent exists, use the default processing mode, which is to display all errors.
@@ -1206,56 +1174,55 @@ default page priority (5) and I/O priority (Normal) are used.
 
 CHAPTER 3 Process and jobs 139
 
-
 ---
 
 - 16. Initialize the address space of the process. (See stage 3B.) Then detach from the target session if
-it was different.
+      it was different.
 
 17. The group affinity for the process is now chosen if group-affinity inheritance was not used.
-The default group affinity will either inherit from the parent if NUMA node propagation was
-set earlier (the group owning the NUMA node will be used) or be assigned round-robin. If the
-system is in forced group-awareness mode and group 0 was chosen by the selection algorithm,
-group 1 is chosen instead, as long as it exists.
+    The default group affinity will either inherit from the parent if NUMA node propagation was
+    set earlier (the group owning the NUMA node will be used) or be assigned round-robin. If the
+    system is in forced group-awareness mode and group 0 was chosen by the selection algorithm,
+    group 1 is chosen instead, as long as it exists.
 
 18. Initialize the KPROCESS part of the process object. (See Stage 3C.)
 
 19. The token for the process is now set.
 
 20. The process's priority class is set to normal unless the parent was using idle or the Below Normal
-process priority class, in which case the parent's priority is inherited.
+    process priority class, in which case the parent's priority is inherited.
 
 21. The process handle table is initialized. If the inherit handles flag is set for the parent process,
-any inheritable handles are copied from the parent's object handle table into the new process.
-(For more information about object handle tables, see Chapter 8 in Part 2.) A process attribute
-can also be used to specify only a subset of handles, which is useful when you are using
+    any inheritable handles are copied from the parent's object handle table into the new process.
+    (For more information about object handle tables, see Chapter 8 in Part 2.) A process attribute
+    can also be used to specify only a subset of handles, which is useful when you are using
 
 CreateProcessAsUser to restrict which objects should be inherited by the child process.
 
 22. If performance options were specified through the PerfOptions key, these are now applied.
-The PerfOptions key includes overrides for the working set limit, I/O priority, page priority,
-and CPU priority class of the process.
+    The PerfOptions key includes overrides for the working set limit, I/O priority, page priority,
+    and CPU priority class of the process.
 
 23. The final process priority class and the default quantum for its threads are computed and set.
 
 24. The various mitigation options provided in the IFEO key (as a single 64-bit value named
-Mitigation) are read and set. If the process is under an AppContainer, add the TreatAs-
-AppContainer mitigation flag.
+    Mitigation) are read and set. If the process is under an AppContainer, add the TreatAs-
+    AppContainer mitigation flag.
 
 25. All other mitigation flags are now applied.
+
 ## Stage 3B: Creating the initial process address space
 
 The initial process address space consists of the following pages:
 
 - ■ Page directory (it's possible there'll be more than one for systems with page tables more than
-two levels, such as x86 systems in PAE mode or 64-bit systems)
+  two levels, such as x86 systems in PAE mode or 64-bit systems)
 
 ■ Hyperspace page
 
 ■ VAD bitmap page
 
-■ Working set list
----
+## ■ Working set list
 
 To create these pages, the following steps are taken:
 
@@ -1272,6 +1239,7 @@ deducted from MmResidentAvailablePages.
 4. The page table pages for the global system space (that is, other than the process-specific
 
 pages we just described, and except session-specific memory) are created.
+
 ## Stage 3C: Creating the kernel process structure
 
 The next stage of PsAppAllocateProcess is the initialization of the KPROCESS structure (the Pcb member
@@ -1281,9 +1249,9 @@ of the EPROCESS). This work is performed by KeInitIaIizeProcess, which does the 
 - 1. The doubly linked list, which connects all threads part of the process (initially empty), is initialized.
 
 2. The initial value (or reset value) of the process default quantum (which is described in more de-
-tail in the "Thread scheduling" section in Chapter 4) is hard-coded to 6 until it is initialized later
-(by PspComputeQuantumAndPriority).
-![Figure](figures/Winternals7thPt1_page_158_figure_005.png)
+   tail in the "Thread scheduling" section in Chapter 4) is hard-coded to 6 until it is initialized later
+   (by PspComputeQuantumAndPriority).
+   ![Figure](figures/Winternals7thPt1_page_158_figure_005.png)
 
 Note The default initial quantum differs between Windows client and server systems. For more information on thread quantums, turn to the discussion in the section "Thread scheduling" in Chapter 4.
 
@@ -1306,12 +1274,12 @@ initial NUMA node block) so that the next new process will get a different ideal
 7. If the process is a secure process (Windows 10 and Server 2016), then its secure ID is created
 
 now by calling Hv1CreateSecureProcess.
+
 ## Stage 3D: Concluding the setup of the process address space
 
 Setting up the address space for a new process is somewhat complicated, so let's look at what's involved one step at a time. To get the most out of this section, you should have some familiarity with the internals of the Windows memory manager, described in Chapter 5.
 
-CHAPTER 3   Processes and jobs      141
-
+CHAPTER 3 Processes and jobs 141
 
 ---
 
@@ -1326,47 +1294,48 @@ Redstone 1). The following steps do not describe the address space cloning funct
 focus on normal process address space initialization.
 
 - 1. The virtual memory manager sets the value of the process's last trim time to the current time.
-The working set manager (which runs in the context of the balance set manager system thread)
-uses this value to determine when to initiate working set trimming.
+     The working set manager (which runs in the context of the balance set manager system thread)
+     uses this value to determine when to initiate working set trimming.
 
 2. The memory manager initializes the process's working set list. Page faults can now be taken.
 3. The section (created when the image file was opened) is now mapped into the new process's
-address space, and the process section base address is set to the base address of the image.
+   address space, and the process section base address is set to the base address of the image.
 
 4. The Process Environment Block (PEB) is created and initialized (see the section stage 3E).
 5. Ntddll.dll is mapped into the process. If this is a Wow64 process, the 32-bit Ntddll.dll is also
-mapped.
+   mapped.
 
 6. A new session, if requested, is now created for the process. This special step is mostly imple-
-mented for the benefit of the Session Manager (Smss) when initializing a new session.
+   mented for the benefit of the Session Manager (Smss) when initializing a new session.
 
 7. The standard handles are duplicated and the new values are written in the process parameters
-structure.
+   structure.
 
 8. Any memory reservations listed in the attribute list are now processed. Additionally, two flags
-allow the bulk reservation of the first 1 or 16 MB of the address space. These flags are used
-internally for mapping, for example, real-mode vectors and ROM code (which must be in the
-low ranges of virtual address space, where normally the heap or other process structures could
-be located).
+   allow the bulk reservation of the first 1 or 16 MB of the address space. These flags are used
+   internally for mapping, for example, real-mode vectors and ROM code (which must be in the
+   low ranges of virtual address space, where normally the heap or other process structures could
+   be located).
 
 9. The user process parameters are written into the process, copied, and fixed up (that is, they are
-converted from absolute form to a relative form so that a single memory block is needed).
+   converted from absolute form to a relative form so that a single memory block is needed).
 
 10. The affinity information is written into the PEB.
 
 11. The MinWin API redirection set is mapped into the process and its pointer is stored in the PEB.
 
 12. The process unique ID is now determined and stored. The kernel does not distinguish between
-unique process and thread IDs and handles. The process and thread IDs (handles) are stored in
-a global handle table (PspCidTable) that is not associated with any process.
+    unique process and thread IDs and handles. The process and thread IDs (handles) are stored in
+    a global handle table (PspCidTable) that is not associated with any process.
 
 13. If the process is secure (that is, it runs in IUM), the secure process is initialized and associated
-with the kernel process object.
+    with the kernel process object.
+
 ---
 
 ## Stage 3E: Setting up the PEB
 
-NtCreateUserProcess calls MmCreatePeb, which first maps the system-wide National Language Support (NLS) tables into the process's address space. It next calls MmCreatePebTok to allocate a page for the PEB and then initializes a number of fields, most of them based on internal variables that were configured through the registry, such as MmHeap* values, MmCriticalSectionTimeout, and MmMinimumStackCommitInBytes. Some of these fields can be overridden by settings in the linked executable image, such as the Windows version in the PE header or the affinity mask in the load configuration directory of the PE header.
+NtCreateUserProcess calls MmCreatePeb, which first maps the system-wide National Language Support (NLS) tables into the process's address space. It next calls MmCreatePebTok to allocate a page for the PEB and then initializes a number of fields, most of them based on internal variables that were configured through the registry, such as MmHeap\* values, MmCriticalSectionTimeout, and MmMinimumStackCommitInBytes. Some of these fields can be overridden by settings in the linked executable image, such as the Windows version in the PE header or the affinity mask in the load configuration directory of the PE header.
 
 If the image header characteristics IMAGE_FILE_UP_SYSTEM_ONLY flag is set (indicating that the image can run only on a uniprocessor system), a single CPU (MM0Rat InGInl processorNumber) is chosen for all the threads in this new process to run on. The selection process is performed by simply cycling through the available processors. Each time this type of image is run, the next processor is used. In this way, these types of images are spread evenly across the processors.
 
@@ -1375,31 +1344,32 @@ If the image header characteristics IMAGE_FILE_UP_SYSTEM_ONLY flag is set (indic
 Before the handle to the new process can be returned, a few final setup steps must be completed, which are performed by PspInsertProcess and its helper functions:
 
 - 1. If system-wide auditing of processes is enabled (because of either local policy settings or group
-policy settings from a domain controller), the process's creation is written to the Security event
-log.
+     policy settings from a domain controller), the process's creation is written to the Security event
+     log.
 
 2. If the parent process was contained in a job, the job is recovered from the job level set of the
-parent and then bound to the session of the newly created process. Finally, the new process is
-added to the job.
+   parent and then bound to the session of the newly created process. Finally, the new process is
+   added to the job.
 
 3. The new process object is inserted at the end of the Windows list of active processes (PsActive-
-ProcessHead). Now the process is accessible via functions like EnumProcesses and OpenProcess.
+   ProcessHead). Now the process is accessible via functions like EnumProcesses and OpenProcess.
 
 4. The process debug port of the parent process is copied to the new child process unless the
-NoDebugInherit flag is set (which can be requested when creating the process). If a debug port
-was specified, it is attached to the new process.
+   NoDebugInherit flag is set (which can be requested when creating the process). If a debug port
+   was specified, it is attached to the new process.
 
 5. Job objects can specify restrictions on which group or groups the threads within the processes
-part of a job can run on. Therefore, PspInsertProcess must make sure the group affinity asso-
-ciated with the process would not violate the group affinity associated with the job. An interest-
-ing secondary issue to consider is if the job's permissions grant access to modify the process's
-affinity permissions, because a lesser-privileged job object might interfere with the affinity
-requirements of a more privileged process.
+   part of a job can run on. Therefore, PspInsertProcess must make sure the group affinity asso-
+   ciated with the process would not violate the group affinity associated with the job. An interest-
+   ing secondary issue to consider is if the job's permissions grant access to modify the process's
+   affinity permissions, because a lesser-privileged job object might interfere with the affinity
+   requirements of a more privileged process.
 
 6. Finally, PspInsertProcess creates a handle for the new process by calling ObOpenObject-
-ByPointer, and then returns this handle to the caller. Note that no process-creation callback
-is sent until the first thread within the process is created, and the code always sends process
-callbacks before sending object managed-based callbacks.
+   ByPointer, and then returns this handle to the caller. Note that no process-creation callback
+   is sent until the first thread within the process is created, and the code always sends process
+   callbacks before sending object managed-based callbacks.
+
 ---
 
 ## Stage 4: Creating the initial thread and its stack and context
@@ -1413,38 +1383,37 @@ Note The thread parameter (which can't be specified in CreateProcess but can be 
 PspAllocateThread performs the following steps:
 
 - 1. It prevents user-mode scheduling (UMS) threads from being created in Wow64 processes, as
-well as preventing user-mode callers from creating threads in the system process.
+     well as preventing user-mode callers from creating threads in the system process.
 
 2. An executive thread object is created and initialized.
 
 3. If energy estimation is enabled for the system (always disabled for XBOX), then it allocates and
-initializes a THREAD_ENERGY_VALUES structure pointed to by the ETHREAD object.
+   initializes a THREAD_ENERGY_VALUES structure pointed to by the ETHREAD object.
 
 4. The various lists used by LPC, I/O Management, and the Executive are initialized.
 
 5. The thread's creation time is set, and its thread ID (TID) is created.
 
 6. Before the thread can execute, it needs a stack and a context in which to run, so these are set
-up. The stack size for the initial thread is taken from the image; there's no way to specify an-
-other size. If this is a Wow64 process, the Wow64 thread context will also be initialized.
+   up. The stack size for the initial thread is taken from the image; there's no way to specify an-
+   other size. If this is a Wow64 process, the Wow64 thread context will also be initialized.
 
 7. The thread environment block (TEB) is allocated for the new thread.
 
 8. The user-mode thread start address is stored in the ETHREAD (in the StartAddress field).
-This is the system-supplied thread startup function in Ndtll.dll (RtlUserThreadStart). The
-user's specified Windows start address is stored in the ETHREAD in a different location
-(the Win32StartAddress field) so that debugging tools such as Process Explorer can display
-the information.
+   This is the system-supplied thread startup function in Ndtll.dll (RtlUserThreadStart). The
+   user's specified Windows start address is stored in the ETHREAD in a different location
+   (the Win32StartAddress field) so that debugging tools such as Process Explorer can display
+   the information.
 
 9. KeInitThread is called to set up the KTHREAD structure. The thread's initial and current base
-priorities are set to the process's base priority, and its affinity and quantum are set to that of the
-process. KeInitThread next allocates a kernel stack for the thread and initializes the machine-
-dependent hardware context for the thread, including the context, trap, and exception frames.
+   priorities are set to the process's base priority, and its affinity and quantum are set to that of the
+   process. KeInitThread next allocates a kernel stack for the thread and initializes the machine-
+   dependent hardware context for the thread, including the context, trap, and exception frames.
 
 APTER 3 Processes and jobs
 
-From the Library of M
----
+## From the Library of M
 
 The thread's context is set up so that the thread will start in kernel startup. Finally, KeInitThread sets the thread's state to Initialized and returns to PspAllocateThread.
 
@@ -1474,10 +1443,9 @@ Once that work is finished, NtCreateUserProcess calls PspInsertThread to perform
 
 11. The thread object is inserted into the process handle table.
 
-12. If it's the first thread created in the process (that is, the operation happened as part of a CreateProcess* call), any registered callbacks for process creation are called. Then any registered thread callbacks are called. If any callback vetoes the creation, it will fail and return an appropriate status to the caller.
+12. If it's the first thread created in the process (that is, the operation happened as part of a CreateProcess\* call), any registered callbacks for process creation are called. Then any registered thread callbacks are called. If any callback vetoes the creation, it will fail and return an appropriate status to the caller.
 
 CHAPTER 3 Processes and jobs 145
-
 
 ---
 
@@ -1531,8 +1499,7 @@ sent to Cxssr. The message includes the following information:
 
 ER 3 Processes and jobs
 
-From the Library of
----
+## From the Library of
 
 - • A flag indicating whether the process belongs to a Windows application (so that Css can
 
@@ -1546,18 +1513,18 @@ determine whether to show the startup cursor)
 When it receives this message, the Windows subsystem performs the following steps:
 
 - 1. CsrCreateProcess duplicates a handle for the process and thread. In this step, the usage count
-of the process and the thread is incremented from 1 (which was set at creation time) to 2.
+     of the process and the thread is incremented from 1 (which was set at creation time) to 2.
 
 2. The Cssr process structure (CSR_PROCESS) is allocated.
 
 3. The new process's exception port is set to be the general function port for the Windows subsys-
-tem so that the Windows subsystem will receive a message when a second-chance exception
-occurs in the process. (For further information on exception handling, see Chapter 8 in Part 2.)
+   tem so that the Windows subsystem will receive a message when a second-chance exception
+   occurs in the process. (For further information on exception handling, see Chapter 8 in Part 2.)
 
-4. If a new process group is to be created with the new process serving as the root (CREATE_NEW_
-PROCESS_GROUP flag in CreateProcess), then it's set in CSR_PROCESS. A process group is useful
-for sending a control event to a set of processes sharing a console. See the Windows SDK docu-
-mentation for CreateProcess and GenerateConsoleCtrlEvent for more information.
+4. If a new process group is to be created with the new process serving as the root (CREATE*NEW*
+   PROCESS_GROUP flag in CreateProcess), then it's set in CSR_PROCESS. A process group is useful
+   for sending a control event to a set of processes sharing a console. See the Windows SDK docu-
+   mentation for CreateProcess and GenerateConsoleCtrlEvent for more information.
 
 5. The Cssr thread structure (CSR_THREAD) is allocated and initialized.
 
@@ -1566,15 +1533,14 @@ mentation for CreateProcess and GenerateConsoleCtrlEvent for more information.
 7. The count of processes in this session is incremented.
 
 8. The process shutdown level is set to 0x280, the default process shutdown level. (See SetProcess-
-ShutdownParameters in the Windows SDK documentation for more information.)
+   ShutdownParameters in the Windows SDK documentation for more information.)
 
 9. The new Cssr process structure is inserted into the list of Windows subsystem--wide processes.
-After Css has performed these steps, CreateProcessInternalW checks whether the process was run elevated (which means it was executed through She'llExecute and elevated by the AppInfo service after the consent dialog box was shown to the user). This includes checking whether the process was a setup program. If it was, the process's token is opened, and the virtualization flag is turned on so that the application is virtualized. (See the information on UAC and virtualization in Chapter 7) If the application contained elevation shims or had a requested elevation level in its manifest, the process is destroyed and an elevation request is sent to the AppInfo service.
+   After Css has performed these steps, CreateProcessInternalW checks whether the process was run elevated (which means it was executed through She'llExecute and elevated by the AppInfo service after the consent dialog box was shown to the user). This includes checking whether the process was a setup program. If it was, the process's token is opened, and the virtualization flag is turned on so that the application is virtualized. (See the information on UAC and virtualization in Chapter 7) If the application contained elevation shims or had a requested elevation level in its manifest, the process is destroyed and an elevation request is sent to the AppInfo service.
 
 Note that most of these checks are not performed for protected processes. Because these processes must have been designed for Windows Vista or later, there's no reason they should require elevation, virtualization, or application-compatibility checks and processing. Additionally, allowing mechanisms such as the shim engine to use its usual hooking and memory-patching techniques on a protected process would result in a security hole if someone could figure how to insert arbitrary shims that modify the behavior of the protected process. Additionally, because the shim engine is installed by the parent process, which might not have access to its child protected process, even legitimate shimming cannot work.
 
-CHAPTER 3   Processes and jobs      147
-
+CHAPTER 3 Processes and jobs 147
 
 ---
 
@@ -1595,20 +1561,20 @@ thread start address is passed as a parameter to this routine. PsUserThreadStart
 following actions:
 
 - 1. It installs an exception chain on x86 architecture. (Other architectures work differently in this
-regard, see Chapter 8 in Part 2.)
+     regard, see Chapter 8 in Part 2.)
 
 2. It lowers IRQL to PASSIVE_LEVEL (0, which is the only IRQL user code is allowed to run at).
 3. It disables the ability to swap the primary process token at runtime.
 4. If the thread was killed on startup (for whatever reason), it's terminated and no further action is
-taken.
+   taken.
 
 5. It sets the locale ID and the ideal processor in the TEB, based on the information present in
-kernel-mode data structures, and then it checks whether thread creation actually failed.
+   kernel-mode data structures, and then it checks whether thread creation actually failed.
 
 6. It calls DbgkCreateThread, which checks whether image notifications were sent for the new
-process. If they weren't, and notifications are enabled, an image notification is sent first for the
-process and then for the image load of Ndtll.dll.
-![Figure](figures/Winternals7thPt1_page_165_figure_005.png)
+   process. If they weren't, and notifications are enabled, an image notification is sent first for the
+   process and then for the image load of Ndtll.dll.
+   ![Figure](figures/Winternals7thPt1_page_165_figure_005.png)
 
 Note This is done in this stage rather than when the images were first mapped because the process ID (which is required for the kernel callouts) is not yet allocated at that time.
 
@@ -1617,29 +1583,29 @@ Note This is done in this stage rather than when the images were first mapped be
 ---
 
 - 8. It checks whether application prefetching is enabled on the system and, if so, calls the prefetcher
-(and Superfetch) to process the prefetch instruction file (if it exists) and prefetch pages refer-
-enced during the first 10 seconds the last time the process ran. (For details on the prefetcher
-and Superfetch, see Chapter 5.)
+     (and Superfetch) to process the prefetch instruction file (if it exists) and prefetch pages refer-
+     enced during the first 10 seconds the last time the process ran. (For details on the prefetcher
+     and Superfetch, see Chapter 5.)
 
 9. It checks whether the system-wide cookie in the SharedUserData structure has been set up. If
-it hasn't, it generates it based on a hash of system information such as the number of interrupts
-processed, DPC deliveries, page faults, interrupt time, and a random number. This system-wide
-cookie is used in the internal decoding and encoding of pointers, such as in the heap manager
-to protect against certain classes of exploitation. (For more information on the heap manager
-security, see Chapter 5.)
+   it hasn't, it generates it based on a hash of system information such as the number of interrupts
+   processed, DPC deliveries, page faults, interrupt time, and a random number. This system-wide
+   cookie is used in the internal decoding and encoding of pointers, such as in the heap manager
+   to protect against certain classes of exploitation. (For more information on the heap manager
+   security, see Chapter 5.)
 
 10. If the process is secure (IUM process), then a call is made to Hv1StartSecureThread that trans-
-fers control to the secure kernel to start thread execution. This function only returns when the
-thread exits.
+    fers control to the secure kernel to start thread execution. This function only returns when the
+    thread exits.
 
 11. It sets up the initial thunk context to run the image-loader initialization routine (LdrInitialize-
-Thunk in Ntdll.dll), as well as the system-wide thread startup stub (RtlUserThreadStart in
-Ntdll.dll). These steps are done by editing the context of the thread in place and then issuing
-an exit from system service operation, which loads the specially crafted user context. The
-LdrInitializeThunk routine initializes the loader, the heap manager, NLS tables, thread-local
-storage (TLS) and fiber-local storage (FLS) arrays, and critical section structures. It then loads
-any required DLLs and calls the DLL entry points with the DLL_PROCESS_ATTACH function code.
-Once the function returns, NConsume restores the new user context and returns to user mode.
+    Thunk in Ntdll.dll), as well as the system-wide thread startup stub (RtlUserThreadStart in
+    Ntdll.dll). These steps are done by editing the context of the thread in place and then issuing
+    an exit from system service operation, which loads the specially crafted user context. The
+    LdrInitializeThunk routine initializes the loader, the heap manager, NLS tables, thread-local
+    storage (TLS) and fiber-local storage (FLS) arrays, and critical section structures. It then loads
+    any required DLLs and calls the DLL entry points with the DLL_PROCESS_ATTACH function code.
+    Once the function returns, NConsume restores the new user context and returns to user mode.
 
 Thread execution now truly starts.
 
@@ -1650,8 +1616,8 @@ calls the application's entry point. These two parameters have also already been
 by the kernel. This complicated series of events has two purposes:
 
 - ■ It allows the image loader inside Ntdll.dll to set up the process internally and behind the scenes
-so that other user-mode code can run properly. (Otherwise, it would have no heap, no thread-
-local storage, and so on.)
+  so that other user-mode code can run properly. (Otherwise, it would have no heap, no thread-
+  local storage, and so on.)
 
 ■ Having all threads begin in a common routine allows them to be wrapped in exception handling
 so that if they crash, Ntdll.dll is aware of that and can call the unhandled exception filter inside
@@ -1659,6 +1625,7 @@ Kernel32.dll. It is also able to coordinate thread exit on return from the threa
 and to perform various cleanup work. Application developers can also call SetUnhandled-
 
 ExceptionFilter to add their own unhandled exception-handling code.
+
 ## EXPERIMENT: Tracing process startup
 
 Now that we've looked in detail at how a process starts up and the different operations required to begin executing an application, we're going to use Process Monitor to look at some of the file I/O and registry keys that are accessed during this process.
@@ -1691,7 +1658,6 @@ As described in stage 1 of the CreateProcess flow, one of the first things to no
 
 150 CHAPTER 3 Processes and jobs
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_168_figure_000.png)
@@ -1700,8 +1666,7 @@ As with this and any other event in Process Monitor's log, you can see whether e
 
 ![Figure](figures/Winternals7thPt1_page_168_figure_002.png)
 
-CHAPTER 3 Processes and jobs     151
-
+CHAPTER 3 Processes and jobs 151
 
 ---
 
@@ -1716,8 +1681,8 @@ Going down the list of events after the thread and process have been created, yo
 three groups of events:
 
 - ■ A simple check for application-compatible flags, which will let the user-mode process-
-creation code know if checks inside the application-compatible database are required
-through the shim engine.
+  creation code know if checks inside the application-compatible database are required
+  through the shim engine.
 
 ■ Multiple reads to SxS (search for Side-By-Side), Manifest, and MUI/Language keys, which
 are part of the assembly framework mentioned earlier.
@@ -1730,8 +1695,7 @@ The following screenshot shows the next series of events, which happen inside th
 
 ![Figure](figures/Winternals7thPt1_page_169_figure_004.png)
 
-152    CHAPTER 3   Processes and jobs
-
+152 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -1745,7 +1709,6 @@ Further events are generated by this routine and its associated helper functions
 
 CHAPTER 3 Processes and jobs 153
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_171_figure_000.png)
@@ -1758,8 +1721,7 @@ A process can exit gracefully by calling the ExitProcess function. For many proc
 
 ExitProcess can be called only by the process itself asking to exit. An ungraceful termination of a process is possible using the TerminateProcess function, which can be called from outside the process. (For example, Process Explorer and T ask Manager use it when so requested.) T erminateProcess requires a handle to the process that is opened with the PROCESS_TERMINATE access mask, which may or may not be granted. This is why it's not easy (or it's impossible) to terminate some processes (for example, Csrss)—the handle with the required access mask cannot be obtained by the requesting user.
 
-154   CHAPTER 3  Processes and jobs
-
+154 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -1811,11 +1773,10 @@ recursively parsing the IAT of each DLL), followed by parsing the export table o
 
 make sure the function is actually present. (Special forwarder entries can also redirect an export
 
-to yet another DLL)
----
+## to yet another DLL)
 
 - ■ Loading and unloading DLLs at run time, as well as on demand, and maintaining a list of all
-loaded modules (the module database).
+  loaded modules (the module database).
 
 ■ Handling manifest files, needed for Windows Side-by-Side (SxS) support, as well as Multiple
 Language User Interface (MUI) files and resources.
@@ -1835,14 +1796,15 @@ EXPERIMENT: Watching the image loader
 In this experiment, you'll use global flags to enable a debugging feature called loader snaps. This allows you to see debug output from the image loader while debugging application startup.
 
 - 1. From the directory where you've installed WinDbg, launch the Gflags.exe application,
-and then click the Image File tab.
+     and then click the Image File tab.
 
 2. In the Image field, type Notepad.exe, and then press the Tab key. This should enable
-the various options. Select the Show Loader Snaps option and then click OK or Apply.
+   the various options. Select the Show Loader Snaps option and then click OK or Apply.
 
 3. Now launch WinDbg, open the File menu, choose Open Executable, and navigate to
-c:\windows\system32\notepad.exe to launch it. You should see a couple of screens of
-debug information similar to that shown here:
+   c:\windows\system32\notepad.exe to launch it. You should see a couple of screens of
+   debug information similar to that shown here:
+
 ```bash
 0f64-2090 @ 02405218 - LdrdInitializeProcess - INFO: Beginning execution of
 notepad.exe (C:\Windows\notepad.exe)
@@ -1893,7 +1855,7 @@ Because the loader is present in Ntdll.dll, which is a native DLL that's not ass
 When a process starts, the loader performs the following steps:
 
 - 1. It checks if LdrProcessInitiallization is already set to 1 or if the SkipJpLoaderInit flag is set in the
-TEB. In this case, skip all initialization and wait three seconds for someone to call LdrProcess-
+     TEB. In this case, skip all initialization and wait three seconds for someone to call LdrProcess-
 
 InitializationComplete. This is used in cases where process reflection is used by Windows
 Error Reporting, or other process fork attempts where loader initialization is not needed.
@@ -1902,7 +1864,6 @@ Error Reporting, or other process fork attempts where loader initialization is n
 
 ProcessInitialization flag to 1 and the TEB's RanProcessInit to 1
 CHAPTER 3 Processes and jobs 157
-
 
 ---
 
@@ -1980,8 +1941,7 @@ set up the required parameters.
 
 CHAPTER 3 Processes and jobs
 
-From the Library of I
----
+## From the Library of I
 
 18. It enables the Terminate process on heap corruption mitigation if it's turned on.
 
@@ -2053,7 +2013,6 @@ between these two libraries.
 
 CHAPTER 3 Processes and jobs 159
 
-
 ---
 
 - 35. It initializes the shim engine and parses the shim database.
@@ -2065,7 +2024,7 @@ have any system call hooks or "detours" attached to them, and based on the numbe
 threads that have been configured through policy and image file execution options.
 
 37. It sets the LdrInitState variable to 1, meaning "import loading in progress."
-At this point, the image loader is ready to start parsing the import table of the executable belonging
+    At this point, the image loader is ready to start parsing the import table of the executable belonging
 
 to the application and start loading any DLLs that were dynamically linked during the compilation of
 
@@ -2108,13 +2067,13 @@ the three system directories, resulting in the following path ordering:
 5. The current directory at application launch time
 
 6. Any directories specified by the %PATH% environment variable
-The DLL search path is recomputed for each subsequent DLL load operation. The algorithm used to compute the search path is the same as the one used to compute the default search path, but the application can change specific path elements by editing the %PATH% variable using the SetEnvironmentVariable API, changing the current directory using the SetCurrentDirectory API, or using the SetD1Directory API to specify a DLL directory for the process. When a DLL directory is specified, the directory replaces the current directory in the search path and the loader ignores the safe DLL search mode setting for the process.
+   The DLL search path is recomputed for each subsequent DLL load operation. The algorithm used to compute the search path is the same as the one used to compute the default search path, but the application can change specific path elements by editing the %PATH% variable using the SetEnvironmentVariable API, changing the current directory using the SetCurrentDirectory API, or using the SetD1Directory API to specify a DLL directory for the process. When a DLL directory is specified, the directory replaces the current directory in the search path and the loader ignores the safe DLL search mode setting for the process.
 
-Callers can also modify the DLL search path for specific load operations by supplying the LOAD_ WITH_ALTERED_SEARCH_PATH flag to the LoadLibraryEx API. When this flag is supplied and the DLL name supplied to the API specifies a full path string, the path containing the DLL file is used in place of the application directory when computing the search path for the operation. Note that if the path is a relative path, this behavior is undefined and potentially dangerous. When Desktop Bridge (Centennial) applications load, this flag is ignored.
+Callers can also modify the DLL search path for specific load operations by supplying the LOAD\_ WITH_ALTERED_SEARCH_PATH flag to the LoadLibraryEx API. When this flag is supplied and the DLL name supplied to the API specifies a full path string, the path containing the DLL file is used in place of the application directory when computing the search path for the operation. Note that if the path is a relative path, this behavior is undefined and potentially dangerous. When Desktop Bridge (Centennial) applications load, this flag is ignored.
 
 Other flags that applications can specify to LoadLibraryEx include LOAD_LIBRARY_SEARCH_DLL,
 
-LOAD_DLR, LOAD_LIBRARY_SEARCH_APPLICATION_DIR, LOAD_LIBRARY_SEARCH_SYSTEM32, and LOAD_
+LOAD*DLR, LOAD_LIBRARY_SEARCH_APPLICATION_DIR, LOAD_LIBRARY_SEARCH_SYSTEM32, and LOAD*
 
 LIBRARY_SEARCH_USER_DIRS, in place of the LOAD_WITH_ALTERED_SEARCH_PATH flag. Each of these
 
@@ -2130,8 +2089,7 @@ Another way search-path ordering can be affected is if the application is a pack
 
 Additionally, when a packaged application is loaded, as long as it is not a Desktop Bridge application, all application-configurable DLL search path ordering APIs, such as the ones we saw earlier, will be disabled, and only the default system behavior will be used (in combination with only looking through package dependencies for most UWP applications as per the above).
 
-CHAPTER 3 Processes and jobs      161
-
+CHAPTER 3 Processes and jobs 161
 
 ---
 
@@ -2160,9 +2118,9 @@ which inverts the order above between points 1 and 2, as the name suggests.
 Before attempting to resolve a DLL name string to a file, the loader attempts to apply DLL name redirection rules. These redirection rules are used to extend or override portions of the DLL namespace— which normally corresponds to the Win32 file system namespace—to extend the Windows application model. In order of application, these are:
 
 - ■MinWin API Set redirection The API set mechanism is designed to allow different versions
-or editions of Windows to change the binary that exports a given system API in a manner that is
-transparent to applications, by introducing the concept of contracts. This mechanism was briefly
-touched upon in Chapter 2, and will be further explained in a later section.
+  or editions of Windows to change the binary that exports a given system API in a manner that is
+  transparent to applications, by introducing the concept of contracts. This mechanism was briefly
+  touched upon in Chapter 2, and will be further explained in a later section.
 
 ●.LOCAL redirection The .LOCAL redirection mechanism allows applications to redirect all
 loads of a specific DLL base name, regardless of whether a full path is specified, to a local copy
@@ -2185,6 +2143,7 @@ different versions that could be installed alongside one another; other binaries
 versioned in the same fashion. As of Visual Studio 2005, applications built with the Microsoft
 linker use Fusion to locate the appropriate version of the C runtime libraries, while Visual Studio
 2015 and later use API Set redirection to implement the idea of the universal CRT.
+
 ---
 
 The Fusion runtime tool reads embedded dependency information from a binary's resource section using the Windows resource loader, and it packages the dependency information into lookup structures known as activation contexts. The system creates default activation contexts at the system and process level at boot and process startup time, respectively; in addition, each thread has an associated activation context stack, with the activation context structure at the top of the stack considered active. The per-thread activation context stack is managed both explicitly, via the ActivateActCtx and DeactivateActCtx APIs, and implicitly by the system at certain points, such as when the DLL main routine of a binary with embedded dependency information is called. When a Fusion DLL name redirection lookup occurs, the system searches for redirection information in the activation context at the head of the thread's activation context stack, followed by the process and system activation contexts; if redirection information is present, the file identity specified by the activation context is used for the load operation.
@@ -2202,10 +2161,10 @@ Here's the capture of the loader's search for the OneDrive.exe executable. To re
 experiment, do the following:
 
 - 1. If the OneDrive is running, close it from its tray icon. Make sure to close all Explorer
-windows that are looking at OneDrive content.
+     windows that are looking at OneDrive content.
 
 2. Open Process Monitor and add filters to show just the process OneDrive.exe. Optionally,
-show only the operation for CreateFile.
+   show only the operation for CreateFile.
 
 3. Go to %LocalAppData%\Microsoft\OneDrive and launch OneDrive.exe or OneDrive
 
@@ -2213,28 +2172,27 @@ Personal.cmd (which launches OneDrive.exe as "personal" rather than "business").
 
 You should see something like the following (note that OneDrive is a 32 bit process,
 
-here running on a 64 bit system):
----
+## here running on a 64 bit system):
 
 ![Figure](figures/Winternals7thPt1_page_181_figure_000.png)
 
 Here are some of the calls shown as they relate to the search order described previously:
 
 - ■ KnownDlls DLLs load from the system location (ole32.dll in the screenshot).
-■ LoggingPlatform.Dll is loaded from a version subdirectory, probably because OneDrive
-calls SetDllDirectory to redirect searches to the latest version (17.3.6743.1212 in the screen-
-shot).
-■ The MSVCRI20.dll (MSVC run time version 12) is searched for in the executable's directory,
-and is not found. Then it's searched in the version subdirectory, where it's located.
-■ The Wsock32.Dll (WinSock) is searched in the executable's path, then in the version subdi-
-rectory, and finally located in the system directory (SysWow64). Note that this DLL is not a
-KnownDll.
+  ■ LoggingPlatform.Dll is loaded from a version subdirectory, probably because OneDrive
+  calls SetDllDirectory to redirect searches to the latest version (17.3.6743.1212 in the screen-
+  shot).
+  ■ The MSVCRI20.dll (MSVC run time version 12) is searched for in the executable's directory,
+  and is not found. Then it's searched in the version subdirectory, where it's located.
+  ■ The Wsock32.Dll (WinSock) is searched in the executable's path, then in the version subdi-
+  rectory, and finally located in the system directory (SysWow64). Note that this DLL is not a
+  KnownDll.
+
 ## Loaded module database
 
 The loader maintains a list of all modules (DLLs as well as the primary executable) that have been loaded by a process. This information is stored in the PEB—namely, in a substructure identified by Ldr and called PEB_LDR_DATA. In the structure, the loader maintains three doubly linked lists, all containing the same information but ordered differently (either by load order, memory location, or initialization order). These lists contain structures called loader data table entries (LDR_DATA_TABLE_ENTRY) that store information about each module.
 
-164   CHAPTER 3   Processes and jobs
-
+164 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -2248,13 +2206,11 @@ Continue...
 
 CHAPTER 3 Processes and jobs 165
 
-
 ---
 
 TABLE 3-9 Fields in a loader data table entry (continued)
 
 <table><tr><td>Field</td><td>Meaning</td></tr><tr><td>ParentDllBase</td><td>In case of static (or forwarder, or delay-load) dependencies, stores the address of the DLL that has a dependency on this one.</td></tr><tr><td>SigningLevel</td><td>Stores the signature level of this image (see Chapter 8, Part 2, for more information on the Code Integrity infrastructure).</td></tr><tr><td>SizeOfImage</td><td>The size of the module in memory.</td></tr><tr><td>SwitchBackContext</td><td>Used by SwitchBack (described later) to store the current Windows context GUID associated with this module, and other data.</td></tr><tr><td>TimeDateStamp</td><td>A time stamp written by the linker when the module was linked, which the loader obtains from the module&#x27;s image PE header.</td></tr><tr><td>TlsIndex</td><td>The thread local storage slot associated with this module.</td></tr></table>
-
 
 One way to look at a process's loader database is to use WinDbg and its formatted output of the
 
@@ -2306,14 +2262,13 @@ KERNELBASE.dll
 
 4. You should then see the entries for each module:
 
-0x0000 InLoadOrderLinks : _LIST_ENTRY [ 0x00000228'15d23d10 0x00007fff'855d23b0 ] +0x010 InMemoryOrderLinks : _LIST_ENTRY [ 0x00000228'15d23d10 0x00007ffe'855d23c0 ] +0x020 InInitializationOrderLinks : _LIST_ENTRY [ 0x00000000'00000000 0x00000000'00000000 ] +0x030 DllBase : 0x00007fff'20b60000 Void +0x038 EntryPoint : 0x00007fff'20b787d0 Void +0x040 SizeOfImage : 0x41000 +0x048 FullDllName : _UNICODE_STRING "C:\Windows\System32\tenpad. exe" +0x058 BaseDllName : _UNICODE_STRING "notepad.exe" +0x068 FlagGroup : [4] "???" +0x068 Flags : 0xa2cc
+0x0000 InLoadOrderLinks : \_LIST_ENTRY [ 0x00000228'15d23d10 0x00007fff'855d23b0 ] +0x010 InMemoryOrderLinks : \_LIST_ENTRY [ 0x00000228'15d23d10 0x00007ffe'855d23c0 ] +0x020 InInitializationOrderLinks : \_LIST_ENTRY [ 0x00000000'00000000 0x00000000'00000000 ] +0x030 DllBase : 0x00007fff'20b60000 Void +0x038 EntryPoint : 0x00007fff'20b787d0 Void +0x040 SizeOfImage : 0x41000 +0x048 FullDllName : \_UNICODE_STRING "C:\Windows\System32\tenpad. exe" +0x058 BaseDllName : \_UNICODE_STRING "notepad.exe" +0x068 FlagGroup : [4] "???" +0x068 Flags : 0xa2cc
 
-Although this section covers the user-mode loader in Ntdll.dll, note that the kernel also employs its own loader for drivers and dependent DLLs, with a similar loader entry structure called KLDRL_DATA_ TABLE_ENTRY instead. Likewise, the kernel-mode loader has its own database of such entries, which is directly accessible through the PsaLoadedModuleList global data variable. To dump the kernel's loaded module database, you can use a similar !list command as shown in the preceding experiment by replacing the pointer at the end of the command with !t!PsaLoadedModuleList and using the new structure/ module name: !list -x "dt nt!_kldr_data_table_entry" nt!PsLoadedModuleList
+Although this section covers the user-mode loader in Ntdll.dll, note that the kernel also employs its own loader for drivers and dependent DLLs, with a similar loader entry structure called KLDRL*DATA* TABLE_ENTRY instead. Likewise, the kernel-mode loader has its own database of such entries, which is directly accessible through the PsaLoadedModuleList global data variable. To dump the kernel's loaded module database, you can use a similar !list command as shown in the preceding experiment by replacing the pointer at the end of the command with !t!PsaLoadedModuleList and using the new structure/ module name: !list -x "dt nt!\_kldr_data_table_entry" nt!PsLoadedModuleList
 
 Looking at the list in this raw format gives you some extra insight into the loader's internals, such as the F1ags field, which contains state information that !peb on its own would not show you. See Table 3-10 for their meaning. Because both the kernel and user-mode loaders use this structure, the meaning of the flags is not always the same. In this table, we explicitly cover the user-mode flags only (some of which may exist in the kernel structure as well).
 
 CHAPTER 3 Processes and jobs 167
-
 
 ---
 
@@ -2321,58 +2276,55 @@ TABLE 3-10 Loader data table entry flags
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>Packaged Binary (0x1)</td><td>This module is part of a packaged application (it can only be set on the main module of an AppX package).</td></tr><tr><td>Marked for Removal (0x2)</td><td>This module will be unloaded as soon as all references (such as from an executing worker thread) are dropped.</td></tr><tr><td>Image DLL (0x4)</td><td>This module is an image DLL (and not a data DLL or executable).</td></tr><tr><td>Load Notifications Sent (0x8)</td><td>Registered DLL notification callouts were notified of this image already.</td></tr><tr><td>Telemetry Entry Processed (0x10)</td><td>Telemetry data has already been processed for this image.</td></tr><tr><td>Process Static Import (0x20)</td><td>This module is a static import of the main application binary.</td></tr><tr><td>In Legacy Lists (0x40)</td><td>This image entry is in the loader&#x27;s doubly linked lists.</td></tr><tr><td>In Indexes (0x80)</td><td>This image entry is in the loader&#x27;s red-black trees.</td></tr><tr><td>Shim DLL (0x100)</td><td>This image entry represents a DLL part of the shim engine/application compatibility database.</td></tr><tr><td>In Exception Table (0x200)</td><td>This module&#x27;s .pdata exception handlers have been captured in the loader&#x27;s inverted function table.</td></tr><tr><td>Load In Progress (0x800)</td><td>This module is currently being loaded.</td></tr><tr><td>Load Config Processed (0x1000)</td><td>This module&#x27;s image load configuration directory has been found and processed.</td></tr><tr><td>Entry Processed (0x2000)</td><td>The loader has fully finished processing this module.</td></tr><tr><td>Protect Delay Load (0x4000)</td><td>Control Flow Guard features for this binary have requested the protection of the delay-load IAT. See chapter 7 for more information.</td></tr><tr><td>Process Attach Called (0x20000)</td><td>The DLL_PROCESS_ATTACH notification has already been sent to the DLL.</td></tr><tr><td>Process Attach Failed (0x40000)</td><td>The DllMain routine of the DLL has failed the DLL_PROCESS_ATTACH notification.</td></tr><tr><td>Don&#x27;t Call for Threads (0x80000)</td><td>Do not send DLL_THREAD_ATTACH/DETACH notifications to this DLL. Can be set with D! sab1Thread.libaryCalls.</td></tr><tr><td>COR Deferred Validate (0x100000)</td><td>The Common Object Runtime (COR) will validate this .NET image at a later time.</td></tr><tr><td>COR Image (0x200000)</td><td>This module is a .NET application.</td></tr><tr><td>Don&#x27;t Relocate (0x400000)</td><td>This image should not be relocated or randomized.</td></tr><tr><td>COR IL Only (0x80000)</td><td>This is a .NET intermediate-language (IL)-only library, which does not contain native assembly code.</td></tr><tr><td>Compat Database Processed (0x40000000)</td><td>The shim engine has processed this DLL.</td></tr></table>
 
-
 ## Import parsing
 
 Now that we've explained the way the loader keeps track of all the modules loaded for a process, you can continue analyzing the startup initialization tasks performed by the loader. During this step, the loader will do the following:
 
-168    CHAPTER 3   Processes and jobs
-
+168 CHAPTER 3 Processes and jobs
 
 ---
 
 - 1. Load each DLL referenced in the import table of the process's executable image.
 
 2. Check whether the DLL has already been loaded by checking the module database. If it doesn't
-find it in the list, the loader opens the DLL and maps it into memory.
+   find it in the list, the loader opens the DLL and maps it into memory.
 
 3. During the mapping operation, the loader first looks at the various paths where it should at-
-tempt to find this DLL, as well as whether this DLL is a known DLL, meaning that the system has
-already loaded it at startup and provided a global memory mapped file for accessing it. Certain
-deviations from the standard lookup algorithm can also occur, either through the use of a local
-file (which forces the loader to use DLLs in the local path) or through a manifest file, which can
-specify a redirected DLL to use to guarantee a specific version.
+   tempt to find this DLL, as well as whether this DLL is a known DLL, meaning that the system has
+   already loaded it at startup and provided a global memory mapped file for accessing it. Certain
+   deviations from the standard lookup algorithm can also occur, either through the use of a local
+   file (which forces the loader to use DLLs in the local path) or through a manifest file, which can
+   specify a redirected DLL to use to guarantee a specific version.
 
 4. After the DLL has been found on disk and mapped, the loader checks whether the kernel has
-loaded it somewhere else—this is called relocation. If the loader detects relocation, it parses
-the relocation information in the DLL and performs the operations required. If no relocation
-information is present, DLL loading fails.
+   loaded it somewhere else—this is called relocation. If the loader detects relocation, it parses
+   the relocation information in the DLL and performs the operations required. If no relocation
+   information is present, DLL loading fails.
 
 5. The loader then creates a loader data table entry for this DLL and inserts it into the database.
 
 6. After a DLL has been mapped, the process is repeated for this DLL to parse its import table and
-all its dependencies.
+   all its dependencies.
 
 7. After each DLL is loaded, the loader parses the IAT to look for specific functions that are being
-imported. Usually this is done by name, but it can also be done by ordinal (an index number).
-For each name, the loader parses the export table of the imported DLL and tries to locate a
-match. If no match is found, the operation is aborted.
+   imported. Usually this is done by name, but it can also be done by ordinal (an index number).
+   For each name, the loader parses the export table of the imported DLL and tries to locate a
+   match. If no match is found, the operation is aborted.
 
 8. The import table of an image can also be bound. This means that at link time, the developers
-already assigned static addresses pointing to imported functions in external DLLs. This removes
-the need to do the lookup for each name, but it assumes that the DLLs the application will use
-will always be located at the same address. Because Windows uses address space randomiza-
-tion (see Chapter 5 for more information on ASLR), this is usually not the case for system ap-
-plications and libraries.
+   already assigned static addresses pointing to imported functions in external DLLs. This removes
+   the need to do the lookup for each name, but it assumes that the DLLs the application will use
+   will always be located at the same address. Because Windows uses address space randomiza-
+   tion (see Chapter 5 for more information on ASLR), this is usually not the case for system ap-
+   plications and libraries.
 
 9. The export table of an imported DLL can use a forwarder entry, meaning that the actual func-
-tion is implemented in another DLL. This must essentially be treated like an import or depen-
-dency, so after parsing the export table, each DLL referenced by a forwarder is also loaded and
-the loader goes back to step 1.
-After all imported DLLs (and their own dependencies, or imports) have been loaded, all the required imported functions have been looked up and found, and all forwarders also have been loaded and processed, the step is complete: All dependencies that were defined at compile time by the application and its various DLLs have now been fulfilled. During execution, delayed dependencies (called delay load), as well as run-time operations (such as calling LoadLibrary) can call into the loader and essentially repeat the same tasks. Note, however, that a failure in these steps will result in an error launching the application if they are done during process startup. For example, attempting to run an application that requires a function that isn’t present in the current version of the operating system can result in a message similar to the one in Figure 3-12.
+   tion is implemented in another DLL. This must essentially be treated like an import or depen-
+   dency, so after parsing the export table, each DLL referenced by a forwarder is also loaded and
+   the loader goes back to step 1.
+   After all imported DLLs (and their own dependencies, or imports) have been loaded, all the required imported functions have been looked up and found, and all forwarders also have been loaded and processed, the step is complete: All dependencies that were defined at compile time by the application and its various DLLs have now been fulfilled. During execution, delayed dependencies (called delay load), as well as run-time operations (such as calling LoadLibrary) can call into the loader and essentially repeat the same tasks. Note, however, that a failure in these steps will result in an error launching the application if they are done during process startup. For example, attempting to run an application that requires a function that isn’t present in the current version of the operating system can result in a message similar to the one in Figure 3-12.
 
-CHAPTER 3 Processes and jobs     169
-
+CHAPTER 3 Processes and jobs 169
 
 ---
 
@@ -2434,8 +2386,7 @@ field back to 0. Then, update the LdrpProcessInitialized variable.
 
 CHAPTER 3 Processes and jobs
 
-From the Library of
----
+## From the Library of
 
 ## SwitchBack
 
@@ -2477,8 +2428,7 @@ Here is an example of a manifest entry that sets compatibility for Windows 10:
 </compatibility>
 ```
 
-CHAPTER 3 Processes and jobs      171
-
+CHAPTER 3 Processes and jobs 171
 
 ---
 
@@ -2545,7 +2495,6 @@ While SwitchBack uses API redirection for specific application-compatibility sce
 
 CHAPTER 3 Processes and jobs 173
 
-
 ---
 
 is to enable fine-grained categorization of Windows APIs into sub-DLLs instead of having large multipurpose DLLs that span nearly thousands of APIs that might not be needed on all types of Windows systems today and in the future. This technology, developed mainly to support the refactoring of the bottom-most layers of the Windows architecture to separate it from higher layers, goes hand in hand with the breakdown of Kernel32.dll and Adap32.dll (among others) into multiple, virtual DLL files.
@@ -2605,8 +2554,7 @@ api-ms-win-core-debug-l1-1-2
 api-ms-win-core-debug-minidump-l1-1-0
 ```
 
-CHAPTER 3 Processes and jobs   175
-
+CHAPTER 3 Processes and jobs 175
 
 ---
 
@@ -2635,17 +2583,16 @@ Jobs can also be associated with an I/O completion port object, which other thre
 Jobs play a significant role in a number of system mechanisms, enumerated here:
 
 - ■ They manage modern apps (UWP processes), as discussed in more detail in Chapter 9 in Part 2.
-In fact, every modern app is running under a job. You can verify this with Process Explorer, as
-described in the "Viewing the job object" experiment later in this chapter.
-■ They are used to implement Windows Container support, through a mechanism called server
-silo, covered later in this section.
-■ They are the primary way through which the Desktop Activity Moderator (DAM) manages
-throttling, timer virtualization, timer freezing, and other idle-inducing behaviors for Win32
-applications and services. The DAM is described in Chapter 8 in Part 2.
-■ They allow the definition and management of scheduling groups for dynamic fair-share
-scheduling (DFSS), which is described in Chapter 4.
-176    CHAPTER 3   Processes and jobs
-
+  In fact, every modern app is running under a job. You can verify this with Process Explorer, as
+  described in the "Viewing the job object" experiment later in this chapter.
+  ■ They are used to implement Windows Container support, through a mechanism called server
+  silo, covered later in this section.
+  ■ They are the primary way through which the Desktop Activity Moderator (DAM) manages
+  throttling, timer virtualization, timer freezing, and other idle-inducing behaviors for Win32
+  applications and services. The DAM is described in Chapter 8 in Part 2.
+  ■ They allow the definition and management of scheduling groups for dynamic fair-share
+  scheduling (DFSS), which is described in Chapter 4.
+  176 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -2669,12 +2616,11 @@ Job process priority class This sets the priority class for each process in the 
 
 CHAPTER 3 Processes and jobs 177
 
-
 ---
 
 - Default working set minimum and maximum This defines the specified working set mini-
-mum and maximum for each process in the job. (This setting isn't job-wide. Each process has its
-own working set with the same minimum and maximum values.)
+  mum and maximum for each process in the job. (This setting isn't job-wide. Each process has its
+  own working set with the same minimum and maximum values.)
 
 • Process and job committed virtual memory limit This defines the maximum amount of
 virtual address space that can be committed by either a single process or the entire job.
@@ -2722,8 +2668,7 @@ specify a handle to the job object by using the PS_CP_JOB_LTST process-creation 
 
 earlier in this chapter. One or more handles to job objects can be specified, which will all be joined.
 
-178    CHAPTER 3   Processes and jobs
-
+178 CHAPTER 3 Processes and jobs
 
 ---
 
@@ -2761,7 +2706,7 @@ Figure 3-15 shows four processes managed by a job hierarchy.
 
 ![Figure](figures/Winternals7thPt1_page_196_figure_006.png)
 
-FIGURE 3-15   A job hierarchy.
+FIGURE 3-15 A job hierarchy.
 
 ---
 
@@ -2780,13 +2725,14 @@ to create this hierarchy:
 5. Add process P3 to job 2.
 
 6. Add process P4 to job 1.
+
 ## EXPERIMENT: Viewing the job object
 
 You can view named job objects with the Performance Monitor tool. (Look for the Job Object
 
 and Job Object Details categories.) You can view unnamed jobs with the kernel debugger !job
 
-or dt !nt!_ejob commands.
+or dt !nt!\_ejob commands.
 
 To see whether a process is associated with a job, you can use the kernel debugger !process
 
@@ -2924,7 +2870,7 @@ The rise of cheap, ubiquitous cloud computing has led to another major Internet 
 It is to satisfy this need that technologies such as Docker were created. These technologies essentially allow the deployment of an "application in a box" from one Linux distribution to another without worrying about the complicated deployment of a local installation or the resource consumption of a virtual machine. Originally a Linux-only technology, Microsoft has helped bring Docker to Windows 10 as part of the Anniversary Update. It can work in two modes:
 
 - ■ By deploying an application in a heavyweight, but fully isolated, Hyper-V container, which is
-supported on both client and server scenarios
+  supported on both client and server scenarios
 
 ■ By deploying an application in a lightweight, OS-isolated, server silo container, which is
 currently supported only in server scenarios due to licensing reasons
@@ -2974,25 +2920,26 @@ application would use
 This initial ability is then combined with the Virtual Machine Compute (Vmcompute) service (used by Docker), which interacts with additional components to provide a full isolation layer:
 
 - ■ A base Windows image (WIM) file called base OS This provides a separate copy of the
-operating system. At this time, Microsoft provides a Server Core image as well as a Nano Server
-image.
-■ The Ntdll.dll library of the host OS This overrides the one in the base OS image. This is
-due to the fact that, as mentioned, server silos leverage the same host kernel and drivers, and
-because Ntdll.dll handles system calls, it is the one user-mode component that must be reused
-from the host OS.
-■ A sandbox virtual file system provided by the Wcifs.sys filter driver This allows tempo-
-rary changes to be made to the file system by the container without affecting the underlying
-NTFS drive, and which can be wiped once the container is shut down.
-■ A sandbox virtual registry provided by the VReg kernel component This allows for the
-provision of a temporary set of registry hives (as well as another layer of namespace isolation, as
-the object manager root namespace only isolates the root of the registry, not the registry hives
-themselves).
-■ The Session Manager (Smss.exe) This is now used to create additional service sessions or
-console sessions, which is a new capability required by the container support. This extends
-Smss to handle not only additional user sessions, but also sessions needed for each container
-launched.
-APITER 3 Processes and jobs
-From the Library of I
+  operating system. At this time, Microsoft provides a Server Core image as well as a Nano Server
+  image.
+  ■ The Ntdll.dll library of the host OS This overrides the one in the base OS image. This is
+  due to the fact that, as mentioned, server silos leverage the same host kernel and drivers, and
+  because Ntdll.dll handles system calls, it is the one user-mode component that must be reused
+  from the host OS.
+  ■ A sandbox virtual file system provided by the Wcifs.sys filter driver This allows tempo-
+  rary changes to be made to the file system by the container without affecting the underlying
+  NTFS drive, and which can be wiped once the container is shut down.
+  ■ A sandbox virtual registry provided by the VReg kernel component This allows for the
+  provision of a temporary set of registry hives (as well as another layer of namespace isolation, as
+  the object manager root namespace only isolates the root of the registry, not the registry hives
+  themselves).
+  ■ The Session Manager (Smss.exe) This is now used to create additional service sessions or
+  console sessions, which is a new capability required by the container support. This extends
+  Smss to handle not only additional user sessions, but also sessions needed for each container
+  launched.
+  APITER 3 Processes and jobs
+  From the Library of I
+
 ---
 
 The architecture of such containers with the preceding components is shown in Figure 3-16.
@@ -3005,36 +2952,37 @@ FIGURE 3-16 Containers architecture.
 
 The aforementioned components provide the user-mode isolation environment. However, as the host
 
-
 Ntdll.dll component is used, which talks to the host kernel and drivers, it is important to create addi tional isolation boundaries, which the kernel provides to differentiate one silo from another. As such,
 
 each server silo will contain its own isolated:
 
 - ■ Micro shared user data (SILO_USER_SHARED_DATA in the symbols) This contains the custom
-system path, session ID, foreground PID, and product type/suite. These are elements of the
-original KUSER_SHARED_DATA that cannot come from the host, as they reference information
-relevant to the host OS image instead of the base OS image, which must be used instead. Vari-
-ous components and APIs were modified to read the silo shared data instead of the user shared
-data when they look up such data. Note that the original KUSER_SHARED_DATA remains at its
-usual address with its original view of the host details, so this is one way that host state "leaks"
-inside container state.
-■ Object directory root namespace This has its own \SystemRoot symlink, \Device directory
-(which is how all user-mode components access device drivers indirectly), device map and DOS
-device mappings (which is how user-mode applications access network mapped drivers, for
-example), \Sessions directory, and more.
-■ API Set mapping This is based on the API Set schema of the base OS WIM, and not the one
-stored on the host OS file system. As you've seen, the loader uses API Set mappings to deter-
-mine which DLL, if any, implements a certain function. This can be different from one SKU to
-another, and applications must see the base OS SKU, not the host's.
+  system path, session ID, foreground PID, and product type/suite. These are elements of the
+  original KUSER_SHARED_DATA that cannot come from the host, as they reference information
+  relevant to the host OS image instead of the base OS image, which must be used instead. Vari-
+  ous components and APIs were modified to read the silo shared data instead of the user shared
+  data when they look up such data. Note that the original KUSER_SHARED_DATA remains at its
+  usual address with its original view of the host details, so this is one way that host state "leaks"
+  inside container state.
+  ■ Object directory root namespace This has its own \SystemRoot symlink, \Device directory
+  (which is how all user-mode components access device drivers indirectly), device map and DOS
+  device mappings (which is how user-mode applications access network mapped drivers, for
+  example), \Sessions directory, and more.
+  ■ API Set mapping This is based on the API Set schema of the base OS WIM, and not the one
+  stored on the host OS file system. As you've seen, the loader uses API Set mappings to deter-
+  mine which DLL, if any, implements a certain function. This can be different from one SKU to
+  another, and applications must see the base OS SKU, not the host's.
+
 ---
 
 - ■ Logon session This is associated with the SYSTEM and Anonymous local unique ID (LUID), plus
-the LUID of a virtual service account describing the user in the silo. This essentially represents the
-token of the services and application that will be running inside the container service session
-created by SMss. For more information on LUIDs and logon sessions, see Chapter 7.
-■ ETW tracing and logger contexts These are for isolating ETW operations to the silo and not
-exposing or leaking states between the containers and/or the host OS itself. (See Chapter 9 in
-Part 2 for more on ETW.)
+  the LUID of a virtual service account describing the user in the silo. This essentially represents the
+  token of the services and application that will be running inside the container service session
+  created by SMss. For more information on LUIDs and logon sessions, see Chapter 7.
+  ■ ETW tracing and logger contexts These are for isolating ETW operations to the silo and not
+  exposing or leaking states between the containers and/or the host OS itself. (See Chapter 9 in
+  Part 2 for more on ETW.)
+
 ## Silo contexts
 
 While these are the isolation boundaries provided by the core host OS kernel itself, other components
@@ -3054,7 +3002,6 @@ As each server silo is created, it receives its own silo-local storage (SLS) arr
 Just like when dealing with the server silo shared user data, various components and APIs have been updated to access data by getting it from the relevant silo context instead of what used to be a global kernel variable. As an example, because each container will now host its own Lsass.exe process, and since the kernel's SRM needs to own a handle to the Lsass.exe process (see Chapter 7 for more information on Lsass and the SRM), this can no longer be a singleton stored in a global variable. As such, the handle is now accessed by the SRM through querying the silo context of the active server silo, and getting the variable from the data structure that is returned.
 
 This leads to an interesting question: What happens with the Lsass.exe that is running on the host
-
 
 OS itself? How will the SRM access the handle, as there's no server silo for this set of processes and
 
@@ -3117,8 +3064,7 @@ Now click the SeRmS1loState field, which will expand to show you, among other th
 
 If kernel drivers have the capability to add their own silo contexts, how do they first know what silos are executing, and what new silos are created as containers are launched? The answer lies in the silo monitor facility, which provides a set of APIs to receive notifications whenever a server silo is created and/ or terminated (PSRegisterSiloMonitor, PStartSiloMonitor, PSUnregisterSiloMonitor), as well as notifications for any already-existing silos. Then, each silo monitor can retrieve its own slot index by calling PGetSiloMonitorContextSlot, which it can then use with the PInsertSiloContext, PReplaceSiloContext, and PRemoveSiloContext functions as needed. Additional slots can be allocated with PAllocSiloContextSlot, but this would be needed only if a component would wish to store two contexts for some reason. Additionally, drivers can also use the PInsertPermanentSiloContext or
 
-CHAPTER 3 Processes and jobs      187
-
+CHAPTER 3 Processes and jobs 187
 
 ---
 
@@ -3188,9 +3134,7 @@ silo context data.
 
 The final step, then, is to "boot up" the server silo by initializing a new service session for it. You can think of this as session 0, but for the server silo. This is done through an ALPC message sent to Smss
 
-
 SmApl Port, which contains a handle to the job object created by Vmcompute, which has now become a server silo job object. Just like when creating a real user session, Smss will clone a copy of itself, except this time, the clone will be associated with the job object at creation time. This will attach this new
-
 
 Smss copy to all the containerized elements of the server silo. Smss will believe this is session 0, and will perform its usual duties, such as launching Cssr.exe, Wininit.exe, Lsass.exe, etc. The "boot-up" process will continue as normal, with Wininit.exe then launching the Service Control Manager (Services.exe), which will then launch all the automatic start services, and so on. New applications can now execute in the server silo, which will run with a logon session associated with a virtual service account LUID, as described earlier.
 
@@ -3217,7 +3161,6 @@ The named pipe driver, for example, can use this functionality to then create a 
 the \Device namespace, which will now be part of SilosVJD.
 
 CHAPTER 3 Processes and jobs 189
-
 
 ---
 
@@ -3255,6 +3198,4 @@ containers are enabled:
 
 This page intentionally left blank
 
-
 ---
-

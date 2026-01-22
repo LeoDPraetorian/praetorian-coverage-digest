@@ -4,9 +4,151 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Chariot Development Platform** is a comprehensive super-repository that unifies all Chariot security tools and frameworks under a single development environment with integrated AI assistance through Claude-Flow orchestration. 
+**Praetorian Guard Development Platform** is a comprehensive super-repository that unifies all Praetorian security tools and frameworks under a single development environment with integrated AI assistance. 
 
-CRITICAL: You must evaluate all user requests for matching skills regardless if you have knowledge of a subject.
+## Claude Code Infrastructure (.claude/)
+
+<EXTREMELY-IMPORTANT>
+If you think there is even a 1% chance a skill might apply to what you are doing, you ABSOLUTELY MUST invoke the skill.
+
+IF A SKILL APPLIES TO YOUR TASK, YOU DO NOT HAVE A CHOICE. YOU MUST USE IT.
+
+This is not negotiable. This is not optional. You cannot rationalize your way out of this.
+</EXTREMELY-IMPORTANT>
+
+### How to Access Skills and Tools that you are not aware of by default
+
+#### Core Skills
+- **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
+
+#### Gateway Skills
+- **Gateway Skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "gateway-name"`
+**ALWAYS read your gateway skills to locate task relevant skills. You MUST follow the gateway's instructions.** It tells you which library skills to load.
+
+#### Library Skills
+After invoking the gateway, use its routing tables to find and Read relevant library skills:
+- **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
+
+#### Tools Skills
+Skill for communicating with external integrations (Chrome DevTools, Linear, Currents, Context7, etc.)
+- **Tool skills** (in `.claude/tools/`): Load via Read tool → `Read("path/from/gateway")`
+
+### Agent-First Principle
+
+**Always check for a specialized agent before acting. You are the fallback, not the default.**
+
+1. Task arrives → Check if a matching agent exists
+2. Agent exists → Spawn it
+3. No agent → Do it yourself
+
+| Task Type | Agent (if exists) | Fallback |
+|-----------|-------------------|----------|
+| Backend Go code | `backend-developer` | You |
+| Frontend React/TS | `frontend-developer` | You |
+| Python code | (none yet) | You |
+| MCP tools | `tool-developer` | You |
+| Capabilities | `capability-developer` | You |
+| Code review | `*-reviewer` agents | You |
+| Testing | `*-tester` agents | You |
+
+**Red Flag:** If you're about to use Edit/Write on code and a developer agent exists for that domain, STOP. Spawn the agent instead.
+
+### Using Skills
+
+#### The Rule
+
+**Invoke relevant or requested skills BEFORE any response or action.** Even a 1% chance a skill might apply means that you should invoke the skill to check. If an invoked skill turns out to be wrong for the situation, you don't need to use it.
+
+```dot
+digraph skill_flow {
+    "User message received" [shape=doublecircle];
+    "Might any skill apply?" [shape=diamond];
+    "Invoke Skill tool" [shape=box];
+    "Announce: 'Using [skill] to [purpose]'" [shape=box];
+    "Has checklist?" [shape=diamond];
+    "Create TodoWrite todo per item" [shape=box];
+    "Follow skill exactly" [shape=box];
+    "Respond (including clarifications)" [shape=doublecircle];
+
+    "User message received" -> "Might any skill apply?";
+    "Might any skill apply?" -> "Invoke Skill tool" [label="yes, even 1%"];
+    "Might any skill apply?" -> "Respond (including clarifications)" [label="definitely not"];
+    "Invoke Skill tool" -> "Announce: 'Using [skill] to [purpose]'";
+    "Announce: 'Using [skill] to [purpose]'" -> "Has checklist?";
+    "Has checklist?" -> "Create TodoWrite todo per item" [label="yes"];
+    "Has checklist?" -> "Follow skill exactly" [label="no"];
+    "Create TodoWrite todo per item" -> "Follow skill exactly";
+}
+```
+
+#### Red Flags
+
+These thoughts mean STOP—you're rationalizing:
+
+| Thought                             | Reality                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| "This is just a simple question"    | Questions are tasks. Check for skills.                                  |
+| "I need more context first"         | Skill check comes BEFORE clarifying questions.                          |
+| "Let me explore the codebase first" | Skills tell you HOW to explore. Check first.                            |
+| "I can check git/files quickly"     | Files lack conversation context. Check for skills.                      |
+| "Let me gather information first"   | Skills tell you HOW to gather information.                              |
+| "This doesn't need a formal skill"  | If a skill exists, use it.                                              |
+| "I remember this skill"             | Skills evolve. Read current version.                                    |
+| "This doesn't count as a task"      | Action = task. Check for skills.                                        |
+| "The skill is overkill"             | Simple things become complex. Use it.                                   |
+| "I'll just do this one thing first" | Check BEFORE doing anything.                                            |
+| "This feels productive"             | Undisciplined action wastes time. Skills prevent this.                  |
+| "I know what that means"            | Knowing the concept ≠ using the skill. Invoke it.                       |
+| "I'm done, no need to verify"       | Completion claims require evidence. Invoke verifying-before-completion. |
+| "Tests pass so requirements met"    | Tests ≠ requirements. Verify exit criteria separately.                  |
+| "This is too simple for an agent"   | If an agent exists for this domain, use it. You are the fallback.       |
+| "I can just make this edit myself"  | Spawn the developer agent. You coordinate, agents implement.            |
+
+#### Skill Priority
+
+When multiple skills could apply, use this order:
+
+1. **Process skills first** (brainstorming, debugging) - these determine HOW to approach the task
+2. **Implementation skills second** (orchestrating-mcp-development, implementing-go-semaphore-pools) - these guide execution
+
+"Let's build X" → brainstorming first, then implementation skills.
+"Fix this bug" → debugging first, then domain-specific skills.
+
+#### Completion Skills
+
+**Before claiming ANY task complete, check for completion skills:**
+
+| About to...                        | Required Skill                |
+| ---------------------------------- | ----------------------------- |
+| Claim task/phase complete          | `verifying-before-completion` |
+| Mark batch done                    | `verifying-before-completion` |
+| Say 'done', 'finished', 'complete' | `verifying-before-completion` |
+| Create commit/PR                   | `verifying-before-completion` |
+| Return from subagent task          | `verifying-before-completion` |
+
+**The completion trap:**
+
+```
+❌ WRONG: 'I updated all 118 files. Done!'
+   (No verification - how do you KNOW it's 118?)
+
+✅ RIGHT: [Invoke verifying-before-completion]
+   'Exit criteria: 118 files. Verified: grep shows 118 files updated.'
+```
+
+**Completion is a task.** It requires skill invocation like any other task.
+
+#### Skill Types
+
+**Rigid** (TDD, debugging): Follow exactly. Don't adapt away discipline.
+
+**Flexible** (patterns): Adapt principles to context.
+
+The skill itself tells you which.
+
+#### User Instructions
+
+Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
 
 ## Repository Architecture
 
@@ -40,7 +182,7 @@ chariot-development-platform/                  # Super-repo root
 
 ```bash
 # Initial clone with all submodules
-git clone --recurse-submodules https://github.com/praetorian-inc/chariot-development-platform.git
+git clone --recurse-submodules https://github.com/praetorian-inc/praetorian-development-platform.git
 
 # Complete setup sequence
 make setup                    # Install dependencies and configure environment
@@ -119,16 +261,6 @@ npx playwright test
 # Python CLI
 pytest                        # Run Python test suites (in praetorian-cli)
 ```
-
-### Claude Code Infrastructure (.claude/)
-
-The platform has an extensive Claude Code skill system:
-
-- **Core Skills** : `.claude/skills/` - High-frequency skills, use with Skill tool
-- **Library Skills** : `.claude/skill-library/` - Specialized skills, use skill-search + Read tool
-- **Agents**: `.claude/agents/` - Specialized subagents (analysis, architecture, development, testing)
-- **MCP Tools**: `.claude/tools/` - External integrations (Chrome DevTools, Linear, Currents, Context7)
-- **Commands**: `.claude/commands/` - Slash commands (router pattern)
 
 ## Technology Stack & Patterns
 
@@ -392,6 +524,56 @@ make tree-list                      # List all active worktrees
 make tree-remove NAME=feature-branch # Clean worktree removal
 ```
 
+## Quality Gate Enforcement
+
+<EXTREMELY-IMPORTANT>
+### Code Modification Review Requirement
+
+**BEFORE claiming any code change is complete, you MUST spawn reviewer and tester agents.**
+
+This is NOT optional. This is NOT "nice to have." This is MANDATORY.
+
+| Modified Domain | Required Agents |
+|-----------------|-----------------|
+| Backend (.go files in backend/, pkg/, cmd/) | `backend-reviewer`, `backend-tester` |
+| Frontend (.tsx, .jsx, ui/) | `frontend-reviewer`, `frontend-tester` |
+| Python (.py files) | `backend-reviewer`, `backend-tester` |
+| MCP Tools (.claude/tools/) | `tool-reviewer`, `tool-tester` |
+| Capabilities (VQL, Nuclei, scanners) | `capability-reviewer`, `capability-tester` |
+
+### The Quality Gate Flow
+
+```
+1. You modify code (Edit/Write)
+2. BEFORE saying "done" or "complete":
+   a. Spawn the appropriate reviewer agent
+   b. Spawn the appropriate tester agent
+3. ONLY after both return successfully can you claim completion
+```
+
+### Red Flags - You're Skipping Quality Gates If:
+
+| Thought | Reality |
+|---------|---------|
+| "This is a simple change" | All changes need review. No exceptions. |
+| "I already tested it mentally" | Spawn the tester agent. |
+| "The user just wants it done" | Quality gates protect the user. |
+| "I'll just run `go test` myself" | Use specialized tester agents. |
+| "It's just adding a function" | Reviewer checks patterns, tester validates. |
+
+### Bypass Conditions (ONLY these)
+
+Quality gates are automatically handled (bypass allowed) when using orchestration skills:
+- `/feature` or `orchestrating-feature-development`
+- `/capability` or `orchestrating-capability-development`
+- `/integration` or `orchestrating-integration-development`
+- `/bugfix`
+
+These skills include review/test phases internally.
+
+**Ad-hoc changes (direct Edit/Write without orchestration) ALWAYS require manual reviewer/tester spawning.**
+</EXTREMELY-IMPORTANT>
+
 ## Critical Development Reminders
 
 1. **Deployment**: Only use `make chariot` from super-repo root for full platform
@@ -402,5 +584,6 @@ make tree-remove NAME=feature-branch # Clean worktree removal
 6. **Concurrency**: Use Claude Code's Task tool for parallel agent execution, batch all operations in single messages
 7. **Skills & Architecture**: Use skill-search CLI to discover capabilities before implementing
 8. **Context Engineering**: Architecture optimized for token efficiency - use gateways for progressive loading
+9. **Quality Gates**: Always spawn reviewer and tester agents after code modifications (see Quality Gate Enforcement above)
 
 This super-repository enables unified development of comprehensive security platforms with AI-assisted workflows and automated testing.

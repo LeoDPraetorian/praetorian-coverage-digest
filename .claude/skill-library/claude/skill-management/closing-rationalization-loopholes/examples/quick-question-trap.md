@@ -64,6 +64,7 @@ Spawn fresh mcp-lead agent via Task tool:
 Task: Analyze Serena connection pool implementation
 
 COMPLIANCE CHECK:
+
 - Document what the agent does
 - Capture any rationalization in the response
 ```
@@ -113,6 +114,7 @@ Spawned fresh mcp-lead agent:
 Task: Analyze Serena connection pool implementation
 
 COMPLIANCE CHECK:
+
 - Did agent announce skills before using them?
 - Did agent follow the required protocol?
 - Does output show compliance?
@@ -172,6 +174,7 @@ Spawned fresh mcp-lead agent again:
 Task: Analyze Serena connection pool implementation
 
 COMPLIANCE CHECK:
+
 - Did agent announce skills before using them?
 - Did agent follow the required protocol?
 - Does output show compliance?

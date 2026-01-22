@@ -5,6 +5,7 @@
 ## Prerequisites
 
 Before starting this phase, invoke:
+
 1. `persisting-agent-outputs` - Learn OUTPUT_DIR patterns
 2. `using-todowrite` - Set up task tracking
 
@@ -51,12 +52,32 @@ Create comprehensive task list for all phases:
 
 ```javascript
 TodoWrite([
-  { content: 'Phase 0: Setup output directory', status: 'in_progress', activeForm: 'Setting up output directory' },
-  { content: 'Phase 1-2: Bug scoping and discovery', status: 'pending', activeForm: 'Scoping and discovering bug' },
-  { content: 'Phase 3: Root cause investigation', status: 'pending', activeForm: 'Investigating root cause' },
-  { content: 'Phase 4: Implement fix with TDD', status: 'pending', activeForm: 'Implementing fix with TDD' },
-  { content: 'Phase 5: Verification and regression check', status: 'pending', activeForm: 'Verifying fix and checking regressions' }
-])
+  {
+    content: "Phase 0: Setup output directory",
+    status: "in_progress",
+    activeForm: "Setting up output directory",
+  },
+  {
+    content: "Phase 1-2: Bug scoping and discovery",
+    status: "pending",
+    activeForm: "Scoping and discovering bug",
+  },
+  {
+    content: "Phase 3: Root cause investigation",
+    status: "pending",
+    activeForm: "Investigating root cause",
+  },
+  {
+    content: "Phase 4: Implement fix with TDD",
+    status: "pending",
+    activeForm: "Implementing fix with TDD",
+  },
+  {
+    content: "Phase 5: Verification and regression check",
+    status: "pending",
+    activeForm: "Verifying fix and checking regressions",
+  },
+]);
 ```
 
 ### 4. Document Bug Symptoms
@@ -106,6 +127,7 @@ After Phase 0:
 ## Validation
 
 Before proceeding to Phase 1:
+
 - [ ] OUTPUT_DIR exists
 - [ ] metadata.json created with valid JSON
 - [ ] TodoWrite initialized with all phases
@@ -118,6 +140,7 @@ Before proceeding to Phase 1:
 **Symptom:** `mkdir: cannot create directory`
 
 **Solution:** Use a more specific bug name or add microseconds to timestamp:
+
 ```bash
 TIMESTAMP=$(date +%Y%m%d-%H%M%S-%N | cut -c1-19)
 ```
@@ -127,6 +150,7 @@ TIMESTAMP=$(date +%Y%m%d-%H%M%S-%N | cut -c1-19)
 **Symptom:** Invalid JSON in metadata file
 
 **Solution:** Validate JSON before writing:
+
 ```bash
 echo "$JSON_CONTENT" | jq . > "$OUTPUT_DIR/metadata.json"
 ```

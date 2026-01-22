@@ -1,6 +1,6 @@
 # Multi-Agent Orchestration Architecture
 
-**Complete architectural documentation for multi-agent AI systems based on research from Anthropic, industry practitioners, and analysis of the Chariot Development Platform's implementation.**
+**Complete architectural documentation for multi-agent AI systems based on research from Anthropic, industry practitioners, and analysis of the Praetorian Development Platform's implementation.**
 
 ---
 
@@ -14,10 +14,13 @@
 6. [Skill Composition Patterns](#skill-composition-patterns)
 7. [Quality Gates](#quality-gates)
 8. [Token Economics & Effort Scaling](#token-economics--effort-scaling)
-9. [FAQ](#faq)
-10. [References](#references)
-11. [Pattern Source Index](#pattern-source-index) - Quick lookup for missing pattern references
-12. [Appendix](#appendix) - Implementation Scorecard, Gap Analysis, Action Plan
+9. [Configuration](#configuration) - Centralized limits and retry behavior
+10. [FAQ](#faq)
+11. [References](#references)
+12. [Pattern Source Index](#pattern-source-index) - Quick lookup for missing pattern references
+13. [Appendix](#appendix) - Implementation Scorecard, Gap Analysis, Action Plan
+
+> **Note:** Security patterns (secret scanning, security gates, threat modeling) were removed from this architecture as they are handled separately by domain-specific security skills rather than orchestration patterns.
 
 ---
 
@@ -85,16 +88,18 @@ In Claude Code, the "lead" from Anthropic's research is implemented as a **Skill
 │  Note: NO Write, Edit - orchestrators coordinate, never implement   │
 └────────────────────────────────────┬────────────────────────────────┘
                                      │ spawns (via Task tool)
-          ┌──────────────────────────┼──────────────────────────┐
-          ▼                          ▼                          ▼
-┌─────────────────┐      ┌─────────────────┐      ┌─────────────────┐
-│   ARCHITECT     │      │   DEVELOPER     │      │    TESTER       │
-│   (Subagent)    │      │   (Subagent)    │      │   (Subagent)    │
-│                 │      │                 │      │                 │
-│ Fresh context   │      │ Fresh context   │      │ Fresh context   │
-│ CANNOT spawn    │      │ CANNOT spawn    │      │ CANNOT spawn    │
-│ Returns JSON    │      │ Returns JSON    │      │ Returns JSON    │
-└─────────────────┘      └─────────────────┘      └─────────────────┘
+        ┌-------───────────────┼───────────------─────|──----------------──┐
+        ▼                      ▼                      ▼                    ▼
+┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐   ┌─────────────────┐
+│   ARCHITECT     │   │   DEVELOPER     │   │    Reviewer     │   |      TESTER     │
+│   (Subagent)    │   │   (Subagent)    │   │   (Subagent)    │   |     (Subagent)  |
+│                 │   │                 │   │                 │   |                 |
+│  Fresh context  │   │  Fresh context  │   │  Fresh context  │   |  Fresh context  |
+│  per task       │   │  per task       │   │  per task       │   |  per task       |
+│  CANNOT spawn   │   │  CANNOT spawn   │   │  CANNOT spawn   │   |  CANNOT spawn   |
+│  other subagents│   │  other subagents│   │  other subagents│   |  other subagents|
+│  Returns JSON   │   │  Returns JSON   │   │  Returns JSON   │   |  Returns JSON   |
+└─────────────────┘   └─────────────────┘   └─────────────────┘   └─────────────────┘
 ```
 
 ### Key Principles
@@ -118,6 +123,48 @@ In Claude Code, the "lead" from Anthropic's research is implemented as a **Skill
 | Full feature with arch/impl/review/test | **Full orchestration** (5-10 agents) | Complexity justifies coordination overhead |
 | Cross-cutting refactor, new subsystem   | **Major orchestration** (10+ agents) | Parallel phases essential for efficiency   |
 
+### Two Execution Models: Coordinator vs Executor
+
+The table above describes WHEN to use multiple agents, but there's a more fundamental choice: **who implements the work?**
+
+| Model                       | Skill                                 | Who Implements            | Tools Available                           | Best For                                    |
+| --------------------------- | ------------------------------------- | ------------------------- | ----------------------------------------- | ------------------------------------------- |
+| **Single Executor**         | `executing-plans`                     | The agent itself          | Edit, Write, Bash                         | Interdependent tasks, tight human oversight |
+| **Multi-Agent Coordinator** | `orchestrating-multi-agent-workflows` | Spawned specialist agents | Task, TodoWrite, Read (**NO** Edit/Write) | Multi-concern tasks, parallelization        |
+
+**These models are mutually exclusive by design.** The tool restrictions aren't arbitrary—they enforce architectural boundaries:
+
+- **Orchestrators cannot use Edit/Write** → Forces delegation to specialists, prevents "doing it yourself"
+- **Executors must use Edit/Write** → They ARE the implementer, no one else to delegate to
+
+### The Fork After Planning
+
+Both models typically follow `writing-plans`, but they diverge based on task characteristics:
+
+```
+writing-plans (creates implementation plan)
+     │
+     ├─── Token budget <50K? ──────────────────────┐
+     │    Tasks tightly interdependent? ───────────┤
+     │    Human review needed every few tasks? ────┤
+     │                                             ▼
+     │                                    executing-plans
+     │                                    • Single agent implements
+     │                                    • Human checkpoint every 3 tasks
+     │                                    • Uses: Edit, Write, Bash
+     │
+     └─── Multiple expertise areas needed? ────────┐
+          Parallelization would save time? ────────┤
+          Complex with 5+ phases? ─────────────────┤
+                                                   ▼
+                                          orchestrating-multi-agent-workflows
+                                          • Orchestrator spawns specialists
+                                          • Agents implement in parallel
+                                          • Uses: Task (NO Edit/Write)
+```
+
+**Key insight:** You cannot combine these models. An agent running `executing-plans` implements directly. An agent running orchestration patterns delegates to others. Attempting to mix them violates the core architectural principle that orchestrators never implement.
+
 ---
 
 ## Architecture Overview
@@ -129,9 +176,10 @@ In Claude Code, the "lead" from Anthropic's research is implemented as a **Skill
 │                         TIER 1: ORCHESTRATION SKILLS                       │
 │      Analyze → Decompose → Delegate → Synthesize → Track Progress          │
 │                                                                            │
-│   Skill("orchestrating-feature-development")  ← Runs IN main conversation  │
-│   Skill("orchestrating-capability-development")                            │
-│   Skill("orchestrating-integration-development")                           │
+│   orchestrating-feature-development (LIBRARY)     ← Runs IN main convo     │
+│   orchestrating-capability-development (LIBRARY)                           │
+│   orchestrating-integration-development (LIBRARY)                          │
+│   orchestrating-fingerprintx-development (LIBRARY)                         │
 │                                                                            │
 │   Tools: Task, TodoWrite, Read, AskUserQuestion, Glob, Grep                │
 │   Note: NO Write, Edit - orchestrators coordinate, never implement         │
@@ -143,8 +191,8 @@ In Claude Code, the "lead" from Anthropic's research is implemented as a **Skill
 │   Focused expertise with implementation tools                              │
 │                                                                            │
 │    ┌──────────────┐ ┌──────────────┐ ┌──────────────┐ ┌──────────────┐     │
-│    │  Architects  │ │  Developers  │ │   Reviewers  │ │  Testers     │     │
-│    │ (Design)     │ │ (Implement)  │ │ (Quality)    │ │ (Validate)   │     │
+│    │  Architects  │ │  Developers  │ │  Reviewers   │ │   Testers    │     │
+│    │ (Design)     │ │ (Implement)  │ │  (Quality)   │ │  (Validate)  │     │
 │    └──────────────┘ └──────────────┘ └──────────────┘ └──────────────┘     │
 │                                                                            │
 │   Tools: Bash, Edit, Write, Read, Glob, Grep, MultiEdit, TodoWrite         │
@@ -166,47 +214,91 @@ In Claude Code, the "lead" from Anthropic's research is implemented as a **Skill
 
 ### Execution Flow
 
+### Standard 16-Phase Template
+
+All orchestration skills follow this standard phase template:
+
+| Phase | Name                  | Purpose                                             | Conditional | Gate |
+| ----- | --------------------- | --------------------------------------------------- | ----------- | ---- |
+| 1     | Setup                 | Worktree creation, output directory, MANIFEST.yaml  | Always      |      |
+| 2     | Triage                | Classify work type, select phases to execute        | Always      |      |
+| 3     | Codebase Discovery    | Explore codebase patterns, detect technologies      | Always      | ⛔ 1 |
+| 4     | Skill Discovery       | Map technologies to skills, write manifest          | Always      |      |
+| 5     | Complexity            | Technical complexity assessment, execution strategy | Always      |      |
+| 6     | Brainstorming         | Design refinement with human-in-loop                | LARGE only  |      |
+| 7     | Architecture Plan     | Technical design AND task decomposition             | MEDIUM+     |      |
+| 8     | Implementation        | Code development                                    | Always      | ⛔ 2 |
+| 9     | Design Verification   | Verify implementation matches plan                  | MEDIUM+     |      |
+| 10    | Domain Compliance     | Domain-specific mandatory patterns validation       | Always      |      |
+| 11    | Code Quality          | Code review for maintainability                     | Always      |      |
+| 12    | Test Planning         | Test strategy and plan creation                     | MEDIUM+     |      |
+| 13    | Testing               | Test implementation and execution                   | Always      | ⛔ 3 |
+| 14    | Coverage Verification | Verify test coverage meets threshold                | Always      |      |
+| 15    | Test Quality          | No low-value tests, correct assertions, all pass    | Always      |      |
+| 16    | Completion            | Final verification, PR, cleanup                     | Always      |      |
+
+**⛔ = Compaction Gate** - BLOCKING checkpoint requiring context compaction before next phase.
+
+**Work Types:** BUGFIX, SMALL, MEDIUM, LARGE (determined in Phase 2: Triage)
+
+**Phase Skip Matrix:**
+
+| Work Type | Skipped Phases               |
+| --------- | ---------------------------- |
+| BUGFIX    | 5, 6, 7, 9, 12               |
+| SMALL     | 5, 6, 7, 9                   |
+| MEDIUM    | None                         |
+| LARGE     | None (all 16 phases execute) |
+
+### Conceptual Flow
+
 ```
 User Request
      │
      ▼
 ┌───────────────────────────────────────────────────────────────────────-──┐
-│  PHASE 1: ANALYSIS                                                       │
-│  Orchestrator determines: Architecture? Implementation? Testing?         │
-│  Creates TodoWrite items for all phases                                  │
+│  PHASES 1-2: SETUP & TRIAGE                                              │
+│  Initialize workspace, classify work type (BUGFIX/SMALL/MEDIUM/LARGE)    │
+│  Creates TodoWrite items for all applicable phases                       │
 └────────────────────────────────────────────────────────────────────────-─┘
      │
      ▼
 ┌───────────────────────────────────────────────────────────────────────-──┐
-│  PHASE 2: DECOMPOSITION                                                  │
-│  Map dependencies: Sequential vs Parallel vs Hybrid                      │
-│  Architecture → Implementation (sequential)                              │
-│  Unit ↔ E2E ↔ Integration tests (parallel)                               │
+│  PHASES 3-5: DISCOVERY & ANALYSIS                                        │
+│  Explore codebase, map skills, assess complexity                         │
+│  X COMPACTION GATE after Phase 3                                         │
 └────────────────────────────────────────────────────────────────────-─────┘
      │
      ▼
 ┌────────────────────────────────────────────────────────────────────-─────┐
-│  PHASE 3: DELEGATION                                                     │
-│  Spawn agents with: Objective + Context + Scope + Expected Output        │
-│  Parallel agents in SINGLE message for concurrency                       │
+│  PHASES 6-7: DESIGN (MEDIUM+ only)                                       │
+│  Brainstorming (LARGE), Architecture planning                            │
+│  Spawn *-lead agents with clear objectives                               │
 └────────────────────────────────────────────────────────────────────-─────┘
      │
      ▼
 ┌────────────────────────────────────────────────────────────────-─────────┐
-│  PHASE 4: SYNTHESIS                                                      │
-│  Collect agent outputs (structured JSON)                                 │
-│  Check for conflicts, run validators, integrate changes                  │
+│  PHASES 8-11: IMPLEMENTATION & REVIEW                                    │
+│  Code development, design verification, domain compliance, quality       │
+│  X COMPACTION GATE after Phase 8                                         │
 └─────────────────────────────────────────────────────────────────-────────┘
      │
      ▼
 ┌────────────────────────────────────────────────────────────────-─────────┐
-│  PHASE 5: VERIFICATION                                                   │
-│  All tests passing? Build successful? User approves?                     │
-│  Update progress file, mark TodoWrite complete                           │
+│  PHASES 12-15: TESTING                                                   │
+│  Plan tests, execute tests, verify coverage, assess quality              │
+│  X COMPACTION GATE after Phase 13                                        │
+└────────────────────────────────────────────────────────────────--────────┘
+     │
+     ▼
+┌────────────────────────────────────────────────────────────────-─────────┐
+│  PHASE 16: COMPLETION                                                    │
+│  Final verification, PR creation, worktree cleanup                       │
+│  Invoke finishing-a-development-branch skill                             │
 └────────────────────────────────────────────────────────────────--────────┘
 ```
 
-### Tight Feedback Loop (Category 11)
+### Tight Feedback Loop (Category 10)
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -233,9 +325,9 @@ User Request
 
 **Why this matters:** Current orchestrations treat phases as sequential with manual intervention on failure. The Ralph pattern treats Implementation→Review→Test as a tight loop that automatically retries until `FEATURE_COMPLETE` or safety limit.
 
-### Ideal State: Complete Orchestration Flow
+### Ideal State: Complete Orchestration Flow (16-Phase)
 
-This diagram shows all patterns working together in a properly orchestrated system:
+This diagram shows all patterns working together in a properly orchestrated system using the standard 16-phase template:
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
@@ -243,90 +335,121 @@ This diagram shows all patterns working together in a properly orchestrated syst
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│   EFFORT SCALING DECISION (Pattern 3.4)                                     │
-│   ┌─────────────────────────────────────────────────────────────────────┐   │
-│   │ Simple (bug fix)?     → Delegate directly to 1 agent (skip below)   │   │
-│   │ Moderate (feature)?   → Light orchestration (2-4 agents)            │   │
-│   │ Complex (full feat)?  → Full orchestration (continue below)         │   │
-│   └─────────────────────────────────────────────────────────────────────┘   │
-└─────────────────────────────────────┬───────────────────────────────────────┘
-                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
 │  PHASE 1: SETUP                                                             │
-│  • Initialize progress.json (Pattern 6.1)                                   │
-│  • Create output directory (persisting-agent-outputs)                       │
+│  • Initialize MANIFEST.yaml (Pattern 6.1)                                   │
+│  • Create output directory, worktree if needed                              │
 │  • TodoWrite for all phases (Pattern 2.1)                                   │
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 2: BRAINSTORMING                                                     │
+│  PHASE 2: TRIAGE (Effort Scaling Decision - Pattern 3.4)                    │
+│  ┌─────────────────────────────────────────────────────────────────────┐    │
+│  │ BUGFIX?  → Skip phases 5, 6, 7, 9, 12                               │    │
+│  │ SMALL?   → Skip phases 5, 6, 7, 9                                   │    │
+│  │ MEDIUM?  → Execute all phases                                       │    │
+│  │ LARGE?   → Execute all 16 phases                                    │    │
+│  └─────────────────────────────────────────────────────────────────────┘    │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 3: CODEBASE DISCOVERY                                                │
+│  • Spawn Explore agent to understand codebase patterns                      │
+│  • Detect technologies, frameworks, patterns                                │
+│  X COMPACTION GATE 1 (Pattern 2.6): Must compact before Phase 4             │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 4: SKILL DISCOVERY                                                   │
+│  • Map detected technologies to skills                                      │
+│  • Write skill manifest for downstream agents                               │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 5: COMPLEXITY ASSESSMENT                                             │
+│  • Technical complexity analysis                                            │
+│  • Determine execution strategy (parallel vs sequential)                    │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 6: BRAINSTORMING (LARGE only)                                        │
 │  • Invoke brainstorming skill                                               │
-│  • Write to context/ directory                                              │
+│  • Design refinement with human-in-loop                                     │
 │  ⏸ CHECKPOINT: User approves design direction (Pattern 2.3)                 │
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 3: PLANNING                                                          │
-│  • Invoke writing-plans skill                                               │
-│  • Write plan.md with tasks                                                 │
-│  ⏸ CHECKPOINT: User approves plan (Pattern 2.3)                             │
-└─────────────────────────────────────┬───────────────────────────────────────┘
-                                      ▼
-┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 4: ARCHITECTURE                                                      │
+│  PHASE 7: ARCHITECTURE PLAN (MEDIUM+ only)                                  │
 │  • Spawn *-lead agent (Pattern 3.1: mandatory skills in prompt)             │
+│  • Technical design AND task decomposition                                  │
 │  • Agent returns structured JSON (Pattern 1.3)                              │
-│  • Validation loop: max 3 retries (Pattern 4.3)                             │
-│  ⏸ CCHECKPOINT: User approves architecture (Pattern 2.3)                    │
+│  ⏸ CHECKPOINT: User approves architecture (Pattern 2.3)                     │
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASES 5-7: TIGHT FEEDBACK LOOP (Pattern 11.5)                             │
-│  ┌───────────────────────────────────────────────────────────────────────┐  │
-│  │  max_feedback_iterations: 5                                           │  │
-│  │  scratchpad: .claude/.output/{feature}/feedback-scratchpad.md         │  │
-│  │                                                                       │  │
-│  │  ┌─────────────┐                                                      │  │
-│  │  │ IMPLEMENT   │ ← Spawn *-developer with context from prior iter     │  │
-│  │  │ (Phase 5)   │   File scope boundaries (Pattern 3.5)                │  │
-│  │  └──────┬──────┘   Parallel if independent (Pattern 1.4)              │  │
-│  │         ▼                                                             │  │
-│  │  ┌─────────────┐                                                      │  │
-│  │  │ REVIEW      │ ← Two-stage: spec compliance → quality (Pattern 4.1) │  │
-│  │  │ (Phase 6)   │   Requirements verification (Pattern 4.4)            │  │
-│  │  └──────┬──────┘                                                      │  │
-│  │         │ fails → record in scratchpad → back to IMPLEMENT            │  │
-│  │         ▼ passes                                                      │  │
-│  │  ┌─────────────┐                                                      │  │
-│  │  │ TEST        │ ← Spawn *-tester agents (parallel if independent)    │  │
-│  │  │ (Phase 7)   │   Validation loop: max 3 retries (Pattern 4.3)       │  │
-│  │  └──────┬──────┘                                                      │  │
-│  │         │ fails → record in scratchpad → back to IMPLEMENT            │  │
-│  │         ▼ passes                                                      │  │
-│  │  ┌─────────────┐                                                      │  │
-│  │  │ SECURITY?   │ ← Conditional: auth/input/secrets (Pattern 8.2)      │  │
-│  │  │ (Optional)  │   Spawn *-security agent if triggered                │  │
-│  │  └──────┬──────┘                                                      │  │
-│  │         ▼                                                             │  │
-│  │  IMPLEMENTATION_VERIFIED (completion promise, Pattern 11.1)           │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
-│                                                                             │
-│  If max iterations exceeded → ESCALATE to user (Pattern 7.2)                │
+│  PHASE 8: IMPLEMENTATION                                                    │
+│  • Spawn *-developer with context from architecture                         │
+│  • File scope boundaries (Pattern 3.5)                                      │
+│  • Parallel if independent tasks (Pattern 1.4)                              │
+│  X COMPACTION GATE 2 (Pattern 2.6): Must compact before Phase 9             │
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  PHASE 8: COMPLETION                                                        │
-│  • Context compaction (Pattern 5.2)                                         │
-│  • Invoke finishing-a-development-branch skill                              │
-│  • Update progress.json: status = "complete"                                │
+│  PHASE 9: DESIGN VERIFICATION (MEDIUM+ only)                                │
+│  • Verify implementation matches architecture plan                          │
+│  • Requirements verification (Pattern 4.4)                                  │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 10: DOMAIN COMPLIANCE                                                │
+│  • P0/Compliance validation (Pattern 4.7)                                   │
+│  • Domain-specific mandatory patterns (VMFilter, errgroup, etc.)            │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 11: CODE QUALITY                                                     │
+│  • Spawn *-reviewer agents                                                  │
+│  • Two-stage: spec compliance → quality (Pattern 4.1)                       │
+│  • Validation loop: max 2 retries (Pattern 4.3)                             │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 12: TEST PLANNING (MEDIUM+ only)                                     │
+│  • Spawn test-lead agent                                                    │
+│  • Create test strategy and plan                                            │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 13: TESTING                                                          │
+│  • Spawn *-tester agents (parallel if independent)                          │
+│  • Unit, integration, E2E as applicable                                     │
+│  X COMPACTION GATE 3 (Pattern 2.6): Must compact before Phase 14            │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 14: COVERAGE VERIFICATION                                            │
+│  • Verify test coverage meets threshold                                     │
+│  • Document coverage gaps if any                                            │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 15: TEST QUALITY                                                     │
+│  • No low-value tests, correct assertions                                   │
+│  • All tests passing                                                        │
+└─────────────────────────────────────┬───────────────────────────────────────┘
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  PHASE 16: COMPLETION                                                       │
 │  • Final verification (verifying-before-completion)                         │
+│  • Invoke finishing-a-development-branch skill                              │
+│  • Update MANIFEST.yaml: status = "complete"                                │
+│  • PR creation, worktree cleanup                                            │
 │  ⏸ CHECKPOINT: User approves final result (Pattern 2.3)                     │
 └─────────────────────────────────────┬───────────────────────────────────────┘
                                       ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │                         FEATURE_COMPLETE                                    │
 │  Output: .claude/.output/features/{id}/                                     │
-│  ├── progress.json (final state)                                            │
+│  ├── MANIFEST.yaml (unified state: agents, phases, verification)            │
 │  ├── context/ (brainstorming artifacts)                                     │
 │  ├── plan.md (implementation plan)                                          │
 │  ├── architecture/ (design decisions)                                       │
@@ -336,9 +459,9 @@ This diagram shows all patterns working together in a properly orchestrated syst
 └─────────────────────────────────────────────────────────────────────────────┘
 
 LEGEND:
-  ⏸️ = Human checkpoint (requires user approval)
+  ⏸ = Human checkpoint (requires user approval)
+  X = Compaction Gate (BLOCKING - must compact context before proceeding)
   → = Automatic flow
-  ← = Loop back on failure
 ```
 
 ---
@@ -365,6 +488,15 @@ tools: Bash, Edit, Write, Read, Glob, Grep, MultiEdit, TodoWrite
 
 **Why this matters:** Prevents orchestrators from "doing it themselves" and bypassing specialists. Enforces clear responsibility boundaries.
 
+**Architectural implication:** This tool restriction is what makes `orchestrating-multi-agent-workflows` and `executing-plans` mutually exclusive execution models:
+
+| Execution Model   | Requires Edit/Write? | Why                                   |
+| ----------------- | -------------------- | ------------------------------------- |
+| `executing-plans` | **YES**              | The agent itself implements the tasks |
+| `orchestrating-*` | **NO** (forbidden)   | Spawned specialists implement         |
+
+An agent cannot run both models simultaneously—if it has Edit/Write access, it's an executor; if it doesn't, it's a coordinator. This isn't a limitation but a design feature that enforces clean separation of concerns.
+
 ### Principle 2: Fresh Context Per Task
 
 Each agent spawn uses a NEW instance with isolated context. No context pollution from prior tasks.
@@ -383,7 +515,7 @@ Each agent spawn uses a NEW instance with isolated context. No context pollution
 
 ### Principle 4: Structured Handoffs
 
-All agents return structured JSON for predictable orchestration:
+All agents return structured JSON metadata (embedded at end of output `.md` files) for predictable orchestration:
 
 ```json
 {
@@ -392,17 +524,33 @@ All agents return structured JSON for predictable orchestration:
   "timestamp": "2026-01-16T15:45:00Z",
   "feature_directory": ".claude/.output/features/...",
   "skills_invoked": ["developing-with-tdd", "verifying-before-completion"],
-  "status": "complete|blocked|needs_review",
-  "blocked_reason": "security_concern|architecture_decision|missing_requirements|test_failures|out_of_scope|unknown",
-  "attempted": ["What agent tried before blocking"],
+  "library_skills_read": [
+    ".claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md"
+  ],
+  "source_files_verified": ["src/components/UserProfile.tsx:45-120"],
+  "status": "complete",
   "handoff": {
-    "next_agent": null,
-    "context": "Key information for next phase"
+    "next_agent": "frontend-reviewer",
+    "context": "Review implementation against architecture plan"
   }
 }
 ```
 
-**Key rule:** When `status: "blocked"`, set `handoff.next_agent` to `null`. Orchestrator uses routing table to decide next steps.
+| Field                   | Required     | Description                                                                                                     |
+| ----------------------- | ------------ | --------------------------------------------------------------------------------------------------------------- |
+| `agent`                 | Yes          | Agent name from agent definition                                                                                |
+| `output_type`           | Yes          | Descriptive type (architecture-review, implementation, test-plan)                                               |
+| `timestamp`             | Yes          | ISO 8601 timestamp                                                                                              |
+| `feature_directory`     | Yes          | Path to output directory                                                                                        |
+| `skills_invoked`        | Yes          | Core skills invoked via Skill tool (min 1)                                                                      |
+| `library_skills_read`   | Yes          | Library skills loaded via Read tool                                                                             |
+| `source_files_verified` | Yes          | Files/functions read for evidence (min 1)                                                                       |
+| `status`                | Yes          | `complete`, `in-progress`, `blocked`, `needs-review`                                                            |
+| `blocked_reason`        | When blocked | `security_concern`, `architecture_decision`, `missing_requirements`, `test_failures`, `out_of_scope`, `unknown` |
+| `attempted`             | When blocked | What agent tried before blocking (min 1)                                                                        |
+| `handoff`               | Optional     | Next agent and context                                                                                          |
+
+**Key rule:** When `status: "blocked"`, set `handoff.next_agent` to `null`. Orchestrator uses routing table to decide next steps. See `persisting-agent-outputs/references/metadata-format.md` for complete schema.
 
 ### Principle 5: Progress Persistence
 
@@ -410,24 +558,35 @@ External state files survive context exhaustion and session interruptions:
 
 ```
 .claude/.output/features/{feature-id}/
-├── progress.json                   # Machine-readable state
+├── MANIFEST.yaml                   # Unified state: agents, phases, verification
 ├── context/                        # Requirements
 ├── architecture/                   # Design decisions
 ├── implementation/                 # Agent outputs
 └── testing/                        # Test results
 ```
 
+**Two-Layer State System:**
+
+| Layer             | Location                                  | Purpose                                               | Used By                                         |
+| ----------------- | ----------------------------------------- | ----------------------------------------------------- | ----------------------------------------------- |
+| **Per-Agent**     | Embedded JSON at end of each `.md` output | What THIS agent did, skills invoked, handoff context  | Hooks (capture-agent-result.sh), verification   |
+| **Per-Directory** | `MANIFEST.yaml`                           | ALL agents contributed, workflow phases, verification | Orchestration, cross-session resume, PreCompact |
+
+The `phases` and `verification` sections in MANIFEST.yaml are OPTIONAL—only populated by orchestration skills. Ad-hoc agent calls only update `agents_contributed`.
+
 ### Principle 6: Human Checkpoints
 
 Get explicit approval before irreversible phases:
 
 ```
-Phase 1: Brainstorming  → CHECKPOINT (User approves design)
-Phase 2: Planning       → CHECKPOINT (User approves plan)
-Phase 3: Architecture   → Automated (dual-agent validation)
-Phase 4: Implementation → Automated
-Phase 5: Testing        → CHECKPOINT (User approves final result)
+Phase 1-5: Setup/Discovery    → Automated
+Phase 6: Brainstorming        → ⏸ CHECKPOINT (User approves design direction) [LARGE only]
+Phase 7: Architecture Plan    → ⏸ CHECKPOINT (User approves architecture) [MEDIUM+]
+Phase 8-15: Impl/Review/Test  → Automated with compaction gates
+Phase 16: Completion          → ⏸ CHECKPOINT (User approves final result)
 ```
+
+**Compaction Gates (⛔)**: Phases 3, 8, and 13 require context compaction before proceeding.
 
 ---
 
@@ -444,14 +603,25 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 | 1.5 | Prompt Templates in Skill       |
 | 1.6 | Commands as Thin Wrappers       |
 
-- **1.1**: Orchestrators coordinate (no Write/Edit), workers implement — [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
-- **1.2**: Each agent spawn uses NEW instance, no context pollution — [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
-- **1.3**: JSON schemas with status/blocked_reason/handoff fields — _persisting-agent-outputs skill_
-- **1.4**: Parallel when independent, sequential when dependent — [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
-- **1.5**: references/prompts/ with MANDATORY SKILLS embedded — [obra/superpowers](https://github.com/obra/superpowers)
-- **1.6**: Commands only invoke skills, no logic duplication — [obra/superpowers](https://github.com/obra/superpowers)
+- **1.1**: Orchestrators coordinate (no Write/Edit), workers implement
+  [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
 
-### Category 2: Phase Management (5 patterns)
+- **1.2**: Each agent spawn uses NEW instance, no context pollution
+  [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
+
+- **1.3**: JSON schemas with status/blocked*reason/handoff fields
+  \_persisting-agent-outputs skill*
+
+- **1.4**: Parallel when independent, sequential when dependent
+  [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
+
+- **1.5**: references/prompts/ with MANDATORY SKILLS embedded
+  [obra/superpowers](https://github.com/obra/superpowers)
+
+- **1.6**: Commands only invoke skills, no logic duplication
+  [obra/superpowers](https://github.com/obra/superpowers)
+
+### Category 2: Phase Management (6 patterns)
 
 | #   | Pattern                                 |
 | --- | --------------------------------------- |
@@ -460,12 +630,25 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 | 2.3 | Human Checkpoints                       |
 | 2.4 | Checkpoint Configuration Documented     |
 | 2.5 | Context Compaction at Phase Transitions |
+| 2.6 | Compaction Gates (BLOCKING)             |
 
-- **2.1**: Create todos at workflow start, update real-time — [TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
-- **2.2**: Sequential numbers, referenced in prompts/docs — _internal convention_
-- **2.3**: Strategic user approval (design, architecture, completion) — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- **2.4**: When/why/how for each checkpoint — _internal convention_
-- **2.5**: Summarize every 3 phases, archive to files — [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- **2.1**: Create todos at workflow start, update real-time
+  [TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
+
+- **2.2**: Sequential numbers starting at 1 (not 0), referenced in prompts/docs. Sub-steps use decimals (5.1, 5.2).
+  _internal convention_
+
+- **2.3**: Strategic user approval (design, architecture, completion)
+  [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
+
+- **2.4**: When/why/how for each checkpoint
+  _internal convention_
+
+- **2.5**: Summarize every 3 phases, archive to files
+  [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+
+- **2.6**: BLOCKING checkpoints at phase transitions (Phases 3, 8, 13) requiring context compaction before proceeding. Token thresholds: 75% (SHOULD compact), 80% (MUST compact), 85% (hook BLOCKS agent spawning).
+  _[compaction-gates.md](.claude/skills/orchestrating-multi-agent-workflows/references/compaction-gates.md)_
 
 ### Category 3: Agent Coordination (7 patterns)
 
@@ -485,9 +668,9 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 - **3.4**: Simple=1 agent, Moderate=2-4, Complex=5-10, Major=10+ — [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
 - **3.5**: "Only modify src/components/filters/", check overlap before parallel — [Context Parallelism](https://www.agalanov.com/notes/efficient-claude-code-context-parallelism-sub-agents/)
 - **3.6**: Identify file boundaries before spawning, prevent simultaneous modifications — [Context Parallelism](https://www.agalanov.com/notes/efficient-claude-code-context-parallelism-sub-agents/)
-- **3.7**: .claude/locks/{agent-name}.lock with file list — _internal convention (P4)_
+- **3.7**: {OUTPUT*DIRECTORY}/locks/{agent-name}.lock distributed locking — \_implemented 2026-01-17*
 
-### Category 4: Quality Gates (8 patterns)
+### Category 4: Quality Gates (7 patterns)
 
 | #   | Pattern                            |
 | --- | ---------------------------------- |
@@ -498,7 +681,6 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 | 4.5 | Blocking Gates                     |
 | 4.6 | Gate Override Protocol             |
 | 4.7 | P0/Compliance Validation           |
-| 4.8 | Complexity Analysis in Review      |
 
 - **4.1**: Spec compliance (BLOCKING) → Code quality (parallel) — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - **4.2**: MAX 2-3 retries per stage, then escalate — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
@@ -507,32 +689,33 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 - **4.5**: Cannot proceed until conditions met — _internal convention_
 - **4.6**: Explicit user approval via AskUserQuestion, documented — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 - **4.7**: Domain-specific compliance checks — _internal convention_
-- **4.8**: analyzing-cyclomatic-complexity skill invocation — _internal skill (P4)_
+
+> **Note:** Complexity analysis (cyclomatic complexity) is handled at the reviewer agent level via linters (golangci-lint, ESLint), not at the orchestration level.
 
 ### Category 5: Context Management (4 patterns)
 
-| #   | Pattern                          |
-| --- | -------------------------------- |
-| 5.1 | Git Worktrees for Isolation      |
-| 5.2 | Context Compaction Protocol      |
-| 5.3 | Context Management Documentation |
-| 5.4 | Progress Persistence             |
+| #   | Pattern                     |
+| --- | --------------------------- |
+| 5.1 | Git Worktrees for Isolation |
+| 5.2 | Context Compaction Protocol |
+| 5.3 | Context Window Monitoring   |
+| 5.4 | Progress Persistence        |
 
 - **5.1**: Separate worktree per feature for conflict prevention — [Anthropic Multi-Agent Research](https://www.anthropic.com/engineering/multi-agent-research-system)
 - **5.2**: 4-step: summarize completed, keep active, file references, trigger every 3 phases — [Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
-- **5.3**: references/context-management.md with DO/DON'T — _internal convention_
-- **5.4**: progress.json with resume protocol — [persisting-progress-across-sessions skill](https://github.com/anthropics/claude-code)
+- **5.3**: Programmatic token tracking via JSONL files, threshold-based compaction triggers — _[context-monitoring.md](.claude/skills/orchestrating-multi-agent-workflows/references/context-monitoring.md), implemented 2026-01-17_
+- **5.4**: MANIFEST.yaml with resume protocol — _persisting-agent-outputs skill (schema) + persisting-progress-across-sessions skill (protocol)_
 
 ### Category 6: Progress Tracking (3 patterns)
 
 | #   | Pattern                     |
 | --- | --------------------------- |
-| 6.1 | Progress File with Metadata |
-| 6.2 | MANIFEST.yaml               |
+| 6.1 | Unified State File          |
+| 6.2 | Agent Contribution Tracking |
 | 6.3 | Metrics Tracking            |
 
-- **6.1**: progress.json with phase_status, agents_spawned — _persisting-agent-outputs skill_
-- **6.2**: File inventory with agent contributions — _persisting-agent-outputs skill_
+- **6.1**: MANIFEST.yaml with phases, verification, status — _persisting-agent-outputs skill_
+- **6.2**: agents*contributed array with artifacts, timestamps, files_modified — \_persisting-agent-outputs skill*
 - **6.3**: tokens, cost, validation_iterations, conflicts, escalations, phase_durations — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
 
 ### Category 7: Error Handling (3 patterns)
@@ -543,55 +726,62 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 | 7.2 | Escalation to User           |
 | 7.3 | Emergency Abort Protocol     |
 
-- **7.1**: references/error-recovery.md or troubleshooting.md — _internal convention_
-- **7.2**: AskUserQuestion when retry limits exceeded — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- **7.3**: When to abort (3+ failures, user request, critical issue), rollback procedure — **Chariot Implementation:** [emergency-abort.md](.claude/skills/orchestrating-feature-development/references/emergency-abort.md)
+- **7.1**: references/error-recovery.md or troubleshooting.md
+  _internal convention_
 
-### Category 8: Security & Compliance (4 patterns)
+- **7.2**: AskUserQuestion when retry limits exceeded
+  [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 
-| #   | Pattern                       |
-| --- | ----------------------------- |
-| 8.1 | Secret Scanner Integration    |
-| 8.2 | Mandatory Security Gate       |
-| 8.3 | Threat Modeling Integration   |
-| 8.4 | Security Review Documentation |
+- **7.3**: When to abort (3+ failures, user request, critical issue), rollback procedure
+  **Praetorian Implementation:** [emergency-abort.md](.claude/skills/orchestrating-multi-agent-workflows/references/emergency-abort.md)
 
-- **8.1**: Grep for credentials/API keys/.env files before commit — [AI Agent Vulnerabilities](https://www.xenonstack.com/blog/vulnerabilities-in-ai-agents)
-- **8.2**: Trigger detection (auth/input/secrets/APIs), spawn security reviewer before testing — [Agentic AI Security](https://securityboulevard.com/2025/07/emerging-agentic-ai-security-vulnerabilities-expose-enterprise-systems-to-widespread-identity-based-attacks/)
-- **8.3**: Conditional Phase for auth/data/API features — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- **8.4**: Security findings, resolutions, reviewer agent, date in progress file — _internal convention_
-
-### Category 9: Documentation (4 patterns)
+### Category 8: Documentation (4 patterns)
 
 | #   | Pattern                          |
 | --- | -------------------------------- |
-| 9.1 | Integration Section              |
-| 9.2 | Rationalization Prevention Table |
-| 9.3 | Exit Criteria Documentation      |
-| 9.4 | Prompt Template Documentation    |
+| 8.1 | Integration Section              |
+| 8.2 | Rationalization Prevention Table |
+| 8.3 | Exit Criteria Documentation      |
+| 8.4 | Prompt Template Documentation    |
 
-- **9.1**: Called-by, Requires, Calls, Spawns, Conditional, Pairs-with — [obra/superpowers](https://github.com/obra/superpowers)
-- **9.2**: Common bypass attempts with mandatory responses — [Claude Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)
-- **9.3**: Clear, verifiable conditions for completion — [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
-- **9.4**: references/prompts/README.md explaining usage — [obra/superpowers](https://github.com/obra/superpowers)
+- **8.1**: Called-by, Requires, Calls, Spawns, Conditional, Pairs-with
+  [obra/superpowers](https://github.com/obra/superpowers)
 
-### Category 10: Integration Patterns (5 patterns)
+- **8.2**: Common bypass attempts with mandatory responses
+  [Claude Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)
 
-| #    | Pattern                          |
-| ---- | -------------------------------- |
-| 10.1 | REQUIRED SUB-SKILL Declarations  |
-| 10.2 | Conditional Sub-Skills Table     |
-| 10.3 | Agent Skills in Prompts          |
-| 10.4 | Workflow Handoff Protocol        |
-| 10.5 | Full Workflow Skills Integration |
+- **8.3**: Clear, verifiable conditions for completion
+  [Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)
 
-- **10.1**: Inline directives in skill content — [obra/superpowers](https://github.com/obra/superpowers)
-- **10.2**: When/why to invoke optional skills — [Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
-- **10.3**: Embedded skill requirements in prompt templates — [obra/superpowers](https://github.com/obra/superpowers)
-- **10.4**: Check TodoWrite for parent workflow, continue if pending — [TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
-- **10.5**: finishing-a-development-branch at completion — [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow) + internal convention
+- **8.4**: references/prompts/README.md explaining usage
+  [obra/superpowers](https://github.com/obra/superpowers)
 
-### Category 11: Iteration Patterns (6 patterns)
+### Category 9: Integration Patterns (5 patterns)
+
+| #   | Pattern                          |
+| --- | -------------------------------- |
+| 9.1 | REQUIRED SUB-SKILL Declarations  |
+| 9.2 | Conditional Sub-Skills Table     |
+| 9.3 | Agent Skills in Prompts          |
+| 9.4 | Workflow Handoff Protocol        |
+| 9.5 | Full Workflow Skills Integration |
+
+- **9.1**: Inline directives in skill content
+  [obra/superpowers](https://github.com/obra/superpowers)
+
+- **9.2**: When/why to invoke optional skills
+  [Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)
+
+- **9.3**: Embedded skill requirements in prompt templates
+  [obra/superpowers](https://github.com/obra/superpowers)
+
+- **9.4**: Check TodoWrite for parent workflow, continue if pending
+  [TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)
+
+- **9.5**: finishing-a-development-branch at completion
+  [GitHub Flow](https://docs.github.com/en/get-started/using-github/github-flow) + internal convention
+
+### Category 10: Iteration Patterns (6 patterns)
 
 **Source:** Ralph Wiggum technique by Geoffrey Huntley, implemented in [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator) by Mike O'Brien (920+ tests, $50K contract for $297 API costs).
 
@@ -599,25 +789,35 @@ Phase 5: Testing        → CHECKPOINT (User approves final result)
 
 | #    | Pattern                 |
 | ---- | ----------------------- |
-| 11.1 | Completion Promise      |
-| 11.2 | Agent Scratchpad        |
-| 11.3 | Iteration Safety Guards |
-| 11.4 | Loop Detection          |
-| 11.5 | Tight Feedback Loop     |
-| 11.6 | Error History Injection |
+| 10.1 | Completion Promise      |
+| 10.2 | Agent Scratchpad        |
+| 10.3 | Iteration Safety Guards |
+| 10.4 | Loop Detection          |
+| 10.5 | Tight Feedback Loop     |
+| 10.6 | Error History Injection |
 
-- **11.1**: Explicit string signal (e.g., `TASK_COMPLETE`, `ALL_TESTS_PASSING`) that task is done — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
-- **11.2**: Cross-iteration context file (`.agent/scratchpad.md`) tracking: accomplished, remaining, decisions, blockers — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
-- **11.3**: Prevent runaway: `max_iterations` (10), `max_runtime` (15min), `consecutive_error_limit` (3), `max_cost` ($50) — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
-- **11.4**: Fuzzy string matching (90% similarity threshold, 5-output sliding window) detects stuck agents — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
-- **11.5**: Implementation→Review→Test cycle with automatic retry on failure — [Ralph Wiggum Technique](https://awesomeclaude.ai/ralph-wiggum)
-- **11.6**: Inject "Recent Errors to Avoid" (last 2-5 errors) into prompts to prevent repeat mistakes — [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
+- **10.1**: Explicit string signal (e.g., `TASK_COMPLETE`, `ALL_TESTS_PASSING`) that task is done
+  [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
 
-**Existing Skill:** `iterating-to-completion` (Phase 1 complete) implements 11.1-11.4 for **intra-task** iteration.
+- **10.2**: Cross-iteration context file (`.agent/scratchpad.md`) tracking: accomplished, remaining, decisions, blockers
+  [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
 
-**Chariot Implementation (Phase 2 COMPLETE):** Tight Feedback Loop (11.5) for **inter-phase** iteration implemented in:
-- [tight-feedback-loop.md](.claude/skills/orchestrating-feature-development/references/tight-feedback-loop.md) - Canonical implementation
-- [feedback-scratchpad-template.md](.claude/skills/orchestrating-feature-development/references/feedback-scratchpad-template.md) - Scratchpad template
+- **10.3**: Prevent runaway: `max_iterations` (10), `max_runtime` (15min), `consecutive_error_limit` (3), `max_cost` ($50)[ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
+
+- **10.4**: Fuzzy string matching (90% similarity threshold, 5-output sliding window) detects stuck agents
+  [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
+
+- **10.5**: Implementation→Review→Test cycle with automatic retry on failure
+  [Ralph Wiggum Technique](https://awesomeclaude.ai/ralph-wiggum)
+
+- **10.6**: Inject "Recent Errors to Avoid" (last 2-5 errors) into prompts to prevent repeat mistakes
+  [ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)
+
+**Existing Skill:** `iterating-to-completion` (Phase 1 complete) implements 10.1-10.4 for **intra-task** iteration.
+
+**Praetorian Implementation (Phase 2 COMPLETE):** Tight Feedback Loop (10.5) for **inter-phase** iteration implemented in:
+
+- [tight-feedback-loop.md](.claude/skills/orchestrating-multi-agent-workflows/references/tight-feedback-loop.md) - Canonical implementation
 
 **Key distinction:** `iterating-to-completion` = INTRA-task (same agent); Tight Feedback Loop = INTER-phase (Implementation→Review→Test cycle across agents).
 
@@ -728,35 +928,87 @@ Invoke the `orchestrating-feature-development` skill and follow it exactly.
 
 ### Pattern 5: Workflow Chains
 
-Skills form explicit chains with clear handoff points:
+Skills form explicit chains with clear handoff points. The most important fork occurs after planning:
+
+```
+                              ┌─────────────────────────────────────────────────┐
+                              │                writing-plans                    │
+                              │    Creates implementation plan with tasks       │
+                              └──────────────────────┬──────────────────────────┘
+                                                     │
+                    ┌────────────────────────────────┼────────────────────────────────┐
+                    │                                │                                │
+                    ▼                                ▼                                ▼
+    ┌───────────────────────────┐   ┌───────────────────────────┐   ┌──────────────────────────--─┐
+    │     Manual Execution      │   │     executing-plans       │   │ orchestrating-*-development │
+    │                           │   │                           │   │                             │
+    │ Human follows plan        │   │ Single agent implements   │   │ Spawns specialist agents    │
+    │ No AI assistance          │   │ Human checkpoint/3 tasks  │   │ Parallel where possible     │
+    │                           │   │ Tools: Edit, Write, Bash  │   │ Tools: Task (NO Edit)       │
+    └───────────────────────────┘   └───────────────────────────┘   └───────────────────────────--┘
+           │                                │                                │
+           │                                │                                │
+    For: External teams,             For: Simple/interdependent,       For: Complex multi-concern,
+         handoff scenarios                 budget-conscious                 expertise diversity
+```
+
+**The `/feature` command follows the orchestration path using the Standard 16-Phase Template:**
 
 ```
 /feature (command)
     └── orchestrating-feature-development (skill)
             │
-            ├── Phase 1: brainstorming
-            │       writes: .claude/.output/features/{id}/context/
+            ├── Phase 1: Setup
+            │       Creates worktree, output directory, MANIFEST.yaml
             │
-            ├── Phase 2: writing-plans
-            │       writes: .claude/.output/features/{id}/plan.md
+            ├── Phase 2: Triage
+            │       Classifies work type (BUGFIX/SMALL/MEDIUM/LARGE)
             │
-            ├── Phase 3: Architecture (via Task tool)
-            │       REQUIRED: persisting-agent-outputs
-            │       dispatches: frontend-lead OR backend-lead
+            ├── Phase 3: Codebase Discovery ⛔ COMPACTION GATE
+            │       Explores codebase patterns, detects technologies
             │
-            ├── Phase 4: Implementation (via Task tool)
-            │       REQUIRED: developing-with-subagents
-            │       CONDITIONAL: dispatching-parallel-agents (if 3+ tasks)
+            ├── Phase 4: Skill Discovery
+            │       Maps technologies to skills, writes manifest
             │
-            ├── Phase 5: Testing (via Task tool)
-            │       dispatches: test-lead, then testers (sequential)
+            ├── Phase 5: Complexity (MEDIUM+ only)
+            │       Technical assessment, execution strategy
             │
-            ├── Phase 6: Review (via Task tool)
-            │       dispatches: *-reviewer agents
+            ├── Phase 6: Brainstorming (LARGE only)
+            │       Design refinement with human-in-loop
             │
-            └── Phase 7: Completion
+            ├── Phase 7: Architecture Plan (MEDIUM+ only)
+            │       Technical design AND task decomposition
+            │
+            ├── Phase 8: Implementation ⛔ COMPACTION GATE
+            │       Code development via *-developer agents
+            │
+            ├── Phase 9: Design Verification (MEDIUM+ only)
+            │       Verifies implementation matches plan
+            │
+            ├── Phase 10: Domain Compliance
+            │       Domain-specific mandatory patterns validation
+            │
+            ├── Phase 11: Code Quality
+            │       Code review via *-reviewer agents
+            │
+            ├── Phase 12: Test Planning (MEDIUM+ only)
+            │       Test strategy and plan creation
+            │
+            ├── Phase 13: Testing ⛔ COMPACTION GATE
+            │       Test implementation via *-tester agents
+            │
+            ├── Phase 14: Coverage Verification
+            │       Verifies test coverage meets threshold
+            │
+            ├── Phase 15: Test Quality
+            │       No low-value tests, correct assertions
+            │
+            └── Phase 16: Completion
+                    Final verification, PR, cleanup
                     REQUIRED: finishing-a-development-branch
 ```
+
+See [Standard 16-Phase Template](#standard-16-phase-template) for detailed phase descriptions and skip logic.
 
 ---
 
@@ -808,7 +1060,7 @@ If gate cannot be satisfied, use AskUserQuestion:
 2. Block until research complete
 3. Abort feature"
 
-Document override decision in progress.json.
+Document override decision in MANIFEST.yaml.
 ```
 
 ### P0/Compliance Validation
@@ -829,21 +1081,22 @@ Domain-specific compliance checks that MUST pass:
 
 Multi-agent systems use **15x more tokens** than single-agent chat. Match agent count to task complexity:
 
-| Complexity   | Agents           | Tool Calls               | Examples                                            |
-| ------------ | ---------------- | ------------------------ | --------------------------------------------------- |
-| **Simple**   | 1 agent directly | 3-10 calls               | Bug fix, add prop, typo fix, single component       |
-| **Moderate** | 2-4 agents       | 10-15 each               | Compare approaches, implement + test one feature    |
-| **Complex**  | 5-10 agents      | Divided responsibilities | Full feature with architecture, impl, review, tests |
-| **Major**    | 10+ agents       | Parallel phases          | Cross-cutting refactor, new subsystem               |
+| Complexity   | Agents            | Skill to Use                          | Examples                                             |
+| ------------ | ----------------- | ------------------------------------- | ---------------------------------------------------- |
+| **Simple**   | 1 agent directly  | None (direct action)                  | Bug fix, add prop, typo fix                          |
+| **Simple+**  | 1 agent with plan | `executing-plans`                     | Multi-step fix, small feature with human checkpoints |
+| **Moderate** | 2-4 agents        | `orchestrating-multi-agent-workflows` | Compare approaches, implement + test one feature     |
+| **Complex**  | 5-10 agents       | `orchestrating-*-development`         | Full feature with architecture, impl, review, tests  |
+| **Major**    | 10+ agents        | `orchestrating-*-development`         | Cross-cutting refactor, new subsystem                |
 
 ### Decision Checklist Before Spawning Multiple Agents
 
-1. Can one agent complete this? If yes, delegate directly
-2. Are subtasks truly independent? If no, sequential is better
+1. Can one agent complete this? If yes, delegate directly (or use `executing-plans` for multi-step work)
+2. Are subtasks truly independent? If no, sequential is better—consider `executing-plans`
 3. Does complexity justify 15x token cost?
 4. Would parallel execution save significant time?
 
-**Warning:** Multi-agent systems are LESS effective for tightly interdependent tasks where each step requires output from the previous step.
+**Warning:** Multi-agent systems are LESS effective for tightly interdependent tasks where each step requires output from the previous step. For interdependent work, use `executing-plans` instead—it provides human checkpoints and single-agent execution without the coordination overhead.
 
 ### Context Compaction Protocol
 
@@ -869,6 +1122,48 @@ When approaching token limits (conversation > 50 messages):
 
 ---
 
+## Configuration
+
+All orchestration retry and iteration limits are centralized in `.claude/config/orchestration-limits.yaml`.
+
+### Configuration Sections
+
+| Section       | Scope                                      | Used By                                   |
+| ------------- | ------------------------------------------ | ----------------------------------------- |
+| `intra_task`  | Same agent looping on ONE task             | `iterating-to-completion`                 |
+| `inter_phase` | Implementation→Review→Test cycles          | `orchestrating-multi-agent-workflows`     |
+| `orchestrator`| Re-invoking entire patterns/phases         | All orchestration skills                  |
+| `escalation`  | What happens when limits are exceeded      | All orchestration and iteration skills    |
+
+### Key Limits
+
+```yaml
+intra_task:
+  max_iterations: 10
+  max_runtime_minutes: 15
+  consecutive_error_limit: 3
+
+inter_phase:
+  max_feedback_iterations: 5
+  max_consecutive_review_failures: 3
+  max_consecutive_test_failures: 3
+
+orchestrator:
+  requirement_compliance_retries: 2
+  quality_fix_retries: 2
+  test_fix_retries: 2
+```
+
+### Precedence Rules
+
+1. Skill-specific override (if skill declares custom limit)
+2. Config file (central defaults)
+3. Hardcoded fallback (only if config unavailable)
+
+**No Unilateral Overrides:** Agents MUST NOT override config values (even with "safer" lower limits) or add limits together across scopes. To change limits, update the config file or get user approval via `AskUserQuestion`.
+
+---
+
 ## FAQ
 
 ### When should I use orchestration vs single agent?
@@ -886,6 +1181,27 @@ Use single agent when:
 - One domain expertise suffices
 - Quick turnaround needed
 - Low token budget
+
+### When should I use `executing-plans` vs `orchestrating-multi-agent-workflows`?
+
+These are **mutually exclusive execution models**, not composable skills:
+
+| Question                                                         | If Yes →        | If No →         |
+| ---------------------------------------------------------------- | --------------- | --------------- |
+| Do tasks require different expertise (arch, impl, test, review)? | Orchestration   | executing-plans |
+| Would parallel execution significantly reduce time?              | Orchestration   | executing-plans |
+| Are tasks tightly interdependent (each needs prior output)?      | executing-plans | Orchestration   |
+| Is human review needed every few tasks?                          | executing-plans | Orchestration   |
+| Token budget under 50K?                                          | executing-plans | Orchestration   |
+
+**Why can't I use both?**
+
+- `executing-plans` requires Edit/Write tools (the agent implements)
+- `orchestrating-*` forbids Edit/Write tools (spawned agents implement)
+
+An agent can't have and not-have implementation tools simultaneously. Choose one model based on task characteristics.
+
+**Common mistake:** Trying to "orchestrate" an `executing-plans` run by spawning an agent to run it. This wastes tokens—just use `executing-plans` directly in the main conversation.
 
 ### How do I handle blocked status?
 
@@ -911,20 +1227,88 @@ Use single agent when:
 ### What's the difference between validation loops and tight feedback loops?
 
 - **Validation loops** (Pattern 4.3): Within a single phase, retry until validators pass (max 3 iterations)
-- **Tight feedback loops** (Pattern 11.5): Across phases, Implementation→Review→Test cycle repeats until FEATURE_COMPLETE
+- **Tight feedback loops** (Pattern 10.5): Across phases, Implementation→Review→Test cycle repeats until FEATURE_COMPLETE
 
 ---
 
 ## References
 
-### Internal
+### Internal - Core Skills
 
 - **Agent Architecture**: `.claude/docs/agents/AGENT-ARCHITECTURE.md`
 - **Skill Architecture**: `.claude/docs/skills/SKILL-ARCHITECTURE.md`
-- **Foundational Skill**: `.claude/skills/orchestrating-multi-agent-workflows/SKILL.md`
-- **Feature Development**: `.claude/skills/orchestrating-feature-development/SKILL.md`
-- **Progress Persistence**: `.claude/skills/persisting-progress-across-sessions/SKILL.md`
-- **Agent Outputs**: `.claude/skills/persisting-agent-outputs/SKILL.md`
+- **Foundational Skill (CORE)**: `.claude/skills/orchestrating-multi-agent-workflows/SKILL.md`
+- **Progress Persistence (CORE)**: `.claude/skills/persisting-progress-across-sessions/SKILL.md`
+- **Agent Outputs (CORE)**: `.claude/skills/persisting-agent-outputs/SKILL.md`
+
+### Internal - Library Skills (Orchestration)
+
+- **Feature Development**: `.claude/skill-library/development/orchestrating-feature-development/SKILL.md`
+- **Capability Development**: `.claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md`
+- **Integration Development**: `.claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md`
+- **Fingerprintx Development**: `.claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/SKILL.md`
+- **MCP Development**: `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`
+- **API Tool Development**: `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`
+- **Research**: `.claude/skill-library/research/orchestrating-research/SKILL.md`
+- **CVE Research Jobs**: `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`
+- **Bugfix**: `.claude/skill-library/testing/orchestrating-bugfix/SKILL.md`
+
+### Internal - OMAW Reference Files (Current State)
+
+| Reference File                                    | Pattern(s)             | Purpose                                      |
+| ------------------------------------------------- | ---------------------- | -------------------------------------------- |
+| `references/phase-1-setup.md`                     | 2.2                    | Worktree creation, output directory, MANIFEST.yaml |
+| `references/phase-2-triage.md`                    | 2.2                    | Work type classification (BUGFIX/SMALL/MEDIUM/LARGE) |
+| `references/phase-3-codebase-discovery.md`        | 2.2                    | Explore agent patterns, technology detection |
+| `references/phase-4-skill-discovery.md`           | 2.2                    | Technology-to-skill mapping, manifest writing |
+| `references/phase-5-complexity.md`                | 2.2                    | Technical assessment, execution strategy     |
+| `references/phase-6-brainstorming.md`             | 2.2                    | Design refinement with human-in-loop (LARGE only) |
+| `references/phase-7-architecture-plan.md`         | 2.2                    | Technical design AND task decomposition      |
+| `references/phase-8-implementation.md`            | 2.2                    | Code development patterns                    |
+| `references/phase-9-design-verification.md`       | 2.2                    | Plan-to-implementation matching              |
+| `references/phase-10-domain-compliance.md`        | 2.2                    | Domain-specific mandatory patterns           |
+| `references/phase-11-code-quality.md`             | 2.2                    | Code review for maintainability              |
+| `references/phase-12-test-planning.md`            | 2.2                    | Test strategy and plan creation              |
+| `references/phase-13-testing.md`                  | 2.2                    | Test implementation and execution            |
+| `references/phase-14-coverage-verification.md`    | 2.2                    | Coverage threshold validation                |
+| `references/phase-15-test-quality.md`             | 2.2                    | Assertion quality, no low-value tests        |
+| `references/phase-16-completion.md`               | 2.2                    | Final verification, PR, cleanup              |
+| `references/compaction-gates.md`                  | 2.6                    | BLOCKING checkpoints for context management  |
+| `references/context-monitoring.md`                                        | 5.3                    | Programmatic token tracking via JSONL        |
+| `references/agent-matrix.md`                                              | 3.2                    | Initial agent selection guide                |
+| `references/agent-output-validation.md`                                   | 1.3                    | Structured handoff validation                |
+| `references/delegation-templates.md`                                      | 1.5, 3.1               | Agent prompt templates with mandatory skills |
+| `references/effort-scaling.md`                                            | 3.4                    | Tier definitions and decision checklist      |
+| `references/file-conflict-protocol.md`                                    | 3.5, 3.6               | Proactive conflict prevention                |
+| `references/file-locking.md`                                              | 3.7                    | Distributed locks for parallel agents        |
+| `references/gated-verification.md`                                        | 4.1, 4.5               | Two-stage review, blocking gates             |
+| `references/orchestration-guards.md`                                      | 4.2, 4.3               | Retry limits, validation loops               |
+| `references/p0-compliance.md`                                             | 4.7                    | Domain-specific compliance validation        |
+| `references/tight-feedback-loop.md`                                       | 10.1, 10.2, 10.5, 10.6 | Implementation→Review→Test cycles            |
+| `references/emergency-abort.md`                                           | 7.3                    | Safe workflow termination                    |
+| `references/escalation-protocol.md`                                       | 7.2                    | When/how to escalate to user                 |
+| `references/checkpoint-configuration.md`                                  | 2.3, 2.4               | Human approval points                        |
+| `references/progress-file-format.md`                                      | 5.4, 6.1               | Persistence structure                        |
+| `references/workflow-handoff.md`                                          | 9.4                    | Parent-child workflow integration            |
+| `references/required-sub-skills.md`                                       | 9.1                    | REQUIRED SUB-SKILL declarations              |
+| `references/anti-patterns.md`                                             | -                      | Common orchestration mistakes                |
+| `references/exit-criteria.md`                                             | 8.3                    | Completion checklist, COUNT+UNIT format      |
+| `references/clarification-protocol.md`                                    | -                      | Handling agent clarification requests        |
+| `references/clarification-protocol-advanced.md`                           | -                      | Mixed questions, blocked vs clarification    |
+| `references/clarification-protocol-examples.md`                           | -                      | Requirement, dependency, arch workflows      |
+| `references/delegation-templates-testing.md`                              | 1.5, 3.1               | Unit, integration, E2E test templates        |
+| `references/delegation-templates-review-skills.md`                        | 1.5, 3.1               | Reviewer prompts, skill requirements         |
+| `references/error-recovery.md`                                            | 7.1                    | Recovery framework, abort triggers, state    |
+| `references/integration-skills.md`                                        | 9.x                    | Integration matrix, invocation hierarchy     |
+| `references/advanced-patterns.md`                                         | Various                | Context compaction, worktrees, security      |
+| `references/prompt-templates.md`                                          | 1.5, 8.4               | Agent prompt structure and requirements      |
+| `references/phase-validators.md`                                          | 4.3                    | Generic validators per phase, pass criteria  |
+| `references/execution-patterns.md`                                        | 3.x                    | Sequential/parallel/hybrid examples          |
+| `references/output-format.md`                                             | 1.3                    | Standardized JSON output schema              |
+| `references/quality-scoring.md`                                           | 4.x                    | Quantitative scoring (0-100) for validation  |
+| `references/agent-output-validation-algorithm.md`                         | 1.3                    | 7-step validation procedure                  |
+| `references/agent-output-validation-examples.md`                          | 1.3                    | Success/failure scenarios                    |
+| `references/agent-output-validation-templates.md`                         | 1.3                    | Re-spawn prompts, retry policy               |
 
 ### Anthropic Official Guidance
 
@@ -969,36 +1353,30 @@ Quick lookup for orchestrators to include when reporting missing patterns.
 Patterns: 1.1, 1.2, 1.4, 3.4, 5.1
 
 **[Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)**
-Patterns: 2.3, 4.1, 4.6, 7.2, 8.3, 9.3
+Patterns: 2.3, 4.1, 4.6, 7.2, 8.3
 
 **[Context Engineering](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)**
 Patterns: 2.5, 5.2
 
 **[TodoWrite Tracking](https://platform.claude.com/docs/en/agent-sdk/todo-tracking)**
-Patterns: 2.1, 10.4
+Patterns: 2.1, 9.4
 
 **[obra/superpowers](https://github.com/obra/superpowers)**
-Patterns: 1.5, 1.6, 3.1, 9.1, 9.4, 10.1, 10.3
+Patterns: 1.5, 1.6, 3.1, 8.1, 8.4, 9.1, 9.3
 
 **[ralph-orchestrator](https://github.com/mikeyobrien/ralph-orchestrator)**
-Patterns: 4.2, 4.3, 6.3, 7.3, 11.1-11.4, 11.6
+Patterns: 4.2, 4.3, 6.3, 7.3, 10.1-10.4, 10.6
 
 **[Ralph Wiggum Technique](https://awesomeclaude.ai/ralph-wiggum)**
-Patterns: 11.5
+Patterns: 10.5
 
 **[Context Parallelism](https://www.agalanov.com/notes/efficient-claude-code-context-parallelism-sub-agents/)**
 Patterns: 3.5, 3.6
 
 **[Agent Skills Best Practices](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices)**
-Patterns: 10.2
-
-**[Claude Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)**
 Patterns: 9.2
 
-**[AI Agent Vulnerabilities](https://www.xenonstack.com/blog/vulnerabilities-in-ai-agents)**
-Patterns: 8.1
-
-**[Agentic AI Security](https://securityboulevard.com/2025/07/emerging-agentic-ai-security-vulnerabilities-expose-enterprise-systems-to-widespread-identity-based-attacks/)**
+**[Claude Skills Deep Dive](https://leehanchung.github.io/blogs/2025/10/26/claude-skills-deep-dive/)**
 Patterns: 8.2
 
 ### Internal Sources
@@ -1007,343 +1385,114 @@ Patterns: 8.2
 Patterns: 1.3, 5.4, 6.1, 6.2
 
 **Internal convention**
-Patterns: 2.2, 2.4, 3.2, 3.7, 4.4, 4.5, 4.7, 5.3, 7.1, 8.4, 10.5
+Patterns: 2.2, 2.4, 3.2, 4.4, 4.5, 4.7, 7.1, 9.5
 
-### Chariot Implementations (Canonical)
+**orchestrating-multi-agent-workflows references**
+Patterns: 3.7 (file-locking.md), 5.3 (context-monitoring.md)
+
+### Praetorian Guard Implementations (Canonical)
 
 **Use these as the source of truth for implementing patterns in other orchestration skills.**
 
-**[orchestrating-feature-development/references/tight-feedback-loop.md](.claude/skills/orchestrating-feature-development/references/tight-feedback-loop.md)**
-Patterns: 11.1 (Completion Promise), 11.2 (Agent Scratchpad), 11.3 (Safety Guards), 11.5 (Tight Feedback Loop), 11.6 (Error History Injection)
+> **Note:** These implementations are in `orchestrating-multi-agent-workflows` skill. The 16-phase template and compaction gates are the current standard.
+
+**[references/compaction-gates.md](.claude/skills/orchestrating-multi-agent-workflows/references/compaction-gates.md)**
+Pattern: 2.6 (Compaction Gates - BLOCKING)
+
+- BLOCKING checkpoints at Phases 3, 8, 13
+- Token thresholds: 75% (SHOULD), 80% (MUST), 85% (hook BLOCKS)
+- Integration with context-monitoring.md for programmatic checks
+- Enforced via hooks (compaction-gate-enforcement.sh)
+
+**[references/tight-feedback-loop.md](.claude/skills/orchestrating-multi-agent-workflows/references/tight-feedback-loop.md)**
+Patterns: 10.1 (Completion Promise), 10.2 (Agent Scratchpad), 10.3 (Safety Guards), 10.5 (Tight Feedback Loop), 10.6 (Error History Injection)
+
 - INTER-phase iteration (Implementation→Review→Test cycle)
 - Completion promise: `IMPLEMENTATION_VERIFIED`
 - Scratchpad: `{feature-dir}/feedback-scratchpad.md`
-- Guards: max_feedback_iterations (5), max_consecutive_*_failures (3)
+- Guards: max_feedback_iterations (5), max_consecutive_failures (3)
 
-**[orchestrating-feature-development/references/emergency-abort.md](.claude/skills/orchestrating-feature-development/references/emergency-abort.md)**
+**[references/emergency-abort.md](.claude/skills/orchestrating-multi-agent-workflows/references/emergency-abort.md)**
 Pattern: 7.3 (Emergency Abort Protocol)
-- 5 abort triggers (user request, repeated escalations, critical security, unrecoverable error, cost/time exceeded)
+
+- 5 abort triggers (user request, repeated escalations, unrecoverable error, cost/time exceeded)
 - 4 cleanup options via AskUserQuestion (keep everything, keep artifacts, rollback, full cleanup)
 - Progress.json abort_info schema
 - Resume after abort via `/feature resume {id}`
 
 **[iterating-to-completion/SKILL.md](.claude/skills/iterating-to-completion/SKILL.md)**
-Patterns: 11.1-11.4 (INTRA-task iteration)
+Patterns: 10.1-10.4 (INTRA-task iteration)
+
 - Same-agent loops with completion promise
 - Guards: max_iterations (10), max_runtime (15min), consecutive_error_limit (3)
 - Different from Tight Feedback Loop (INTER-phase)
 
-### Usage Example
+**[references/context-monitoring.md](.claude/skills/orchestrating-multi-agent-workflows/references/context-monitoring.md)**
+Pattern: 5.3 (Context Window Monitoring)
 
-When an orchestrator detects a missing pattern, it can output:
+- Programmatic token tracking via Claude Code JSONL files (`~/.claude/projects/<project>/<session>.jsonl`)
+- Scripts to get current context size: `cache_read + cache_create + input` from latest entry
+- Threshold triggers: 75% (150k) = SHOULD compact, 80% (160k) = MUST compact, 85% (170k) = hook BLOCKS
+- Integration with compaction gates at phase transitions
+- External tools using same mechanism: [ccusage](https://github.com/ryoppippi/ccusage), [claude-code-statusline](https://github.com/levz0r/claude-code-statusline)
 
-```markdown
-## Missing Pattern: 11.5 - Tight Feedback Loop
+**[references/file-locking.md](.claude/skills/orchestrating-multi-agent-workflows/references/file-locking.md)**
+Pattern: 3.7 (File Locking Mechanism)
 
-**Description:** Implementation→Review→Test cycle with automatic retry on failure
+- Distributed locks in `{OUTPUT_DIRECTORY}/locks/{agent-name}.lock`
+- Lock schema: agent, locked_at, files[], directories[], expires_at (1 hour default)
+- Conflict detection before parallel spawn, resolution strategies (sequential, reassignment, split, merge)
+- Automatic cleanup when workflow completes or aborts
 
-**Reference:** [Ralph Wiggum Technique](https://awesomeclaude.ai/ralph-wiggum)
+**[references/phase-validators.md](.claude/skills/orchestrating-multi-agent-workflows/references/phase-validators.md)**
+Pattern: 4.3 (Explicit Validation Loop Protocol)
 
-**Category:** Iteration Patterns
-
-**Implementation guidance:** See Category 11 in Pattern Catalog
-```
-
----
-
-## Appendix
-
-### Pattern-Based Quality
-
-We define **34 foundational patterns** across **11 categories** that distinguish high-quality orchestrations from ad-hoc multi-agent workflows. Implementation scores:
-
-| Orchestration                          | Score | Rank | Notes |
-| -------------------------------------- | ----- | ---- | ----- |
-| orchestrating-integration-development  | 93%   | 1    |       |
-| **orchestrating-feature-development**  | 90    | 2    |       |
-| orchestrating-fingerprintx-development | 89%   | 3    |       |
-| orchestrating-capability-development   | 86%   | 4    |       |
-| orchestrating-research                 | 71%   | 5    |       |
-| threat-modeling-orchestrator           | 62%   | 6    | Write/Edit in allowed-tools (VIOLATION) |
-
-**Score calculation:** `(Implemented + 0.5×Partial) / Total applicable patterns`
-
-## Implementation Scorecard
-
-### Foundational Skill: orchestrating-multi-agent-workflows
-
-**Current Score: 38% (13/34 patterns)**
-
-| Category               | Defined | Partial | Missing | Score        |
-| ---------------------- | ------- | ------- | ------- | ------------ |
-| Core Architecture      | 3       | 2       | 1       | 4/6 (67%)    |
-| Phase Management       | 2       | 1       | 2       | 2.5/5 (50%)  |
-| Agent Coordination     | 3       | 1       | 3       | 3.5/7 (50%)  |
-| Quality Gates          | 3       | 2       | 3       | 4/8 (50%)    |
-| Context Management     | 1       | 0       | 3       | 1/4 (25%)    |
-| Progress Tracking      | 1       | 0       | 2       | 1/3 (33%)    |
-| Error Handling         | 1       | 1       | 1       | 1.5/3 (50%)  |
-| Security & Compliance  | 0       | 0       | 4       | 0/4 (0%)     |
-| Documentation          | 1       | 2       | 1       | 2/4 (50%)    |
-| Integration Patterns   | 2       | 0       | 3       | 2/5 (40%)    |
-| **Iteration Patterns** | **0**   | **0**   | **6**   | **0/6 (0%)** |
-
-### Implementation Rankings
-
-| Orchestration                              | Score | Strengths                                                         | Critical Gaps                               |
-| ------------------------------------------ | ----- | ----------------------------------------------------------------- | ------------------------------------------- |
-| **orchestrating-integration-development**  | 93%   | P0 compliance, skill check+creation, conditional frontend phase   | File locking (P4)                           |
-| **orchestrating-feature-development**      | ~90%  | Most phases (12), tight feedback loop, emergency abort, complete documentation | File scope boundaries, secret scanner |
-| **orchestrating-fingerprintx-development** | 89%   | Strongest blocking gates, prerequisite checks, live validation    | foundational ref missing                    |
-| **orchestrating-capability-development**   | 86%   | Capability type matrix, work type decision point                  | Context compaction                          |
-| **orchestrating-research**                 | 71%   | Sequential agent spawning, intent expansion, three-pass synthesis | Two-stage review                            |
-| **threat-modeling-orchestrator**           | 62%   | Dynamic parallelization, session resume, multi-format output      | **Write/Edit in allowed-tools (VIOLATION)** |
-
-### Utility Skills (Not Full Orchestrations)
-
-These skills provide **coordination patterns** used BY orchestrations, but are not standalone orchestrations:
-
-| Skill                           | Score | Purpose                                       | Used By                                |
-| ------------------------------- | ----- | --------------------------------------------- | -------------------------------------- |
-| **dispatching-parallel-agents** | 18%   | Parallel dispatch for 3+ independent failures | feature-dev, debugging, testing phases |
-| **iterating-to-completion**     | N/A   | Loop-until-done pattern (Category 11)         | All orchestrations                     |
-
-**Why not full orchestrations:**
-
-- No phases, no progress files, no human checkpoints
-- Narrow scope (single coordination pattern)
-- Designed to be invoked by other skills, not standalone
-
-### Debugging Skills Gap
-
-**No `orchestrating-debugging` skill exists.** Current debugging support:
-
-| Skill                         | Type                 | Gap                                               |
-| ----------------------------- | -------------------- | ------------------------------------------------- |
-| `debugging-systematically`    | Process methodology  | Not an orchestration - single-agent guidance      |
-| `debugging-strategies`        | Reference catalog    | Not an orchestration - knowledge base             |
-| `dispatching-parallel-agents` | Coordination utility | Used for parallel debugging, but no full workflow |
-
-**Potential Need:** A full `orchestrating-debugging` skill would:
-
-1. Invoke `debugging-systematically` for root cause analysis
-2. Use `dispatching-parallel-agents` for 3+ independent failures
-3. Provide human checkpoints (hypothesis approval, fix approval)
-4. Track progress across debugging sessions
-5. Integrate with `developing-with-tdd` for test creation
-
-### Cascade Effect
-
-```
-                    ┌─────────────────────────────────────┐
-                    │ orchestrating-multi-agent-workflows │
-                    │            (38% complete)           │
-                    └─────────────────┬───────────────────┘
-                                      │
-                    Missing from foundational skill:
-                    • Iteration Patterns (0%)
-                    • Security Patterns (0%)
-                    • Context Compaction (25%)
-                                      │
-          ┌───────────────┬───────────┼───────────┬───────────────┐
-          ▼               ▼           ▼           ▼               ▼
-    ┌───────────┐  ┌──-─────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
-    │integration│  │fingerprintx│ │capability │ │  feature  │ │  research │
-    │   93%     │  │    89%     │ │    86%    │ │   ~90%    │ │    71%    │
-    └───────────┘  └─-──────────┘ └───────────┘ └───────────┘ └───────────┘
-         │               │             │             │              │
-         └───────────────┴─────────────┴─────────────┴──────────────┘
-                                      │
-                    Each implementation independently:
-                    • Discovered iteration patterns (partial)
-                    • Missed security patterns (most)
-                    • Invented context management (inconsistent)
-```
-
-**Fix foundational skill FIRST, then cascade updates to implementations.**
-
----
-
-## Gap Analysis
-
-### P0 - Critical (Missing from all implementations)
-
-| Gap                           | Pattern   | Impact                                           | Fix                       | Status |
-| ----------------------------- | --------- | ------------------------------------------------ | ------------------------- | ------ |
-| **Iteration Patterns**        | 11.1-11.6 | No loop-until-done pattern - key to one-shotting | Add to foundational skill | ✅ DONE (feature-dev) |
-| **Context Compaction**        | 2.5, 5.2  | Context overflow crashes long workflows          | Add compaction protocol   | ✅ DONE (feature-dev, 2026-01-16) |
-| **Security Patterns**         | 8.1-8.4   | Zero security guidance in toolkit                | Add security gate section | ❌ Still missing |
-| **Requirements Verification** | 4.4       | Code review without requirements check           | Add pre-review phase      | ✅ DONE (feature-dev Phase 7) |
-
-### P1 - High Impact
-
-| Gap                           | Pattern | Impact                           | Fix                        | Status |
-| ----------------------------- | ------- | -------------------------------- | -------------------------- | ------ |
-| File Scope Boundaries         | 3.5     | Parallel agents may conflict     | Add scope in prompts       | ❌ Still missing |
-| Proactive Conflict Prevention | 3.6     | Only reactive detection exists   | Check overlap before spawn | ❌ Still missing |
-| Git Worktrees                 | 5.1     | No isolation pattern             | Document worktree usage    | ✅ DONE (feature-dev Phase 1) |
-| Metrics Tracking              | 6.3     | No cost/token visibility         | Add to progress.json       | ✅ DONE (feature-dev) |
-| Emergency Abort               | 7.3     | No rollback guidance             | Document abort protocol    | ✅ DONE (feature-dev) |
-| Workflow Handoff              | 10.4    | Research orphans parent workflow | Check TodoWrite for parent | ❌ Still missing |
-
-### P2 - Should Have
-
-| Gap                          | Pattern | Impact                        | Fix                     |
-| ---------------------------- | ------- | ----------------------------- | ----------------------- |
-| Commands as Thin Wrappers    | 1.6     | Implementation inconsistency  | Refactor commands       |
-| Phase Numbering Convention   | 2.2     | Inconsistent across skills    | Standardize             |
-| Agent Matrix Standard        | 3.2     | Each skill reinvents format   | Create template         |
-| Integration Section Standard | 9.1     | Inconsistent documentation    | Add Phase 28 compliance |
-| Exit Criteria Standard       | 9.3     | Unclear completion conditions | Document per skill      |
-
----
+- Generic validators per phase with pass criteria
+- Integration with orchestration-guards.md for retry limits
 
 ## Skill Connectivity Analysis
 
-### The Fundamental Problem
+### Foundational Skill Dependency Matrix
 
-```
-┌───────────────────────────────────────────────────────────────────┐
-│  /feature orchestration (12 phases as of 2026-01-16)              │
-│                                                                   │
-│  Phase 1  ─→ Setup (worktree + output dir)      ✓ ENFORCED        │
-│  Phase 2  ─→ skill: "brainstorming"             ✓ ENFORCED        │
-│  Phase 3  ─→ skill: "discovering-codebases..."  ✓ ENFORCED        │
-│  Phase 4  ─→ skill: "writing-plans"             ✓ ENFORCED        │
-│  Phase 5  ─→ Task(lead + security-lead)         ✓ Skills in prompt│
-│  Phase 6  ─→ Task(frontend-developer)           ✓ Skills in prompt│
-│  Phase 7  ─→ Plan Completion Review             ✓ BUILT-IN        │
-│  Phase 8  ─→ Code Review (two-stage)            ✓ BUILT-IN        │
-│  Phase 9  ─→ Task(test-lead)                    ✓ Skills in prompt│
-│  Phase 10 ─→ Task(testers, parallel)            ✓ Skills in prompt│
-│  Phase 11 ─→ Test Validation                    ✓ BUILT-IN        │
-│  Phase 12 ─→ skill: "finishing-a-dev-branch"    ✓ ENFORCED        │
-│                                                                   │
-│  ✓ Code Review: Phase 8 (two-stage gated)                         │
-│  ✓ Security Review: Phase 5 (security-lead in parallel)           │
-│  ✓ PR/Branch Completion: Phase 12 (finishing-a-development-branch)│
-└───────────────────────────────────────────────────────────────────┘
-```
+The `orchestrating-multi-agent-workflows` skill is the foundation for all orchestration patterns. Understanding its dependencies clarifies how the orchestration ecosystem fits together.
 
-### Skills Inventory
+> **Cross-References for Agent Skill Requirements**
+>
+> - **What agents must invoke**: See [AGENT-ARCHITECTURE.md](../agents/AGENT-ARCHITECTURE.md) for the complete Step 1/2/3 skill template (8 universal skills + role-specific additions + gateway routing)
+> - **How orchestrators validate agents**: See `orchestrating-multi-agent-workflows/references/agent-output-validation.md` for the 4-tier skill hierarchy and validation algorithm
+> - **Gateway matrix by agent type**: See `agent-output-validation.md` Section 2 for which gateways each agent type requires
 
-| Category         | Total Skills | Connected to /feature        | Gap               |
-| ---------------- | ------------ | ---------------------------- | ----------------- |
-| Core Skills      | 42           | 2 explicitly, ~15 via agents | 25 orphaned       |
-| Testing Library  | 18           | 0 directly                   | 18 orphaned       |
-| Security Library | 13           | 0 directly                   | 13 orphaned       |
-| Workflow Library | 7            | 0 directly                   | 7 orphaned        |
-| Frontend Library | ~25          | ~10 via gateway              | 15 orphaned       |
-| Backend Library  | ~15          | ~8 via gateway               | 7 orphaned        |
-| **Total**        | **~155**     | **~27 connected**            | **~60% orphaned** |
+#### Required Skills (invoke at orchestration start)
 
-### Orphaned Skills by Category
+| Skill                                 | Purpose                                                                | Why Required                            |
+| ------------------------------------- | ---------------------------------------------------------------------- | --------------------------------------- |
+| `persisting-agent-outputs`            | Output dir structure, MANIFEST.yaml, blocked agent routing table | Provides shared workspace / routing decisions |
+| `persisting-progress-across-sessions` | Resume protocol, progress files                                        | For tasks >30 min or >5 phases          |
 
-#### Workflow Skills (Status as of 2026-01-16)
+#### Called During Execution
 
-| Skill                            | Purpose                        | Status                                         |
-| -------------------------------- | ------------------------------ | ---------------------------------------------- |
-| `finishing-a-development-branch` | Branch cleanup, PR prep        | ✅ CONNECTED - Phase 12 of feature-dev         |
-| `code-review-checklist`          | Comprehensive review checklist | ❌ Orphaned - could enhance Phase 8            |
-| `requesting-code-review`         | PR creation best practices     | ❌ Orphaned - could enhance Phase 12           |
-| `github-workflow-automation`     | PR/issue automation            | ❌ Orphaned - could enhance Phase 12           |
+| Skill                                      | Trigger                      | Purpose                                                                                                                          |
+| ------------------------------------------ | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `developing-with-subagents` (CORE)         | 3+ independent tasks in plan | Same-session parallel execution with code review gates                                                                           |
+| `dispatching-parallel-agents` (CORE)       | 3+ independent failures      | Parallel debugging of independent test failures                                                                                  |
+| `finishing-a-development-branch` (LIBRARY) | Workflow complete            | Branch cleanup, PR creation, worktree cleanup - `Read(".claude/skill-library/workflow/finishing-a-development-branch/SKILL.md")` |
+| `using-git-worktrees` (CORE)               | 5+ phase orchestrations      | Isolated workspaces, rollback points                                                                                             |
 
-#### Security Skills (Never Mandated)
+#### Paired Skills (check before/during execution)
 
-| Skill                   | Purpose                | Should Be Used In             |
-| ----------------------- | ---------------------- | ----------------------------- |
-| `authorization-testing` | Test access controls   | Phase 5 for auth features     |
-| `secret-scanner`        | Find hardcoded secrets | Before any commit             |
-| `defense-in-depth`      | Security architecture  | Phase 3 Architecture          |
-| `threat-modeling`       | STRIDE analysis        | Phase 3 for security features |
+| Skill                                | Relationship                                                          |
+| ------------------------------------ | --------------------------------------------------------------------- |
+| `writing-plans` (CORE)               | Create detailed plan BEFORE orchestrating                             |
+| `brainstorming` (CORE)               | Design exploration BEFORE implementation                              |
+| `verifying-before-completion` (CORE) | Embedded in ALL agent prompts for exit criteria                       |
+| `iterating-to-completion` (CORE)     | INTRA-task loops (complementary to orchestration's INTER-phase loops) |
 
-#### Testing Skills (Exist but Not Mandated)
+#### Alternative Execution Model (NOT a dependency)
 
-| Skill                           | Purpose                           | Should Be Used In                |
-| ------------------------------- | --------------------------------- | -------------------------------- |
-| `test-infrastructure-discovery` | Find existing test utilities      | BEFORE spawning test engineers   |
-| `verifying-test-file-existence` | Verify files exist before testing | BEFORE test engineers            |
-| `testing-anti-patterns`         | Avoid common test mistakes        | Mandatory for all test engineers |
+| Skill             | Relationship                                                             |
+| ----------------- | ------------------------------------------------------------------------ |
+| `executing-plans` | Alternative single-executor model; mutually exclusive with orchestration |
 
-### Recommended Fixes
+**Key insight:** `executing-plans` does NOT appear in the dependency list because it represents a different execution model, not a sub-skill. See [Two Execution Models](#two-execution-models-coordinator-vs-executor) for the distinction.
 
-1. **Add missing phases to /feature** (Code Review, Security Review, Completion)
-2. **Enforce pre-conditions before spawning agents** (test-infrastructure-discovery)
-3. **Add skill verification to agent handoffs** (skills_invoked array)
-4. **Create skill enforcement layer** (mandatory skills by agent type)
-5. **Add conditional security gate** (trigger on auth/input/secrets/APIs)
-
----
-
-## Action Plan
-
-### Phase 1: Fix Foundational Skill (P0)
-
-**Target:** Bring `orchestrating-multi-agent-workflows` from 38% to 80%+
-
-| Action                                | Patterns Addressed | Effort    | Status                    |
-| ------------------------------------- | ------------------ | --------- | ------------------------- |
-| Add Iteration Patterns section        | 11.1-11.6          | 2-3 hours | ✅ DONE (feature-dev)     |
-| Add Context Compaction section        | 2.5, 5.2           | 1-2 hours | ✅ DONE (feature-dev 2026-01-16) |
-| Add Security Patterns section         | 8.1-8.4            | 2 hours   | ❌ Pending                |
-| Add Requirements Verification pattern | 4.4                | 1 hour    | ✅ DONE (feature-dev Phase 7) |
-| Add File Scope Boundaries pattern     | 3.5, 3.6           | 1 hour    | ❌ Pending                |
-| Add Git Worktrees pattern             | 5.1                | 30 min    | ✅ DONE (feature-dev Phase 1) |
-| Add Metrics Tracking pattern          | 6.3                | 1 hour    | ✅ DONE (feature-dev)     |
-| Add Emergency Abort pattern           | 7.3                | 1 hour    | ✅ DONE (feature-dev)     |
-| Add standard documentation formats    | 2.2, 3.2, 9.1, 9.3 | 2 hours   | ✅ DONE (feature-dev Integration) |
-
-### Phase 2: Update Implementations (P1)
-
-After foundational skill is updated:
-
-1. **threat-modeling-orchestrator**: Remove Write/Edit from allowed-tools (CRITICAL)
-2. ~~**orchestrating-feature-development**: Add tight feedback loop~~ ✅ **DONE** (2026-01-16)
-3. ~~**orchestrating-feature-development**: Add emergency abort protocol~~ ✅ **DONE** (2026-01-16)
-4. ~~**orchestrating-feature-development**: Fix allowed-tools violation~~ ✅ **DONE** (2026-01-16)
-5. ~~**orchestrating-feature-development**: Add compaction enforcement~~ ✅ **DONE** (2026-01-16)
-6. **All skills**: Add orchestrating-multi-agent-workflows reference if missing
-7. **Apply context compaction enforcement to other orchestrations** (capability, fingerprintx, integration, research)
-8. **Apply tight feedback loop to other orchestrations** (capability, fingerprintx, integration)
-
-### Phase 3: Maintain Compliance (P2)
-
-- Add foundational skill compliance check to skill creation workflow
-- Update auditing-skills to verify pattern compliance
-- Create automated score calculation
-
-### Detailed Todo List
-
-#### Priority 0: Skill Composition Patterns
-
-- [ ] Add REQUIRED SUB-SKILL directives to orchestrating-feature-development
-- [ ] Add Integration sections to all orchestration skills
-- [ ] Create prompt templates for orchestrating-feature-development
-- [ ] Refactor /feature command to thin wrapper
-- [ ] Add developing-with-subagents integration to Phase 4
-- [ ] Add dispatching-parallel-agents as conditional skill
-- [ ] Add persisting-progress-across-sessions for long workflows
-
-#### Priority 1: Skill Connectivity Quick Wins
-
-- [ ] Add `test-infrastructure-discovery` to Phase 5 preconditions
-- [ ] Add `code-review-checklist` as Phase 6
-- [ ] Add `secret-scanner` to completion workflow
-- [ ] Add `finishing-a-development-branch` at workflow end
-- [x] Add `skills_invoked` to agent handoff schema ✓ DONE
-- [x] Add Tight Feedback Loop to orchestrating-feature-development ✓ DONE (2026-01-16)
-- [x] Add Emergency Abort Protocol to orchestrating-feature-development ✓ DONE (2026-01-16)
-- [x] Fix allowed-tools violation in orchestrating-feature-development ✓ DONE (2026-01-16)
-
-#### Priority 2: High Impact
-
-- [ ] Add context compaction protocol to persisting-progress-across-sessions
-- [ ] Add file scope boundaries to agent delegation prompts
-- [ ] Document validation loop protocol in orchestration skills
-- [ ] Create skill enforcement layer for agents
-
-#### Priority 3: Medium Impact
-
-- [ ] Create mandatory security gate for sensitive features
-- [ ] Add metrics tracking to progress files
-- [ ] Connect workflow skills to /feature completion
+**Blocked Agent Routing**: The `orchestrating-multi-agent-workflows` skill USES the blocked agent routing table maintained in `persisting-agent-outputs/references/blocked-agent-routing.md` as the single source of truth. The routing table is owned by the `persisting-agent-outputs` skill. Orchestration skills may add orchestration-specific override logic based on workflow context.

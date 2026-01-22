@@ -53,6 +53,7 @@ filter.Asset(&asset) == false  // Asset is ACCEPTED - send it
 ```
 
 **Common Mistake**:
+
 ```go
 // WRONG - Inverted logic
 if !task.Filter.Asset(&asset) {
@@ -71,13 +72,14 @@ task.Job.Send(&asset)
 
 The VMFilter combines multiple filter types:
 
-| Filter Type | Purpose |
-|-------------|---------|
-| `InternalFilter` | Filters unreachable/internal IPs (via DNS/ping) |
-| `CloudFilter` | Filters cloud provider IPs (AWS, Azure, GCP ranges) |
-| `OrFilter` | Combines filters with OR logic (filter if EITHER matches) |
+| Filter Type      | Purpose                                                   |
+| ---------------- | --------------------------------------------------------- |
+| `InternalFilter` | Filters unreachable/internal IPs (via DNS/ping)           |
+| `CloudFilter`    | Filters cloud provider IPs (AWS, Azure, GCP ranges)       |
+| `OrFilter`       | Combines filters with OR logic (filter if EITHER matches) |
 
 **Initialization Pattern**:
+
 ```go
 // Standard VM integration
 Filter: filter.NewVMFilter(baseCapability.AWS, baseCapability.Collectors)
@@ -89,6 +91,7 @@ Filter: filter.NewCloudModuleFilter(baseCapability)
 ## Evidence Format
 
 **PASS Example**:
+
 ```
 ✅ VMFilter
 Evidence: aws.go:45 - Filter: filter.NewVMFilter(baseCapability.AWS, baseCapability.Collectors)
@@ -97,6 +100,7 @@ Evidence: aws.go:125 - task.Job.Send(&asset)
 ```
 
 **FAIL Example**:
+
 ```
 ❌ VMFilter
 Evidence: vendor.go - No NewVMFilter or NewCloudModuleFilter found
@@ -106,21 +110,23 @@ Required: Initialize VMFilter and gate all Job.Send calls
 
 ## Applicability
 
-| Integration Type | VMFilter Required? | Notes |
-|-----------------|-------------------|-------|
-| VM/Vulnerability scanners | YES | Nessus, Qualys, InsightVM, Tenable, etc. |
-| Cloud providers | YES (CloudModuleFilter) | AWS, Azure, GCP |
-| SCM integrations | NO | GitHub, Bitbucket, GitLab (no IP assets) |
-| File imports | DEPENDS | If importing IP/host assets, YES |
+| Integration Type          | VMFilter Required?      | Notes                                    |
+| ------------------------- | ----------------------- | ---------------------------------------- |
+| VM/Vulnerability scanners | YES                     | Nessus, Qualys, InsightVM, Tenable, etc. |
+| Cloud providers           | YES (CloudModuleFilter) | AWS, Azure, GCP                          |
+| SCM integrations          | NO                      | GitHub, Bitbucket, GitLab (no IP assets) |
+| File imports              | DEPENDS                 | If importing IP/host assets, YES         |
 
 ## Known Violations (from codebase research)
 
 **Critical Violation**:
+
 - **Axonius**: Sends device/IP assets directly without filter checks
   - Risk: Could ingest internal IPs, cloud infrastructure, or duplicates
   - Fix: Add VMFilter initialization and gating logic
 
 **Acceptable N/A**:
+
 - **GitHub, Bitbucket**: SCM integrations discovering repositories (not IPs)
   - Assessment: VMFilter not needed for repository assets
 

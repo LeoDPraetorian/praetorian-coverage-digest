@@ -281,12 +281,12 @@ Router synthesizes both outputs. Each provides different perspective.
 
 ## Related Skills
 
-| Skill                      | Access Method                                                                            | Purpose                                |
-| -------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------- |
-| **orchestrating-research** | `skill: "orchestrating-research"` (CORE)                                                 | Orchestrator for all research methods  |
-| **researching-web**        | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)              | Traditional WebSearch + WebFetch       |
-| **researching-context7**   | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)         | npm/library documentation              |
-| **researching-github**     | `Read(".claude/skill-library/research/researching-github/SKILL.md")` (LIBRARY)           | Open-source repos, issues, discussions |
-| **researching-arxiv**      | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)            | Academic papers                        |
-| **researching-codebase**   | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)         | Local pattern discovery                |
-| **mcp-tools-perplexity**   | `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md")` (LIBRARY) | Perplexity MCP wrapper catalog         |
+| Skill                              | Access Method                                                                            | Purpose                                |
+| ---------------------------------- | ---------------------------------------------------------------------------------------- | -------------------------------------- |
+| `orchestrating-research` (LIBRARY) | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`                 | Orchestrator for all research methods  |
+| **researching-web**                | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)              | Traditional WebSearch + WebFetch       |
+| **researching-context7**           | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)         | npm/library documentation              |
+| **researching-github**             | `Read(".claude/skill-library/research/researching-github/SKILL.md")` (LIBRARY)           | Open-source repos, issues, discussions |
+| **researching-arxiv**              | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)            | Academic papers                        |
+| **researching-codebase**           | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)         | Local pattern discovery                |
+| **mcp-tools-perplexity**           | `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-perplexity/SKILL.md")` (LIBRARY) | Perplexity MCP wrapper catalog         |

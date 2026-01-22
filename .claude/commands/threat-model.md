@@ -2,7 +2,6 @@
 description: Multi-phase threat modeling with parallel agents, human checkpoints, and structured outputs (MD + JSON + SARIF)
 argument-hint: [scope]
 allowed-tools: Skill, AskUserQuestion
-skills: threat-modeling-orchestrator
 ---
 
 # Threat Model
@@ -11,7 +10,15 @@ skills: threat-modeling-orchestrator
 
 ## Action
 
-**ACTION:** Invoke the `threat-modeling-orchestrator` skill.
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+```
+
+Then read the skill file:
+
+```bash
+Read: $ROOT/.claude/skill-library/security/threat-modeling-orchestrator/SKILL.md
+```
 
 **Arguments:**
 

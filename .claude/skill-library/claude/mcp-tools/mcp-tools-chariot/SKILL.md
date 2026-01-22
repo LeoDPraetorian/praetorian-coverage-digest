@@ -200,8 +200,22 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 })();" 2>/dev/null
 ```
 
-## Related Skills
+## Integration
 
-- **mcp-tools-registry** - Execution patterns (REQUIRED - see for Bash + tsx usage)
-- **mcp-code-create** - Create new wrappers
-- **mcp-code-test** - Test wrappers
+### Called By
+
+- `gateway-mcp-tools` (CORE) - Routes to this tool skill when user needs Chariot platform access
+
+### Requires (invoke before starting)
+
+- **`mcp-tools-registry`** (LIBRARY) - Always
+  - Purpose: Execution patterns for Bash + tsx
+  - `Read(".claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md")`
+
+### Calls (during execution)
+
+None - Reference skill providing tool documentation
+
+### Pairs With (conditional)
+
+None

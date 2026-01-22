@@ -319,10 +319,10 @@ function findSkillInDirectory(dir: string, name: string): string | null {
  *
  * @example
  * ```typescript
- * const skillDir = findSkillPath('claude-skill-write');
+ * const skillDir = findSkillPath('managing-skills');
  * // Returns: '/path/.claude/skills' (found in core)
  *
- * const libSkill = findSkillPath('frontend-tanstack-query');
+ * const libSkill = findSkillPath('using-tanstack-query');
  * // Returns: '/path/.claude/skill-library/development/frontend' (found via recursive search)
  * ```
  */

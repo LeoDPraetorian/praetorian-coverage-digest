@@ -75,6 +75,7 @@ Use subcategories (ID.AM-01, PR.AC-03) when you know the specific control:
 ## Quick Finding-to-CSF Mappings
 
 For comprehensive vulnerability-to-CSF category mapping tables covering:
+
 - Cloud Security (AWS/Azure/GCP) - 14 patterns
 - Network Security - 10 patterns
 - Web Application Security - 12 patterns
@@ -85,6 +86,7 @@ For comprehensive vulnerability-to-CSF category mapping tables covering:
 **See:** [references/finding-type-mappings.md](references/finding-type-mappings.md) - Complete mapping tables with 60+ finding types
 
 **Common patterns:**
+
 - Public S3 bucket → PR.DS-05 (Leak protection)
 - Unpatched CVE → PR.IP-12 (Vulnerability remediation)
 - SQL Injection → PR.DS-08 (Integrity check)
@@ -241,6 +243,7 @@ For real-world capability implementations, gap analysis procedures, and tool int
 **See:** [references/implementation-examples.md](references/implementation-examples.md) - Comprehensive implementation guide
 
 **Includes:**
+
 - Capability coverage matrix (10+ Chariot examples)
 - Implementation examples by CSF category (GV, ID, PR, DE, RS, RC)
 - Gap analysis methodology with prioritization
@@ -274,7 +277,7 @@ None - documentation-only skill, no workflow dependencies.
 | `mapping-to-mitre-attack` | Threat context needed        | Correlate CSF with adversary techniques |
 | `mapping-to-cwe`          | Vulnerability classification | Map CSF to technical weakness types     |
 | `mapping-to-sans-top-25`  | Prioritization needed        | Align CSF with industry-critical risks  |
-| `scoring-cvss-threats`            | Severity assessment          | Risk severity + CSF category            |
+| `scoring-cvss-threats`    | Severity assessment          | Risk severity + CSF category            |
 
 ---
 

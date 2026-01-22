@@ -1,6 +1,6 @@
 ---
 name: codebase-sizer
-description: Use when assessing codebase size before threat modeling Phase 2 - executes codebase-sizing skill to count files per component, categorize as small/medium/large, and output sizing-report.json with parallelization strategy recommendation for codebase-mapper agents.\n\n<example>\nContext: Orchestrator spawning Phase 2\nuser: "Assess codebase size for ./modules/chariot"\nassistant: "I'll use codebase-sizer"\n</example>
+description: Use when assessing codebase size before threat modeling Phase 2 - executes sizing-codebases skill to count files per component, categorize as small/medium/large, and output sizing-report.json with parallelization strategy recommendation for codebase-mapper agents.\n\n<example>\nContext: Orchestrator spawning Phase 2\nuser: "Assess codebase size for ./modules/chariot"\nassistant: "I'll use codebase-sizer"\n</example>
 type: analysis
 permissionMode: plan
 tools: Bash, Glob, Grep, Read, TodoWrite, Write, WebFetch, WebSearch
@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - count files, don't estimate                                            |
-| `gateway-security`                  | Routes to codebase-sizing library skill (5-step methodology)                                         |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST                 |
-| `using-todowrite`                   | Track 5-step workflow progress                                                                       |
-| `verifying-before-completion`       | Ensures sizing-report.json produced before claiming done                                             |
+| Skill                               | Why Always Invoke                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure.     |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing          |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                   |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - count files, don't estimate                            |
+| `gateway-security`                  | Routes to sizing-codebases library skill (5-step methodology)                         |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST |
+| `using-todowrite`                   | Track 5-step workflow progress                                                       |
+| `verifying-before-completion`       | Ensures sizing-report.json produced before claiming done                             |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -53,7 +53,7 @@ Your `skills` frontmatter makes these core skills available. **Invoke based on s
 
 The gateway provides:
 
-1. **Mandatory library skills** - Read the `codebase-sizing` skill for 5-step methodology
+1. **Mandatory library skills** - Read the `sizing-codebases` skill for 5-step methodology
 2. **Task-specific routing** - File counting patterns, component discovery heuristics
 3. **Output schema** - JSON schema that orchestrator depends on
 
@@ -174,7 +174,7 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 
 | Field                | Value                                           |
 | -------------------- | ----------------------------------------------- |
-| `output_type`        | `"codebase-sizing"` or `"threat-model-phase-2"` |
+| `output_type`        | `"sizing-codebases"` or `"threat-model-phase-2"` |
 | `handoff.next_agent` | `"codebase-mapper"` (spawn based on strategy)   |
 
 **Session directory structure:**

@@ -8,28 +8,28 @@
 
 ### By Content Type
 
-| Content Type       | Tokens per Line | Tokens per Character | Notes                                 |
-| ------------------ | --------------- | -------------------- | ------------------------------------- |
-| **English text**   | 8-10            | 0.25                 | 1 token ≈ 4 characters ≈ 0.75 words  |
-| **Code (Go)**      | 10-12           | 0.33                 | More tokens due to symbols            |
-| **Code (Python)**  | 9-11            | 0.30                 | Less dense than Go                    |
-| **Code (TS/JS)**   | 10-13           | 0.33                 | Verbose, many tokens per line         |
-| **Markdown**       | 8-10            | 0.25                 | 15% more efficient than JSON/XML      |
-| **JSON**           | 12-15           | 0.35                 | High token density due to syntax      |
-| **XML**            | 12-15           | 0.35                 | Similar to JSON                       |
-| **YAML**           | 10-12           | 0.28                 | Between Markdown and JSON             |
-| **SQL**            | 11-14           | 0.32                 | Keywords and symbols                  |
+| Content Type      | Tokens per Line | Tokens per Character | Notes                               |
+| ----------------- | --------------- | -------------------- | ----------------------------------- |
+| **English text**  | 8-10            | 0.25                 | 1 token ≈ 4 characters ≈ 0.75 words |
+| **Code (Go)**     | 10-12           | 0.33                 | More tokens due to symbols          |
+| **Code (Python)** | 9-11            | 0.30                 | Less dense than Go                  |
+| **Code (TS/JS)**  | 10-13           | 0.33                 | Verbose, many tokens per line       |
+| **Markdown**      | 8-10            | 0.25                 | 15% more efficient than JSON/XML    |
+| **JSON**          | 12-15           | 0.35                 | High token density due to syntax    |
+| **XML**           | 12-15           | 0.35                 | Similar to JSON                     |
+| **YAML**          | 10-12           | 0.28                 | Between Markdown and JSON           |
+| **SQL**           | 11-14           | 0.32                 | Keywords and symbols                |
 
 ### By Document Type
 
-| Document Type      | Tokens per Page | Basis                                     |
-| ------------------ | --------------- | ----------------------------------------- |
-| **PDF (general)**  | 500             | ~250 words/page × 1.33 tokens/word        |
-| **PDF (academic)** | 800             | Dense text, ~400 words/page               |
-| **PDF (technical)**| 600             | Mix of text, diagrams, code               |
-| **Word (.docx)**   | 500             | Similar to general PDF                    |
-| **PowerPoint**     | 400             | ~200 words/slide + metadata               |
-| **Excel (.xlsx)**  | Varies          | Depends on cell density (est. 2 tok/cell) |
+| Document Type       | Tokens per Page | Basis                                     |
+| ------------------- | --------------- | ----------------------------------------- |
+| **PDF (general)**   | 500             | ~250 words/page × 1.33 tokens/word        |
+| **PDF (academic)**  | 800             | Dense text, ~400 words/page               |
+| **PDF (technical)** | 600             | Mix of text, diagrams, code               |
+| **Word (.docx)**    | 500             | Similar to general PDF                    |
+| **PowerPoint**      | 400             | ~200 words/slide + metadata               |
+| **Excel (.xlsx)**   | Varies          | Depends on cell density (est. 2 tok/cell) |
 
 ---
 
@@ -60,15 +60,15 @@ Safe target:            50,000 tokens (50% buffer for safety)
 
 Thresholds derived from **safe target of 50K tokens per agent**:
 
-| Content Type      | Threshold      | Calculation                        |
-| ----------------- | -------------- | ---------------------------------- |
-| Code files        | 5,000 lines    | 50,000 tokens / 10 tokens/line     |
-| Markdown files    | 5,000 lines    | 50,000 tokens / 10 tokens/line     |
-| PDF (general)     | 100 pages      | 50,000 tokens / 500 tokens/page    |
-| PDF (academic)    | 60 pages       | 50,000 tokens / 800 tokens/page    |
-| Word documents    | 100 pages      | 50,000 tokens / 500 tokens/page    |
-| PowerPoint        | 75 slides      | 50,000 tokens / 400 tokens/slide   |
-| JSON/XML          | 3,000 lines    | 50,000 tokens / 15 tokens/line     |
+| Content Type   | Threshold   | Calculation                      |
+| -------------- | ----------- | -------------------------------- |
+| Code files     | 5,000 lines | 50,000 tokens / 10 tokens/line   |
+| Markdown files | 5,000 lines | 50,000 tokens / 10 tokens/line   |
+| PDF (general)  | 100 pages   | 50,000 tokens / 500 tokens/page  |
+| PDF (academic) | 60 pages    | 50,000 tokens / 800 tokens/page  |
+| Word documents | 100 pages   | 50,000 tokens / 500 tokens/page  |
+| PowerPoint     | 75 slides   | 50,000 tokens / 400 tokens/slide |
+| JSON/XML       | 3,000 lines | 50,000 tokens / 15 tokens/line   |
 
 ---
 

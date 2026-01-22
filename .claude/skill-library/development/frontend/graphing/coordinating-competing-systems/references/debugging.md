@@ -15,13 +15,13 @@ This guide provides a systematic 4-step process for debugging interference.
 
 ## Quick Diagnostic
 
-| Symptom                          | Likely Interference Type        | Quick Test                           |
-| -------------------------------- | ------------------------------- | ------------------------------------ |
-| Feature A works, B works, A+B fails | State or timing conflict        | Disable one, verify other works      |
-| "Works sometimes"                | Race condition                  | Add delays, check if behavior changes |
-| Performance degradation          | Resource contention             | Profile during peak operations       |
-| Stale/incorrect data             | Cache or state synchronization  | Force refresh, check if fixes issue  |
-| UI freezes intermittently        | Event loop blocking             | Check call stack during freeze       |
+| Symptom                             | Likely Interference Type       | Quick Test                            |
+| ----------------------------------- | ------------------------------ | ------------------------------------- |
+| Feature A works, B works, A+B fails | State or timing conflict       | Disable one, verify other works       |
+| "Works sometimes"                   | Race condition                 | Add delays, check if behavior changes |
+| Performance degradation             | Resource contention            | Profile during peak operations        |
+| Stale/incorrect data                | Cache or state synchronization | Force refresh, check if fixes issue   |
+| UI freezes intermittently           | Event loop blocking            | Check call stack during freeze        |
 
 ## 4-Step Debugging Process
 
@@ -93,11 +93,7 @@ if (DEBUG_FLAGS.enableLayout) {
 const useSystemLogger = (systemName: string) => {
   const log = useCallback(
     (event: string, data?: any) => {
-      console.debug(
-        `[${systemName}][${Date.now()}] ${event}`,
-        data,
-        new Error().stack
-      );
+      console.debug(`[${systemName}][${Date.now()}] ${event}`, data, new Error().stack);
     },
     [systemName]
   );
@@ -107,22 +103,22 @@ const useSystemLogger = (systemName: string) => {
 
 // Usage in systems
 const useForceLayout = (graph: Graph) => {
-  const log = useSystemLogger('ForceLayout');
+  const log = useSystemLogger("ForceLayout");
 
   useEffect(() => {
-    log('START', { nodeCount: graph.order });
+    log("START", { nodeCount: graph.order });
 
     const layout = new FA2Layout(graph, options);
     layout.start();
 
     return () => {
-      log('STOP');
+      log("STOP");
       layout.stop();
     };
   }, [graph]);
 
   const tick = () => {
-    log('TICK', {
+    log("TICK", {
       running: layout.isRunning(),
       iteration: layout.getIteration(),
     });
@@ -130,24 +126,24 @@ const useForceLayout = (graph: Graph) => {
 };
 
 const useViewportCulling = (graph: Graph) => {
-  const log = useSystemLogger('ViewportCulling');
+  const log = useSystemLogger("ViewportCulling");
 
   const updateVisibility = useCallback(() => {
-    const layout = graph.getAttribute('layout');
+    const layout = graph.getAttribute("layout");
 
-    log('CHECK_GUARD', {
+    log("CHECK_GUARD", {
       layoutRunning: layout?.isRunning(),
       nodeCount: graph.order,
     });
 
     if (layout?.isRunning()) {
-      log('SKIP', { reason: 'layout running' });
+      log("SKIP", { reason: "layout running" });
       return;
     }
 
-    log('CULL_START');
+    log("CULL_START");
     cullNodes(graph);
-    log('CULL_END', { culledCount: getCulledCount() });
+    log("CULL_END", { culledCount: getCulledCount() });
   }, [graph, log]);
 };
 ```
@@ -185,11 +181,7 @@ const usePerformanceTracking = (operationName: string) => {
 
   const end = useCallback(() => {
     performance.mark(`${operationName}-end`);
-    performance.measure(
-      operationName,
-      `${operationName}-start`,
-      `${operationName}-end`
-    );
+    performance.measure(operationName, `${operationName}-start`, `${operationName}-end`);
 
     const measure = performance.getEntriesByName(operationName)[0];
     console.debug(`[Perf] ${operationName}: ${measure.duration.toFixed(2)}ms`);
@@ -200,7 +192,7 @@ const usePerformanceTracking = (operationName: string) => {
 
 // Usage
 const useForceLayout = (graph: Graph) => {
-  const perf = usePerformanceTracking('ForceLayout');
+  const perf = usePerformanceTracking("ForceLayout");
 
   useEffect(() => {
     perf.start();
@@ -221,7 +213,7 @@ const useForceLayout = (graph: Graph) => {
 ```typescript
 // Get all performance entries and sort by startTime
 const getTimeline = () => {
-  const entries = performance.getEntriesByType('measure');
+  const entries = performance.getEntriesByType("measure");
   entries.sort((a, b) => a.startTime - b.startTime);
 
   console.table(
@@ -301,7 +293,7 @@ git log -p --all -S "useViewportCulling" -- "*.tsx"
 
 ```typescript
 const updateVisibility = useCallback(() => {
-  const layout = graph.getAttribute('layout');
+  const layout = graph.getAttribute("layout");
   if (layout?.isRunning()) {
     return; // Guard: Wait for layout
   }
@@ -326,12 +318,12 @@ const usePausableAnimation = (graph: Graph) => {
     const handleDragStart = () => setPaused(true);
     const handleDragEnd = () => setPaused(false);
 
-    graph.on('drag', handleDragStart);
-    graph.on('dragend', handleDragEnd);
+    graph.on("drag", handleDragStart);
+    graph.on("dragend", handleDragEnd);
 
     return () => {
-      graph.off('drag', handleDragStart);
-      graph.off('dragend', handleDragEnd);
+      graph.off("drag", handleDragStart);
+      graph.off("dragend", handleDragEnd);
     };
   }, [graph]);
 
@@ -414,9 +406,9 @@ const useZoomAwareClick = (graph: Graph) => {
       handleNodeClick(event);
     };
 
-    graph.on('zoomstart', handleZoomStart);
-    graph.on('zoomend', handleZoomEnd);
-    graph.on('click', handleClick);
+    graph.on("zoomstart", handleZoomStart);
+    graph.on("zoomend", handleZoomEnd);
+    graph.on("click", handleClick);
   }, [graph]);
 };
 ```
@@ -450,9 +442,7 @@ Record all events for playback.
 
 ```typescript
 const useEventRecorder = (graph: Graph) => {
-  const events = useRef<Array<{ timestamp: number; type: string; data: any }>>(
-    []
-  );
+  const events = useRef<Array<{ timestamp: number; type: string; data: any }>>([]);
 
   useEffect(() => {
     const handler = (type: string) => (data: any) => {
@@ -463,15 +453,15 @@ const useEventRecorder = (graph: Graph) => {
       });
     };
 
-    graph.on('layout:start', handler('layout:start'));
-    graph.on('layout:stop', handler('layout:stop'));
-    graph.on('cull:start', handler('cull:start'));
-    graph.on('cull:end', handler('cull:end'));
+    graph.on("layout:start", handler("layout:start"));
+    graph.on("layout:stop", handler("layout:stop"));
+    graph.on("cull:start", handler("cull:start"));
+    graph.on("cull:end", handler("cull:end"));
   }, [graph]);
 
   const dump = useCallback(() => {
     console.log(
-      'Event timeline:',
+      "Event timeline:",
       events.current.map((e) => `${e.timestamp}: ${e.type}`)
     );
   }, []);
@@ -486,17 +476,15 @@ Add runtime assertions to catch violations.
 
 ```typescript
 const assertNoLayoutRunning = (graph: Graph, operation: string) => {
-  const layout = graph.getAttribute('layout');
+  const layout = graph.getAttribute("layout");
   if (layout?.isRunning()) {
-    throw new Error(
-      `Assertion failed: ${operation} called while layout running`
-    );
+    throw new Error(`Assertion failed: ${operation} called while layout running`);
   }
 };
 
 // Usage
 const cullNodes = (graph: Graph) => {
-  assertNoLayoutRunning(graph, 'cullNodes');
+  assertNoLayoutRunning(graph, "cullNodes");
   // ... culling logic
 };
 ```
@@ -555,7 +543,7 @@ Found: `// useViewportCulling() - TEMPORARILY DISABLED`
 
 ```typescript
 const updateVisibility = useCallback(() => {
-  const layout = graph?.getAttribute('layout');
+  const layout = graph?.getAttribute("layout");
   if (layout?.isRunning()) {
     return; // Guard: Don't cull during layout
   }

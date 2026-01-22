@@ -24,12 +24,12 @@ The following requirements drove the specification of Windows NT back in 1989:
 To guide the thousands of decisions that had to be made to create a system that met these requirements, the Windows NT design team adopted the following design goals at the beginning of the project:
 
 - ■ Extensibility The code must be written to comfortably grow and change as market require-
-ments change.
-■ Portability The system must be able to run on multiple hardware architectures and must be
-able to move with relative ease to new ones as market demands dictate.
-■ Reliability and robustness The system should protect itself from both internal malfunction
-and external tampering. Applications should not be able to harm the OS or other applications.
-45
+  ments change.
+  ■ Portability The system must be able to run on multiple hardware architectures and must be
+  able to move with relative ease to new ones as market demands dictate.
+  ■ Reliability and robustness The system should protect itself from both internal malfunction
+  and external tampering. Applications should not be able to harm the OS or other applications.
+  45
 
 ---
 
@@ -81,27 +81,27 @@ In Figure 2-1, first notice the line dividing the user-mode and kernel-mode part
 The four basic types of user-mode processes are described as follows:
 
 - ■ User processes These processes can be one of the following types: Windows 32-bit or 64-bit
-(Windows Apps running on top of the Windows Runtime in Windows 8 and later are included
-in this category), Windows 3.1 16-bit, MS-DOS 16-bit, or POSIX 32-bit or 64-bit. Note that 16-bit
-applications can be run only on 32-bit Windows, and that POSIX applications are no longer sup-
-ported as of Windows 8.
-■ Service processes These are processes that host Windows services, such as the Task Sched-
-uler and Print Spooler services. Services generally have the requirement that they run indepen-
-dently of user logons. Many Windows server applications, such as Microsoft SQL Server and
-Microsoft Exchange Server, also include components that run as services. Chapter 9, “Manage-
-ment mechanisms,” in Part 2 describes services in detail.
-■ System processes These are fixed, or hardwired, processes, such as the logon process and
-the Session Manager, that are not Windows services. That is, they are not started by the Service
-Control Manager.
-■ Environment subsystem server processes These implement part of the support for the OS
-environment, or personality, presented to the user and programmer. Windows NT originally
-shipped with three environment subsystems: Windows, POSIX, and OS/2. However, the OS/2
-subsystem last shipped with Windows 2000 and POSIX last shipped with Windows XP. The Ulti-
-mate and Enterprise editions of Windows 7 client as well as all of the server versions of Windows
-2008 R2 include support for an enhanced POSIX subsystem called Subsystem for UNIX-based
-Applications (SUA). The SUA is now discontinued and is no longer offered as an optional part of
-Windows (either client or server).
-![Figure](figures/Winternals7thPt1_page_065_figure_002.png)
+  (Windows Apps running on top of the Windows Runtime in Windows 8 and later are included
+  in this category), Windows 3.1 16-bit, MS-DOS 16-bit, or POSIX 32-bit or 64-bit. Note that 16-bit
+  applications can be run only on 32-bit Windows, and that POSIX applications are no longer sup-
+  ported as of Windows 8.
+  ■ Service processes These are processes that host Windows services, such as the Task Sched-
+  uler and Print Spooler services. Services generally have the requirement that they run indepen-
+  dently of user logons. Many Windows server applications, such as Microsoft SQL Server and
+  Microsoft Exchange Server, also include components that run as services. Chapter 9, “Manage-
+  ment mechanisms,” in Part 2 describes services in detail.
+  ■ System processes These are fixed, or hardwired, processes, such as the logon process and
+  the Session Manager, that are not Windows services. That is, they are not started by the Service
+  Control Manager.
+  ■ Environment subsystem server processes These implement part of the support for the OS
+  environment, or personality, presented to the user and programmer. Windows NT originally
+  shipped with three environment subsystems: Windows, POSIX, and OS/2. However, the OS/2
+  subsystem last shipped with Windows 2000 and POSIX last shipped with Windows XP. The Ulti-
+  mate and Enterprise editions of Windows 7 client as well as all of the server versions of Windows
+  2008 R2 include support for an enhanced POSIX subsystem called Subsystem for UNIX-based
+  Applications (SUA). The SUA is now discontinued and is no longer offered as an optional part of
+  Windows (either client or server).
+  ![Figure](figures/Winternals7thPt1_page_065_figure_002.png)
 
 Note Windows 10 Version 1607 includes a Windows Subsystem for Linux (WSL) in beta state for developers only. However, this is not a true subsystem as described in this section. This chapter will discuss WSL and the related Pico providers in more detail. For information about Pico processes, see Chapter 3, "Processes and jobs. "
 
@@ -110,7 +110,8 @@ In Figure 2-1, notice the Subsystem DLLs box below the Service Processes and Use
 The kernel-mode components of Windows include the following:
 
 - Executive The Windows executive contains the base OS services, such as memory management,
-process and thread management, security, I/O, networking, and inter-process communication.
+  process and thread management, security, I/O, networking, and inter-process communication.
+
 ---
 
 <table><tr><td>— The Windows kernel</td><td>This consists of low-level OS functions, such as thread scheduling, interrupt and exception dispatching, and multiprocessor synchronization. It also provides a set of routines and basic objects that the rest of the executive uses to implement higher-level constructs.</td></tr><tr><td>— Device drivers</td><td>This includes both hardware device I/O functions, such as file system and network drivers.</td></tr><tr><td>— The Hardware Abstraction Layer (HAL)</td><td>This is a layer of code that isolates the kernel, the process, and the rest of the Windows executive from platform-specific hardware differences between platforms.</td></tr><tr><td>— The windowing graphics system</td><td>This implements the graphical user interface (GUI) functions (better known as the Windows User and GDI functions), such as dealing with windows, user interface controls, and drawing.</td></tr><tr><td>— The hypervisor layer</td><td>This is composed of a single component: the hypervisor itself. There are no drivers or other modules in this environment. That being said, the hypervisor is either com-posed of multiple internal layers and services, such as its own memory manager, virtual processor scheduler, interrupt and timer management, synchronization routines, partitions (virtual machine instances) management and inter-partition communication (IPC), and more.</td></tr></table>
@@ -123,8 +124,7 @@ TABLE 2-1 Core Windows System Files
 
 Before we dig into the details of these system components, though, let's examine some basics about the Windows kernel design, starting with how Windows achieves portability across multiple hardware architectures.
 
-CHAPTER 2 System architecture    49
-
+CHAPTER 2 System architecture 49
 
 ---
 
@@ -137,25 +137,24 @@ Newer editions of Windows support the ARM processor architecture. For example, W
 Windows achieves portability across hardware architectures and platforms in two primary ways:
 
 - ■ By using a layered design Windows has a layered design, with low-level portions of the
-system that are processor-architecture-specific or platform-specific isolated into separate
-modules so that upper layers of the system can be shielded from the differences between
-architectures and among hardware platforms. The two key components that provide OS por-
-tability are the kernel (contained in Ntoskrnl.exe) and the HAL (contained in Hal.dll). Both these
-components are described in more detail later in this chapter. Functions that are architecture-
-specific, such as thread context switching and trap dispatching, are implemented in the kernel.
-Functions that can differ among systems within the same architecture (for example, different
-motherboards) are implemented in the HAL. The only other component with a significant
-amount of architecture-specific code is the memory manager, but even that is a small amount
-compared to the system as a whole. The hypervisor follows a similar design, with most parts
-shared between the AMD (SVM) and Intel (VT-x) implementation, and some specific parts for
-each processor—hence the two file names on disk you saw in Table 2-1.
-■ By using C The vast majority of Windows is written in C, with some portions in C++. Assembly
-language is used only for those parts of the OS that need to communicate directly with system
-hardware (such as the interrupt trap handler) or that are extremely performance-sensitive (such
-as context switching). Assembly language code exists not only in the kernel and the HAL but
-also in a few other places within the core OS (such as the routines that implement interlocked
-50 CHAPTER 2 System architecture
-
+  system that are processor-architecture-specific or platform-specific isolated into separate
+  modules so that upper layers of the system can be shielded from the differences between
+  architectures and among hardware platforms. The two key components that provide OS por-
+  tability are the kernel (contained in Ntoskrnl.exe) and the HAL (contained in Hal.dll). Both these
+  components are described in more detail later in this chapter. Functions that are architecture-
+  specific, such as thread context switching and trap dispatching, are implemented in the kernel.
+  Functions that can differ among systems within the same architecture (for example, different
+  motherboards) are implemented in the HAL. The only other component with a significant
+  amount of architecture-specific code is the memory manager, but even that is a small amount
+  compared to the system as a whole. The hypervisor follows a similar design, with most parts
+  shared between the AMD (SVM) and Intel (VT-x) implementation, and some specific parts for
+  each processor—hence the two file names on disk you saw in Table 2-1.
+  ■ By using C The vast majority of Windows is written in C, with some portions in C++. Assembly
+  language is used only for those parts of the OS that need to communicate directly with system
+  hardware (such as the interrupt trap handler) or that are extremely performance-sensitive (such
+  as context switching). Assembly language code exists not only in the kernel and the HAL but
+  also in a few other places within the core OS (such as the routines that implement interlocked
+  50 CHAPTER 2 System architecture
 
 ---
 
@@ -187,7 +186,6 @@ CHAPTER 2 System architecture
 
 51
 
-
 ---
 
 Each logical processor has its own CPU state, but the execution engine and onboard cache are shared. This permits one logical CPU to make progress while the other logical CPU is stalled (such as after a cache miss or branch misprediction). Confusingly, the marketing literature for both companies refers to these additional cores as threads, so you'll often see claims such as "four cores, eight threads." This indicates that up to eight threads can be scheduled, hence, the existence of eight logical processors. The scheduling algorithms are enhanced to make optimal use of SMT-enabled machines, such as by scheduling threads on an idle physical processor versus choosing an idle logical processor on a physical processor whose other logical processors are busy. For more details on thread scheduling, see Chapter 4.
@@ -212,8 +210,7 @@ By being able to pair such legacy mobile processors with top-of-the-line ones, A
 
 Windows was not originally designed with a specific processor number limit in mind, other than the licensing policies that differentiate the various Windows editions. However, for convenience and
 
-52      CHAPTER 2   System architecture
-
+52 CHAPTER 2 System architecture
 
 ---
 
@@ -239,8 +236,7 @@ that facilitate the efficient implementation of multithreaded server processes t
 on multiprocessor systems
 The scalability of the Windows kernel has evolved over time. For example, Windows Server 2003 introduced per-CPU scheduling queues with a fine-grained lock, permitting thread-scheduling decisions to occur in parallel on multiple processors. Windows 7 and Windows Server 2008 R2 eliminated global scheduler locking during wait-dispatching operations. This stepwise improvement of the granularity of locking has also occurred in other areas, such as the memory manager, cache manager, and object manager.
 
-CHAPTER 2 System architecture     53
-
+CHAPTER 2 System architecture 53
 
 ---
 
@@ -257,7 +253,7 @@ Server, Windows Storage Server 2016, and Microsoft Hyper-V Server 2016.
 These versions differ as follows:
 
 - Core-based (rather than socket-based) pricing for the Server 2016 Datacenter and Standard
-edition
+  edition
 
 The number of total logical processors supported
 
@@ -292,7 +288,6 @@ TABLE 2-2 Processor and memory limits for some Windows editions
 
 <table><tr><td></td><td>Number of Sockets Supported (32-Bit Edition)</td><td>Physical Memory Supported (32-Bit Edition)</td><td>Number of Logical Processors/Sockets Supported (64-Bit Edition)</td><td>Physical Memory Supported (x64 Editions)</td></tr><tr><td>Windows 10 Home</td><td>1</td><td>4 GB</td><td>1 socket</td><td>128 GB</td></tr><tr><td>Windows 10 Pro</td><td>2</td><td>4 GB</td><td>2 sockets</td><td>2 TB</td></tr><tr><td>Windows 10 Enterprise</td><td>2</td><td>4 GB</td><td>2 sockets</td><td>2 TB</td></tr><tr><td>Windows Server 2012 R2 Essentials</td><td>Not available</td><td>Not available</td><td>2 sockets</td><td>64 GB</td></tr><tr><td>Windows Server 2016 Standard</td><td>Not available</td><td>Not available</td><td>512 logical processors</td><td>24 TB</td></tr><tr><td>Windows Server 2016 Datacenter</td><td>Not available</td><td>Not available</td><td>512 logical processors</td><td>24 TB</td></tr></table>
 
-
 With so many different editions of Windows and each having the same kernel image, how does the
 
 system know which edition is booted? By querying the registry values ProductType and ProductSuite
@@ -312,7 +307,6 @@ documented in the Windows Driver Kit (WDK).
 TABLE 2-3 ProductType registry values
 
 <table><tr><td>Edition of Windows</td><td>Value of ProductType</td></tr><tr><td>Windows client</td><td>WinNT</td></tr><tr><td>Windows server (domain controller)</td><td>LanmanNT</td></tr><tr><td>Windows server (server only)</td><td>ServerNT</td></tr></table>
-
 
 A different registry value, ProductPolicy, contains a cached copy of the data inside the tokens.dat file, which differentiates between the editions of Windows and the features that they enable.
 
@@ -434,8 +428,7 @@ EXPERIMENT: Determining if you are running the checked build
 
 There is no built-in tool to display whether you are running the checked build or the retail build (called the free build) of the kernel. However, this information is available through the Debug property of the Windows Management Instrumentation (WMI) Win32_OperatingSystem class.
 
-CHAPTER 2 System architecture     57
-
+CHAPTER 2 System architecture 57
 
 ---
 
@@ -482,7 +475,6 @@ Toolkit, TraceView (from the WDK), or the !wimprint extension command in the ker
 
 Finally, the checked build can also be useful for testing user-mode code only because the timing of the system is different. (This is because of the additional checking taking place within the kernel and the fact that the components are compiled without optimizations.) Often, multithreaded synchronization bugs are related to specific timing conditions. By running your tests on a system running the checked build (or at least the checked kernel and HAL), the fact that the timing of the whole system is different might cause latent timing bugs to surface that do not occur on a normal retail system.
 
-
 CHAPTER 2 System architecture
 
 From the Library of
@@ -517,7 +509,7 @@ Figure 2-3 shows the architecture of Windows 10 Enterprise and Server 2016 when 
 
 ![Figure](figures/Winternals7thPt1_page_076_figure_003.png)
 
-FIGURE 2-3   Windows 10 and Server 2016 VBS architecture.
+FIGURE 2-3 Windows 10 and Server 2016 VBS architecture.
 
 As shown in Figure 2-3, the user/kernel code discussed earlier is running on top of a Hyper-V hypervisor, just like in Figure 2-1. The difference is that with VBS enabled, a VTL of 1 is now present, which contains its own secure kernel running in the privileged processor mode (that is, ring 0 on x86/x64). Similarly, a run-time user environment mode, called the Isolated User Mode (IUM), now exists, which runs in unprivileged mode (that is, ring 3).
 
@@ -557,10 +549,9 @@ Now that we've looked at the high-level architecture of Windows, let's delve dee
 
 ![Figure](figures/Winternals7thPt1_page_078_figure_004.png)
 
-FIGURE 2-4   Windows architecture.
+FIGURE 2-4 Windows architecture.
 
-CHAPTER 2 System architecture      61
-
+CHAPTER 2 System architecture 61
 
 ---
 
@@ -586,8 +577,7 @@ You can see the image subsystem type by using the Dependency Walker tool (Depend
 
 ![Figure](figures/Winternals7thPt1_page_079_figure_007.png)
 
-62      CHAPTER 2   System architecture
-
+62 CHAPTER 2 System architecture
 
 ---
 
@@ -598,22 +588,22 @@ This shows that Notepad is a GUI program, while Cmd is a console, or character-b
 When an application calls a function in a subsystem DLL, one of three things can occur:
 
 - ■ The function is entirely implemented in user mode inside the subsystem DLL. In other words,
-no message is sent to the environment subsystem process, and no Windows executive system
-services are called. The function is performed in user mode, and the results are returned to the
-caller. Examples of such functions include GetCurrentProcess (which always returns -1, a value
-that is defined to refer to the current process in all process-related functions) and GetCurrent-
-ProcessID. (The process ID doesn't change for a running process, so this ID is retrieved from a
-cached location, thus avoiding the need to call into the kernel.)
-■ The function requires one or more calls to the Windows executive. For example, the Windows
-ReadFile and WriteFile functions involve calling the underlying internal (and undocumented
-for user-mode use) Windows I/O system services NtReadFile and NtWriteFile, respectively.
-■ The function requires some work to be done in the environment subsystem process. (The
-environment subsystem processes, running in user mode, are responsible for maintaining the
-state of the client applications running under their control.) In this case, a client/server request
-is made to the environment subsystem via an ALPC (described in Chapter 8 in Part 2) message
-sent to the subsystem to perform some operation. The subsystem DLL then waits for a reply
-before returning to the caller.
-Some functions can be a combination of the second and third items just listed, such as the Windows
+  no message is sent to the environment subsystem process, and no Windows executive system
+  services are called. The function is performed in user mode, and the results are returned to the
+  caller. Examples of such functions include GetCurrentProcess (which always returns -1, a value
+  that is defined to refer to the current process in all process-related functions) and GetCurrent-
+  ProcessID. (The process ID doesn't change for a running process, so this ID is retrieved from a
+  cached location, thus avoiding the need to call into the kernel.)
+  ■ The function requires one or more calls to the Windows executive. For example, the Windows
+  ReadFile and WriteFile functions involve calling the underlying internal (and undocumented
+  for user-mode use) Windows I/O system services NtReadFile and NtWriteFile, respectively.
+  ■ The function requires some work to be done in the environment subsystem process. (The
+  environment subsystem processes, running in user mode, are responsible for maintaining the
+  state of the client applications running under their control.) In this case, a client/server request
+  is made to the environment subsystem via an ALPC (described in Chapter 8 in Part 2) message
+  sent to the subsystem to perform some operation. The subsystem DLL then waits for a reply
+  before returning to the caller.
+  Some functions can be a combination of the second and third items just listed, such as the Windows
 
 CreateProcess and ExitWindowsEx functions.
 
@@ -667,7 +657,7 @@ Note Perhaps most critically, the kernel mode code that handles the raw input th
 ■ A kernel-mode device driver (Win32k.sys) that contains the following:
 
 - • The window manager, which controls window displays; manages screen output; collects
-input from keyboard, mouse, and other devices; and passes user messages to applications
+  input from keyboard, mouse, and other devices; and passes user messages to applications
 
 • The Graphics Device Interface (GDI), which is a library of functions for graphics output de-
 vices and includes functions for line, text, and figure drawing and for graphics manipulation
@@ -769,13 +759,13 @@ POSIX and OS/2 for a decade, has two important technical disadvantages that made
 broad usage of non-Windows binaries beyond a few specialized use cases:
 
 - ■ As mentioned, because subsystem information is extracted from the Portable Executable (PE)
-header, it requires the source code of the original binary to rebuild it as a Windows PE ex-
-ecutable file (.exe). This will also change any POSIX-style dependencies and system calls into
-Windows-style imports of the Psxdll.dll library.
-■ It is limited by the functionality provided either by the Win32 subsystem (on which it sometimes
-piggybacks) or the NT kernel. Therefore, the subsystem wraps, instead of emulates, the behav-
-ior required by the POSIX application. This can sometimes lead to subtle compatibility flaws.
-Finally, it's also important to point out, that as the name says, the POSIX subsystem/SUA was designed with POSIX/UNIX applications in mind, which dominated the server market decades ago, not true Linux applications, which are common today.
+  header, it requires the source code of the original binary to rebuild it as a Windows PE ex-
+  ecutable file (.exe). This will also change any POSIX-style dependencies and system calls into
+  Windows-style imports of the Psxdll.dll library.
+  ■ It is limited by the functionality provided either by the Win32 subsystem (on which it sometimes
+  piggybacks) or the NT kernel. Therefore, the subsystem wraps, instead of emulates, the behav-
+  ior required by the POSIX application. This can sometimes lead to subtle compatibility flaws.
+  Finally, it's also important to point out, that as the name says, the POSIX subsystem/SUA was designed with POSIX/UNIX applications in mind, which dominated the server market decades ago, not true Linux applications, which are common today.
 
 Solving these issues required a different approach to building a subsystem—one that did not require the traditional user-mode wrapping of the other environments' system call and the execution of traditional PE images. Luckily, the Drawbridge project from Microsoft Research provided the perfect vehicle for an updated take on subsystems. It resulted in the implementation of the Pico model.
 
@@ -824,13 +814,11 @@ Providing support for a wide variety of Linux applications is a massive undertak
 
 In other cases, existing Windows facilities were simply not adequately compatible, sometimes in subtle ways. For example, Windows has a named pipe driver (Npfs.sys) that supports the traditional pipe IPC mechanism. Yet, it's subtly different enough from Linux pipes that applications would break. This required a from-scratch implementation of pipes for Linux applications, without using the kernel's Npfs.sys driver.
 
-CHAPTER 2 System architecture  69
-
+CHAPTER 2 System architecture 69
 
 ---
 
 As the feature is still officially in beta at the time of this writing and subject to significant change, we won't cover the actual internals of the subsystem in this book. We will, however, take another look at
-
 
 Pico processes in Chapter 3. When the subsystem matures beyond beta, you will probably see official
 
@@ -927,8 +915,7 @@ iumd!!!lumCrypto
 
 Ntdll.dll also contains many support functions, such as the image loader (functions that start with Ldr), the heap manager, and Windows subsystem process communication functions (functions that
 
-CHAPTER 2 System architecture      71
-
+CHAPTER 2 System architecture 71
 
 ---
 
@@ -957,52 +944,52 @@ The Windows executive is the upper layer of Ntoskrnl.exe. (The kernel is the low
 includes the following types of functions:
 
 - ■ Functions that are exported and callable from user mode These functions are called
-system services and are exported via Ntdll.dll (such as NtCreateFile from the previous experi-
-ment). Most of the services are accessible through the Windows API or the APIs of another
-environment subsystem. A few services, however, aren't available through any documented
-subsystem function. (Examples include ALPC and various query functions such as NtQuery-
-InformationProcess, specialized functions such as NtCreatePagingFile, and so on.)
+  system services and are exported via Ntdll.dll (such as NtCreateFile from the previous experi-
+  ment). Most of the services are accessible through the Windows API or the APIs of another
+  environment subsystem. A few services, however, aren't available through any documented
+  subsystem function. (Examples include ALPC and various query functions such as NtQuery-
+  InformationProcess, specialized functions such as NtCreatePagingFile, and so on.)
+
 ---
 
 - ■ Device driver functions that are called through the DeviceIoControl function This provides a
-general interface from user mode to kernel mode to call functions in device drivers that are not
-associated with a read or write. The driver used for Process Explorer and Process Monitor from
-Sysinternals are good examples of that as is the console driver (ConDrv.sys) mentioned earlier.
-■ Functions that can be called only from kernel mode that are exported and documented
-in the WDK These include various support routines, such as the I/O manager (start with Io),
-general executive functions (Ex) and more, needed for device driver developers.
-■ Functions that are exported and can be called from kernel mode but are not documented
-in the WDK These include the functions called by the boot video driver, which start with Inbv.
-■ Functions that are defined as global symbols but are not exported These include internal
-support functions called within Ntoskrnl.exe, such as those that start with Top (internal I/O
-manager support functions) or M$ (internal memory management support functions).
-■ Functions that are internal to a module that are not defined as global symbols These
-functions are used exclusively by the executive and kernel.
-The executive contains the following major components, each of which is covered in detail in a subsequent chapter of this book:
+  general interface from user mode to kernel mode to call functions in device drivers that are not
+  associated with a read or write. The driver used for Process Explorer and Process Monitor from
+  Sysinternals are good examples of that as is the console driver (ConDrv.sys) mentioned earlier.
+  ■ Functions that can be called only from kernel mode that are exported and documented
+  in the WDK These include various support routines, such as the I/O manager (start with Io),
+  general executive functions (Ex) and more, needed for device driver developers.
+  ■ Functions that are exported and can be called from kernel mode but are not documented
+  in the WDK These include the functions called by the boot video driver, which start with Inbv.
+  ■ Functions that are defined as global symbols but are not exported These include internal
+  support functions called within Ntoskrnl.exe, such as those that start with Top (internal I/O
+  manager support functions) or M$ (internal memory management support functions).
+  ■ Functions that are internal to a module that are not defined as global symbols These
+  functions are used exclusively by the executive and kernel.
+  The executive contains the following major components, each of which is covered in detail in a subsequent chapter of this book:
 
 - ■ Configuration manager The configuration manager, explained in Chapter 9 in Part 2, is
-responsible for implementing and managing the system registry.
-■ Process manager The process manager, explained in Chapter 3 and Chapter 4, creates and
-terminates processes and threads. The underlying support for processes and threads is imple-
-mented in the Windows kernel; the executive adds additional semantics and functions to these
-lower-level objects.
-■ Security Reference Monitor (SRM) The SRM, described in Chapter 7, enforces security
-policies on the local computer. It guards OS resources, performing run-time object protection
-and auditing.
-■ I/O manager The I/O manager, discussed in Chapter 6, implements device-independent I/O
-and is responsible for dispatching to the appropriate device drivers for further processing.
-■ Plug and Play (PnP) manager The PnP manager, covered in Chapter 6, determines which driv-
-ers are required to support a particular device and loads those drivers. It retrieves the hardware
-resource requirements for each device during enumeration. Based on the resource requirements
-of each device, the PnP manager assigns the appropriate hardware resources such as I/O ports,
-IRQs, DMA channels, and memory locations. It is also responsible for sending proper event notifi-
-cation for device changes (the addition or removal of a device) on the system.
-■ Power manager The power manager (explained in Chapter 6), processor power management
-(PPM), and power management framework (PoFx) coordinate power events and generate
-power management I/O notifications to device drivers. When the system is idle, the PPM can
-be configured to reduce power consumption by putting the CPU to sleep. Changes in power
-CHAPTER 2   System architecture      73
-
+  responsible for implementing and managing the system registry.
+  ■ Process manager The process manager, explained in Chapter 3 and Chapter 4, creates and
+  terminates processes and threads. The underlying support for processes and threads is imple-
+  mented in the Windows kernel; the executive adds additional semantics and functions to these
+  lower-level objects.
+  ■ Security Reference Monitor (SRM) The SRM, described in Chapter 7, enforces security
+  policies on the local computer. It guards OS resources, performing run-time object protection
+  and auditing.
+  ■ I/O manager The I/O manager, discussed in Chapter 6, implements device-independent I/O
+  and is responsible for dispatching to the appropriate device drivers for further processing.
+  ■ Plug and Play (PnP) manager The PnP manager, covered in Chapter 6, determines which driv-
+  ers are required to support a particular device and loads those drivers. It retrieves the hardware
+  resource requirements for each device during enumeration. Based on the resource requirements
+  of each device, the PnP manager assigns the appropriate hardware resources such as I/O ports,
+  IRQs, DMA channels, and memory locations. It is also responsible for sending proper event notifi-
+  cation for device changes (the addition or removal of a device) on the system.
+  ■ Power manager The power manager (explained in Chapter 6), processor power management
+  (PPM), and power management framework (PoFx) coordinate power events and generate
+  power management I/O notifications to device drivers. When the system is idle, the PPM can
+  be configured to reduce power consumption by putting the CPU to sleep. Changes in power
+  CHAPTER 2 System architecture 73
 
 ---
 
@@ -1013,48 +1000,49 @@ power manager and PoFx. On certain classes of devices, the terminal timeout mana
 manages physical display timeouts based on device usage and proximity.
 
 - ■ Windows Driver Model (WDM) Windows Management Instrumentation (WMI) routines
-These routines, discussed in Chapter 9 in Part 2, enable device drivers to publish performance
-and configuration information and receive commands from the user-mode WMI service.
-Consumers of WMI information can be on the local machine or remote across the network.
-■ Memory manager The memory manager, discussed in Chapter 5, implements virtual
-memory; a memory management scheme that provides a large private address space for each
-process that can exceed available physical memory. The memory manager also provides the
-underlying support for the cache manager. It is assisted by the prefetcher and Store Manager,
-also explained in Chapter 5.
-■ Cache manager The cache manager, discussed in Chapter 14, "Cache manager," in Part 2,
-improves the performance of file-based I/O by causing recently referenced disk data to reside
-in main memory for quick access. It also achieves this by deferring disk writes by holding the
-updates in memory for a short time before sending them to the disk. As you'll see, it does this
-by using the memory manager's support for mapped files.
-In addition, the executive contains four main groups of support functions that are used by the
+  These routines, discussed in Chapter 9 in Part 2, enable device drivers to publish performance
+  and configuration information and receive commands from the user-mode WMI service.
+  Consumers of WMI information can be on the local machine or remote across the network.
+  ■ Memory manager The memory manager, discussed in Chapter 5, implements virtual
+  memory; a memory management scheme that provides a large private address space for each
+  process that can exceed available physical memory. The memory manager also provides the
+  underlying support for the cache manager. It is assisted by the prefetcher and Store Manager,
+  also explained in Chapter 5.
+  ■ Cache manager The cache manager, discussed in Chapter 14, "Cache manager," in Part 2,
+  improves the performance of file-based I/O by causing recently referenced disk data to reside
+  in main memory for quick access. It also achieves this by deferring disk writes by holding the
+  updates in memory for a short time before sending them to the disk. As you'll see, it does this
+  by using the memory manager's support for mapped files.
+  In addition, the executive contains four main groups of support functions that are used by the
 
 executive components just listed. About a third of these support functions are documented in the WDK
 
 because device drivers also use them. These are the four categories of support functions:
 
 - ■ Object manager The object manager creates, manages, and deletes Windows executive ob-
-jects and abstract data types that are used to represent OS resources such as processes, threads,
-and the various synchronization objects. The object manager is explained in Chapter 8 in Part 2.
-■ Asynchronous LPC (ALPC) facility The ALPC facility, explained in Chapter 8 in Part 2, passes
-messages between a client process and a server process on the same computer. Among other
-things, ALPC is used as a local transport for remote procedure call (RPC), the Windows imple-
-mentation of an industry-standard communication facility for client and server processes across
-a network.
-■ Run-time library functions These include string processing, arithmetic operations, data type
-conversion, and security structure processing.
-■ Executive support routines These include system memory allocation (paged and non-paged
-pool), interlocked memory access, as well as special types of synchronization mechanisms such
-as executive resources, fast mutexes, and pushlocks.
-The executive also contains a variety of other infrastructure routines, some of which are mentioned only briefly in this book:
+  jects and abstract data types that are used to represent OS resources such as processes, threads,
+  and the various synchronization objects. The object manager is explained in Chapter 8 in Part 2.
+  ■ Asynchronous LPC (ALPC) facility The ALPC facility, explained in Chapter 8 in Part 2, passes
+  messages between a client process and a server process on the same computer. Among other
+  things, ALPC is used as a local transport for remote procedure call (RPC), the Windows imple-
+  mentation of an industry-standard communication facility for client and server processes across
+  a network.
+  ■ Run-time library functions These include string processing, arithmetic operations, data type
+  conversion, and security structure processing.
+  ■ Executive support routines These include system memory allocation (paged and non-paged
+  pool), interlocked memory access, as well as special types of synchronization mechanisms such
+  as executive resources, fast mutexes, and pushlocks.
+  The executive also contains a variety of other infrastructure routines, some of which are mentioned only briefly in this book:
 
 - ■ Kernel debugger library This allows debugging of the kernel from a debugger supporting
-KD, a portable protocol supported over a variety of transports such as USB, Ethernet, and IEEE
-1394, and implemented by WinDbg and the Kd.exe debuggers.
+  KD, a portable protocol supported over a variety of transports such as USB, Ethernet, and IEEE
+  1394, and implemented by WinDbg and the Kd.exe debuggers.
+
 ---
 
 - ⊠User-Mode Debugging Framework This is responsible for sending events to the user-mode
-debugging API and allowing breakpoints and stepping through code to work, as well as for
-changing contexts of running threads.
+  debugging API and allowing breakpoints and stepping through code to work, as well as for
+  changing contexts of running threads.
 
 ⊠Hypervisor library and VBS library These provide kernel support for the secure virtual
 machine environment and optimize certain parts of the code when the system knows it's
@@ -1080,6 +1068,7 @@ system drivers.
 
 ⊠Kernel Shim Engine (KSE) The KSE provides driver-compatibility shims and additional device
 errata support. It leverages the shim infrastructure and database described in Chapter 8 in Part 2.
+
 ## Kernel
 
 The kernel consists of a set of functions in Ntoskrnl.exe that provides fundamental mechanisms. These include thread-scheduling and synchronization services, used by the executive components, and lowlevel hardware architecture–dependent support, such as interrupt and exception dispatching, which is different on each processor architecture. The kernel code is written primarily in C, with assembly code reserved for those tasks that require access to specialized processor instructions and registers not easily accessible from C.
@@ -1115,7 +1104,7 @@ kernel components, the KPRCB is a private structure used only by the kernel code
 contains the following:
 
 - ■ Scheduling information such as the current, next, and idle threads scheduled for execution on
-the processor
+  the processor
 
 ■ The dispatcher database for the processor, which includes the ready queues for each priority
 level
@@ -1129,8 +1118,7 @@ core, and so on
 
 ■ Cache sizes
 
-■ Time accounting information, such as the DPC and interrupt time.
----
+## ■ Time accounting information, such as the DPC and interrupt time.
 
 The KPRCB also contains all the statistics for the processor, such as:
 
@@ -1176,8 +1164,7 @@ t!kd: dt nt!\KPCR @$\pcr
 : (null)
 ```
 
-CHAPTER 2 System architecture     77
-
+CHAPTER 2 System architecture 77
 
 ---
 
@@ -1254,13 +1241,11 @@ TABLE 2-4 List of x86 HALs
 
 <table><tr><td>HAL File Name</td><td>Systems Supported</td></tr><tr><td>Halacpi.dll</td><td>Advanced Configuration and Power Interface (ACPI) PCs. Implies uniprocessor-only machine, without APIC support. (The presence of either one would make the system use the HAL below instead.)</td></tr><tr><td>Halmacpi.dll</td><td>Advanced Programmable Interrupt Controller (APIC) PCs with an ACPI. The existence of an APIC implies SMP support.</td></tr></table>
 
-
 On x64 and ARM machines, there is only one HAL image, called Hal.dll. This results from all x64 machines having the same motherboard configuration, because the processors require ACPI and APIC support. Therefore, there is no need to support machines without ACPI or with a standard PIC. Similarly, all ARM systems have ACPI and use interrupt controllers, which are similar to a standard APIC. Once again, a single HAL can support this.
 
 On the other hand, although such interrupt controllers are similar, they are not identical. Additionally, the actual timer and memory/DMA controllers on some ARM systems are different from others.
 
-CHAPTER 2 System architecture     79
-
+CHAPTER 2 System architecture 79
 
 ---
 
@@ -1290,8 +1275,7 @@ the hardware error reporting facilities of the underlying platform. It does this
 
 details of a platform's error-handling mechanisms from the OS and exposing a consistent
 
-interface to the Windows OS.
----
+## interface to the Windows OS.
 
 ■ Bootvid.dll The Boot Video Driver on x86 systems (Bootvid) provides support for the VGA commands required to display boot text and the boot logo during startup. ■ Kdcom.dll This is the Kernel Debugger Protocol (KD) communications library. ■ C.idl This is the integrity library. (See Chapter 8 in Part 2 for more information on code integrity.) ■ Mspc.sys The Microsoft Remote Procedure Call (RPC) client driver for kernel mode allows the kernel (and other drivers) to communicate with user-mode services through RPC or to marshal MES-encoded assets. For example, the kernel uses this to marshal data to and from the user-mode Plug-and-Play service.
 
@@ -1317,12 +1301,12 @@ We ask you to disregard the errors that Dependency Walker has parsing API Sets b
 
 CHAPTER 2 System architecture 81
 
-
 ---
 
 - • Ium Contract These are additional policies for IUM Trustlets running on the system,
-which may be needed on certain SKUs, such as for providing shielded VMs on Datacenter
-Server. Trustlets are described further in Chapter 3.
+  which may be needed on certain SKUs, such as for providing shielded VMs on Datacenter
+  Server. Trustlets are described further in Chapter 3.
+
 ## Device drivers
 
 Although device drivers are explained in detail in Chapter 6, this section provides a brief overview of the types of drivers and explains how to list the drivers installed and loaded on your system.
@@ -1347,25 +1331,27 @@ As stated in the preceding section, device drivers in Windows don't manipulate h
 There are several types of device drivers:
 
 - ■ Hardware device drivers These use the HAL to manipulate hardware to write output to or
-retrieve input from a physical device or network. There are many types of hardware device
-drivers, such as bus drivers, human interface drivers, mass storage drivers, and so on.
-■ File system drivers These are Windows drivers that accept file-oriented I/O requests and
-translate them into I/O requests bound for a particular device.
-■ File system filter drivers These include drivers that perform disk mirroring and encryption
-or scanning to locate viruses, intercept I/O requests, and perform some added-value processing
-before passing the I/O to the next layer (or in some cases rejecting the operation).
-■ Network redirectors and servers These are file system drivers that transmit file system I/O
-requests to a machine on the network and receive such requests, respectively.
-■ Protocol drivers These implement a networking protocol such as TCP/IP, NetBEUI, and IPX/SPX.
+  retrieve input from a physical device or network. There are many types of hardware device
+  drivers, such as bus drivers, human interface drivers, mass storage drivers, and so on.
+  ■ File system drivers These are Windows drivers that accept file-oriented I/O requests and
+  translate them into I/O requests bound for a particular device.
+  ■ File system filter drivers These include drivers that perform disk mirroring and encryption
+  or scanning to locate viruses, intercept I/O requests, and perform some added-value processing
+  before passing the I/O to the next layer (or in some cases rejecting the operation).
+  ■ Network redirectors and servers These are file system drivers that transmit file system I/O
+  requests to a machine on the network and receive such requests, respectively.
+  ■ Protocol drivers These implement a networking protocol such as TCP/IP, NetBEUI, and IPX/SPX.
+
 ---
 
 - ■ Kernel streaming filter drivers These are chained together to perform signal processing on
-data streams, such as recording or displaying audio and video.
+  data streams, such as recording or displaying audio and video.
 
 ■ Software drivers These are kernel modules that perform operations that can only be done
 in kernel mode on behalf of some user-mode process. Many utilities from Sysinternals such as
 Process Explorer and Process Monitor use drivers to get information or perform operations that
 are not possible to do from user-mode APIs.
+
 ## Windows driver model
 
 The original driver model was created in the first NT version (3.1) and did not support the concept of Plug and Play (PnP) because it was not yet available. This remained the case until Windows 2000 came along (and Windows 95/98 on the consumer Windows side).
@@ -1385,9 +1371,9 @@ for hardware devices for Windows 2000 and later versions.
 From the WDM perspective, there are three kinds of drivers:
 
 - ■ Bus drivers A bus driver services a bus controller, adapter, bridge, or any device that has child
-devices. Bus drivers are required drivers, and Microsoft generally provides them. Each type of
-bus (such as PCI, PCMCIA, and USB) on a system has one bus driver. Third parties can write bus
-drivers to provide support for new buses, such as VMDBus, Multibus, and Futurebus.
+  devices. Bus drivers are required drivers, and Microsoft generally provides them. Each type of
+  bus (such as PCI, PCMCIA, and USB) on a system has one bus driver. Third parties can write bus
+  drivers to provide support for new buses, such as VMDBus, Multibus, and Futurebus.
 
 ■ Function drivers A function driver is the main device driver and provides the operational
 interface for its device. It is a required driver unless the device is used raw, an implementation in
@@ -1407,8 +1393,7 @@ concerned with reporting the devices on its bus to PnP manager, while a function
 
 the device.
 
-CHAPTER 2 System architecture     83
-
+CHAPTER 2 System architecture 83
 
 ---
 
@@ -1478,23 +1463,19 @@ Table 2-5 lists most of the commonly used function name prefixes for the executi
 
 86 CHAPTER 2 System architecture
 
-
 ---
 
 TABLE 2-5 Commonly Used Prefixes
 
 <table><tr><td>Prefix</td><td>Component</td></tr><tr><td>A1pc</td><td>Advanced Local Procedure Calls</td></tr><tr><td>Cc</td><td>Common Cache</td></tr><tr><td>Cm</td><td>Configuration manager</td></tr><tr><td>Dbg</td><td>Kernel debug support</td></tr><tr><td>Dbgk</td><td>Debugging Framework for user mode</td></tr><tr><td>Em</td><td>Errata manager</td></tr><tr><td>Etw</td><td>Event Tracing for Windows</td></tr><tr><td>Ex</td><td>Executive support routines</td></tr><tr><td>FsRt1</td><td>File System Runtime Library</td></tr><tr><td>Hv</td><td>Hive library</td></tr><tr><td>Hv1</td><td>Hypervisor library</td></tr><tr><td>Io</td><td>I/O manager</td></tr><tr><td>Kd</td><td>Kernel debugger</td></tr><tr><td>Ke</td><td>Kernel</td></tr><tr><td>Kse</td><td>Kernel Shim Engine</td></tr><tr><td>Lsa</td><td>Local Security Authority</td></tr><tr><td>Mm</td><td>Memory manager</td></tr><tr><td>Nt</td><td>NT system services (accessible from user mode through system calls)</td></tr><tr><td>Ob</td><td>Object manager</td></tr><tr><td>Pf</td><td>Prefetcher</td></tr><tr><td>Po</td><td>Power manager</td></tr><tr><td>PoFx</td><td>Power framework</td></tr><tr><td>Pp</td><td>PnP manager</td></tr><tr><td>Ppm</td><td>Processor power manager</td></tr><tr><td>Ps</td><td>Process support</td></tr><tr><td>Rt1</td><td>Run-time library</td></tr><tr><td>Se</td><td>Security Reference Monitor</td></tr><tr><td>Sm</td><td>Store Manager</td></tr><tr><td>Tm</td><td>Transaction manager</td></tr><tr><td>Ttm</td><td>Terminal timeout manager</td></tr><tr><td>Vf</td><td>Driver Verifier</td></tr></table>
 
-
-CHAPTER 2    System architecture      87
-
+CHAPTER 2 System architecture 87
 
 ---
 
 TABLE 2-5 Commonly Used Prefixes (Continued)
 
 <table><tr><td>Prefix</td><td>Component</td></tr><tr><td>Vsl</td><td>Virtual Secure Mode library</td></tr><tr><td>Wdi</td><td>Windows Diagnostic Infrastructure</td></tr><tr><td>Wfp</td><td>Windows FingerPrint</td></tr><tr><td>Whea</td><td>Windows Hardware Error Architecture</td></tr><tr><td>Wmi</td><td>Windows Management Instrumentation</td></tr><tr><td>Zw</td><td>Mirer entry point for system services (beginning with Nt) that sets previous access mode to kernel, which eliminates parameter validation, because Nt system services validate parameters only if previous access mode is user</td></tr></table>
-
 
 You can decipher the names of these exported functions more easily if you understand the
 
@@ -1519,19 +1500,18 @@ kernel thread object.
 The following system processes appear on every Windows 10 system. One of these (Idle) is not a process at all, and three of them—System, Secure System, and Memory Compression—are not full processes because they are not running a user-mode executable. These types of processes are called minimal processes and are described in Chapter 3.
 
 - ■ Idle process This contains one thread per CPU to account for idle CPU time.
-■ System process This contains the majority of the kernel-mode system threads and handles.
-■ Secure System process This contains the address space of the secure kernel in VTL 1, if running.
-■ Memory Compression process This contains the compressed working set of user-mode
-processes, as described in Chapter 5.
-■ Session manager (Smss.exe).
-■ Windows subsystem (Csrss.exe).
-■ Session 0 initialization (Wininit.exe).
-■ Logon process (Winlogon.exe).
+  ■ System process This contains the majority of the kernel-mode system threads and handles.
+  ■ Secure System process This contains the address space of the secure kernel in VTL 1, if running.
+  ■ Memory Compression process This contains the compressed working set of user-mode
+  processes, as described in Chapter 5.
+  ■ Session manager (Smss.exe).
+  ■ Windows subsystem (Csrss.exe).
+  ■ Session 0 initialization (Wininit.exe).
+  ■ Logon process (Winlogon.exe).
 
 APTER 2 System architecture
 
-From the Library of I
----
+## From the Library of I
 
 - ■ Service Control Manager (Services.exe) and the child service processes it creates such as the
 
@@ -1566,7 +1546,6 @@ TABLE 2-6 Names for process ID 0 in various utilities
 
 <table><tr><td>Utility</td><td>Name for Process ID 0</td></tr><tr><td>Task Manager</td><td>System idle process</td></tr><tr><td>Process Status (Pstat.exe)</td><td>Idle process</td></tr><tr><td>Process Explorer (Proexp.exe)</td><td>System idle process</td></tr><tr><td>Task List (Tasklist.exe)</td><td>System idle process</td></tr><tr><td>Tlist (Tlist.exe)</td><td>System process</td></tr></table>
 
-
 Now let's look at system threads and the purpose of each of the system processes that are running real images.
 
 ## System process and system threads
@@ -1580,7 +1559,6 @@ Note On Windows 10 Version 1511, Task Manager calls the System process System an
 System threads are created by the PscCreateSystemThread or IoCreateSystemThread functions, both documented in the WDK. These threads can be called only from kernel mode. Windows, as well as various device drivers, create system threads during system initialization to perform operations that require thread context, such as issuing and waiting for I/Os or other objects or polling a device. For example, the memory manager uses system threads to implement such functions as writing dirty pages to the page file or mapped files, swapping processes in and out of memory, and so forth. The kernel creates a system thread called the balance set manager that wakes up once per second to possibly initiate various scheduling and memory-management related events. The cache manager also uses system threads to implement both read-ahead and write-behind I/Os. The file server device driver (Srv2.sys) uses system threads to respond to network I/O requests for file data on disk partitions shared to the network. Even the floppy driver has a system thread to poll the floppy device. (Polling is more efficient in this case because an interrupt-driven floppy driver consumes a large amount of system
 
 90 CHAPTER 2 System architecture
-
 
 ---
 
@@ -1627,16 +1605,16 @@ When Smss.exe starts, it checks whether it is the first instance (the master Sms
 The master Smss.exe performs the following one-time initialization steps:
 
 - 1. It marks the process and the initial thread as critical. If a process or thread marked critical exits
-for any reason, Windows crashes. See Chapter 3 for more information.
+     for any reason, Windows crashes. See Chapter 3 for more information.
 
 2. It causes the process to treat certain errors as critical, such as invalid handle usage and heap
-corruption, and enables the Disable Dynamic Code Execution process mitigation.
+   corruption, and enables the Disable Dynamic Code Execution process mitigation.
 
 3. It increases the process base priority to 11.
 
 4. If the system supports hot processor add, it enables automatic processor affinity updates. That
-way, if new processors are added, new sessions will take advantage of the new processors. For
-more information about dynamic processor additions, see Chapter 4.
+   way, if new processors are added, new sessions will take advantage of the new processors. For
+   more information about dynamic processor additions, see Chapter 4.
 
 5. It initializes a thread pool to handle ALPC commands and other work items.
 
@@ -1649,15 +1627,16 @@ more information about dynamic processor additions, see Chapter 4.
 9. It creates the initial process environment block and updates the Safe Mode variable if needed.
 
 10. Based on the ProtectionMode value in the HKLM\SYSTEM\CurrentControlSet\Control\Session
-Manager key, it creates the security descriptors that will be used for various system resources.
+    Manager key, it creates the security descriptors that will be used for various system resources.
 
 11. Based on the ObjectDirectory value in the HKLM\SYSTEM\CurrentControlSet\Control\
-Session Manager key, it creates the object manager directories that are described, such as \
-RPC Control and Windows. It also saves the programs listed under the values BootExecute,
-BootExecuteNoPnpSync, and SetupExecute.
+    Session Manager key, it creates the object manager directories that are described, such as \
+    RPC Control and Windows. It also saves the programs listed under the values BootExecute,
+    BootExecuteNoPnpSync, and SetupExecute.
 
 12. It saves the program path listed in the $O\text{InitialCommand value under the HKLM\SYSTEM\
-CurrentControlSet\Control\Session Manager key.
+    CurrentControlSet\Control\Session Manager key.
+
 ---
 
 13. It reads the NumberOfInitialSessions value from the HKLM\SYSTEM\CurrentControlSet\ Control\SessionManager key, but ignores it if the system is in manufacturing mode.
@@ -1693,7 +1672,6 @@ CurrentControlSet\Control\Session Manager key.
 28. It processes pending file renames specified in the registry keys seen earlier unless this is a Windows Recovery Environment boot.
 
 CHAPTER 2 System architecture 93
-
 
 ---
 
@@ -1738,9 +1716,10 @@ see Chapter 3), if Cssr.exe exits, this wait will never complete because the sys
 A session startup instance of Smss.exe does the following:
 
 - ■ It creates the subsystem process(es) for the session (by default, the Windows subsystem Css.exe).
-■ It creates an instance of Winlogon (interactive sessions) or the Session 0 Initial Command, which
-is Wininit (for session 0) by default unless modified by the registry values seen in the preceding
-steps. See the upcoming paragraphs for more information on these two processes.
+  ■ It creates an instance of Winlogon (interactive sessions) or the Session 0 Initial Command, which
+  is Wininit (for session 0) by default unless modified by the registry values seen in the preceding
+  steps. See the upcoming paragraphs for more information on these two processes.
+
 ---
 
 Finally, this intermediate Smss.exe process exits, leaving the subsystem processes and Winlogon or Wininit as parent-less processes.
@@ -1779,19 +1758,19 @@ The Wininit.exe process performs the following system initialization functions:
 
 CHAPTER 2 System architecture 95
 
-
 ---
 
 - 15. It starts the Local Security Authentication Subsystem Service (Lsas.exe) and, if Credential Guard
-is enabled, the Isolated LSA Trustlet (Lsaiso.exe). This also requires querying the VBS provision-
-ing key from UEFI. See Chapter 7 for more information on Lsas.exe and Lsaiso.exe.
+      is enabled, the Isolated LSA Trustlet (Lsaiso.exe). This also requires querying the VBS provision-
+      ing key from UEFI. See Chapter 7 for more information on Lsas.exe and Lsaiso.exe.
 
 16. If Setup is currently pending (that is, if this is the first boot during a fresh install or an update to
-a new major OS build or Insider Preview), it launches the setup program.
+    a new major OS build or Insider Preview), it launches the setup program.
 
 17. It waits forever for a request for system shutdown or for one of the aforementioned system
-processes to terminate (unless the DontWatchSysProcs registry value is set in the Winlogon
-key mentioned in step 7). In either case, it shuts down the system.
+    processes to terminate (unless the DontWatchSysProcs registry value is set in the Winlogon
+    key mentioned in step 7). In either case, it shuts down the system.
+
 ## Service control manager
 
 Recall that with Windows, services can refer to either a server process or a device driver. This section deals with services that are user-mode processes. Services are like Linux daemon processes in that they can be configured to start automatically at system boot time without requiring an interactive logon. They can also be started manually, such as by running the Services administrative tool, using the sc.exe tool, or calling the Windows Start Service function. Typically, services do not interact with the logged-on user, although there are special conditions when this is possible. Additionally, while most services run in special service accounts (such as SYSTEM or LOCAL SERVICE), others can run with the same security context as logged-in user accounts. (For more, see Chapter 9 in Part 2.)
@@ -1803,7 +1782,6 @@ Keep in mind that services have three names: the process name you see running on
 To map a service process to the services contained in that process, use the tlist /s (from Debugging Tools for Windows) or tasklist /svc (built-in Windows tool) command. Note that there isn't always one-to-one mapping between service processes and running services, however, because some services share a process with other services. In the registry, the T ype value under the service's key indicates whether the service runs in its own process or shares a process with other services in the image.
 
 A number of Windows components are implemented as services, such as the Print Spooler, Event
-
 
 Log, Task Scheduler, and various networking components. For more details on services, see Chapter 9
 
@@ -1819,9 +1797,7 @@ To list the installed services, open the Control Panel, select Administrative To
 
 To see the detailed properties of a service, right-click the service and select Properties.
 
-
 For example, here are the properties of the Windows Update service:
-
 
 1
 
@@ -1903,6 +1879,4 @@ This chapter takes a broad look at the overall system architecture of Windows. I
 
 This page intentionally left blank
 
-
 ---
-

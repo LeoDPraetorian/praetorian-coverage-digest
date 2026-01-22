@@ -4,13 +4,13 @@ Optimization strategies for large Sigma.js graphs.
 
 ## Performance Thresholds
 
-| Nodes       | Edges      | Icons | Expected FPS | Bottleneck           |
-| ----------- | ---------- | ----- | ------------ | -------------------- |
-| < 1,000     | < 5,000    | Yes   | 60           | None                 |
-| 1,000-5,000 | < 20,000   | Yes   | 30-60        | Camera events        |
-| 5,000-10,000| < 50,000   | No    | 30-60        | WebGL draw calls     |
-| 5,000-10,000| < 50,000   | Yes   | 15-30        | Texture memory       |
-| > 10,000    | > 50,000   | No    | 15-30        | Vertex processing    |
+| Nodes        | Edges    | Icons | Expected FPS | Bottleneck        |
+| ------------ | -------- | ----- | ------------ | ----------------- |
+| < 1,000      | < 5,000  | Yes   | 60           | None              |
+| 1,000-5,000  | < 20,000 | Yes   | 30-60        | Camera events     |
+| 5,000-10,000 | < 50,000 | No    | 30-60        | WebGL draw calls  |
+| 5,000-10,000 | < 50,000 | Yes   | 15-30        | Texture memory    |
+| > 10,000     | > 50,000 | No    | 15-30        | Vertex processing |
 
 ## Level of Detail (LOD)
 
@@ -19,8 +19,8 @@ Optimization strategies for large Sigma.js graphs.
 ### Zoom-Based LOD
 
 ```typescript
-import { useSigma } from '@react-sigma/core';
-import { useDebouncedCameraState } from './camera-patterns';
+import { useSigma } from "@react-sigma/core";
+import { useDebouncedCameraState } from "./camera-patterns";
 
 export const useLOD = () => {
   const sigma = useSigma();
@@ -29,21 +29,21 @@ export const useLOD = () => {
   useEffect(() => {
     // Zoomed out: circles only
     if (ratio < 0.3) {
-      sigma.setSetting('defaultNodeType', 'circle');
-      sigma.setSetting('renderLabels', false);
-      sigma.setSetting('renderEdgeLabels', false);
+      sigma.setSetting("defaultNodeType", "circle");
+      sigma.setSetting("renderLabels", false);
+      sigma.setSetting("renderEdgeLabels", false);
     }
     // Mid zoom: icons without labels
     else if (ratio < 1.0) {
-      sigma.setSetting('defaultNodeType', 'image');
-      sigma.setSetting('renderLabels', false);
-      sigma.setSetting('renderEdgeLabels', false);
+      sigma.setSetting("defaultNodeType", "image");
+      sigma.setSetting("renderLabels", false);
+      sigma.setSetting("renderEdgeLabels", false);
     }
     // Zoomed in: full detail
     else {
-      sigma.setSetting('defaultNodeType', 'image');
-      sigma.setSetting('renderLabels', true);
-      sigma.setSetting('renderEdgeLabels', true);
+      sigma.setSetting("defaultNodeType", "image");
+      sigma.setSetting("renderLabels", true);
+      sigma.setSetting("renderEdgeLabels", true);
     }
 
     sigma.refresh();
@@ -71,19 +71,19 @@ export const useNodeCountLOD = () => {
 
     if (nodeCount > 10000) {
       // Minimal rendering
-      sigma.setSetting('defaultNodeType', 'circle');
-      sigma.setSetting('renderLabels', false);
-      sigma.setSetting('hideEdgesOnMove', true);
+      sigma.setSetting("defaultNodeType", "circle");
+      sigma.setSetting("renderLabels", false);
+      sigma.setSetting("hideEdgesOnMove", true);
     } else if (nodeCount > 5000) {
       // Medium detail
-      sigma.setSetting('defaultNodeType', 'circle');
-      sigma.setSetting('renderLabels', false);
-      sigma.setSetting('hideEdgesOnMove', true);
+      sigma.setSetting("defaultNodeType", "circle");
+      sigma.setSetting("renderLabels", false);
+      sigma.setSetting("hideEdgesOnMove", true);
     } else {
       // Full detail
-      sigma.setSetting('defaultNodeType', 'image');
-      sigma.setSetting('renderLabels', true);
-      sigma.setSetting('hideEdgesOnMove', false);
+      sigma.setSetting("defaultNodeType", "image");
+      sigma.setSetting("renderLabels", true);
+      sigma.setSetting("hideEdgesOnMove", false);
     }
 
     sigma.refresh();
@@ -96,9 +96,9 @@ export const useNodeCountLOD = () => {
 **Strategy:** Hide nodes/edges outside visible viewport.
 
 ```typescript
-import { useCallback, useEffect } from 'react';
-import { useSigma } from '@react-sigma/core';
-import { useViewportBounds } from './camera-patterns';
+import { useCallback, useEffect } from "react";
+import { useSigma } from "@react-sigma/core";
+import { useViewportBounds } from "./camera-patterns";
 
 export const useViewportCulling = (enabled = true) => {
   const sigma = useSigma();
@@ -119,7 +119,7 @@ export const useViewportCulling = (enabled = true) => {
         attrs.y <= bounds.maxY;
 
       if (inViewport !== !attrs.hidden) {
-        graph.setNodeAttribute(nodeId, 'hidden', !inViewport);
+        graph.setNodeAttribute(nodeId, "hidden", !inViewport);
         if (inViewport) visible++;
         else hidden++;
       }
@@ -147,9 +147,9 @@ export const useViewportCulling = (enabled = true) => {
 
 ```typescript
 const settings = {
-  hideEdgesOnMove: true,           // Hide edges during pan/zoom
-  hideLabelsOnMove: true,          // Hide labels during pan/zoom
-  renderEdgeLabels: false,         // Never render edge labels (expensive)
+  hideEdgesOnMove: true, // Hide edges during pan/zoom
+  hideLabelsOnMove: true, // Hide labels during pan/zoom
+  renderEdgeLabels: false, // Never render edge labels (expensive)
 };
 ```
 
@@ -160,14 +160,10 @@ const settings = {
 **Strategy:** Pre-load node icons into texture atlas to reduce draw calls.
 
 ```typescript
-import { NodeImageProgram } from '@sigma/node-image';
+import { NodeImageProgram } from "@sigma/node-image";
 
 // Pre-load all icons
-const iconUrls = [
-  '/icons/server.png',
-  '/icons/database.png',
-  '/icons/user.png',
-];
+const iconUrls = ["/icons/server.png", "/icons/database.png", "/icons/user.png"];
 
 // Wait for all icons to load before rendering
 Promise.all(
@@ -191,9 +187,9 @@ Promise.all(
 **Strategy:** Pause layout during user interaction to maintain FPS.
 
 ```typescript
-import { useEffect, useRef } from 'react';
-import { useSigma } from '@react-sigma/core';
-import FA2Layout from 'graphology-layout-forceatlas2/worker';
+import { useEffect, useRef } from "react";
+import { useSigma } from "@react-sigma/core";
+import FA2Layout from "graphology-layout-forceatlas2/worker";
 
 export const useThrottledLayout = () => {
   const sigma = useSigma();
@@ -209,7 +205,7 @@ export const useThrottledLayout = () => {
 
     // Pause on camera move
     const camera = sigma.getCamera();
-    camera.on('updated', () => {
+    camera.on("updated", () => {
       if (!isInteractingRef.current) {
         isInteractingRef.current = true;
         layout.stop();
@@ -218,7 +214,7 @@ export const useThrottledLayout = () => {
 
     // Resume after 500ms idle
     let resumeTimer: number;
-    camera.on('updated', () => {
+    camera.on("updated", () => {
       clearTimeout(resumeTimer);
       resumeTimer = window.setTimeout(() => {
         isInteractingRef.current = false;
@@ -302,8 +298,7 @@ export const useFPSCounter = () => {
       }
 
       const avgDelta =
-        frameTimesRef.current.reduce((a, b) => a + b, 0) /
-        frameTimesRef.current.length;
+        frameTimesRef.current.reduce((a, b) => a + b, 0) / frameTimesRef.current.length;
 
       setFps(Math.round(1000 / avgDelta));
 

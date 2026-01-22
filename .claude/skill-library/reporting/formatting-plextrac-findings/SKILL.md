@@ -33,6 +33,7 @@ Use this skill when:
 - Structuring findings for future API automation
 
 **NOT for:**
+
 - Creating findings in other formats (use generic finding templates)
 - Threat modeling (use `threat-modeling` skill)
 - Executive summaries or narratives (different PlexTrac sections)
@@ -43,34 +44,34 @@ Use this skill when:
 
 ### Required Fields (All Findings)
 
-| Field | Type | Requirement | Notes |
-|-------|------|-------------|-------|
-| **Name** | Text | REQUIRED | Short, actionable title |
-| **Severity** | Enum | REQUIRED | Critical/High/Medium/Low/Informational |
-| **CVSS Score** | Number | REQUIRED | CVSS 4.0 base score (auto-calculates severity) |
-| **CVSS Vector** | String | REQUIRED | Full CVSS 4.0 vector string |
-| **Tags** | Array | REQUIRED | Must include at least one `phase_` tag |
-| **Description** | Markdown | REQUIRED | Detailed explanation of vulnerability |
-| **Impact** | Markdown | REQUIRED | Attacker capabilities and consequences (narrative paragraphs) |
-| **Verification and Attack Information** | Markdown | REQUIRED | Evidence, reproduction steps, exploitation details |
-| **Recommendations** | Markdown | REQUIRED | Specific, actionable fix steps |
+| Field                                   | Type     | Requirement | Notes                                                         |
+| --------------------------------------- | -------- | ----------- | ------------------------------------------------------------- |
+| **Name**                                | Text     | REQUIRED    | Short, actionable title                                       |
+| **Severity**                            | Enum     | REQUIRED    | Critical/High/Medium/Low/Informational                        |
+| **CVSS Score**                          | Number   | REQUIRED    | CVSS 4.0 base score (auto-calculates severity)                |
+| **CVSS Vector**                         | String   | REQUIRED    | Full CVSS 4.0 vector string                                   |
+| **Tags**                                | Array    | REQUIRED    | Must include at least one `phase_` tag                        |
+| **Description**                         | Markdown | REQUIRED    | Detailed explanation of vulnerability                         |
+| **Impact**                              | Markdown | REQUIRED    | Attacker capabilities and consequences (narrative paragraphs) |
+| **Verification and Attack Information** | Markdown | REQUIRED    | Evidence, reproduction steps, exploitation details            |
+| **Recommendations**                     | Markdown | REQUIRED    | Specific, actionable fix steps                                |
 
 ### VKB Custom Fields (Layout-Specific)
 
-| Field | When Required | Notes |
-|-------|---------------|-------|
-| **Verification and Attack Information** | All findings | How to reproduce/exploit |
-| **Systems Impacted** | All findings | Specific assets/endpoints affected |
-| **ASVS** | Mobile/Web findings | ASVS category selection |
+| Field                                   | When Required       | Notes                              |
+| --------------------------------------- | ------------------- | ---------------------------------- |
+| **Verification and Attack Information** | All findings        | How to reproduce/exploit           |
+| **Systems Impacted**                    | All findings        | Specific assets/endpoints affected |
+| **ASVS**                                | Mobile/Web findings | ASVS category selection            |
 
 ### Required Tags
 
-| Tag Pattern | Required For | Purpose |
-|-------------|--------------|---------|
-| `phase_*` | ALL findings | Controls report section placement |
-| `owasp_*` | ProdSec engagements | OWASP Top 10 table population |
-| `effective_control` | Optional | Long-form effective control section |
-| `es` | Narratives only | Executive summary sections |
+| Tag Pattern         | Required For        | Purpose                             |
+| ------------------- | ------------------- | ----------------------------------- |
+| `phase_*`           | ALL findings        | Controls report section placement   |
+| `owasp_*`           | ProdSec engagements | OWASP Top 10 table population       |
+| `effective_control` | Optional            | Long-form effective control section |
+| `es`                | Narratives only     | Executive summary sections          |
 
 **Complete tag reference:** [references/tagging-system.md](references/tagging-system.md)
 
@@ -101,12 +102,14 @@ Skill tool: "scoring-cvss-findings"
 ```
 
 **Provide to the skill:**
+
 - Vulnerability description
 - Attack scenario
 - Impact scope
 - Exploitation requirements
 
 **The skill will**:
+
 - Guide you through CVSS 4.0 vector selection
 - Calculate base score
 - Provide severity rating
@@ -177,6 +180,7 @@ Use the template structure:
 {1-3 paragraphs describing what attacker can do and the consequences. Use narrative style focused on attacker capabilities and resulting harm. Include specific examples when applicable. No subsections - write as flowing paragraphs.}
 
 **Example structure:**
+
 - Paragraph 1: What attacker can do with this vulnerability
 - Paragraph 2 (optional): Specific consequences or examples discovered during assessment
 - Bullet points (optional): Multiple specific consequences when applicable
@@ -217,18 +221,22 @@ Use the template structure:
 {Specific, actionable steps to fix the vulnerability}
 
 **Immediate (Within 14-30 Days):**
+
 1. {Urgent fix step 1}
 2. {Urgent fix step 2}
 
 **Short-Term (Within 60-90 Days):**
+
 1. {Important fix step 1}
 2. {Important fix step 2}
 
 **Long-Term (Within 6-12 Months):**
+
 1. {Architectural improvement 1}
 2. {Architectural improvement 2}
 
 **Validation:**
+
 1. {How to verify fix worked}
 
 **Note:** Use descriptive timeline labels, NOT P0/P1/P2/P3 priority notation.
@@ -269,6 +277,7 @@ In PlexTrac UI, use "Add custom fields from layout" to ensure fields render in c
 - [ ] All custom fields populated
 
 **Image formatting:**
+
 - Add black outlines to light-colored images (PlexTrac has white background)
 - Use tools like Skitch for image annotation
 - See [references/image-formatting.md](references/image-formatting.md)
@@ -328,6 +337,7 @@ The field structure produced by this skill is designed to map directly to PlexTr
 **Purpose**: Explain what the vulnerability is, why it exists, and its security implications.
 
 **Structure**:
+
 1. What: The vulnerability and where it occurs
 2. Why: Root cause or configuration issue
 3. Impact: Security implications
@@ -361,6 +371,7 @@ The field structure produced by this skill is designed to map directly to PlexTr
 **CRITICAL:** Evidence should be embedded in this section, NOT separated into an "Evidence" section.
 
 **Include**:
+
 - Step-by-step reproduction instructions
 - Screenshots with annotations
 - HTTP request/response pairs
@@ -370,6 +381,7 @@ The field structure produced by this skill is designed to map directly to PlexTr
 - API responses and policy configurations
 
 **Structure**:
+
 1. Reproduction steps (numbered list)
 2. Embedded evidence (screenshots, code blocks, JSON) proving each step
 3. Observed behavior
@@ -386,18 +398,21 @@ The field structure produced by this skill is designed to map directly to PlexTr
 **CRITICAL:** Use "Recommendations" header, not "Remediation" (client preference for consultative tone).
 
 **Structure**:
+
 1. **Immediate (Within 14-30 Days)** - Urgent fixes to stop active exploitation
 2. **Short-Term (Within 60-90 Days)** - Important security improvements
 3. **Long-Term (Within 6-12 Months)** - Architectural changes and preventive controls
 4. **Validation** - Steps to confirm fix works
 
 **Include**:
+
 - Code examples (if applicable)
 - Configuration changes with specific settings
 - Validation commands to test remediation
 - Alternative approaches if primary solution has constraints
 
 **Avoid**:
+
 - ❌ P0/P1/P2/P3 priority notation (internal project management shorthand)
 - ✅ Use descriptive timeline labels instead (Immediate, Short-Term, Long-Term, As Resources Permit)
 
@@ -423,8 +438,8 @@ For Mobile and Web application findings, PlexTrac includes ASVS (Application Sec
 
 ### Requires (invoke before starting)
 
-| Skill | When | Purpose |
-|-------|------|---------|
+| Skill                   | When   | Purpose                                    |
+| ----------------------- | ------ | ------------------------------------------ |
 | `scoring-cvss-findings` | Step 2 | CVSS 4.0 scoring with interactive guidance |
 
 ### Calls (during execution)
@@ -433,10 +448,10 @@ None - terminal skill (orchestrates user data collection and formatting only)
 
 ### Pairs With (conditional)
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| `reviewing-okta-configurations` | Okta findings | Use that skill's finding template, then format with this skill |
-| `threat-modeling` | Threat-based findings | Convert threats to findings with this format |
+| Skill                           | Trigger               | Purpose                                                        |
+| ------------------------------- | --------------------- | -------------------------------------------------------------- |
+| `reviewing-okta-configurations` | Okta findings         | Use that skill's finding template, then format with this skill |
+| `threat-modeling`               | Threat-based findings | Convert threats to findings with this format                   |
 
 ---
 
@@ -447,6 +462,7 @@ None - terminal skill (orchestrates user data collection and formatting only)
 **Symptom**: Finding created but not visible in rendered PDF
 
 **Causes**:
+
 1. Missing `phase_` tag
 2. Wrong phase tag for report template
 3. Finding marked as "Hidden" in PlexTrac
@@ -466,6 +482,7 @@ None - terminal skill (orchestrates user data collection and formatting only)
 **Symptom**: "Verification and Attack Information" not showing in PDF
 
 **Causes**:
+
 1. Report Details → Findings Layout not set to "VKB"
 2. Custom field not added via "Add custom fields from layout"
 
@@ -486,7 +503,7 @@ None - terminal skill (orchestrates user data collection and formatting only)
 - `scoring-cvss-findings` - CVSS 4.0 interactive scoring (invoked in Step 2)
 - `reviewing-okta-configurations` - Okta security findings (uses similar template)
 - `threat-modeling` - Threat identification (findings are outputs)
-- `orchestrating-research` - Research for finding details and remediation
+- `orchestrating-research` (LIBRARY) - Research for finding details and remediation - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`
 
 ---
 

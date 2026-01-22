@@ -379,11 +379,11 @@ Discovery → Vendor notification → FDA notification → Joint assessment
 
 ## References
 
-| Reference                                                           | Content                                      |
-| ------------------------------------------------------------------- | -------------------------------------------- |
-| [premarket-requirements.md](references/premarket-requirements.md)   | Complete 510(k) cybersecurity checklist      |
-| [postmarket-requirements.md](references/postmarket-requirements.md) | Vulnerability management and disclosure      |
-| [sbom-templates.md](references/sbom-templates.md)                   | SPDX and CycloneDX SBOM examples             |
+| Reference                                                           | Content                                                               |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------- |
+| [premarket-requirements.md](references/premarket-requirements.md)   | Complete 510(k) cybersecurity checklist                               |
+| [postmarket-requirements.md](references/postmarket-requirements.md) | Vulnerability management and disclosure                               |
+| [sbom-templates.md](references/sbom-templates.md)                   | SPDX and CycloneDX SBOM examples                                      |
 | [severity-classification.md](references/severity-classification.md) | Patient harm + exploitability decision trees, Tier 1/2 classification |
 
 ## External Sources

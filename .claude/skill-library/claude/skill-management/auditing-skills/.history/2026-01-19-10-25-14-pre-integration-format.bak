@@ -1,0 +1,491 @@
+---
+name: auditing-skills
+description: Use when validating skill compliance - reads skills, applies 30-phase rules from phase-details.md, reports violations
+allowed-tools: Read, Grep, Bash, TodoWrite
+---
+
+# Auditing Skills
+
+**Validates skills for structural compliance and quality by reading skill files and checking against documented rules.**
+
+> **You MUST use TodoWrite** to track audit progress for all audits to ensure no phases are skipped.
+
+---
+
+## What This Skill Does
+
+Audits skills across **30 validation phases** by reading skill files and applying rules from phase-details.md.
+
+**Phase categories:**
+
+| Phase Category   | Count | What                   | Example Phases                            |
+| ---------------- | ----- | ---------------------- | ----------------------------------------- |
+| Deterministic    | 9     | One correct answer     | Description format, Line count            |
+| Hybrid           | 5     | Deterministic + Claude | Broken links, Path resolution, References |
+| Claude-Automated | 11    | Claude decides         | Orphan detection, Integration             |
+| Human-Required   | 3     | Human judgment         | TypeScript errors, Bash migration         |
+| Validation-Only  | 2     | Detect, no fix         | Header hierarchy                          |
+| Gateway-only     | 4     | Gateway skills only    | Structure, Routing, Coverage              |
+
+**Why this matters:** Structural issues prevent skills from loading correctly. Progressive disclosure keeps skills under 500 lines. Semantic issues impact maintainability and usability.
+
+---
+
+## When to Use
+
+- After editing any skill file
+- Before committing skill changes
+- When debugging skill loading issues
+- User says "audit the X skill"
+- As part of create/update workflows (automatic)
+
+---
+
+## How to Audit
+
+### Step 1: Read the Skill
+
+**Navigate to repository root first:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+**Read the skill file:**
+
+```
+Read({skill-location}/SKILL.md)
+```
+
+**List supporting files:**
+
+```bash
+find {skill-location} -type f -name "*.md" | sort
+find {skill-location}/scripts -type f 2>/dev/null | sort
+find {skill-location}/examples -type f 2>/dev/null | sort
+```
+
+**Extract and verify ALL markdown links (MANDATORY for Phase 4):**
+
+<EXTREMELY-IMPORTANT>
+You MUST extract ALL markdown links from SKILL.md and verify EACH ONE resolves.
+
+❌ DO NOT assume links are valid because files exist in the directory
+❌ DO NOT assume listing files = verifying links
+✅ You MUST cross-reference SKILL.md links against actual filesystem
+
+**Extract links:**
+```bash
+grep -oE '\[[^\]]+\]\([^)]+\)' {skill-location}/SKILL.md | grep -v '^http'
+```
+
+**For each extracted relative path, verify it exists:**
+```bash
+# Example: if link is (references/foo.md), check:
+[ -f "{skill-location}/references/foo.md" ] && echo '✅' || echo '❌ MISSING'
+```
+
+**Path context matters for .claude/ paths:**
+
+Links starting with `.claude/` are repo-root style paths. These must be verified FROM THE SKILL'S DIRECTORY to detect resolution failures:
+
+```bash
+# WRONG: Verifying from repo root (will falsely pass)
+cd $REPO_ROOT && [ -f ".claude/skills/..." ]
+
+# CORRECT: Verify from skill's directory (catches broken paths)
+cd {skill-location} && [ -f ".claude/skills/..." ] && echo '✅' || echo '❌ BROKEN - path does not resolve from skill location'
+```
+
+If a .claude/ path fails from skill location but exists at repo root, the link is broken and needs fixing with proper relative path (e.g., `../../../../../skills/...`).
+</EXTREMELY-IMPORTANT>
+
+**READ ALL REFERENCE FILES (MANDATORY for Phase 26):**
+
+<EXTREMELY-IMPORTANT>
+You MUST read EVERY file in the `references/` directory. Not just list them. Not just check their sizes. ACTUALLY READ THEM.
+
+❌ DO NOT assume file existence = content quality
+❌ DO NOT assume non-zero bytes = real content
+❌ DO NOT use grep as a shortcut to "check for placeholders"
+✅ You MUST invoke `Read()` on each reference file
+
+**Why this is mandatory:**
+
+- A 600-byte file can be 100% placeholder text
+- File size tells you nothing about content quality
+- Grep patterns miss edge cases like `[TO BE POPULATED: ...]`
+- The ONLY way to verify content is to READ it
+
+**For each reference file:**
+
+```
+Read({skill-location}/references/{filename}.md)
+```
+
+Then evaluate: Does this file contain ACTUAL content or just structure/placeholders?
+</EXTREMELY-IMPORTANT>
+
+**Determine skill type:**
+
+- Core: `.claude/skills/{name}/`
+- Library: `.claude/skill-library/{category}/{name}/`
+- Gateway: skill name starts with `gateway-`
+
+### Step 2: Apply Rules from phase-details.md
+
+**You MUST read the phase-details.md reference:**
+
+```
+Read(.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md)
+```
+
+For each of the 30 phases documented there:
+
+1. Check if skill complies with that phase's requirements
+2. Note violations with severity (CRITICAL, WARNING, INFO)
+3. Apply **General Detection Principles** from phase-details.md:
+   - Skip WRONG examples in code blocks
+   - Check code blocks only, not prose explanations
+   - Use exact patterns specified per phase
+   - Consider context (deterministic vs semantic phases)
+
+**Critical phases to check:**
+
+| Phase | Name                      | Check                                                |
+| ----- | ------------------------- | ---------------------------------------------------- |
+| 1     | Description Format        | Starts with "Use when", <120 chars, no block scalars |
+| 3     | Line Count                | <500 lines hard limit                                |
+| 4     | Broken Links              | All markdown links resolve                           |
+| 10    | Reference Audit           | Referenced skills/agents exist                       |
+| 13    | State Externalization     | TodoWrite for multi-step workflows                   |
+| 14    | Table Formatting          | Prettier-formatted markdown tables                   |
+| 16    | Header Hierarchy          | Proper H1→H2→H3 nesting, single H1                   |
+| 18    | Orphan Detection          | Library skills have gateway or agent reference       |
+| 24    | Line Number References    | No hardcoded line numbers (use method names)         |
+| 26    | Reference Content Quality | No empty or placeholder reference files              |
+| 28    | Integration Section       | Has Called-By, Requires, Calls structure             |
+
+**Gateway-specific phases (only for `gateway-*` skills):**
+
+| Phase | Name                 | Check                                            |
+| ----- | -------------------- | ------------------------------------------------ |
+| 20    | Gateway Structure    | Explains two-tier system                         |
+| 21    | Routing Table Format | Tables show full paths not just names            |
+| 22    | Path Resolution      | Routing paths exist on filesystem                |
+| 23    | Coverage Check       | All library skills appear in exactly one gateway |
+
+### Step 2b: Verification Counters (MANDATORY)
+
+<EXTREMELY-IMPORTANT>
+**Superficial Verification Counter**
+
+If you think: "This section looks similar to the requirement, PASS"
+
+Reality: "Looks similar" is NOT compliance. You MUST verify against the EXACT criteria in phase-details.md.
+
+**Phase 28 Trap:** Seeing "Related Skills" ≠ having "Integration" section
+
+- "Related Skills" = flat list (OLD format, FAILS Phase 28)
+- "Integration" = 4 subsections: Called By, Requires, Calls, Pairs With (REQUIRED)
+- You MUST verify ALL FOUR subsections exist, not just "skill relationships exist"
+
+**Phase 4 Trap:** Seeing a path ≠ path resolves
+
+- Skill location: `.claude/skill-library/{category}/{skill}/SKILL.md`
+- Link target: `.claude/skills/...` (repo-root style)
+- These do NOT resolve from skill-library location without `../../../..`
+- You MUST mentally trace the path from the skill's directory
+
+**Anti-Rationalization Checklist (MANDATORY for each phase):**
+
+| Phase | Superficial Check (WRONG)  | Rigorous Check (REQUIRED)                                                        |
+| ----- | -------------------------- | -------------------------------------------------------------------------------- |
+| 28    | "Has skill references"     | "Has ## Integration with ### Called By, ### Requires, ### Calls, ### Pairs With" |
+| 4     | "Files exist in directory" | "Extract links from SKILL.md, verify EACH link target exists on filesystem"     |
+| 26    | "Reference files exist"    | "Read each file; content is substantive, not placeholders"                       |
+| 13    | "Mentions TodoWrite"       | "Has STRONG mandate: 'You MUST use TodoWrite'"                                   |
+
+**Required Action:** For EACH phase, verify against the SPECIFIC criteria in phase-details.md, not your mental model of "what compliance looks like."
+</EXTREMELY-IMPORTANT>
+
+### Step 3: Report Findings
+
+**Format your findings as:**
+
+```
+# Audit Results: {skill-name}
+
+## Structural Issues ({count})
+
+[CRITICAL] Phase 3: Line Count - Skill has 612 lines, exceeds 500 line limit
+Location: SKILL.md
+Recommendation: Extract detailed content to references/
+
+[WARNING] Phase 14: Table Formatting - Tables not Prettier-formatted
+Location: SKILL.md:45-52, SKILL.md:89-96
+Recommendation: Run prettier on markdown tables
+
+[INFO] Phase 2: Allowed Tools - Using Bash tool without clear justification
+Location: Frontmatter
+Recommendation: Document why Bash is needed or remove from allowed-tools
+```
+
+**Phase 26 Per-File Reporting (MANDATORY):**
+
+For Phase 26 (Reference Content Quality), report EACH stub file as a separate finding (not aggregated). This enables fixing-skills to create granular TodoWrite items.
+
+**See:** [references/phase-26-reporting-examples.md](references/phase-26-reporting-examples.md) for correct vs incorrect reporting patterns and complete examples.
+
+## Semantic Issues ({count})
+
+[WARNING] Description Quality - Missing specific trigger terms
+Location: Frontmatter description field
+Recommendation: Add keywords like "TanStack Query", "mutations", "cache invalidation"
+
+[INFO] Phase Numbering Hygiene - Found fractional phase number
+Location: SKILL.md:125 ("## Phase 5.4")
+Recommendation: Renumber as Phase 6, increment subsequent phases
+
+```
+
+**Severity levels:**
+
+- **CRITICAL** - Blocks skill from loading or causes errors
+- **WARNING** - Degrades quality or maintainability
+- **INFO** - Best practice recommendations
+
+After reporting, you MUST use AskUserQuestion to offer fix options (see Post-Audit Actions).
+
+### Step 3b: Machine-Readable Summary (MANDATORY)
+
+After prose findings, output a structured JSON summary for downstream skill consumption (e.g., fixing-skills).
+
+**See:** [references/machine-readable-output.md](references/machine-readable-output.md) for complete format specification and downstream consumer contract.
+
+### Step 4: Reference Fix Procedures
+
+For each issue category, reference the appropriate fix procedure:
+
+**Deterministic fixes** (clear correct answer):
+
+- Phase 2: Allowed Tools → Remove invalid tool names
+- Phase 5: File Organization → Move files to correct directories
+- Phase 14: Table Formatting → Run prettier
+
+**Hybrid fixes** (need reasoning):
+
+- Phase 4: Broken Links → Investigate if file moved or deleted
+- Phase 22: Path Resolution → Check if routing table paths exist
+
+**Claude-automated fixes** (Claude decides):
+
+- Phase 1: Description Format → Rewrite to start with "Use when"
+- Phase 13: State Externalization → Add TodoWrite mandate
+- Phase 18: Orphan Detection → Add skill to gateway routing table
+
+**Human-required fixes** (judgment needed):
+
+- Phase 8: TypeScript Structure → Fix compilation errors
+- Phase 9: Bash→TypeScript Migration → Assess migration value
+- Phase 23: Coverage Check → Decide which gateway owns skill
+
+---
+
+## Semantic Review (MANDATORY)
+
+**After reporting structural findings, you MUST perform semantic review.**
+
+This applies even if structural validation passed with zero issues.
+
+### Semantic Checklist
+
+Evaluate against these 9 criteria:
+
+1. **Description Quality** - MANDATORY detailed assessment (see below)
+2. **Skill Categorization** - Is category correct (frontend/backend/testing/security/tooling/claude)?
+3. **Gateway Membership** - Should skill be in a gateway? Correct gateway(s)?
+4. **Tool Appropriateness** - Are allowed-tools appropriate for purpose?
+5. **Content Density** - If >500 lines, is length justified?
+6. **External Documentation** - Do library skills link to official docs?
+7. **Phase Numbering Hygiene** - Are phases numbered sequentially (no fractional)?
+8. **Numeric Consistency** - Are counts consistent across all mentions? (see below)
+9. **Logical Coherence** - Does the skill make sense as a coherent whole?
+
+### Description Quality Assessment (MANDATORY)
+
+**You MUST evaluate every skill's description against 5 criteria:**
+
+Read the full assessment framework:
+
+```
+
+Read(.claude/skill-library/claude/skill-management/auditing-skills/references/description-quality-assessment.md)
+
+```
+
+**Required evaluation:**
+
+- **Accuracy** - Does description match actual behavior?
+- **Completeness** - Are key capabilities mentioned?
+- **Specificity** - Does it include concrete trigger terms?
+- **Discoverability** - Will search find this skill?
+- **Honesty** - Are limitations acknowledged?
+
+**Output format:**
+
+```
+
+## Semantic Review
+
+Description Quality: [PASS/WARNING/CRITICAL]
+
+- Accuracy: ✅ Matches skill behavior
+- Completeness: ⚠️ Missing mention of error handling patterns
+- Specificity: ✅ Includes "TanStack Query", "mutations"
+- Discoverability: ⚠️ Should mention "cache invalidation" for search
+- Honesty: ✅ Acknowledges framework-specific patterns
+
+Recommendation: Add "cache invalidation" and "error handling" to description
+
+```
+
+### Phase Numbering Hygiene
+
+**Check for fractional major phase numbers** (e.g., Phase 3.5, Phase 5.4) in headings.
+
+**Scan:** SKILL.md and all files under `references/` directory
+
+**Pattern:** `## Phase X.Y` or `## Step X.Y` where X and Y are digits (in headings, not sub-steps)
+
+**Acceptable:** Sub-steps within phases (e.g., `### Step 7.1` under `## Step 7`)
+
+**Flag as WARNING:** Fractional major phases should be renumbered sequentially
+
+See [Phase Numbering Hygiene](references/phase-numbering-hygiene.md) for examples.
+
+### Numeric Consistency Check
+
+**If a skill claims a specific count** (e.g., '30 phases', '5 criteria', '8 steps'), verify that count is consistent across ALL mentions in SKILL.md and references/.
+
+**Detection:**
+```bash
+# Find all numeric claims about phases/steps/criteria
+grep -n '[0-9]\+ \(phase\|step\|criteria\|rule\)' {skill-location}/SKILL.md
+```
+
+**Flag as WARNING** if the same concept has different counts in different locations (e.g., "30 phases" in one place, "29 phases" in another).
+
+---
+
+## Success Criteria
+
+Audit complete when:
+
+1. ✅ All 30 validation phases checked
+2. ✅ Findings reported with severity levels
+3. ✅ Semantic review performed (9 criteria)
+4. ✅ Description quality assessed (5 dimensions)
+5. ✅ Fix procedures referenced
+6. ✅ TodoWrite tracking used
+7. ✅ AskUserQuestion used for post-audit options (if issues found)
+
+---
+
+## Post-Audit Actions
+
+**If issues found**, offer to fix them:
+
+<IMPORTANT>
+❌ DO NOT display options as prose/text in your response
+❌ DO NOT list options with 'Would you like me to...' formatting
+❌ DO NOT skip because 'user can just tell me'
+✅ You MUST invoke the AskUserQuestion tool - this is the ONLY acceptable method
+</IMPORTANT>
+
+Use AskUserQuestion:
+
+```
+
+Question: The audit found fixable issues. How would you like to proceed?
+Header: Next steps
+Options:
+
+- Run fixing-skills workflow (Recommended) - Claude fixes issues automatically using semantic reasoning
+- Show me the issues - See which issues are auto-fixable vs need reasoning
+
+```
+
+**Based on selection:**
+
+- **Run fixing-skills workflow** - Read and invoke the fixing-skills skill: `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`, then execute the workflow with audit findings
+- **Show me the issues** - Display phase categories (deterministic/hybrid/Claude-automated/human-required), then re-prompt with same AskUserQuestion options
+
+---
+
+## Complete Phase Reference
+
+**30 validation phases** across 6 categories (Deterministic, Hybrid, Claude-Automated, Human-Required, Validation-Only, Gateway-only).
+
+**For quick phase overview**, see [Phase Quick Reference](references/phase-quick-reference.md).
+
+**For detailed phase documentation**, see [Phase Details Reference](references/phase-details.md).
+
+---
+
+## References
+
+All audit rules and guidance are documented in references/:
+
+- [Phase Details](references/phase-details.md) - Complete rules for all 30 phases (READ THIS FIRST)
+- [Phase Quick Reference](references/phase-quick-reference.md) - Phase overview table
+- [Description Quality Assessment](references/description-quality-assessment.md) - 5-criteria evaluation framework
+- [Phase Numbering Hygiene](references/phase-numbering-hygiene.md) - Sequential numbering rules
+- [Common Failure Patterns](references/common-failure-patterns.md) - Quick fixes for frequent issues
+- [Library Skill Patterns](references/library-skill-patterns.md) - Specialized validation for library skills
+- [Semantic Review Output](references/semantic-review-output.md) - Output format specifications
+
+**Phase-specific semantic guidance:**
+
+- [Phase 13 Semantic Review](references/phase-13-semantic-review.md) - State externalization patterns
+- [Phase 15 Semantic Review](references/phase-15-semantic-review.md) - Code block quality patterns
+- [Phase 24 Semantic Review](references/phase-24-semantic-review.md) - Line number reference patterns
+- [Phase 26 Semantic Review](references/phase-26-semantic-review.md) - Reference content quality
+
+**Cross-cutting references:**
+
+- [Phase Categorization](../../../../skills/managing-skills/references/patterns/phase-categorization.md) - Fix categories
+- [Skill Compliance Contract](../../../../skills/managing-skills/references/skill-compliance-contract.md) - Requirements
+
+---
+
+## Integration
+
+### Called By
+
+- `creating-skills` (LIBRARY) - Invokes audit after creation - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`
+- `updating-skills` (LIBRARY) - Invokes audit for compliance - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")`
+- `fixing-skills` (LIBRARY) - Invokes audit to identify issues - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`
+- `managing-skills` - Router for audit operations
+
+### Requires (invoke before starting)
+
+None - Entry point skill for validation
+
+### Calls (during execution)
+
+None - Validates using Read tool only
+
+### Pairs With (conditional)
+
+| Skill                                    | Trigger       | Purpose                                                                                                      |
+| ---------------------------------------- | ------------- | ------------------------------------------------------------------------------------------------------------ |
+| `fixing-skills` (LIBRARY)                | Issues found  | Systematic compliance remediation - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` |
+
+## Related Skills
+
+- `creating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` - Create new skills (invokes audit after creation)
+- `updating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` - Update existing skills (invokes audit for compliance)
+- `fixing-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")` - Fix audit issues systematically
+- `managing-skills` - Router for all skill operations
+```

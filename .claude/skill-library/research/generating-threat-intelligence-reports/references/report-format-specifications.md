@@ -11,11 +11,13 @@
 ### The 5-6 Metric Rule
 
 **Research Finding** (2026 best practices):
+
 - **Maximum metrics per dashboard**: 5-6 key indicators
 - **Rationale**: Cognitive load limitation, executive time constraints
 - **Progressive disclosure**: High-level overview → drill-down for details
 
 **Application to Threat Intelligence Reports**:
+
 - 5 Key Takeaways (bullets)
 - Top 5 CVEs (priority table)
 - Detection coverage summary (single percentage)
@@ -30,6 +32,7 @@
 | 🟢 **GREEN** | Good/Monitored | COVERED by nuclei templates |
 
 **Why traffic lights work**:
+
 - Instant comprehension (no reading required)
 - Universal understanding across cultures
 - Draws attention to critical items
@@ -41,6 +44,7 @@
 ### Part 1: Executive Summary (1 paragraph)
 
 **Format**:
+
 > Over the past {N} days, CISA added {X} vulnerabilities to the Known Exploited Vulnerabilities (KEV) catalog, with {Y} linked to nation-state actors and {Z} to ransomware campaigns. Chariot can detect {P}% of these threats, with {Q} critical detection gaps requiring immediate attention. The top priority is {CVE-ID}, exploited by {Threat Actor} and affecting {Product}.
 
 **Character limit**: 300-400 characters (2-3 sentences)
@@ -48,6 +52,7 @@
 **Purpose**: Set narrative context before presenting data
 
 **Example**:
+
 > Over the past 45 days, CISA added 24 vulnerabilities to the KEV catalog, with 8 linked to nation-state actors (APT28, APT29, APT41) and 5 to ransomware campaigns (LockBit 3.0, Black Basta). Chariot can detect 60% of these threats, with 2 critical detection gaps requiring immediate capability development. The top priority is CVE-2025-55182, exploited by APT28 (Russia) within 48 hours of disclosure, affecting React/Next.js applications.
 
 ---
@@ -55,9 +60,11 @@
 ### Part 2: Key Takeaways (5 Bullets)
 
 **Mandatory format**:
+
 > **Bold Title:** Single sentence explanation with supporting data.
 
 **Required focus areas** (from Phase 5.1 in SKILL.md):
+
 1. **Speed of Weaponization** - 0-day to KEV addition timeline
 2. **Threat Actor Convergence** - Multiple groups using same CVE or targeting same sector
 3. **Sector/Platform Targeting Patterns** - Which industries/technologies under attack
@@ -66,6 +73,7 @@
 
 **Research-Backed Enhancement**:
 Add **Cyber Risk Quantification (CRQ)** when possible:
+
 - **From**: "We found 5 critical vulnerabilities"
 - **To**: "We face $2.5M in potential ransomware exposure across 5 critical vulnerabilities"
 
@@ -94,6 +102,7 @@ Add **Cyber Risk Quantification (CRQ)** when possible:
 |----------|-----|---------|--------------|-----------|----------|----------|------|-----------|
 
 **Formatting rules**:
+
 - **Priority**: CRITICAL/HIGH/MEDIUM (not P0/P1/P2)
 - **CVE**: Hyperlinked to NVD or CISA KEV entry
 - **Threat Actor**: Include country for nation-states (e.g., APT28 (Russia))
@@ -101,6 +110,7 @@ Add **Cyber Risk Quantification (CRQ)** when possible:
 - **Detection Status**: Use emoji + text (❌ GAP, ⚠️ Partial, ✅ COVERED)
 
 **Color coding (for PowerPoint/dashboard presentation)**:
+
 - **Detection Status**:
   - 🔴 **RED**: GAP (white text on red background)
   - 🟡 **YELLOW**: Partial (black text on yellow background)
@@ -113,13 +123,13 @@ Add **Cyber Risk Quantification (CRQ)** when possible:
 **Example Table** (Markdown):
 
 ```markdown
-| Priority | CVE | Product | Threat Actor Attribution | Confidence | Detection Status |
-|----------|-----|---------|-------------------------|------------|------------------|
-| **CRITICAL** | [CVE-2025-55182](https://nvd.nist.gov/vuln/detail/CVE-2025-55182) | React/Next.js | APT28 (Russia) | HIGH | ❌ **GAP** |
-| **HIGH** | [CVE-2024-12345](https://nvd.nist.gov/vuln/detail/CVE-2024-12345) | Apache Struts | LockBit 3.0 | HIGH | ✅ COVERED |
-| **HIGH** | [CVE-2024-23456](https://nvd.nist.gov/vuln/detail/CVE-2024-23456) | Cisco ASA | APT41 (China) | MEDIUM | ✅ COVERED |
-| **MEDIUM** | [CVE-2024-34567](https://nvd.nist.gov/vuln/detail/CVE-2024-34567) | VMware vCenter | Opportunistic | N/A | ⚠️ Partial |
-| **MEDIUM** | [CVE-2024-45678](https://nvd.nist.gov/vuln/detail/CVE-2024-45678) | Microsoft Exchange | Unknown | LOW | ✅ COVERED |
+| Priority     | CVE                                                               | Product            | Threat Actor Attribution | Confidence | Detection Status |
+| ------------ | ----------------------------------------------------------------- | ------------------ | ------------------------ | ---------- | ---------------- |
+| **CRITICAL** | [CVE-2025-55182](https://nvd.nist.gov/vuln/detail/CVE-2025-55182) | React/Next.js      | APT28 (Russia)           | HIGH       | ❌ **GAP**       |
+| **HIGH**     | [CVE-2024-12345](https://nvd.nist.gov/vuln/detail/CVE-2024-12345) | Apache Struts      | LockBit 3.0              | HIGH       | ✅ COVERED       |
+| **HIGH**     | [CVE-2024-23456](https://nvd.nist.gov/vuln/detail/CVE-2024-23456) | Cisco ASA          | APT41 (China)            | MEDIUM     | ✅ COVERED       |
+| **MEDIUM**   | [CVE-2024-34567](https://nvd.nist.gov/vuln/detail/CVE-2024-34567) | VMware vCenter     | Opportunistic            | N/A        | ⚠️ Partial       |
+| **MEDIUM**   | [CVE-2024-45678](https://nvd.nist.gov/vuln/detail/CVE-2024-45678) | Microsoft Exchange | Unknown                  | LOW        | ✅ COVERED       |
 ```
 
 ---
@@ -143,6 +153,7 @@ Add **Cyber Risk Quantification (CRQ)** when possible:
 **Exploitation Method:** {Brief description}
 
 **Evidence & Sources:**
+
 1. [{Source 1 Name}]({URL}) - {Publication Date} - "{Relevant Quote}"
 2. [{Source 2 Name}]({URL}) - {Publication Date} - "{Relevant Quote}"
 
@@ -166,6 +177,7 @@ Add **Cyber Risk Quantification (CRQ)** when possible:
 **Exploitation Method:** Spearphishing emails with malicious RSC payloads, triggering server-side code execution
 
 **Evidence & Sources:**
+
 1. [Microsoft Threat Intelligence Center](https://microsoft.com/ti/apt28-rsc) - Jan 3, 2025 - "APT28 conducted widespread scanning for vulnerable React Server Component endpoints within 24 hours of CVE disclosure"
 2. [Unit 42 Threat Brief](https://unit42.paloaltonetworks.com/apt28-rsc-campaign/) - Jan 5, 2025 - "Winter Vivern campaign targeted 18 US government agencies using CVE-2025-55182 exploit"
 
@@ -203,12 +215,14 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 ---
 
 **Detection Coverage Summary:**
+
 - Total CVEs analyzed: {N}
 - **COVERED** (Chariot can detect): {X} ({P}%)
 - **PARTIAL** (Limited detection): {Y} ({P}%)
 - **GAP** (Blind spot): {Z} ({P}%)
 
 **Capability Development Recommendations:**
+
 1. **Immediate** (P0): CVE-YYYY-NNNNN (nation-state + high customer exposure)
 2. **High Priority** (P1): CVE-YYYY-NNNNN (ransomware + medium customer exposure)
 3. **Standard Priority** (P2): CVE-YYYY-NNNNN (opportunistic + low customer exposure)
@@ -244,12 +258,14 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 ---
 
 **Detection Coverage Summary:**
+
 - Total CVEs analyzed: 5
 - **COVERED** (Chariot can detect): 3 (60%)
 - **PARTIAL** (Limited detection): 0 (0%)
 - **GAP** (Blind spot): 2 (40%)
 
 **Capability Development Recommendations:**
+
 1. **Immediate** (P0): CVE-2025-55182 (APT28 nation-state + 40% customer exposure)
 2. **High Priority** (P1): CVE-2024-77777 (moderate exposure + database criticality)
 ```
@@ -263,6 +279,7 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 **Location**: `.claude/.output/threat-intelligence/{timestamp}-kev-{N}day-report/REPORT.md`
 
 **Contents** (in order):
+
 1. Report metadata (date generated, timeframe, CVE count)
 2. Executive Summary (1 paragraph)
 3. Key Takeaways (5 bullets)
@@ -281,6 +298,7 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 **Purpose**: Citation transparency and verification
 
 **Contents**:
+
 ```markdown
 # Attribution Sources
 
@@ -290,6 +308,7 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 **Confidence:** HIGH
 
 ### Sources:
+
 1. **Microsoft Threat Intelligence Center**
    - URL: https://microsoft.com/ti/apt28-rsc
    - Date: Jan 3, 2025
@@ -305,6 +324,7 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 ---
 
 ## CVE-2024-12345
+
 ...
 ```
 
@@ -315,26 +335,31 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 ### PowerPoint/Keynote Slides
 
 **Slide 1: Executive Summary**
+
 - Title: "Threat Intelligence Report - {Timeframe}"
 - Body: Executive summary paragraph
 - Footer: "Generated {Date} | Chariot Security Platform"
 
 **Slide 2: Key Takeaways**
+
 - Title: "5 Key Findings"
 - Body: Bullets (with icons for visual appeal)
 - Footer: Source citations
 
 **Slide 3: Priority Patching Table**
+
 - Title: "Top 5 Vulnerabilities Requiring Action"
 - Body: Table with color-coded detection status
 - Footer: "Color Key: 🔴 No Detection | 🟡 Limited | 🟢 Monitored"
 
 **Slide 4-8: Attribution Cards** (one per slide for CRITICAL/HIGH priority)
+
 - Title: "{CVE-ID}: {Vulnerability Name}"
 - Body: Attribution card format
 - Footer: Evidence sources
 
 **Slide 9: Detection Coverage**
+
 - Title: "Chariot Detection Coverage & Roadmap"
 - Body: Pie chart (60% Covered, 40% Gap) + gap list
 - Footer: Capability development timeline
@@ -344,6 +369,7 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 **For Chariot UI integration** (future enhancement):
 
 **Widget 1: Security Posture Score**
+
 - Single number (0-100) calculated from:
   ```
   score = (100 - (critical_vulns * 10 + high_vulns * 5)) * (detection_coverage_percentage / 100)
@@ -351,18 +377,22 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 - Traffic light indicator
 
 **Widget 2: KEV Remediation Rate**
+
 - Percentage of KEV vulns patched within federal deadlines
 - Trend graph (6-month)
 
 **Widget 3: Top 5 Risks**
+
 - Mini version of priority patching table
 - Click to drill down for details
 
 **Widget 4: Threat Actor Heatmap**
+
 - Geographic visualization of threat actor targeting
 - Color intensity = number of active campaigns
 
 **Widget 5: Detection Coverage Breakdown**
+
 - Pie chart or stacked bar chart
 - COVERED / PARTIAL / GAP percentages
 
@@ -374,30 +404,31 @@ The following vulnerabilities are actively exploited but **not yet detectable** 
 
 **Research Finding**: Security metrics require translation to business language for executive communication
 
-| Technical | Business Translation |
-|-----------|---------------------|
-| "5 critical CVEs" | "$2.5M in potential ransomware exposure" |
-| "Nation-state APT28" | "Russian government-sponsored hackers" |
-| "Detection gap" | "Blind spot in our security monitoring" |
-| "KEV deadline in 14 days" | "Federal mandate requires patching by {Date}" |
-| "CVSS 9.8 Critical" | "Maximum severity vulnerability" |
-| "60% detection coverage" | "We can detect 3 of 5 threats; 2 require capability development" |
+| Technical                 | Business Translation                                             |
+| ------------------------- | ---------------------------------------------------------------- |
+| "5 critical CVEs"         | "$2.5M in potential ransomware exposure"                         |
+| "Nation-state APT28"      | "Russian government-sponsored hackers"                           |
+| "Detection gap"           | "Blind spot in our security monitoring"                          |
+| "KEV deadline in 14 days" | "Federal mandate requires patching by {Date}"                    |
+| "CVSS 9.8 Critical"       | "Maximum severity vulnerability"                                 |
+| "60% detection coverage"  | "We can detect 3 of 5 threats; 2 require capability development" |
 
 **CRQ (Cyber Risk Quantification) Example**:
+
 > "CVE-2025-55182 affects React applications representing $12M in annual revenue. Based on IBM X-Force ransomware data ($4.5M average ransom), this vulnerability poses $4.5M in potential financial exposure if exploited."
 
 ---
 
 ## Common Mistakes to Avoid
 
-| Mistake | Why It's Wrong | Fix |
-|---------|----------------|-----|
-| **Too many metrics** | Cognitive overload, executives skip reading | Stick to 5-6 key metrics |
-| **No visual cues** | Text-heavy reports don't get read | Use traffic lights, color coding |
-| **Technical jargon** | Executives don't understand CVE/CVSS | Translate to business impact |
-| **Point-in-time snapshots** | No context on improvement/degradation | Show 6-12 month trends |
-| **Missing attribution sources** | Cannot verify claims | Include citation URLs + dates |
-| **All gaps equal priority** | Wastes time on low-risk items | Use prioritization algorithm |
+| Mistake                         | Why It's Wrong                              | Fix                              |
+| ------------------------------- | ------------------------------------------- | -------------------------------- |
+| **Too many metrics**            | Cognitive overload, executives skip reading | Stick to 5-6 key metrics         |
+| **No visual cues**              | Text-heavy reports don't get read           | Use traffic lights, color coding |
+| **Technical jargon**            | Executives don't understand CVE/CVSS        | Translate to business impact     |
+| **Point-in-time snapshots**     | No context on improvement/degradation       | Show 6-12 month trends           |
+| **Missing attribution sources** | Cannot verify claims                        | Include citation URLs + dates    |
+| **All gaps equal priority**     | Wastes time on low-risk items               | Use prioritization algorithm     |
 
 ---
 

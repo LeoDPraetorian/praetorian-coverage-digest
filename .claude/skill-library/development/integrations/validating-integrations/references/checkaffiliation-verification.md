@@ -123,6 +123,7 @@ func (task *Wiz) CheckAffiliation(asset model.Asset) (bool, error) {
 ```
 
 **Key Characteristics**:
+
 - Validates credentials first
 - Requires asset identifier (CloudId, DNS, etc.)
 - Makes actual API call (GraphQL query)
@@ -139,6 +140,7 @@ func (a *Amazon) CheckAffiliation(asset model.Asset) (bool, error) {
 ```
 
 **Implementation in Base Class**:
+
 ```go
 func (base *BaseCapability) CheckAffiliationSimple(asset model.Asset, job *model.Job, invoke func() error) (bool, error) {
     job.Open()
@@ -168,6 +170,7 @@ func (base *BaseCapability) CheckAffiliationSimple(asset model.Asset, job *model
 ```
 
 **When CheckAffiliationSimple Is Acceptable**:
+
 - Cloud provider integrations (AWS, Azure, GCP)
 - No efficient single-asset query API available
 - Full enumeration is required for accurate affiliation
@@ -175,6 +178,7 @@ func (base *BaseCapability) CheckAffiliationSimple(asset model.Asset, job *model
 ## Evidence Format
 
 **PASS Example (Real Implementation)**:
+
 ```
 ✅ CheckAffiliation
 Evidence: wiz.go:717 - func (task *Wiz) CheckAffiliation(asset model.Asset) (bool, error)
@@ -183,6 +187,7 @@ Pattern: Real API query (GraphQL) to verify asset ownership
 ```
 
 **PASS Example (CheckAffiliationSimple)**:
+
 ```
 ✅ CheckAffiliation (CheckAffiliationSimple)
 Evidence: amazon.go:475 - return a.BaseCapability.CheckAffiliationSimple(asset, &a.Job, a.Invoke)
@@ -190,6 +195,7 @@ Pattern: Cloud provider using full re-enumeration (acceptable)
 ```
 
 **FAIL Example (Stub/Not Overridden)**:
+
 ```
 ❌ CheckAffiliation
 Evidence: vendor.go - No CheckAffiliation override found
@@ -200,6 +206,7 @@ Required: Override with real API query or use CheckAffiliationSimple
 ## Known Violation Rate
 
 **Current Codebase Status (from research)**:
+
 - Real implementation: 1 (Wiz)
 - Acceptable (CheckAffiliationSimple): 3 (AWS, Azure, GCP)
 - Violations (stub/not overridden): 41 integrations
@@ -209,15 +216,18 @@ Required: Override with real API query or use CheckAffiliationSimple
 ## Remediation Strategy
 
 **For SaaS integrations with single-asset query API**:
+
 1. Check vendor API for GET /asset/:id or equivalent endpoint
 2. Follow Wiz pattern: validate credentials → require identifier → query API → check result
 3. Return true if asset exists and belongs to organization
 
 **For integrations without single-asset query**:
+
 1. Use CheckAffiliationSimple pattern
 2. Accept performance cost of full re-enumeration
 
 **For file-based imports**:
+
 1. CheckAffiliation may not be applicable
 2. Document as N/A with justification
 

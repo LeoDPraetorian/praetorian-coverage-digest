@@ -107,6 +107,37 @@ Discovery?
 
 ---
 
+## Integration
+
+### Called By
+
+- `/agent-manager` command - All agent management operations (create, update, audit, fix, rename, test, search, list)
+- `gateway-claude` skill - Routes agent-related queries ("create agent", "update agent", "agents")
+- User direct invocation via `skill: "managing-agents"`
+
+### Requires (invoke before starting)
+
+None - This is an entry point router skill
+
+### Calls (during execution)
+
+| Skill                                        | When             | Purpose                                        |
+| -------------------------------------------- | ---------------- | ---------------------------------------------- |
+| `creating-agents` (LIBRARY)                  | create operation | Delegates agent creation with TDD workflow     |
+| `updating-agents` (LIBRARY)                  | update operation | Delegates agent updates with compliance checks |
+| `auditing-agents` (LIBRARY)                  | audit operation  | Delegates 8-phase compliance validation        |
+| `fixing-agents` (LIBRARY)                    | fix operation    | Delegates compliance remediation               |
+| `renaming-agents` (LIBRARY)                  | rename operation | Delegates safe renaming with reference updates |
+| `verifying-agent-skill-invocation` (LIBRARY) | test operation   | Delegates behavioral skill invocation testing  |
+| `searching-agents` (LIBRARY)                 | search operation | Delegates agent discovery by name/description  |
+| `listing-agents` (LIBRARY)                   | list operation   | Delegates agent enumeration by category        |
+
+### Pairs With (conditional)
+
+None - Pure router that delegates operations to library skills, doesn't conditionally pair with other skills
+
+---
+
 ## Related
 
 **References**:

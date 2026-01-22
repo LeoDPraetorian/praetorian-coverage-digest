@@ -6,12 +6,12 @@
 
 Select developer agent based on bug location:
 
-| File Pattern | Agent | Example |
-|--------------|-------|---------|
-| `*.tsx`, `*.ts` (ui/) | frontend-developer | React components, UI logic |
-| `*.go` | backend-developer | Lambda handlers, Go services |
-| `*.vql`, `nuclei/*.yaml` | capability-developer | Security capabilities |
-| `*.py` | backend-developer | Python services, CLI tools |
+| File Pattern             | Agent                | Example                      |
+| ------------------------ | -------------------- | ---------------------------- |
+| `*.tsx`, `*.ts` (ui/)    | frontend-developer   | React components, UI logic   |
+| `*.go`                   | backend-developer    | Lambda handlers, Go services |
+| `*.vql`, `nuclei/*.yaml` | capability-developer | Security capabilities        |
+| `*.py`                   | backend-developer    | Python services, CLI tools   |
 
 **See agent definitions:** `.claude/agents/development/`
 
@@ -26,6 +26,7 @@ The developer agent MUST invoke these skills before completing:
 ## Inputs
 
 From Phase 3:
+
 - `root-cause-report.md` with:
   - Root cause description
   - Evidence (file:line)
@@ -73,20 +74,20 @@ Example (LoginForm validation bug):
 
 ```typescript
 // src/components/LoginForm.test.tsx
-describe('LoginForm', () => {
-  describe('email validation with empty input', () => {
-    it('should return false for undefined email', () => {
+describe("LoginForm", () => {
+  describe("email validation with empty input", () => {
+    it("should return false for undefined email", () => {
       // This test reproduces the bug
       const result = validateEmail(undefined);
-      expect(result).toBe(false);  // Currently throws error
+      expect(result).toBe(false); // Currently throws error
     });
 
-    it('should return false for empty string email', () => {
-      const result = validateEmail('');
+    it("should return false for empty string email", () => {
+      const result = validateEmail("");
       expect(result).toBe(false);
     });
 
-    it('should return false for null email', () => {
+    it("should return false for null email", () => {
       const result = validateEmail(null);
       expect(result).toBe(false);
     });
@@ -95,6 +96,7 @@ describe('LoginForm', () => {
 ```
 
 **Verify test fails:**
+
 ```bash
 npm test -- LoginForm.test.tsx
 # Expected: Test fails with "Cannot read property 'test' of undefined"
@@ -109,13 +111,14 @@ Apply ONLY the fix recommended in root-cause-report.md:
 ```typescript
 // src/components/LoginForm.tsx
 function validateEmail(email) {
-  if (!email) return false;  // ✅ ONLY THIS LINE ADDED
+  if (!email) return false; // ✅ ONLY THIS LINE ADDED
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 }
 ```
 
 **DO NOT:**
+
 - Refactor validateEmail() to use a validation library ❌
 - Add email format validation ❌
 - Extract regex to a constant ❌
@@ -173,19 +176,22 @@ After Phase 4 completes:
 ## Test Results
 
 ### New Tests (3 added, 3 passing)
-
 ```
+
 ✓ should return false for undefined email
 ✓ should return false for empty string email
 ✓ should return false for null email
+
 ```
 
 ### Existing Tests (47 passing, 0 failing)
 
 ```
+
 Test Suites: 12 passed, 12 total
-Tests:       47 passed, 47 total
-Time:        3.247s
+Tests: 47 passed, 47 total
+Time: 3.247s
+
 ```
 
 ## Verification
@@ -209,22 +215,26 @@ Changes limited to:
 **IF existing tests fail after fix:**
 
 1. **Analyze failure:**
+
    ```bash
    npm test -- --verbose
    # Capture full output
    ```
 
 2. **Document in implementation-report.md:**
+
    ```markdown
    ## Regressions Detected
 
    ### Test: LoginForm renders with pre-filled email
+
    - **Status:** FAILING
    - **Error:** Expected validateEmail(null) to return true, got false
    - **Root cause:** Test assumed null email is valid (incorrect assumption)
    - **Assessment:** Test bug, not fix regression
 
    ### Recommendation
+
    Fix the test to match correct behavior (null email should be invalid)
    ```
 
@@ -235,6 +245,7 @@ Changes limited to:
 ### Anti-Pattern: Refactoring While Fixing
 
 **Example (WRONG):**
+
 ```typescript
 // ❌ WRONG: Extracted regex, added comments, reformatted
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -253,10 +264,11 @@ function validateEmail(email: string | null | undefined): boolean {
 **Why wrong:** Changed more than necessary. Harder to review. Risk of introducing new bugs.
 
 **Correct (MINIMAL):**
+
 ```typescript
 // ✅ RIGHT: One line added, nothing else changed
 function validateEmail(email) {
-  if (!email) return false;  // Only this line added
+  if (!email) return false; // Only this line added
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 }
@@ -265,16 +277,17 @@ function validateEmail(email) {
 ### Anti-Pattern: Fixing Multiple Issues
 
 **Example (WRONG):**
+
 ```typescript
 // ❌ WRONG: Fixed null bug AND weak password validation in same commit
 function validateEmail(email) {
-  if (!email) return false;  // Bug fix
+  if (!email) return false; // Bug fix
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return regex.test(email);
 }
 
 function validatePassword(password) {
-  if (!password) return false;  // "While we're here" fix
+  if (!password) return false; // "While we're here" fix
   return password.length >= 8;
 }
 ```
@@ -282,6 +295,7 @@ function validatePassword(password) {
 **Why wrong:** Mixed concerns. If this commit causes issues, harder to revert just the bug fix.
 
 **Correct (ATOMIC):**
+
 ```typescript
 // ✅ RIGHT: Only validateEmail() changed
 function validateEmail(email) {
@@ -296,26 +310,29 @@ function validateEmail(email) {
 ### Anti-Pattern: Test That Doesn't Fail First
 
 **Example (WRONG):**
+
 ```typescript
 // ❌ WRONG: Test passes even without fix
-it('should validate email correctly', () => {
-  expect(validateEmail('test@example.com')).toBe(true);  // Already worked
+it("should validate email correctly", () => {
+  expect(validateEmail("test@example.com")).toBe(true); // Already worked
 });
 ```
 
 **Why wrong:** Test doesn't reproduce the bug. Doesn't verify fix.
 
 **Correct (REPRODUCES BUG):**
+
 ```typescript
 // ✅ RIGHT: Test fails without fix, passes with fix
-it('should return false for undefined email', () => {
-  expect(validateEmail(undefined)).toBe(false);  // Throws without fix
+it("should return false for undefined email", () => {
+  expect(validateEmail(undefined)).toBe(false); // Throws without fix
 });
 ```
 
 ## Exit Criteria
 
 Phase 4 is complete when:
+
 - [ ] Test written that reproduces bug
 - [ ] Test failed before implementing fix (verified RED)
 - [ ] Minimal fix implemented (matches root-cause-report.md)
@@ -326,6 +343,7 @@ Phase 4 is complete when:
 ## Next Phase
 
 Proceed to [Phase 5: Verification](phase-5-verification.md) with:
+
 - Code changes (committed to working branch)
 - New/updated test file
 - implementation-report.md

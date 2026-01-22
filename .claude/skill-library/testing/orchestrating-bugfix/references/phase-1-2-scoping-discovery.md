@@ -5,6 +5,7 @@
 ## Phase Structure
 
 Phase 1-2 is divided into two stages:
+
 1. **Stage 1 (Scoping):** Parse symptoms, grep for clues, calculate agent count
 2. **Stage 2 (Discovery):** Spawn 0-5 Explore agents if location unknown
 
@@ -23,6 +24,7 @@ The discovering-bugs-for-fixing skill handles the complete scoping and discovery
 ### Inputs
 
 From Phase 0:
+
 - `bug-symptoms.md` - User's bug description
 - Error messages or stack traces (if available)
 - Expected vs actual behavior
@@ -74,6 +76,7 @@ The discovering-bugs-for-fixing skill will:
 ### When to Skip
 
 Skip if discovery_plan.agents_needed = 0:
+
 - Bug location identified by grep
 - Error message points to specific file:line
 - Component explicitly named in symptoms
@@ -81,6 +84,7 @@ Skip if discovery_plan.agents_needed = 0:
 ### When to Execute
 
 Execute if discovery_plan.agents_needed >= 1:
+
 - Bug location unclear from grep
 - Multiple candidate locations found
 - Generic error requires code exploration
@@ -90,11 +94,13 @@ Execute if discovery_plan.agents_needed >= 1:
 The discovering-bugs-for-fixing skill spawns Explore agents in parallel:
 
 **Agent count scale:**
+
 - 1-2 agents: Narrow scope (single feature)
 - 3-4 agents: Medium scope (multiple components)
 - 5 agents: Broad scope (cross-cutting concern)
 
 **Each agent receives:**
+
 ```
 Task: Explore codebase to find [specific aspect]
 
@@ -110,12 +116,14 @@ Mode: quick  # Not "very thorough" - this is lightweight discovery
 ### Outputs
 
 - `candidate-locations.md`:
+
   ```markdown
   # Candidate Bug Locations
 
   ## High Confidence
 
   ### src/components/LoginForm.tsx - validateEmail()
+
   - Contains validation logic for email field
   - Matches error message pattern
   - No null check before regex test
@@ -123,6 +131,7 @@ Mode: quick  # Not "very thorough" - this is lightweight discovery
   ## Medium Confidence
 
   ### src/utils/validation.ts - isValidEmail()
+
   - Called by LoginForm
   - Could be source of ValidationError
   - But error message suggests component-level issue
@@ -130,6 +139,7 @@ Mode: quick  # Not "very thorough" - this is lightweight discovery
   ## Low Confidence
 
   ### src/api/auth.ts - login()
+
   - Server-side validation possible
   - But error appears client-side from stack trace
   ```
@@ -139,8 +149,10 @@ Mode: quick  # Not "very thorough" - this is lightweight discovery
 After Phase 1-2 completes:
 
 **IF 0 candidates found:**
+
 - STOP workflow
 - Ask user via AskUserQuestion:
+
   ```
   No candidate locations found for this bug.
 
@@ -151,6 +163,7 @@ After Phase 1-2 completes:
   ```
 
 **IF candidates found:**
+
 - Proceed to Phase 3 (Investigation)
 - Pass candidate-locations.md to debugger agent
 
@@ -161,6 +174,7 @@ If discovering-bugs-for-fixing returns >=3 candidates AND they are independent (
 **Consider** invoking `dispatching-parallel-agents` to spawn multiple debugger agents investigating different candidates simultaneously.
 
 **Criteria for parallelization:**
+
 - 3+ candidates
 - Independent code paths (no shared state)
 - Candidates in different features/modules
@@ -190,6 +204,7 @@ If discovering-bugs-for-fixing returns >=3 candidates AND they are independent (
 ### Issue: Too many candidates (>10)
 
 **Solution:** Refine symptoms with user:
+
 ```
 Bug scope is too broad. Can you specify:
 - Which feature/page has the bug?
@@ -200,6 +215,7 @@ Bug scope is too broad. Can you specify:
 ### Issue: No grep results
 
 **Solution:** Adjust search terms:
+
 - Try partial error messages
 - Search for component names
 - Look for related functionality

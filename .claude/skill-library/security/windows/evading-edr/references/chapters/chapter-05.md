@@ -1,4 +1,4 @@
-## 5  IMAGE-LOAD AND REGISTRY NOTIFICATIONS
+## 5 IMAGE-LOAD AND REGISTRY NOTIFICATIONS
 
 ![Figure](figures/EvadingEDR_page_105_figure_001.png)
 
@@ -42,9 +42,7 @@ Listing 5-1: Registering an image-load callback routine
 
 Now the system will invoke the internal callback function
 
-
 ImageLoadNotificationCallback() each time a new image is loaded into a
-
 
 process.
 
@@ -58,7 +56,7 @@ The system also adds a pointer to the function to an array, nt!PspLoad ImageNoti
 .Select(a => @getSysm(@getCallbackRoutine(a).Function))
 ```
 
-80      Chapter 5
+80 Chapter 5
 
 ---
 
@@ -155,10 +153,9 @@ Listing 5-5: The SE_IMAGE_SIGNATURE_TYPE enumeration
 
 The Code Integrity internals related to these properties are outside the scope of this chapter, but the most commonly encountered are
 
-
 SeImageSignatureNone (meaning the file is unsigned), SeImageSignatureEmbedded (meaning the signature is embedded in the file), and SeImageSignatureCache (meaning the signature is cached on the system).
 
-82    Chapter 5
+82 Chapter 5
 
 ---
 
@@ -251,7 +248,7 @@ KAPC injection is relatively straightforward in theory and only gets murky when 
 
 KAPC injection queues this task from kernel mode, and unlike plain user-mode APC injection, the operating system doesn't formally support it, making its implementation a bit hacky. The process consists of a few steps. First, the driver is notified of an image load, whether it be the process image (such as notepad.exe) or a DLL that the EDR is interested in. Because the notification occurs in the context of the target process, the driver then searches the currently loaded modules for the address of a function that
 
-86    Chapter 5
+86 Chapter 5
 
 ---
 
@@ -338,7 +335,7 @@ Listing 5-10: Allocating memory for the KAPC structure
 
 The driver allocates this memory in NonPagedPool , a memory pool that guarantees the data will stay in physical memory rather than being paged out to disk as long as the object is allocated. This is important because the thread into which the DLL is being injected may be running at a high interrupt request level, such as DISPATCH_LEVEL , in which case it shouldn't access memory in the PagedPool , as this causes a fatal error that usually results in an IRQL_NOT_LESS_OR_EQUAL bug check (also known as the Blue Screen of Death).
 
-88    Chapter 5
+88 Chapter 5
 
 ---
 
@@ -407,7 +404,7 @@ The mitigation strategies work as follows. When a process is created via the use
 
 A caveat to this technique is that the flag is only passed to processes being created and does not apply to the current process. Because of this,
 
-90    Chapter 5
+90 Chapter 5
 
 ---
 
@@ -419,13 +416,13 @@ Another challenge with using this technique is that EDR vendors have begun to ge
 
 Figure 5-3: CrowdStrike Falcon's DLL countersigned by Microsoft
 
-In his post "Protecting Your Malware with blockfills and ACG," Adam Chester describes using the PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT _DYNAMIC_CODE_ALWAYS_ON flag, commonly referred to as Arbitrary Code Guard (ACG), to prevent the modification of executable regions of memory, a requirement of placing function hooks. While this flag prevented function hooks from being placed, it also prevented many off-the-shelf commandand-control agents' shellcode from executing during testing, as most rely on manually setting pages of memory to read-write-execute (RWX).
+In his post "Protecting Your Malware with blockfills and ACG," Adam Chester describes using the PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT \_DYNAMIC_CODE_ALWAYS_ON flag, commonly referred to as Arbitrary Code Guard (ACG), to prevent the modification of executable regions of memory, a requirement of placing function hooks. While this flag prevented function hooks from being placed, it also prevented many off-the-shelf commandand-control agents' shellcode from executing during testing, as most rely on manually setting pages of memory to read-write-execute (RWX).
 
 ## How Registry Notifications Work
 
 Like most software, malicious tools commonly interact with the registry, such as by querying values and creating new keys. In order to capture these interactions, drivers can register notification callback routines that get alerted any time a process interacts with the registry, allowing the driver to prevent, tamper with, or simply log the event.
 
-Image-Load and Registry Notifications  91
+Image-Load and Registry Notifications 91
 
 ---
 
@@ -434,7 +431,6 @@ Some offensive techniques rely heavily on the registry. We can often detect thes
 Table 5-1: Attacker Tradecraft in the Registry and the Related REG_NOTIFY_CLASS Members
 
 <table><tr><td>Technique</td><td>Registry location</td><td>REG_NOTIFY_CLASS members</td></tr><tr><td>Run-key persistence</td><td>HKLM\Software\Microsoft\Windows\CurrentVersion\Run</td><td>RegntCreateKey(Ex)</td></tr><tr><td>Security Support Provider (SSP) persistence</td><td>HKLM\SYSTEM\CurrentControlSet\Control\Lsa\Security Packages</td><td>RegntSetValueKey</td></tr><tr><td>Component Object Model (COM) hijack</td><td>HKLM\SOFTWARE\Classes\CLSID\CLSID&gt;</td><td>RegntSetValueKey</td></tr><tr><td>Service hijack</td><td>HKLM\SYSTEM\CurrentControlSet\Services\&lt;ServiceName&gt;</td><td>RegntSetValueKey</td></tr><tr><td>Link-Local Multicast Name Resolution (LLMNR) poisoning</td><td>HKLM\Software\Policies\Microsoft\Windows NT\DNSClient</td><td>RegntQueryValueKey</td></tr><tr><td>Security Account Manager dumping</td><td>HKLM\SAM</td><td>Regnt(Pre/Post)SaveKey</td></tr></table>
-
 
 To explore how adversaries interact with the registry, consider the technique of service hijacking. On Windows, services are a way of creating long-running processes that can be started manually or on boot, similar to daemons on Linux. While the service control manager manages these services, their configurations are stored exclusively in the registry, under the HKEY_LOCAL_MACHINE (HKLM) hive. For the most part, services run as the privileged NT AUTHORITYSYSTEM account, which gives them pretty much full control over the system and makes them a juicy target for attackers.
 
@@ -446,7 +442,7 @@ Because this attack procedure relies on registry value modification, an EDR driv
 
 To register a registry callback routine, drivers must use the ntlcm@register callback(x) function defined in Listing 5-14. The Cm prefix references the configuration manager, which is the component of the kernel that oversees the registry.
 
-92   Chapter 5
+92 Chapter 5
 
 ---
 
@@ -483,7 +479,6 @@ Table 5-2: Stripped REG_NOTIFY_CLASS Members and Descriptions
 
 <table><tr><td>Registry operation</td><td>Description</td></tr><tr><td>DeleteKey</td><td>A registry key is being deleted.</td></tr><tr><td>SetValueKey</td><td>A value is being set for a key.</td></tr><tr><td>DeleteValueKey</td><td>A value is being deleted from a key.</td></tr></table>
 
-
 (continued)
 
 Image-load and Registry Notifications 93
@@ -494,7 +489,6 @@ Table 5-2: Stripped REG_NOTIFY_CLASS Members and Descriptions (continued)
 
 <table><tr><td>Registry operation</td><td>Description</td></tr><tr><td>SetInformationKey</td><td>Metadata is being set for a key.</td></tr><tr><td>RenameKey</td><td>A key is being renamed.</td></tr><tr><td>EnumerateKey</td><td>Subkeys of a key are being enumerated.</td></tr><tr><td>EnumerateValueKey</td><td>Values of a key are being enumerated.</td></tr><tr><td>QueryKey</td><td>A key&#x27;s metadata is being read.</td></tr><tr><td>QueryValueKey</td><td>A value in a key is being read.</td></tr><tr><td>QueryMultipleValueKey</td><td>Multiple values of a key are being queried.</td></tr><tr><td>CreateKey</td><td>A new key is being created.</td></tr><tr><td>OpenKey</td><td>A handle to a key is being opened.</td></tr><tr><td>KeyHandleClose</td><td>A handle to a key is being closed.</td></tr><tr><td>CreateKeyEx</td><td>A key is being created.</td></tr><tr><td>OpenKeyEx</td><td>A thread is trying to open a handle to an existing key.</td></tr><tr><td>FlushKey</td><td>A key is being written to disk.</td></tr><tr><td>LoadKey</td><td>A registry hive is being loaded from a file.</td></tr><tr><td>UnLoadKey</td><td>A registry hive is being unloaded.</td></tr><tr><td>QueryKeySecurity</td><td>A key&#x27;s security information is being queried.</td></tr><tr><td>SetKeySecurity</td><td>A key&#x27;s security information is being set.</td></tr><tr><td>RestoreKey</td><td>A key&#x27;s information is being restored.</td></tr><tr><td>SaveKey</td><td>A key&#x27;s information is being saved.</td></tr><tr><td>ReplaceKey</td><td>A key&#x27;s information is being replaced.</td></tr><tr><td>QueryKeyName</td><td>The full registry path of a key is being queried.</td></tr></table>
 
-
 The Argument2 parameter is a pointer to a structure that contains information relevant to the operation specified in Argument1. Each operation has its own associated structure. For example, RegntPrecreateKeyEx operations use the REG_CREATE_KEY_INFORMATION structure. This information provides the relevant context for the registry operation that occurred on the system, allowing the EDR to extract the data it needs to make a decision on how to proceed.
 
 Every pre-operation member of the REG_NOTIFY_CLASS enumeration (those that begin with RegtPre or simply Reght) uses structures specific to the type of operation. For example, the RegtPreQueryKey operation uses the REG_QUERY_KEY_INFORMATION structure. These pre-operation callbacks allow the driver to modify or prevent the request from completing before execution is handed off to the configuration manager. An example of this using the previous RegtPreQueryKey member would be to modify the KeyInformation member of the REG_QUERY_KEY_INFOATION structure to change the type of information returned to the caller.
@@ -503,7 +497,7 @@ Post-operation callbacks always use the REG_POST_OPERATION_INFORMATION structure
 
 ---
 
-which use the REG_POST_CREATE_KEY_INFORMATION and REG_POST_OPEN_KEY_INFORMATION structures, respectively. This post-operation structure consists of a few interesting members. The Object member is a pointer to the registrykey object for which the operation was completed. The Status member is the NTSTATUS value that the system will return to the caller. The ReturnStatus member is an NTSTATUS value that, if the callback routine returns STATUS _CALLBACK_BYPASS, will be returned to the caller. Lastly, the PreInformation member contains a pointer to the structure used for the corresponding pre-operation callback. For example, if the operation being processed is RegntPreQueryKey, the PreInformation member would be a pointer to a REG _QUERY_KEY_INFORMATION structure.
+which use the REG_POST_CREATE_KEY_INFORMATION and REG_POST_OPEN_KEY_INFORMATION structures, respectively. This post-operation structure consists of a few interesting members. The Object member is a pointer to the registrykey object for which the operation was completed. The Status member is the NTSTATUS value that the system will return to the caller. The ReturnStatus member is an NTSTATUS value that, if the callback routine returns STATUS \_CALLBACK_BYPASS, will be returned to the caller. Lastly, the PreInformation member contains a pointer to the structure used for the corresponding pre-operation callback. For example, if the operation being processed is RegntPreQueryKey, the PreInformation member would be a pointer to a REG \_QUERY_KEY_INFORMATION structure.
 
 While these callbacks don't allow the same level of control as preoperation callbacks do, they still give the driver some influence over the value returned to the caller. For example, the EDR could collect the return value and log that data.
 
@@ -599,7 +593,6 @@ The driver uses a switch case to handle notifications related to different types
 
 There are a few notable gaps in coverage here. For instance, RegIt
 
-
 PostSetValueKey, the operation of which the driver is notified whenever the RegSetValueEx) API is called, is handled in a case much later in the switch statement. This case would detect an attempt to set a value in a registry key, such as to create a new service. If the attacker needs to create a new
 
 ---
@@ -686,7 +679,7 @@ void * InternalGetNameFromRegistryObject(longlong RegObject)
 
 Listing 5-19: The InternalGetNameFromRegistryObject() disassembly
 
-This internal function takes a pointer to a registry object, which is passed in as the local variable holding the Object member of the REG_POST _OPERATION_INFORMATION structure, and extracts the name of the registry key being acted on using nt10bqueynameString() ❸. The problem with this flow is that if the operation was unsuccessful (as in the Status member of the postoperation information structure isn't STATUS_SUCCESS), the registry object pointer is invalidated and the call to the object-name-resolution function won't be able to extract the name of the registry key. This driver contains conditional logic to check for this condition ❹.
+This internal function takes a pointer to a registry object, which is passed in as the local variable holding the Object member of the REG_POST \_OPERATION_INFORMATION structure, and extracts the name of the registry key being acted on using nt10bqueynameString() ❸. The problem with this flow is that if the operation was unsuccessful (as in the Status member of the postoperation information structure isn't STATUS_SUCCESS), the registry object pointer is invalidated and the call to the object-name-resolution function won't be able to extract the name of the registry key. This driver contains conditional logic to check for this condition ❹.
 
 NOTE
 
@@ -723,7 +716,7 @@ mimikatz # !notifProcess
 [00] 0xFFFFF80617C245E0  [tcip!sys + 0x45e0]
 ```
 
-100    Chapter 5
+100 Chapter 5
 
 ---
 
@@ -740,15 +733,13 @@ Listing 5-20: Using Mimidrv to enumerate process-notification callback routines
 
 Minidrv searches for a byte pattern that indicates the start of the array holding the registered callback routines. It uses Windows build-specific offsets from functions inside ntkrnl.exe. After locating the list of callback routines, Minidrv determines the driver from which the callback originates by correlating the address of the callback function to the address space in use by the driver. Once it has located the callback routine in the target driver, the attacker can choose to overwrite the first byte at the entry point of the function with a RETURN instruction (0x33). This would cause the function to immediately return when execution is passed to the callback, preventing the EDR from collecting any telemetry related to the notification event or taking any preventive action.
 
-While this technique is operationally viable, deploying it comes with significant technical hurdles. First, unsigned drivers can't be loaded onto Windows 10 or later unless the host is put into test mode. Next, the technique relies on build-specific offsets, which introduces complexity and unreliability to the tooling, as newer versions of Windows could change these patterns. Lastly, Microsoft has heavily invested in making Hypervisor-Protected Code Integrity (HVI) a default protection on Windows 10 and has enabled it by default on secured-core systems. HVI reduces the ability to load malicious or known-vulnerable drivers by protecting the code-integrity decision-making logic, including c11g _ c0019 , which is commonly temporarily overwritten to allow an unsigned driver to be loaded. This drives up the complexity of overwriting a callback's entry point, as only HVI-compatible drivers could be loaded on the system, reducing the potential attack surface.
+While this technique is operationally viable, deploying it comes with significant technical hurdles. First, unsigned drivers can't be loaded onto Windows 10 or later unless the host is put into test mode. Next, the technique relies on build-specific offsets, which introduces complexity and unreliability to the tooling, as newer versions of Windows could change these patterns. Lastly, Microsoft has heavily invested in making Hypervisor-Protected Code Integrity (HVI) a default protection on Windows 10 and has enabled it by default on secured-core systems. HVI reduces the ability to load malicious or known-vulnerable drivers by protecting the code-integrity decision-making logic, including c11g \_ c0019 , which is commonly temporarily overwritten to allow an unsigned driver to be loaded. This drives up the complexity of overwriting a callback's entry point, as only HVI-compatible drivers could be loaded on the system, reducing the potential attack surface.
 
 ## Conclusion
 
 While not as straightforward as the previously discussed callback types, image-load and registry-notification callbacks provide just as much information to an EDR. Image-load notifications can tell us when images, whether they be DLLs, executables, or drivers, are being loaded, and they give the EDR a chance to log, act, or even signal to inject its function-hooking DLL. Registry notifications provide an unparalleled level of visibility into actions affecting the registry. To date, the strongest evasion strategies an adversary can employ when facing these sensors is either to abuse a gap in coverage or logical flaw in the sensor itself or to avoid it entirely, such as by proxying in their tooling.
 
 ---
-
-
 
 ---
 
@@ -794,7 +785,7 @@ Legacy filter drivers can't be inserted into a specific location on the device s
 
 The mechanics of how the filesystem stack attaches and detaches devices are extremely complicated, and developers must have a
 
-104    Chapter 6
+104 Chapter 6
 
 ---
 
@@ -836,14 +827,13 @@ Next is how they interact with registered callback routines. As with the drivers
 
 Each minifilter has an altitude , which is a number that identifies its location in the minifilter stack and determines when the system will load that minifilter. Altitudes address the issue of ordering that plagued legacy filter drivers. Ideally, Microsoft assigns altitudes to the minifiers of production applications, and these values are specified in the drivers' registry keys, under Altitude . Microsoft sorts altitudes into load-order groups, which are shown in Table 6 - 1 .
 
-106    Chapter 6
+106 Chapter 6
 
 ---
 
 Table 6-1: Microsoft’s Minifilter Load-Order Groups
 
 <table><tr><td>Altitude range</td><td>Load-order group name</td><td>Minifilter role</td></tr><tr><td>420000-429999</td><td>Filter</td><td>Legacy filter drivers</td></tr><tr><td>400000-409999</td><td>FSFilter Top</td><td>Filters that must attach above all others</td></tr><tr><td>360000-389999</td><td>FSFilter Activity Monitor</td><td>Drivers that observe and report on file I/O</td></tr><tr><td>340000-349999</td><td>FSFilter Undelete</td><td>Drivers that recover deleted files</td></tr><tr><td>320000-329998</td><td>FSFilter Anti-Virus</td><td>Antimalware drivers</td></tr><tr><td>300000-309998</td><td>FSFilter Replication</td><td>Drivers that copy data to a remote system</td></tr><tr><td>280000-289998</td><td>FSFilter Continuous Backup</td><td>Drivers that copy data to backup media</td></tr><tr><td>260000-269998</td><td>FSFilter Content Screener</td><td>Drivers that prevent the creation of specific files or content</td></tr><tr><td>240000-249999</td><td>FSFilter Quota Management</td><td>Drivers that provide enhanced filesystem quotas that limit the space allowed for a volume or folder</td></tr><tr><td>220000-229999</td><td>FSFilter System Recovery</td><td>Drivers that maintain operating system integrity</td></tr><tr><td>200000-209999</td><td>FSFilter Cluster File System</td><td>Drivers used by applications that provide file server metadata across a network</td></tr><tr><td>180000-189999</td><td>FSFilter HSM</td><td>Hierarchical storage management drivers</td></tr><tr><td>170000-174999</td><td>FSFilter Imaging</td><td>ZIP-like drivers that provide a virtual namespace</td></tr><tr><td>160000-169999</td><td>FSFilter Compression</td><td>File-data compression drivers</td></tr><tr><td>140000-149999</td><td>FSFilter Encryption</td><td>File-data encryption and decryption drivers</td></tr><tr><td>130000-139999</td><td>FSFilter Virtualization</td><td>Filepath virtualization drivers</td></tr><tr><td>120000-129999</td><td>FSFilter Physical Quota Management</td><td>Drivers that manage quotes by using physical block counts</td></tr><tr><td>100000-109999</td><td>FSFilter Open File</td><td>Drivers that provide snapshots of already-opened files</td></tr><tr><td>80000-89999</td><td>FSFilter Security Enhancer</td><td>Drivers that apply file-based lockdowns and enhanced access control</td></tr><tr><td>60000-69999</td><td>FSFilter Copy Protection</td><td>Drivers that check for out-of-band data on storage media</td></tr><tr><td>40000-49999</td><td>FSFilter Bottom</td><td>Filters that must attach below all others</td></tr><tr><td>20000-29999</td><td>FSFilter System</td><td>Reserved</td></tr><tr><td>&lt;20000</td><td>FSFilter Infrastructure</td><td>Reserved for system use but attaches closest to the filesystem</td></tr></table>
-
 
 Most EDR vendors register their minifiers in the FSFilter Anti-Virus or FSFilter Activity Monitor group. Microsoft publishes a list of registered altitudes, as well as their associated filenames and publishers. Table 6-2
 
@@ -856,7 +846,6 @@ lists altitudes assigned to minifilters belonging to popular commercial EDR solu
 Table 6-2: Altitudes of Popular EDRs
 
 <table><tr><td>Altitude</td><td>Vendor</td><td>EDR</td></tr><tr><td>389220</td><td>Sophos</td><td>sophosed.sys</td></tr><tr><td>389040</td><td>SentinelOne</td><td>sentinelmonitor.sys</td></tr><tr><td>328010</td><td>Microsoft</td><td>wfilter.sys</td></tr><tr><td>321410</td><td>CrowdStrike</td><td>csagent.sys</td></tr><tr><td>388360</td><td>FireEye/Trellix</td><td>fekem.sys</td></tr><tr><td>386720</td><td>Bi9/Carbon Black/VMWare</td><td>carbonblackk.sys</td></tr></table>
-
 
 While an administrator can change a minifilter's altitude, the system can load only one minifilter at a single altitude at one time.
 
@@ -922,7 +911,7 @@ FLTFL_REGISTRATION_SUPPORT_DAX_VOLUME (4)
 
 The minifilter supports attaching to a Direct Access (DAX) volume.
 
-Following this member is the context registration. This will be either an array of FLT_CONTEXT_REGISTRATION structures or null. These contexts allow a minifilter to associate related objects and preserve state across I/O operations. After this array of context comes the critically important operation registration array. This is a variable length array of FLT_OPERATION _REGISTRATION structures, which are defined in Listing 6-3. While this array can technically be null, it's rare to see that configuration in an EDR sensor. The minifilter must provide a structure for each type of I/O for which it registers a pre-operation or post-operation callback routine.
+Following this member is the context registration. This will be either an array of FLT_CONTEXT_REGISTRATION structures or null. These contexts allow a minifilter to associate related objects and preserve state across I/O operations. After this array of context comes the critically important operation registration array. This is a variable length array of FLT_OPERATION \_REGISTRATION structures, which are defined in Listing 6-3. While this array can technically be null, it's rare to see that configuration in an EDR sensor. The minifilter must provide a structure for each type of I/O for which it registers a pre-operation or post-operation callback routine.
 
 ```bash
 typedef struct _FLT_OPERATION_REGISTRATION {
@@ -946,8 +935,7 @@ Table 6-3: Major Functions and Their Purposes
 
 <table><tr><td>Major function</td><td>Purpose</td></tr><tr><td>IRP_MJ_CREATE (0x00)</td><td>A new file is being created or a handle to an existing one is being opened.</td></tr><tr><td>IRP_MJ_CREATE_NAMED_PIPE (0x01)</td><td>A named pipe is being created or opened.</td></tr><tr><td>IRP_MJ_CLOSE (0x02)</td><td>A handle to a file object is being closed.</td></tr><tr><td>IRP_MJ_READ (0x03)</td><td>Data is being read from a file.</td></tr><tr><td>IRP_MJ_WRITE (0x04)</td><td>Data is being written to a file.</td></tr><tr><td>IRP_MJ_QUERY_INFORMATION (0x05)</td><td>Information about a file, such as its creation time, has been requested.</td></tr><tr><td>IRP_MJ_SET_INFORMATION (0x06)</td><td>Information about a file, such as its name, is being set or updated.</td></tr><tr><td>IRP_MJ_QUERY_EA (0x07)</td><td>A file&#x27;s extended information has been requested.</td></tr><tr><td>IRP_MJ_SET_EA (0x08)</td><td>A file&#x27;s extended information is being set or updated.</td></tr><tr><td>IRP_MJ_LOCK_CONTROL (0x11)</td><td>A lock is being placed on a file, such as via a call to kernel321lockfileEx().</td></tr><tr><td>IRP_MJ_CREATE_MAILSLOT (0x13)</td><td>A new mailslot is being created or opened.</td></tr><tr><td>IRP_MJ_QUERY_SECURITY (0x14)</td><td>Security information about a file is being requested.</td></tr><tr><td>IRP_MJ_SET_SECURITY (0x15)</td><td>Security information related to a file is being set or updated.</td></tr><tr><td>IRP_MJ_SYSTEM_CONTROL (0x17)</td><td>A new driver has been registered as a supplier of Windows Management Instrumentation.</td></tr></table>
 
-
-The next member of the structure specifies the flags. This bitmask describes when the callback functions should be invoked for cached I/O or paging I/O operations. At the time of this writing, there are four supported flags, all of which are prefixed with FLUTI_OPERATION_REGISTRATION_ First, SKIP_PAGING_I0 indicates whether a callback should be invoked for IRP-based read or write paging I/O operations. The SKIP_CACHED_I0 flag is used to prevent the invocation of callbacks on fast I/O-based read or write cached I/O operations. Next, SKIP_NON_CACHED_I0 is used for requests issued on a Direct Access Storage Device (DASD) volume handle. Finally, SKIP_NON_CACHED_NON_PAGING_I0 prevents callback invocation on read or write I/O operations that are not cached or paging operations.
+The next member of the structure specifies the flags. This bitmask describes when the callback functions should be invoked for cached I/O or paging I/O operations. At the time of this writing, there are four supported flags, all of which are prefixed with FLUTI*OPERATION_REGISTRATION* First, SKIP_PAGING_I0 indicates whether a callback should be invoked for IRP-based read or write paging I/O operations. The SKIP_CACHED_I0 flag is used to prevent the invocation of callbacks on fast I/O-based read or write cached I/O operations. Next, SKIP_NON_CACHED_I0 is used for requests issued on a Direct Access Storage Device (DASD) volume handle. Finally, SKIP_NON_CACHED_NON_PAGING_I0 prevents callback invocation on read or write I/O operations that are not cached or paging operations.
 
 ## Defining Pre-operation Callbacks
 
@@ -955,7 +943,7 @@ The next two members of the FLT_OPERATION_REGISTRATION structure define the pre-
 
 ---
 
-are passed via a pointer to an FLT_PRE_OPERATION_CALLBACK structure, and post-operation routines are specified as a pointer to an FLT_POST_OPERATION _CALLBACK structure. While these functions' definitions aren't too dissimilar, their capabilities and limitations vary substantially.
+are passed via a pointer to an FLT_PRE_OPERATION_CALLBACK structure, and post-operation routines are specified as a pointer to an FLT_POST_OPERATION \_CALLBACK structure. While these functions' definitions aren't too dissimilar, their capabilities and limitations vary substantially.
 
 As with callbacks in other types of drivers, pre-operation callback functions allow the developer to inspect an operation on its way to its destination (the target filesystem, in the case of a minifilter). These callback functions receive a pointer to the callback data for the operation and some opaque pointers for the objects related to the current I/O request, and they return an FLT_PREOP_CALLBACK_STATUS return code. In code, this would look like what is shown in Listing 6-4.
 
@@ -986,9 +974,9 @@ TagData A pointer to an FLT_TAG_DATA_BUFFER structure containing information abo
 
 RequestorMode A value indicating whether the request came from user mode or kernel mode.
 
-This structure contains much of the information that an EDR agent needs to track file operations on the system. The second parameter passed to the pre-operation callback, a pointer to an FLT_RELATED_OBJECTS structure, provides supplemental information. This structure contains opaque pointers to the object associated with the operation, including the volume, minifilter instance, and file object (if present). The last parameter, CompletionContext, contains an optional context pointer that will be passed to the correlated post-operation callback if the minifilter returns FLT_PREOP _SUCCESS_WITH_CALLBACK OR FLT_PREOP_SYNCHRONIZE .
+This structure contains much of the information that an EDR agent needs to track file operations on the system. The second parameter passed to the pre-operation callback, a pointer to an FLT_RELATED_OBJECTS structure, provides supplemental information. This structure contains opaque pointers to the object associated with the operation, including the volume, minifilter instance, and file object (if present). The last parameter, CompletionContext, contains an optional context pointer that will be passed to the correlated post-operation callback if the minifilter returns FLT_PREOP \_SUCCESS_WITH_CALLBACK OR FLT_PREOP_SYNCHRONIZE .
 
-On completion of the routine, the minifilter must return an FLT_PREOP __CALLBACK_STATUS value. Pre-operation callbacks may return one of seven supported values:
+On completion of the routine, the minifilter must return an FLT_PREOP \_\_CALLBACK_STATUS value. Pre-operation callbacks may return one of seven supported values:
 
 FLT_PREOP_SUCCESS_WITH_CALLBACK (0)
 
@@ -1072,7 +1060,7 @@ The last section in the FIL_REGISTRATION structure contains the optional callbac
 
 After all callback routines have been set, a pointer to the created FLT_REGISTRATION structure is passed as the second parameter to fltmgr! FltRegister(filter(). Upon completion of this function, an opaque filter pointer (PFLT_FILTER) is returned to the caller in the &rtfilter parameter. This pointer uniquely identifies the minifilter and remains static as long as the driver is loaded on the system. This pointer is typically preserved as a global variable.
 
-114    Chapter 6
+114 Chapter 6
 
 ---
 
@@ -1128,7 +1116,7 @@ Additionally, the attacker has no control over the format of the data being writ
 
 Some defenders use these concepts to implement filesystem canaries. These are files created in key locations that users should seldom, if ever, interact with. If an application other than a backup agent or the EDR
 
-116    Chapter 6
+116 Chapter 6
 
 ---
 
@@ -1140,7 +1128,7 @@ Another key piece of adversary tradecraft that minifiers can detect highly effec
 
 Minifilters commonly look for the creation of anomalously named pipes, or those originating from atypical processes. This is useful because many tools used by adversaries rely on the use of named pipes, so an attacker who wants to blend in should pick pipe and host process names that are typical in the environment. Thankfully for attackers and defenders alike, Windows makes enumerating existing named pipes easy, and we can straightforwardly identify many of the common process-to-pipe relationships. One of the most well-known named pipes in the realm of security is mojo . When a Chromium process spawns, it creates several named pipes with the format mojo.PID.TID .VALUE for use by an IPC abstraction library called Mojo. This named pipe became popular after its inclusion in a well-known repository for documenting Cobalt Strike's Malleable profile options.
 
-There are a few problems with using this specific named pipe that a minifilter can detect. The main one is related to the structured formatting used for the name of the pipe. Because Cobalt Stride's pipe name is a static attribute tied to the instance of the Malleable profile, it is immutable at runtime. This means that an adversary would need to accurately predict the process and thread IDs of their Beacon to ensure the attributes of their process match those of the pipe name format used by Mojo. Remember that minifilters with pre-operation callbacks for monitoring RPC _ NO_CREATE_NAMED PIPE requests are guaranteed to be invoked in the context of the calling thread. This means that when a Beacon process creates the "mogo" named pipe, the minifilter can check that its current context matches the information in the pipe name. Pseudocode to demonstrate this would look like that shown in Listing 6-8.
+There are a few problems with using this specific named pipe that a minifilter can detect. The main one is related to the structured formatting used for the name of the pipe. Because Cobalt Stride's pipe name is a static attribute tied to the instance of the Malleable profile, it is immutable at runtime. This means that an adversary would need to accurately predict the process and thread IDs of their Beacon to ensure the attributes of their process match those of the pipe name format used by Mojo. Remember that minifilters with pre-operation callbacks for monitoring RPC \_ NO_CREATE_NAMED PIPE requests are guaranteed to be invoked in the context of the calling thread. This means that when a Beacon process creates the "mogo" named pipe, the minifilter can check that its current context matches the information in the pipe name. Pseudocode to demonstrate this would look like that shown in Listing 6-8.
 
 ```bash
 DetectMojoMismatch(string mojoPipeName)
@@ -1180,7 +1168,7 @@ The first technique is to completely unload the minifilter. While you'll need ad
 
 Unloading the minifilter can be as simple as calling !fltm.exe unload , but if the vendor has put a lot of effort into hiding the presence of their minifilter, it might require complex custom tooling. To explore this idea further, let's target Symson, whose minifilter, SymsonDru , is configured in the registry, as shown in Listing 6-9.
 
-118   Chapter 6
+118 Chapter 6
 
 ---
 
@@ -1238,13 +1226,13 @@ FLT_PREOP_CALLBACK_STATUS EvilPreWriteCallback{
 
 Listing 6-10: Registering a malicious pre-operation callback routine
 
-When the filter manager invokes this callback routine, it must return an FLT_PREOP_CALLBACK_STATUS value. One of the possible values, FLT_PREOP_ COMPLETE, tells the filter manager that the current minifilter is in the process of completing the request, so the request shouldn't be passed to any minifilters below the current altitude. If a minifilter returns this value, it must set the NSTATUS value in the Status member of the I/O status block to the operation's final status. Antivirus engines whose minifiers communicate with user-mode scanning engines commonly use this functionality to
+When the filter manager invokes this callback routine, it must return an FLT*PREOP_CALLBACK_STATUS value. One of the possible values, FLT_PREOP* COMPLETE, tells the filter manager that the current minifilter is in the process of completing the request, so the request shouldn't be passed to any minifilters below the current altitude. If a minifilter returns this value, it must set the NSTATUS value in the Status member of the I/O status block to the operation's final status. Antivirus engines whose minifiers communicate with user-mode scanning engines commonly use this functionality to
 
-120    Chapter 6
+120 Chapter 6
 
 ---
 
-determine whether malicious content is being written to a file. If the scanner indicates to the minifilter that the content is malicious, the minifilter completes the request and returns a failure status, such as STATUS_VIRUS _INFECTED, to the caller.
+determine whether malicious content is being written to a file. If the scanner indicates to the minifilter that the content is malicious, the minifilter completes the request and returns a failure status, such as STATUS_VIRUS \_INFECTED, to the caller.
 
 But attackers can abuse this feature of minifiers to prevent the security agent from ever intercepting their filesystem operations. Using the earlier callback we registered, this would look something like what's shown in Listing 6-11 .
 
@@ -1282,7 +1270,6 @@ callbackDataDirty(), is present and act accordingly, but the data will still be 
 
 Minifilters are the de facto standard for monitoring filesystem activity on Windows, whether it be for NTFS, named pipes, or even mailslots. Their implementation is somewhat more complex than the drivers discussed earlier in this book, but the way they work is very similar; they sit inline of some system operation and receive data about the activity. Attackers can evade minifilters by abusing some logical issue in the sensor or even unloading the driver entirely, but most adversaries have adapted their tradecraft to drastically limit creating new artifacts on disk to reduce the chances of a minifilter picking up their activity.
 
-122    Chapter 6
+122 Chapter 6
 
 ---
-

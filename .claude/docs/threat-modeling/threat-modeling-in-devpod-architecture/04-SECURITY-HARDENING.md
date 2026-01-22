@@ -516,6 +516,7 @@ Inspection, attackers can exfiltrate to any IP by spoofing allowed domain names.
 **For cost-sensitive deployments or multi-cloud (GCP/Azure where Network Firewall unavailable)**:
 
 **Architecture**:
+
 ```
 DevPod Instance → Squid/Suricata Proxy (EC2/GCE/Azure VM) → Internet
                           ↓
@@ -526,13 +527,13 @@ DevPod Instance → Squid/Suricata Proxy (EC2/GCE/Azure VM) → Internet
 
 **Cost Comparison**:
 
-| Component | AWS Network Firewall | Squid/Suricata Proxy |
-|-----------|---------------------|----------------------|
-| **Compute** | Managed service | EC2 t3.medium (~$30/mo) |
-| **TLS Inspection** | ACM Private CA ($150/mo) + NFW | Self-signed CA (free) + Squid SSL Bump |
-| **Data Processing** | $0.04/GB (~$500/mo) | Bandwidth only (~$50/mo) |
-| **Operational Overhead** | Zero (AWS manages) | Medium (self-hosted) |
-| **Total Monthly** | $850-1,000 | $300-500 |
+| Component                | AWS Network Firewall           | Squid/Suricata Proxy                   |
+| ------------------------ | ------------------------------ | -------------------------------------- |
+| **Compute**              | Managed service                | EC2 t3.medium (~$30/mo)                |
+| **TLS Inspection**       | ACM Private CA ($150/mo) + NFW | Self-signed CA (free) + Squid SSL Bump |
+| **Data Processing**      | $0.04/GB (~$500/mo)            | Bandwidth only (~$50/mo)               |
+| **Operational Overhead** | Zero (AWS manages)             | Medium (self-hosted)                   |
+| **Total Monthly**        | $850-1,000                     | $300-500                               |
 
 **Squid Configuration** (`/etc/squid/squid.conf`):
 
@@ -558,22 +559,23 @@ http_access deny all
 
 ```yaml
 alert tls any any -> any any (msg:"TLS SNI Mismatch"; \
-  tls.sni; content:".anthropic.com"; nocase; \
-  tls.cert_subject; content:!"anthropic.com"; \
-  sid:1000001; rev:1;)
+tls.sni; content:".anthropic.com"; nocase; \
+tls.cert_subject; content:!"anthropic.com"; \
+sid:1000001; rev:1;)
 ```
 
 **Trade-offs**:
 
-| Factor | Network Firewall | Squid/Suricata |
-|--------|------------------|----------------|
-| **Security** | Managed, AWS-hardened | Self-hosted, requires hardening |
-| **Reliability** | 99.95% SLA | Depends on deployment (use ASG for HA) |
-| **Cost** | $850-1,000/mo | $300-500/mo |
-| **Operational Burden** | Zero | Medium (updates, monitoring, scaling) |
-| **Multi-Cloud** | AWS only | Works on GCP, Azure, AWS |
+| Factor                 | Network Firewall      | Squid/Suricata                         |
+| ---------------------- | --------------------- | -------------------------------------- |
+| **Security**           | Managed, AWS-hardened | Self-hosted, requires hardening        |
+| **Reliability**        | 99.95% SLA            | Depends on deployment (use ASG for HA) |
+| **Cost**               | $850-1,000/mo         | $300-500/mo                            |
+| **Operational Burden** | Zero                  | Medium (updates, monitoring, scaling)  |
+| **Multi-Cloud**        | AWS only              | Works on GCP, Azure, AWS               |
 
 **Recommendation**:
+
 - **AWS Production**: Use Network Firewall ($850/mo justified for customer IP protection)
 - **GCP/Azure**: Use Squid/Suricata (Network Firewall unavailable)
 - **Cost-Sensitive**: Document Squid as alternative, but operational risk must be accepted
@@ -704,6 +706,7 @@ func injectSSHKeyViaSession(session *ssh.Session, publicKey string) error {
 ```
 
 **Benefits over command execution**:
+
 - No shell argument concatenation
 - Pure Go implementation (no subprocess spawning)
 - Uses existing SSH connection (no new attack surface)
@@ -1085,6 +1088,7 @@ If Falco crashes or is killed, malicious code runs unmonitored.
 **Hybrid approach (Mario's enhancement)**: systemd auto-restart for transient crashes + watchdog for sustained failures and attacks.
 
 **Why Hybrid**:
+
 - systemd `Restart=on-failure` handles legitimate Falco crashes (e.g., OOM, segfaults)
 - Watchdog monitors systemd status for sustained failures or malicious termination
 - Eliminates false positives from transient issues while maintaining fail-closed security
@@ -1148,6 +1152,7 @@ trigger_termination() {
 ```
 
 **Hybrid Behavior**:
+
 1. **Transient crash** (OOM, segfault): systemd auto-restarts → watchdog sees active service → no termination
 2. **Sustained failure** (3+ consecutive check failures): systemd gives up → watchdog terminates workspace
 3. **Malicious kill** (repeated kill commands): systemd restarts hit limit → watchdog terminates
@@ -1173,6 +1178,7 @@ WantedBy=multi-user.target
 ```
 
 **Key Parameters**:
+
 - `Restart=on-failure`: Auto-restart on crashes (OOM, segfaults)
 - `StartLimitBurst=5`: Allow up to 5 restart attempts
 - `StartLimitIntervalSec=60`: Within 60 seconds
@@ -1942,29 +1948,32 @@ trap cleanup_chroot EXIT SIGTERM SIGINT
 #### Defense-in-Depth Value
 
 **Without chroot**:
+
 ```
 Container Escape (CVE-2019-5736) → Host Access
 ```
 
 **With chroot**:
+
 ```
 Container Escape → chroot Jail → Additional Escape Required → Host Access
 ```
 
 **Real-world CVEs mitigated by defense-in-depth**:
+
 - CVE-2019-5736 (runc vulnerability) - CRITICAL
 - CVE-2020-15257 (containerd vulnerability) - HIGH
 - CVE-2022-0185 (kernel vulnerability via containers) - HIGH
 
 #### Trade-offs
 
-| Factor | Impact |
-|--------|--------|
-| **Security Benefit** | Additional escape barrier against container CVEs |
-| **Complexity** | MEDIUM - Requires library copying, mount management |
-| **Performance** | NEGLIGIBLE - chroot has minimal overhead |
-| **Debugging** | MEDIUM - Two isolation layers complicate troubleshooting |
-| **Cost** | $0 - Configuration only |
+| Factor               | Impact                                                   |
+| -------------------- | -------------------------------------------------------- |
+| **Security Benefit** | Additional escape barrier against container CVEs         |
+| **Complexity**       | MEDIUM - Requires library copying, mount management      |
+| **Performance**      | NEGLIGIBLE - chroot has minimal overhead                 |
+| **Debugging**        | MEDIUM - Two isolation layers complicate troubleshooting |
+| **Cost**             | $0 - Configuration only                                  |
 
 #### Adversarial Test
 
@@ -2017,10 +2026,7 @@ const gitBranchSchema = z
   .string()
   .min(1, "Branch name is required")
   .max(255, "Branch name too long")
-  .regex(
-    /^[a-zA-Z0-9][a-zA-Z0-9._/-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$/,
-    "Invalid branch name format"
-  )
+  .regex(/^[a-zA-Z0-9][a-zA-Z0-9._/-]*[a-zA-Z0-9]$|^[a-zA-Z0-9]$/, "Invalid branch name format")
   .refine((val) => !DANGEROUS_CHARS.test(val), "Contains invalid characters")
   .refine((val) => !val.includes(".."), "Path traversal not allowed");
 

@@ -53,13 +53,13 @@ Invoke this skill when:
 
 ## Quick Workflow
 
-| Phase | Purpose                           | Time   |
-| ----- | --------------------------------- | ------ |
-| 1     | Discovery - List files, validate  | 1 min  |
-| 2     | Context - Extract from SKILL.md   | 2 min  |
-| 3     | Analysis - Parallel ref agents    | 3 min  |
-| 4     | Synthesis - Build relationship map | 2 min  |
-| 5     | Output - Generate mode-specific   | 2 min  |
+| Phase | Purpose                            | Time  |
+| ----- | ---------------------------------- | ----- |
+| 1     | Discovery - List files, validate   | 1 min |
+| 2     | Context - Extract from SKILL.md    | 2 min |
+| 3     | Analysis - Parallel ref agents     | 3 min |
+| 4     | Synthesis - Build relationship map | 2 min |
+| 5     | Output - Generate mode-specific    | 2 min |
 
 **Total:** ~10 minutes for comprehensive skill analysis
 
@@ -161,10 +161,10 @@ All outputs persist to:
 
 ### Pairs With (conditional)
 
-| Skill            | Trigger          | Purpose               |
-| ---------------- | ---------------- | --------------------- |
-| auditing-skills  | After understand | Validate compliance   |
-| updating-skills  | After understand | Make informed changes |
+| Skill                     | Trigger          | Purpose                                                                                                  |
+| ------------------------- | ---------------- | -------------------------------------------------------------------------------------------------------- |
+| auditing-skills (LIBRARY) | After understand | Validate compliance - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`   |
+| updating-skills (LIBRARY) | After understand | Make informed changes - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` |
 
 ## Examples
 
@@ -210,12 +210,12 @@ All outputs persist to:
 
 ## Error Handling
 
-| Error                        | Recovery                                  |
-| ---------------------------- | ----------------------------------------- |
-| Skill path doesn't exist     | Return clear error with suggestions       |
-| No reference files           | Analyze SKILL.md only, note in output     |
-| Circular dependency detected | Flag in trace output, continue            |
-| Reference file empty         | Note in output, reduce confidence         |
+| Error                        | Recovery                              |
+| ---------------------------- | ------------------------------------- |
+| Skill path doesn't exist     | Return clear error with suggestions   |
+| No reference files           | Analyze SKILL.md only, note in output |
+| Circular dependency detected | Flag in trace output, continue        |
+| Reference file empty         | Note in output, reduce confidence     |
 
 ## Common Pitfalls
 
@@ -245,8 +245,8 @@ All outputs persist to:
 
 ## Related Skills
 
-- `managing-skills` - Router for all skill operations
-- `creating-skills` - Full TDD workflow for new skills
-- `updating-skills` - Targeted modifications with test guards
-- `auditing-skills` - Compliance validation
-- `persisting-agent-outputs` - Output directory management
+- `managing-skills` (CORE) - Router for all skill operations
+- `creating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` - Full TDD workflow for new skills
+- `updating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` - Targeted modifications with test guards
+- `auditing-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` - Compliance validation
+- `persisting-agent-outputs` (CORE) - Output directory management

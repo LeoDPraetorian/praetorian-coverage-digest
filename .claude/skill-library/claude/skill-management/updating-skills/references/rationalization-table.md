@@ -1,6 +1,6 @@
 # Skill Update Rationalization Table
 
-Extends [shared rationalization prevention](../../using-skills/references/rationalization-prevention.md).
+Extends [shared rationalization prevention](.claude/skills/using-skills/references/rationalization-prevention.md).
 
 ## Step-Specific Rationalizations
 

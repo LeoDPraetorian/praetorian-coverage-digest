@@ -1,0 +1,28 @@
+# Changelog - debugging-systematically
+
+## 2026-01-19 - Compliance Fixes
+
+**Method**: Claude-Automated + Deterministic
+
+**Issues Resolved**:
+
+1. **Phase 28 (CRITICAL)**: Migrated flat "Integration with Other Skills" section to structured Integration format
+   - Added "Called By" subsection
+   - Added "Requires" subsection
+   - Added "Calls" subsection with structured table
+   - Added "Pairs With" subsection with structured table
+
+2. **Phase 30 (WARNING)**: Added (LIBRARY) annotations to library skill references
+   - `defense-in-depth` (LIBRARY)
+   - `condition-based-waiting` (LIBRARY)
+
+3. **Phase 1 (WARNING)**: Condensed description from 244 to 146 characters
+   - Old: "Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes - four-phase framework (root cause investigation, pattern analysis, hypothesis testing, implementation) that ensures understanding before attempting solutions."
+   - New: "Use when encountering bugs or test failures - four-phase framework (root cause, pattern, hypothesis, fix) ensuring understanding before solutions"
+
+4. **Phase 15 (INFO)**: Added language tag to Iron Law code block
+   - Changed from unmarked code block to ```text
+
+**Audit Status**: PASSED (all critical issues resolved)
+
+**Backup**: `.local/2026-01-19-06-06-05-pre-fix.bak`

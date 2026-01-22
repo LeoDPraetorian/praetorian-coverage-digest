@@ -51,11 +51,11 @@ The Agent Manager operates as a **finite state machine** with circular transitio
 
 ### State Categories
 
-| Category                | States                                                                             | Characteristics                     |
-| ----------------------- | ---------------------------------------------------------------------------------- | ----------------------------------- |
-| **Entry States**        | CREATING, UPDATING, AUDITING, FIXING, RENAMING, TESTING, SEARCHING, LISTING        | User-initiated via `/agent-manager` |
-| **Intermediate States** | RESEARCHING, PRESSURE_TESTING, AWAITING_HUMAN                                      | Delegation or waiting states        |
-| **Terminal States**     | COMPLETE, ERROR, CANCELLED                                                         | Workflow endpoints                  |
+| Category                | States                                                                      | Characteristics                     |
+| ----------------------- | --------------------------------------------------------------------------- | ----------------------------------- |
+| **Entry States**        | CREATING, UPDATING, AUDITING, FIXING, RENAMING, TESTING, SEARCHING, LISTING | User-initiated via `/agent-manager` |
+| **Intermediate States** | RESEARCHING, PRESSURE_TESTING, AWAITING_HUMAN                               | Delegation or waiting states        |
+| **Terminal States**     | COMPLETE, ERROR, CANCELLED                                                  | Workflow endpoints                  |
 
 ### State Transition Matrix
 
@@ -301,12 +301,12 @@ The system is organized in four distinct layers, each with clear responsibilitie
 
 **Layer Responsibilities:**
 
-| Layer             | Responsibility                              | Implementation              | Tools Used                   |
-| ----------------- | ------------------------------------------- | --------------------------- | ---------------------------- |
-| **1. Command**    | User entry point, operation validation      | Markdown command file       | Skill tool                   |
-| **2. Router**     | Pure delegation, TodoWrite enforcement      | Markdown skill file         | Read, Skill, AskUserQuestion |
-| **3. Sub-Skills** | Operation-specific workflows and logic      | Markdown skills (8 total)   | All tools (varies by skill)  |
-| **4. CLI**        | Critical automation, shared libraries       | TypeScript (npm workspaces) | N/A (executed by Bash tool)  |
+| Layer             | Responsibility                         | Implementation              | Tools Used                   |
+| ----------------- | -------------------------------------- | --------------------------- | ---------------------------- |
+| **1. Command**    | User entry point, operation validation | Markdown command file       | Skill tool                   |
+| **2. Router**     | Pure delegation, TodoWrite enforcement | Markdown skill file         | Read, Skill, AskUserQuestion |
+| **3. Sub-Skills** | Operation-specific workflows and logic | Markdown skills (8 total)   | All tools (varies by skill)  |
+| **4. CLI**        | Critical automation, shared libraries  | TypeScript (npm workspaces) | N/A (executed by Bash tool)  |
 
 ---
 
@@ -356,16 +356,16 @@ Step 5: Fix if needed (circular delegation)
 
 **Complete Delegation Table:**
 
-| User Input                               | Command → Router → Sub-Skill                            | CLI Involved?        | Circular?           |
-| ---------------------------------------- | ------------------------------------------------------- | -------------------- | ------------------- |
-| `/agent-manager create X "desc" --type Y`| agent-manager → managing-agents → creating-agents       | Yes (audit)          | Yes (audit → fix)   |
-| `/agent-manager update X "changes"`      | agent-manager → managing-agents → updating-agents       | Yes (audit)          | Yes (audit → fix)   |
-| `/agent-manager audit X`                 | agent-manager → managing-agents → auditing-agents       | Yes (audit-critical) | Yes (→ fix → audit) |
-| `/agent-manager fix X`                   | agent-manager → managing-agents → fixing-agents         | Yes (fix CLI)        | Yes (→ audit → fix) |
-| `/agent-manager rename X Y`              | agent-manager → managing-agents → renaming-agents       | No (instructions)    | No                  |
-| `/agent-manager test X [skill]`          | agent-manager → managing-agents → testing-agent-skills  | No (Task tool)       | No                  |
-| `/agent-manager search "query"`          | agent-manager → managing-agents → searching-agents      | Yes (search CLI)     | No                  |
-| `/agent-manager list [--type X]`         | agent-manager → managing-agents → listing-agents        | No (Glob + Read)     | No                  |
+| User Input                                | Command → Router → Sub-Skill                           | CLI Involved?        | Circular?           |
+| ----------------------------------------- | ------------------------------------------------------ | -------------------- | ------------------- |
+| `/agent-manager create X "desc" --type Y` | agent-manager → managing-agents → creating-agents      | Yes (audit)          | Yes (audit → fix)   |
+| `/agent-manager update X "changes"`       | agent-manager → managing-agents → updating-agents      | Yes (audit)          | Yes (audit → fix)   |
+| `/agent-manager audit X`                  | agent-manager → managing-agents → auditing-agents      | Yes (audit-critical) | Yes (→ fix → audit) |
+| `/agent-manager fix X`                    | agent-manager → managing-agents → fixing-agents        | Yes (fix CLI)        | Yes (→ audit → fix) |
+| `/agent-manager rename X Y`               | agent-manager → managing-agents → renaming-agents      | No (instructions)    | No                  |
+| `/agent-manager test X [skill]`           | agent-manager → managing-agents → testing-agent-skills | No (Task tool)       | No                  |
+| `/agent-manager search "query"`           | agent-manager → managing-agents → searching-agents     | Yes (search CLI)     | No                  |
+| `/agent-manager list [--type X]`          | agent-manager → managing-agents → listing-agents       | No (Glob + Read)     | No                  |
 
 ---
 
@@ -1104,16 +1104,16 @@ Supporting files in shared location:
 
 **Categories and Permission Modes:**
 
-| Category       | Permission Mode | Purpose                      |
-| -------------- | --------------- | ---------------------------- |
-| architecture   | plan            | Design decisions (read-only) |
-| development    | default         | Implementation (can edit)    |
-| testing        | default         | Test creation (can edit)     |
-| quality        | default         | Code review                  |
-| analysis       | plan            | Security analysis (read-only)|
-| research       | default         | Documentation lookup         |
-| orchestrator   | default         | Coordination                 |
-| mcp-tools      | default         | MCP server access            |
+| Category     | Permission Mode | Purpose                       |
+| ------------ | --------------- | ----------------------------- |
+| architecture | plan            | Design decisions (read-only)  |
+| development  | default         | Implementation (can edit)     |
+| testing      | default         | Test creation (can edit)      |
+| quality      | default         | Code review                   |
+| analysis     | plan            | Security analysis (read-only) |
+| research     | default         | Documentation lookup          |
+| orchestrator | default         | Coordination                  |
+| mcp-tools    | default         | MCP server access             |
 
 ### 5. TDD Enforcement
 
@@ -1173,21 +1173,21 @@ Tier 3: Triggered by Task Type
 
 ## Comparison with Skill Manager
 
-| Aspect                    | Skill Manager                              | Agent Manager                             |
-| ------------------------- | ------------------------------------------ | ----------------------------------------- |
-| **Audit Phases**          | 21 (16 structural + 5 semantic)            | 19 (Phase 0 CLI + 18 manual)              |
-| **CLI Scope**             | Heavy (audit, fix, search, format)         | Light (Phase 0 critical only)             |
-| **File Structure**        | Directory per skill                        | Single file per agent                     |
-| **Line Limit**            | <500 lines                                 | <300 lines (or <400 complex)              |
-| **Reference Files**       | In skill's references/ directory           | Shared in .claude/agents/{type}/.history/ |
-| **Fix Tiers**             | 4 tiers (7+6+5+3 phases)                   | 4 tiers (4+6+5+4 phases)                  |
-| **Circular Patterns**     | AUDIT ↔ FIX + Research + Agent Discovery   | AUDIT ↔ FIX + Pressure Testing            |
-| **TDD Phases**            | RED, GREEN, REFACTOR (full)                | RED, GREEN, REFACTOR (conditional)        |
-| **Operations**            | 11 (create, update, audit, fix, delete,    | 8 (create, update, audit, fix, rename,    |
-|                           | rename, search, list, migrate, sync, find) | test, search, list)                       |
-| **Shared Libraries**      | audit-engine, formatting-skill-output      | agent-finder, agent-parser                |
-| **Progressive Loading**   | Library skills via gateways                | Tiered Skill Loading Protocol             |
-| **Behavioral Testing**    | testing-skills-with-subagents              | testing-agent-skills                      |
+| Aspect                  | Skill Manager                              | Agent Manager                             |
+| ----------------------- | ------------------------------------------ | ----------------------------------------- |
+| **Audit Phases**        | 21 (16 structural + 5 semantic)            | 19 (Phase 0 CLI + 18 manual)              |
+| **CLI Scope**           | Heavy (audit, fix, search, format)         | Light (Phase 0 critical only)             |
+| **File Structure**      | Directory per skill                        | Single file per agent                     |
+| **Line Limit**          | <500 lines                                 | <300 lines (or <400 complex)              |
+| **Reference Files**     | In skill's references/ directory           | Shared in .claude/agents/{type}/.history/ |
+| **Fix Tiers**           | 4 tiers (7+6+5+3 phases)                   | 4 tiers (4+6+5+4 phases)                  |
+| **Circular Patterns**   | AUDIT ↔ FIX + Research + Agent Discovery   | AUDIT ↔ FIX + Pressure Testing            |
+| **TDD Phases**          | RED, GREEN, REFACTOR (full)                | RED, GREEN, REFACTOR (conditional)        |
+| **Operations**          | 11 (create, update, audit, fix, delete,    | 8 (create, update, audit, fix, rename,    |
+|                         | rename, search, list, migrate, sync, find) | test, search, list)                       |
+| **Shared Libraries**    | audit-engine, formatting-skill-output      | agent-finder, agent-parser                |
+| **Progressive Loading** | Library skills via gateways                | Tiered Skill Loading Protocol             |
+| **Behavioral Testing**  | testing-skills-with-subagents              | testing-agent-skills                      |
 
 **Key Differences:**
 

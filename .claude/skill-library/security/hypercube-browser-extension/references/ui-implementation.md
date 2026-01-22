@@ -7,6 +7,7 @@
 ## Overview
 
 The extension UI serves two purposes:
+
 1. **Legitimacy**: Provides screenshots for Chrome Store listing
 2. **Credibility**: Shows functional features matching the pretext
 
@@ -19,29 +20,29 @@ The extension UI serves two purposes:
 **Source**: `modules/hypercube-ng/extension/background.js`
 
 ```javascript
-try{
-    // Load dependencies via importScripts (service worker requirement)
-    importScripts('./wasm_exec.js')
-    importScripts('./firebase-app-compat.js')
-    importScripts('./firebase-auth-compat.js')
-    importScripts('./firebase-database-compat.js')
+try {
+  // Load dependencies via importScripts (service worker requirement)
+  importScripts("./wasm_exec.js");
+  importScripts("./firebase-app-compat.js");
+  importScripts("./firebase-auth-compat.js");
+  importScripts("./firebase-database-compat.js");
 } catch (e) {
-    console.error(e);
+  console.error(e);
 }
 
 async function Startup() {
-    const go = new Go();
-    const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
-    go.run(result.instance);
+  const go = new Go();
+  const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
+  go.run(result.instance);
 }
 
 // Initialize on install and startup
-chrome.runtime.onInstalled.addListener(async function() {
-    await Startup();
+chrome.runtime.onInstalled.addListener(async function () {
+  await Startup();
 });
 
-chrome.runtime.onStartup.addListener(async function() {
-    await Startup();
+chrome.runtime.onStartup.addListener(async function () {
+  await Startup();
 });
 
 // CRITICAL: Keep service worker alive (prevents 30s termination)
@@ -50,6 +51,7 @@ keepAlive();
 ```
 
 **Key patterns:**
+
 - `importScripts()` for all dependencies (service worker requirement)
 - Dual initialization: `onInstalled` + `onStartup`
 - Keep-alive: 20-second interval prevents worker termination
@@ -64,50 +66,50 @@ keepAlive();
 ```html
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
+  <head>
+    <meta charset="utf-8" />
     <title>Extension Name</title>
-    <link rel="stylesheet" href="popup.css">
-</head>
-<body>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
     <div class="container">
-        <div class="header">
-            <img src="assets/icon48.png" alt="Logo">
-            <h1>Extension Name</h1>
-        </div>
+      <div class="header">
+        <img src="assets/icon48.png" alt="Logo" />
+        <h1>Extension Name</h1>
+      </div>
 
-        <div class="status">
-            <div class="status-indicator active"></div>
-            <span>Protection Active</span>
-        </div>
+      <div class="status">
+        <div class="status-indicator active"></div>
+        <span>Protection Active</span>
+      </div>
 
-        <div class="features">
-            <div class="feature-item">
-                <span class="icon">🛡️</span>
-                <div class="feature-text">
-                    <h3>Real-time Protection</h3>
-                    <p>Monitoring all websites</p>
-                </div>
-            </div>
-            <!-- Add more feature items -->
+      <div class="features">
+        <div class="feature-item">
+          <span class="icon">🛡️</span>
+          <div class="feature-text">
+            <h3>Real-time Protection</h3>
+            <p>Monitoring all websites</p>
+          </div>
         </div>
+        <!-- Add more feature items -->
+      </div>
 
-        <div class="stats">
-            <div class="stat">
-                <span class="stat-number">127</span>
-                <span class="stat-label">Threats Blocked</span>
-            </div>
-            <div class="stat">
-                <span class="stat-number">1,043</span>
-                <span class="stat-label">Sites Scanned</span>
-            </div>
+      <div class="stats">
+        <div class="stat">
+          <span class="stat-number">127</span>
+          <span class="stat-label">Threats Blocked</span>
         </div>
+        <div class="stat">
+          <span class="stat-number">1,043</span>
+          <span class="stat-label">Sites Scanned</span>
+        </div>
+      </div>
 
-        <button class="settings-btn">Settings</button>
+      <button class="settings-btn">Settings</button>
     </div>
 
     <script src="popup.js"></script>
-</body>
+  </body>
 </html>
 ```
 
@@ -118,6 +120,7 @@ keepAlive();
 ### Security Tool UI
 
 **Key elements:**
+
 - Status indicator (green = active, red = inactive)
 - Threat counter (blocked threats, scanned sites)
 - Recent activity log
@@ -125,6 +128,7 @@ keepAlive();
 - Settings panel
 
 **Example from antiphish-solutions:**
+
 - Shield logo
 - "Protection Active" status
 - Statistics dashboard
@@ -133,6 +137,7 @@ keepAlive();
 ### VPN Tool UI
 
 **Key elements:**
+
 - Connection status (connected/disconnected)
 - Server location selector
 - Connection speed indicator
@@ -142,6 +147,7 @@ keepAlive();
 ### Meeting Tool UI
 
 **Key elements:**
+
 - Detected meeting platform
 - Connection quality indicator
 - Optimization status
@@ -155,6 +161,7 @@ keepAlive();
 **Critical**: Code must use ALL manifest permissions (even if not functional).
 
 **From `modules/hypercube-ng/docs/chrome-store-process.md`:**
+
 > "There's no actual requirement that the code it generates actually works - it just needs to demonstrate usage of the behaviors and not throw a ton of errors"
 
 ### Demonstrating `webRequest`
@@ -162,13 +169,13 @@ keepAlive();
 ```javascript
 // Add listener that logs requests
 chrome.webRequest.onBeforeRequest.addListener(
-    function(details) {
-        console.log("Request to:", details.url);
-        // Log but don't block
-        return {};
-    },
-    {urls: ["<all_urls>"]},
-    []
+  function (details) {
+    console.log("Request to:", details.url);
+    // Log but don't block
+    return {};
+  },
+  { urls: ["<all_urls>"] },
+  []
 );
 ```
 
@@ -177,9 +184,9 @@ chrome.webRequest.onBeforeRequest.addListener(
 ```javascript
 // Function that reads cookies (even if unused)
 async function analyzeCookies() {
-    const cookies = await chrome.cookies.getAll({});
-    console.log("Total cookies:", cookies.length);
-    // Add cookie analysis logic (can be basic)
+  const cookies = await chrome.cookies.getAll({});
+  console.log("Total cookies:", cookies.length);
+  // Add cookie analysis logic (can be basic)
 }
 
 // Call periodically
@@ -191,12 +198,12 @@ setInterval(analyzeCookies, 60000);
 ```javascript
 // Store and retrieve settings
 async function saveSettings(settings) {
-    await chrome.storage.local.set({ settings });
+  await chrome.storage.local.set({ settings });
 }
 
 async function loadSettings() {
-    const { settings } = await chrome.storage.local.get(['settings']);
-    return settings || {};
+  const { settings } = await chrome.storage.local.get(["settings"]);
+  return settings || {};
 }
 ```
 
@@ -205,20 +212,20 @@ async function loadSettings() {
 ```javascript
 // Add dynamic rule (can be trivial)
 const rule = {
-    id: 1,
-    priority: 1,
-    action: {
-        type: "block"
-    },
-    condition: {
-        urlFilter: "example-blocked-domain.com",
-        resourceTypes: ["main_frame"]
-    }
+  id: 1,
+  priority: 1,
+  action: {
+    type: "block",
+  },
+  condition: {
+    urlFilter: "example-blocked-domain.com",
+    resourceTypes: ["main_frame"],
+  },
 };
 
 chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: [rule],
-    removeRuleIds: [1]
+  addRules: [rule],
+  removeRuleIds: [1],
 });
 ```
 
@@ -258,6 +265,7 @@ Make it look like a real implementation even if functionality is basic.
 - Modern, clean aesthetic
 
 **Example from antiphish-solutions:**
+
 - Blue theme (#3BA7FF primary, #1B4B87 secondary)
 - Shield/protection imagery
 - Inter/Segoe UI fonts
@@ -284,6 +292,7 @@ Make it look like a real implementation even if functionality is basic.
 **Source**: `modules/hypercube-ng/examples/antiphish-solutions/`
 
 **Structure:**
+
 ```
 ui/
 ├── popup.html          # Main popup interface
@@ -299,6 +308,7 @@ ui/
 ```
 
 **Key features implemented:**
+
 - Protection status toggle
 - Threat statistics dashboard
 - Recent activity log

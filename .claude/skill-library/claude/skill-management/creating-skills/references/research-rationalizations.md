@@ -1,6 +1,6 @@
 # Research Phase Rationalization Table
 
-**Why agents skip the researching-skills phase and why they're wrong.**
+**Why agents skip the research phase and why they're wrong.**
 
 ## Common Rationalizations
 
@@ -61,7 +61,7 @@ Without Context7, you're guessing which patterns are current.
 2. You think "I'll just copy patterns from similar skills"
 3. You feel confident because "I've used this library before"
 4. You rationalize "research is for complex skills, this is simple"
-5. You skip to Phase 7 (Gateway Update) without loading researching-skills
+5. You skip to Phase 7 (Gateway Update) without loading orchestrating-research
 
 **Self-test**: Ask yourself "When was this library last updated? What changed in the latest version?" If you can't answer confidently, YOU NEED RESEARCH.
 
@@ -69,7 +69,7 @@ Without Context7, you're guessing which patterns are current.
 
 1. **Create structure** (Phase 5)
 2. **STOP before writing** ⚠️
-3. **Load researching-skills** - `skill: "researching-skills"`
+3. **Load orchestrating-research** - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`
 4. **Follow research workflow**:
    - Codebase search: Find existing patterns
    - Context7 query: Get latest documentation
@@ -90,6 +90,6 @@ Without Context7, you're guessing which patterns are current.
 
 ## Related
 
-- [Research Workflow](../researching-skills/SKILL.md) - Complete research process
+- [Research Workflow](.claude/skill-library/research/orchestrating-research/SKILL.md) - Complete research process
 - [Creating Skills](../SKILL.md) - Main creation workflow
-- [TDD Methodology](../../references/tdd-methodology.md) - Why research is the "failing test"
+- [TDD Methodology](.claude/skills/managing-skills/references/tdd-methodology.md) - Why research is the "failing test"

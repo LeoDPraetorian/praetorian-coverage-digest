@@ -12,7 +12,7 @@ The sync algorithm has 3 main phases:
 
 ## Phase 1: Discovery
 
-### Step 1.1: Find All Library Skills
+### Step 2.1: Find All Library Skills
 
 ```bash
 find .claude/skill-library -name "SKILL.md" -type f
@@ -20,7 +20,7 @@ find .claude/skill-library -name "SKILL.md" -type f
 
 **Output:** List of absolute paths to all library skill files.
 
-### Step 1.2: Extract Skill Metadata
+### Step 2.2: Extract Skill Metadata
 
 For each discovered path:
 
@@ -33,7 +33,7 @@ Extract:
 - Full path: ".claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md"
 ```
 
-### Step 1.3: Map to Gateways
+### Step 2.3: Map to Gateways
 
 For each skill, determine gateway using mapping rules (see gateway-mapping.md):
 
@@ -54,7 +54,7 @@ For each skill, determine gateway using mapping rules (see gateway-mapping.md):
 
 ## Phase 2: Comparison
 
-### Step 2.1: Read Current Gateway State
+### Step 3.1: Read Current Gateway State
 
 For each gateway (e.g., `gateway-frontend`):
 
@@ -80,7 +80,7 @@ For each gateway (e.g., `gateway-frontend`):
 }
 ```
 
-### Step 2.2: Identify Additions
+### Step 3.2: Identify Additions
 
 **Additions** = Skills discovered in library that are NOT in gateway routing table.
 
@@ -100,7 +100,7 @@ Current table: Does not contain this path
 Result: ADD to additions list
 ```
 
-### Step 2.3: Identify Removals
+### Step 3.3: Identify Removals
 
 **Removals** = Skills in gateway routing table whose paths NO LONGER EXIST in filesystem.
 
@@ -122,7 +122,7 @@ test -f ".claude/skill-library/development/frontend/old-skill/SKILL.md"
 
 **IMPORTANT:** Never remove based on "seems wrong". Only remove if path verification fails.
 
-### Step 2.4: Build Change Report
+### Step 3.4: Build Change Report
 
 **Data structure:**
 
@@ -146,7 +146,7 @@ test -f ".claude/skill-library/development/frontend/old-skill/SKILL.md"
 
 ## Phase 3: Application (Full Sync Only)
 
-### Step 3.1: Build New Routing Table
+### Step 4.1: Build New Routing Table
 
 For each gateway with changes:
 
@@ -172,7 +172,7 @@ New table (sorted):
   - TanStack Query
 ```
 
-### Step 3.2: Format Table Rows
+### Step 4.2: Format Table Rows
 
 Convert data structure to markdown Skill Registry table format:
 
@@ -184,7 +184,7 @@ Convert data structure to markdown Skill Registry table format:
 | TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
 ```
 
-### Step 3.3: Apply Edit
+### Step 4.3: Apply Edit
 
 Use Edit tool to replace old table with new table:
 
@@ -207,7 +207,7 @@ Use Edit tool to replace old table with new table:
 | TanStack Query       | `.claude/skill-library/development/frontend/state/frontend-tanstack/SKILL.md`          | TanStack, cache, fetch |
 ```
 
-### Step 3.4: Verify Edit
+### Step 4.4: Verify Edit
 
 1. Read updated gateway file
 2. Verify table format is correct

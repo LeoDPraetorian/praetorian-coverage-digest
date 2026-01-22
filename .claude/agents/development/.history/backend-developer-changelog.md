@@ -1,7 +1,7 @@
-
 ## 2026-01-13 - Add Go-Specific Skills and Quality Guidelines
 
 **Changes:**
+
 1. Added Go-Specific Skills table in Step 2 referencing:
    - `implementing-golang-tests` (testify mandate)
    - `go-best-practices` (CLI structure, function org, early returns)
@@ -23,6 +23,7 @@
 
 **Why:**
 Julius code review showed backend-developer producing code with:
+
 - t.Error instead of testify
 - Interface compliance vars
 - Version scaffolding

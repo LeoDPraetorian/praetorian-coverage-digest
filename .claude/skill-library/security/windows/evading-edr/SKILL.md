@@ -11,6 +11,7 @@ allowed-tools: Read
 ## When to Use This Skill
 
 Use this skill when:
+
 - Researching EDR architecture and sensor components
 - Analyzing EDR detection mechanisms and telemetry sources
 - Understanding function hooking (userland and kernel)
@@ -31,6 +32,7 @@ Use this skill when:
 Matt Hand provides a comprehensive offensive security perspective on EDR systems, explaining how they work under the hood and how adversaries can evade them. The book is essential reading for both red teamers and defenders who need to understand EDR capabilities and limitations.
 
 **Key Topics**:
+
 - EDR architecture (agents, sensors, telemetry, detections)
 - Function hooking DLLs (userland API monitoring)
 - Kernel callbacks (PsSetCreateProcessNotifyRoutine, etc.)
@@ -49,18 +51,18 @@ All chapters have been split into individual markdown files with OCR corrections
 
 **Location**: `references/chapters/` (within this skill)
 
-| Chapter | File | Topics Covered |
-|---------|------|----------------|
-| 0 (Front Matter) | `chapter-00.md` | Praise, dedication, author bio, technical reviewer |
-| 1 | `chapter-01.md` | EDR architecture - Components (agent, telemetry, sensors, detections), challenges of EDR evasion, identifying malicious activity, brittle vs robust detections |
-| 2 | `chapter-02.md` | Function-hooking DLLs - Userland API hooking, inline hooks, IAT hooking, detours, hook detection and bypass |
-| 4 | `chapter-04.md` | Object notifications - ObRegisterCallbacks, process/thread handle notifications, protected processes |
-| 5 | `chapter-05.md` | Image-load and registry notifications - PsSetLoadImageNotifyRoutine, CmRegisterCallback, bypasses |
-| 7 | `chapter-07.md` | Network filter drivers - Windows Filtering Platform (WFP), callout drivers, network telemetry collection |
-| 8 | `chapter-08.md` | Event Tracing for Windows (ETW) - Provider architecture, consumer sessions, ETW patching, bypasses |
-| 11 | `chapter-11.md` | Early Launch Anti-Malware (ELAM) drivers - Boot-start protection, driver signing, ELAM bypasses |
-| 12 | `chapter-12.md` | Microsoft-Windows-Threat-Intelligence - Kernel ETW provider, stack walking, memory allocations, RWX detection |
-| 13 | `chapter-13.md` | Case study: A detection-aware attack - End-to-end offensive operation demonstrating evasion techniques |
+| Chapter          | File            | Topics Covered                                                                                                                                                 |
+| ---------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0 (Front Matter) | `chapter-00.md` | Praise, dedication, author bio, technical reviewer                                                                                                             |
+| 1                | `chapter-01.md` | EDR architecture - Components (agent, telemetry, sensors, detections), challenges of EDR evasion, identifying malicious activity, brittle vs robust detections |
+| 2                | `chapter-02.md` | Function-hooking DLLs - Userland API hooking, inline hooks, IAT hooking, detours, hook detection and bypass                                                    |
+| 4                | `chapter-04.md` | Object notifications - ObRegisterCallbacks, process/thread handle notifications, protected processes                                                           |
+| 5                | `chapter-05.md` | Image-load and registry notifications - PsSetLoadImageNotifyRoutine, CmRegisterCallback, bypasses                                                              |
+| 7                | `chapter-07.md` | Network filter drivers - Windows Filtering Platform (WFP), callout drivers, network telemetry collection                                                       |
+| 8                | `chapter-08.md` | Event Tracing for Windows (ETW) - Provider architecture, consumer sessions, ETW patching, bypasses                                                             |
+| 11               | `chapter-11.md` | Early Launch Anti-Malware (ELAM) drivers - Boot-start protection, driver signing, ELAM bypasses                                                                |
+| 12               | `chapter-12.md` | Microsoft-Windows-Threat-Intelligence - Kernel ETW provider, stack walking, memory allocations, RWX detection                                                  |
+| 13               | `chapter-13.md` | Case study: A detection-aware attack - End-to-end offensive operation demonstrating evasion techniques                                                         |
 
 **Note**: Some chapter numbers are missing due to book structure (chapters 3, 6, 9, 10 not present in current extraction).
 
@@ -75,6 +77,7 @@ Read(".claude/skill-library/security/windows/evading-edr/references/chapters/cha
 ```
 
 **Example queries:**
+
 - "How do EDR function hooks work?" → Read chapter 2
 - "What are kernel callbacks and how do EDRs use them?" → Read chapter 4-5
 - "How does ETW provide telemetry to EDRs?" → Read chapter 8
@@ -90,6 +93,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 ```
 
 **Common search terms:**
+
 - Function hook, inline hook, IAT hook, detours
 - Kernel callback, ObRegisterCallbacks, PsSetCreateProcessNotifyRoutine
 - ETW, event provider, consumer, trace session
@@ -108,6 +112,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 ## Key Concepts by Chapter
 
 ### Chapter 1: EDR Architecture
+
 - EDR components (agent, sensors, detections, telemetry)
 - Sensor types and their purposes
 - Detection logic (brittle vs robust)
@@ -117,6 +122,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Detection engineering principles
 
 ### Chapter 2: Function-Hooking DLLs
+
 - Userland API hooking mechanisms
 - Inline hooks (trampoline, hotpatching)
 - Import Address Table (IAT) hooking
@@ -126,6 +132,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - EDR DLL injection methods
 
 ### Chapter 4: Object Notifications
+
 - ObRegisterCallbacks API
 - Process handle notifications
 - Thread handle notifications
@@ -135,6 +142,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Kernel-mode evasion
 
 ### Chapter 5: Image-Load and Registry Notifications
+
 - PsSetLoadImageNotifyRoutine (DLL load monitoring)
 - CmRegisterCallback (registry monitoring)
 - Image load telemetry for suspicious DLLs
@@ -143,6 +151,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Registry callback evasion
 
 ### Chapter 7: Network Filter Drivers
+
 - Windows Filtering Platform (WFP) architecture
 - Callout drivers and filter engine
 - Network telemetry collection
@@ -151,6 +160,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - DNS filtering and C2 detection
 
 ### Chapter 8: Event Tracing for Windows (ETW)
+
 - ETW provider architecture
 - Trace sessions and consumers
 - Kernel and user-mode providers
@@ -161,6 +171,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Common ETW providers used by EDR
 
 ### Chapter 11: Early Launch Anti-Malware (ELAM)
+
 - Boot-start driver loading sequence
 - ELAM driver requirements
 - Driver signature verification
@@ -170,6 +181,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Windows Defender ELAM
 
 ### Chapter 12: Microsoft-Windows-Threat-Intelligence
+
 - Kernel ETW provider for threat intelligence
 - Stack walking and call stack inspection
 - Memory allocation tracking (VirtualAlloc, etc.)
@@ -179,6 +191,7 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 - Bypassing Threat-Intelligence provider
 
 ### Chapter 13: Case Study - Detection-Aware Attack
+
 - End-to-end offensive operation planning
 - Combining multiple evasion techniques
 - Detection surface minimization
@@ -200,9 +213,9 @@ grep -i "keyword" .claude/skill-library/security/windows/evading-edr/references/
 
 ### Requires (invoke before starting)
 
-| Skill | When | Purpose |
-|-------|------|---------|
-| `windows-internals` | When kernel concepts needed | Provides OS foundation for chapters 2, 4-5, 7-8, 11-12 |
+| Skill                        | When                                      | Purpose                                                         |
+| ---------------------------- | ----------------------------------------- | --------------------------------------------------------------- |
+| `windows-internals`          | When kernel concepts needed               | Provides OS foundation for chapters 2, 4-5, 7-8, 11-12          |
 | `windows-security-internals` | When authentication/token concepts needed | Complements Chapter 1 context and Chapter 4 protected processes |
 
 ### Calls (during execution)
@@ -211,10 +224,10 @@ None - terminal skill (reads chapter files directly)
 
 ### Pairs With (conditional)
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| `windows-internals` | Frequently | EDR concepts build on Windows internals (processes, threads, drivers, security) |
-| `windows-security-internals` | When authentication involved | Token manipulation, privilege escalation in evasion context |
+| Skill                        | Trigger                      | Purpose                                                                         |
+| ---------------------------- | ---------------------------- | ------------------------------------------------------------------------------- |
+| `windows-internals`          | Frequently                   | EDR concepts build on Windows internals (processes, threads, drivers, security) |
+| `windows-security-internals` | When authentication involved | Token manipulation, privilege escalation in evasion context                     |
 
 ## EDR Evasion Mindset
 
@@ -232,6 +245,7 @@ None - terminal skill (reads chapter files directly)
 ## Offensive Security Context
 
 **WARNING**: This book describes offensive security techniques. Use ONLY in authorized security testing contexts:
+
 - Authorized penetration testing engagements
 - Red team exercises with written authorization
 - Security research on systems you own
@@ -257,6 +271,7 @@ ISBN: 978-1-7185-0334-2
 ### OCR Quality Notes
 
 Chapters have been OCR-transcribed from PDF with automated error corrections applied:
+
 - Common patterns fixed: `EDR chitecture` → `EDR Architecture`, `rundll2` → `rundll32`
 - Technical terms verified against Windows documentation
 - Code examples and memory addresses preserved

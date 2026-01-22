@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/shodan",
+  "version": "1.0.0",
+  "description": "Internet-connected device search and reconnaissance",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

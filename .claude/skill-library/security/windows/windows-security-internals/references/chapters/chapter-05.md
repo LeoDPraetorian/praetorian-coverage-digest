@@ -1,4 +1,4 @@
-## 5  SECURITY DESCRIPTORS
+## 5 SECURITY DESCRIPTORS
 
 ![Figure](figures/WindowsSecurityInternals_page_173_figure_001.png)
 
@@ -17,13 +17,13 @@ kernel object and many user-mode components, such as services. You'll even find 
 Windows stores security descriptors as binary structures on disk or in memory. While you'll rarely have to manually parse these structures, it's worth understanding what they contain. A security descriptor consists of the following seven components:
 
 - • The revision
-• Optional resource manager flags
-• Control flags
-• An optional owner SID
-• An optional group SID
-• An optional discretionary access control list
-• An optional system access control list
-Let's look at each of these in turn. The first component of any security descriptor is the revision, which indicates the version of the security descriptor’s binary format. There is only one version, so the revision is always set to the value 1. Next is an optional set of flags for use by a resource manager. You'll almost never encounter these flags being set; however, they are used by Active Directory, so we'll talk more about them in Chapter 11.
+  • Optional resource manager flags
+  • Control flags
+  • An optional owner SID
+  • An optional group SID
+  • An optional discretionary access control list
+  • An optional system access control list
+  Let's look at each of these in turn. The first component of any security descriptor is the revision, which indicates the version of the security descriptor’s binary format. There is only one version, so the revision is always set to the value 1. Next is an optional set of flags for use by a resource manager. You'll almost never encounter these flags being set; however, they are used by Active Directory, so we'll talk more about them in Chapter 11.
 
 The resource manager flags are followed by a set of control flags . These have three uses: they define which optional components of the security descriptor are valid, how the security descriptors and components were created, and how to process the security descriptor when applying it to an object. Table 5-1 shows the list of valid flags and their descriptions. We'll cover many of the terms in this table, such as inheritance, in more detail in the following chapter.
 
@@ -31,13 +31,11 @@ Table 5-1: Valid Control Flags
 
 <table><tr><td>Name</td><td>Value</td><td>Description</td></tr><tr><td>OwnerDefaulted</td><td>0x0001</td><td>The owner SID was assigned through a default method.</td></tr><tr><td>GroupDefaulted</td><td>0x0002</td><td>The group SID was assigned through a default method.</td></tr><tr><td>DaclPresent</td><td>0x0004</td><td>The DACL is present in the security descriptor.</td></tr><tr><td>DaclDefaulted</td><td>0x0008</td><td>The DACL was assigned through a default method.</td></tr></table>
 
-
-144    Chapter 5
+144 Chapter 5
 
 ---
 
 <table><tr><td>Name</td><td>Value</td><td>Description</td></tr><tr><td>SaclPresent</td><td>0x0010</td><td>The SACL is present in the security descriptor.</td></tr><tr><td>SaclDefaulted</td><td>0x0020</td><td>The SACL was assigned through a default method.</td></tr><tr><td>DaclUntrusted</td><td>0x0040</td><td>When combined with ServerSecurity, the DACL is untrusted.</td></tr><tr><td>ServerSecurity</td><td>0x0080</td><td>The DACL is replaced with a server ACL (more on the use of this in Chapter 6).</td></tr><tr><td>DaclAutoInheritReq</td><td>0x0100</td><td>DACL auto-inheritance for child objects is requested.</td></tr><tr><td>SaclAutoInheritReq</td><td>0x0200</td><td>SACL auto-inheritance for child objects is requested.</td></tr><tr><td>DaclAutoInherited</td><td>0x0400</td><td>The DACL supports auto-inheritance.</td></tr><tr><td>SaclAutoInherited</td><td>0x0800</td><td>The SACL supports auto-inheritance.</td></tr><tr><td>DaclProtected</td><td>0x1000</td><td>The DACL is protected from inheritance.</td></tr><tr><td>SaclProtected</td><td>0x2000</td><td>The SACL is protected from inheritance.</td></tr><tr><td>RmControlValid</td><td>0x4000</td><td>The resource manager flags are valid.</td></tr><tr><td>SelfRelative</td><td>0x8000</td><td>The security descriptor is in a relative format.</td></tr></table>
-
 
 After the control flags comes the owner SID , which represents the owner of the resource. This is typically the user's SID; however, ownership can also be assigned to a group, such as the Administrators group. Being the owner of a resource grants you certain privileges, including the ability to modify the resource's security descriptor. By ensuring the owner has this capability, the system prevents a user from locking themselves out of their own resources.
 
@@ -46,9 +44,9 @@ The groupSid is like the owner SID, but it's rarely used. It exists primarily to
 The most important part of the security descriptor is the discretionary access control list (DACL) . The DACL contains a list of access control entries (ACEs) , which define what access a SID is given. It's considered discretionary because the user or system administrator can choose the level of access granted. There are many different types of ACEs. We'll discuss these further in “Access Control List Headers and Entries” on page 151; for now, you just need to know that the basic information in each ACE includes the following:
 
 - • The SID of the user or group to which the ACE applies
-• The type of ACE
-• The access mask to which the SID will be allowed or denied access
-The final component of the security descriptor is the security access control list (SACL) , which stores auditing rules. Like the DACL, it contains a list
+  • The type of ACE
+  • The access mask to which the SID will be allowed or denied access
+  The final component of the security descriptor is the security access control list (SACL) , which stores auditing rules. Like the DACL, it contains a list
 
 ---
 
@@ -76,14 +74,13 @@ Relative identifiers Zero or more 32-bit numbers that represent the user or grou
 
 The security authority can be any value, but Windows has predefined some commonly used ones. All well-known authorities start with five 0 bytes followed by a value from Table 5-2.
 
-146    Chapter 5
+146 Chapter 5
 
 ---
 
 Table 5-2: Well-Known Authorities
 
 <table><tr><td>Name</td><td>Final value</td><td>Example name</td></tr><tr><td>Null</td><td>0</td><td>NULL SID</td></tr><tr><td>World</td><td>1</td><td>Everyone</td></tr><tr><td>Local</td><td>2</td><td>CONSOLE LOGON</td></tr><tr><td>Creator</td><td>3</td><td>CREATOR OWNER</td></tr><tr><td>Nt</td><td>5</td><td>BUILTIN\Users</td></tr><tr><td>Package</td><td>15</td><td>APPLICATION PACKAGE AUTHORITY\Your Internet connection</td></tr><tr><td>MandatoryLabel</td><td>16</td><td>Mandatory label\Medium Mandatory Level</td></tr><tr><td>ScopedPolicyId</td><td>17</td><td>N/A</td></tr><tr><td>ProcessTrust</td><td>19</td><td>TRUST LEVEL\ProtectedLight\Windows</td></tr></table>
-
 
 After the security authority come the relative identifiers. A SID can contain one or more RIDs, with the domain RIDs followed by the user RIDs.
 
@@ -144,7 +141,7 @@ BUILTIN\Administrators 5-1-5-32-544
 
 Listing 5-4: Querying the known Administrators group SID
 
-148      Chapter 5
+148 Chapter 5
 
 ---
 
@@ -178,7 +175,7 @@ When the SelfRelative flag is set, the security descriptor instead follows the r
 
 Figure 5-4. The structure of a relative security descriptor
 
-150    Chapter 5
+150 Chapter 5
 
 ---
 
@@ -216,7 +213,7 @@ Figure 5-6: The structure of the ACL header
 
 The ACL header also contains two reserved fields, $b21 and $b22, both of which should always be 0. They serve no purpose in modern versions of Windows and are there in case the ACL structure needs to be extended. Currently, the Revision field can have one of three values, which determine the ACL's valid ACE. If an ACE uses an ACE that the revision doesn't
 
-152   Chapter 5
+152 Chapter 5
 
 ---
 
@@ -244,7 +241,6 @@ Table 5-3: Supported ACE Types, Minimum ACL Revisions, and Locations
 
 <table><tr><td>ACE type</td><td>Value</td><td>Minimum revision</td><td>ACL</td><td>Description</td></tr><tr><td>Allowed</td><td>0x0</td><td>Default</td><td>DACL</td><td>Grants access to a resource</td></tr><tr><td>Denied</td><td>0x1</td><td>Default</td><td>DACL</td><td>Denies access to a resource</td></tr><tr><td>Audit</td><td>0x2</td><td>Default</td><td>SACL</td><td>Audit access to a resource</td></tr></table>
 
-
 (continued)
 
 ---
@@ -252,7 +248,6 @@ Table 5-3: Supported ACE Types, Minimum ACL Revisions, and Locations
 Table 5-3: Supported ACE Types, Minimum ACL Revisions, and Locations (continued)
 
 <table><tr><td>ACE type</td><td>Value</td><td>Minimum revision</td><td>ACL</td><td>Description</td></tr><tr><td>Alarm</td><td>0x3</td><td>Default</td><td>SACL</td><td>Alarms upon access to a resource; unused</td></tr><tr><td>AllowedCompound</td><td>0x4</td><td>Compound</td><td>DACL</td><td>Grants access to a resource during impersonation</td></tr><tr><td>AllowedObject</td><td>0x5</td><td>Object</td><td>DACL</td><td>Grants access to a resource with an object type</td></tr><tr><td>DeniedObject</td><td>0x6</td><td>Object</td><td>DACL</td><td>Denies access to a resource with an object type</td></tr><tr><td>AuditObject</td><td>0x7</td><td>Object</td><td>SACL</td><td>Audit access to a resource with an object type</td></tr><tr><td>AlarmObject</td><td>0x8</td><td>Object</td><td>SACL</td><td>Alarms upon access with an object type; unused</td></tr><tr><td>AllowedCallback</td><td>0x9</td><td>Default</td><td>DACL</td><td>Grants access to a resource with a callback</td></tr><tr><td>DeniedCallback</td><td>0xA</td><td>Default</td><td>DACL</td><td>Denies access to a resource with a callback</td></tr><tr><td>AllowedCallbackObject</td><td>0xB</td><td>Object</td><td>DACL</td><td>Grants access with a callback and an object type</td></tr><tr><td>DeniedCallbackObject</td><td>0xC</td><td>Object</td><td>DACL</td><td>Denies access with a callback and an object type</td></tr><tr><td>AuditCallback</td><td>0xD</td><td>Default</td><td>SACL</td><td>Audit access with a callback</td></tr><tr><td>AlarmCallback</td><td>0xE</td><td>Default</td><td>SACL</td><td>Alarms upon access with a callback; unused</td></tr><tr><td>AuditCallbackObject</td><td>0xF</td><td>Object</td><td>SACL</td><td>Audit access with a callback and an object type</td></tr><tr><td>AlarmCallbackObject</td><td>0x10</td><td>Object</td><td>SACL</td><td>Alarms upon access with a callback and an object type; unused</td></tr><tr><td>MandatoryLabel</td><td>0x11</td><td>Default</td><td>SACL</td><td>Specifies a mandatory label</td></tr><tr><td>ResourceAttribute</td><td>0x12</td><td>Default</td><td>SACL</td><td>Specifies attributes for the resource</td></tr><tr><td>ScopedPolicyId</td><td>0x13</td><td>Default</td><td>SACL</td><td>Specifies a central access policy ID for the resource</td></tr><tr><td>ProcessTrustLabel</td><td>0x14</td><td>Default</td><td>SACL</td><td>Specifies a process trust label to limit resource access</td></tr><tr><td>AccessFilter</td><td>0x15</td><td>Default</td><td>SACL</td><td>Specifies an access filter for the resource</td></tr></table>
-
 
 While Windows officially supports all these ACE types, the kernel does not use the Alarn types. User applications can specify their own ACE types, but various APIs in user and kernel mode check for valid types and will generate an error if the ACE type isn't known.
 
@@ -314,14 +309,13 @@ Table 5-4: ACE Flags
 
 <table><tr><td>ACE flag</td><td>Value</td><td>Description</td></tr><tr><td>ObjectInherit</td><td>0x1</td><td>The ACE can be inherited by an object.</td></tr><tr><td>ContainerInherit</td><td>0x2</td><td>The ACE can be inherited by a container.</td></tr><tr><td>NoPropagateInherit</td><td>0x4</td><td>The ACE&#x27;s inheritance flags are not propagated to children.</td></tr><tr><td>InheritOnly</td><td>0x8</td><td>The ACE is used only for inheritance and not for access checks.</td></tr><tr><td>Inherited</td><td>0x10</td><td>The ACE was inherited from a parent container.</td></tr><tr><td>Critical</td><td>0x20</td><td>The ACE is critical and can&#x27;t be removed. Applies only to Allowed ACEs.</td></tr><tr><td>SuccessfulAccess</td><td>0x40</td><td>An audit event should be generated for a successful access.</td></tr><tr><td>FailedAccess</td><td>0x80</td><td>An audit event should be generated for a failed access.</td></tr><tr><td>TrustProtected</td><td>0x40</td><td>When used with an AccessFilter ACE, this flag prevents modification.</td></tr></table>
 
-
 The inheritance flags take up only the lower 5 bits, leaving the top 3 bits for ACE-specific flags.
 
 ## Constructing and Manipulating Security Descriptors
 
 Now that you're familiar with the structure of a security descriptor, let's look at how to construct and manipulate them using PowerShell. By far the most common reason to do this is to view a security descriptor's contents so you can understand the access applied to a resource. Another important
 
-156    Chapter 5
+156 Chapter 5
 
 ---
 
@@ -343,7 +337,6 @@ PS> $d %d | Format-Table
 Listing 5-6: Creating a new security descriptor with a specified owner.
 
 We first get the SID for the World group. When calling New-NtSecurity
-
 
 Descriptor to create a new security descriptor, we use this SID to specify its Owner and Group. We also specify the name of the kernel object type this security descriptor will be associated with; this step makes some of the later commands easier to use. In this case, we'll assume it's a file object's security descriptor.
 
@@ -402,10 +395,10 @@ Because of how access checking works, there is a canonical ordering to the ACEs 
 3. The Denied ACEs must come before Denied object ACEs.
 
 4. All non-inherited ACEs must come before ACEs with the Inherited
-flag set.
-In Listing 5-7, we added a Denied ACE to the DACL after we added an Allowed ACE, failing the first order rule. We can ensure the DACL is canonicalized by using the Edit-NtSecurity command with the CanonicalizeDacL
+   flag set.
+   In Listing 5-7, we added a Denied ACE to the DACL after we added an Allowed ACE, failing the first order rule. We can ensure the DACL is canonicalized by using the Edit-NtSecurity command with the CanonicalizeDacL
 
-158      Chapter 5
+158 Chapter 5
 
 ---
 
@@ -487,7 +480,6 @@ Listing 5-9: Displaying the security descriptor
 
 We pass the ShowAll parameter to Format-NtSecurityDescriptor to ensure that it displays the entire contents of the security descriptor; by default it won't output the SACL or less common ACEs, such as ResourceAttribute.
 
-
 Note that the output kernel object type matches the file type we specified when creating the security descriptor in Listing 5-6. Specifying the kernel object type allows the formatter to print the decoded access mask for the type rather than a generic hex value.
 
 The next line in the output shows the current control flags. These are calculated on the fly based on the current state of the security descriptor; later, we'll discuss how to change these control flags to change the security descriptor's behavior. The control flags are followed by the owner and group SIDs and the DACL, which account for most of the output. Any DACL-specific flags appear next to the header; in this case, these indicate that we set the DacLtoInherited flag. Next, the output lists each of the ACEs in the ACL in order, starting with the type of ACE. Because the command knows the object type, it prints the decoded access mask for the type as well as the original access mask in hexadecimal.
@@ -499,7 +491,6 @@ Next is the SACL, which shows our single audit ACE as well as the Sacl Protected
 Table 5-5: Mandatory Policy Values
 
 <table><tr><td>Name</td><td>Value</td><td>Description</td></tr><tr><td>NoWriteUp</td><td>0x00000001</td><td>A lower integrity level caller can't write to this resource.</td></tr><tr><td>NoReadUp</td><td>0x00000002</td><td>A lower integrity level caller can't read this resource.</td></tr><tr><td>NoExecuteUp</td><td>0x00000004</td><td>A lower integrity level caller can't execute this resource.</td></tr></table>
-
 
 By default, format-MTSecurityDescriptor can be a bit verbose. To shorten its output, specify the Summary parameter, which will remove as much data as possible while keeping the important information. Listing 5-10 demonstrates.
 
@@ -556,7 +547,6 @@ Listing 5-11: Formatting a security descriptor with SDK names
 
 One quirk of File objects is that their access masks have two naming conventions, one for files and one for directories. You can request that
 
-
 Format-NtSecurityDescriptor print the directory version of the access mask by using the Container parameter, or more generally, by setting the Container property of the security descriptor object to True. Listing 5-12 shows the impact of setting the Container parameter on the output.
 
 ```bash
@@ -577,7 +567,6 @@ Note how the following line changes from ReadData!WriteData to List
 DirectoryAddFile when we format it as a container. The File type is the only object type with this behavior in Windows. This is important to security, as you could easily misinterpret File access rights if you formatted the security descriptor for a directory as a file, or vice versa.
 
 If a GUI is more your thing, you can start a viewer using the following
-
 
 Show-NTSecurityDescriptor command:
 
@@ -638,7 +627,7 @@ Figure 5-9. An outline of the major structures in the relative security descript
 
 You'll need to refer to the layout of the ACL and SID structures to manually decode the rest.
 
-164    Chapter 5
+164 Chapter 5
 
 ---
 
@@ -647,7 +636,6 @@ You'll need to refer to the layout of the ACL and SID structures to manually dec
 In Chapter 2, we discussed the basics of the Security Descriptor Definition Language (SDDL) format for representing SIDs. The SDDL format can represent the entire security descriptor too. As the SDDL version of a security descriptor uses ASCII text, it's somewhat human readable, and unlike the binary data shown in Listing 5-13, it can be easily copied. Because it's common to see SDDL strings used throughout Windows, let's look at how to represent a security descriptor in SDDL and how you can read it.
 
 You can convert a security descriptor to SDDL format by specifying the ToSddd parameter to Format-NTSecurityDescriptor. This is demonstrated in
-
 
 Listing 5-14, where we pass the security descriptor we built in the previous section. You can also create a security descriptor from an SDDL string using New-NTSecurityDescriptor with the ToSddd parameter.
 
@@ -704,7 +692,6 @@ Table 5-6: Well-Known SIDs and Their Aliases
 
 <table><tr><td>SID alias</td><td>Name</td><td>SDLL SID</td></tr><tr><td>AU</td><td>NT AUTHORITY\Authenticated Users</td><td>S-1-5-11</td></tr><tr><td>BA</td><td>BUILTIN\Administrators</td><td>S-1-32-544</td></tr><tr><td>IU</td><td>NT AUTHORITY\INTERACTIVE</td><td>S-1-5-4</td></tr><tr><td>SY</td><td>NT AUTHORITY\SYSTEM</td><td>S-1-5-18</td></tr><tr><td>WD</td><td>Everyone</td><td>S-1-1-0</td></tr></table>
 
-
 If a SID has no alias, Format-NetSecurity@Descriptor will emit the SID in SDDL format, as shown in Listing 5-15. Even SIDS without aliases can have names defined by LSASS. For example, the SID in Listing 5-15 belongs to the current user, as shown in Listing 5-17.
 
 ```bash
@@ -726,8 +713,7 @@ Table 5-7: ACL Flag Strings Mapped to Security Descriptor Control Flags
 
 <table><tr><td>ACL flag string</td><td>DACL control flag</td><td>SACL control flag</td></tr><tr><td>P</td><td>DaclProtected</td><td>SaclProtected</td></tr><tr><td>AI</td><td>DaclAutoInherited</td><td>SaclAutoInherited</td></tr><tr><td>AR</td><td>DaclAutoInheritReq</td><td>SaclAutoInheritReq</td></tr></table>
 
-
-166    Chapter 5
+166 Chapter 5
 
 ---
 
@@ -743,13 +729,11 @@ Table 5-8: Mappings of Type Strings to ACE Types
 
 <table><tr><td>ACE type string</td><td>ACE type</td></tr><tr><td>A</td><td>Allowed</td></tr><tr><td>D</td><td>Denied</td></tr><tr><td>AU</td><td>Audit</td></tr><tr><td>AL</td><td>Alarm</td></tr><tr><td>OA</td><td>AllowedObject</td></tr><tr><td>OD</td><td>DeniedObject</td></tr><tr><td>OU</td><td>AuditObject</td></tr><tr><td>OL</td><td>AlarmObject</td></tr><tr><td>XA</td><td>AllowedCallback</td></tr><tr><td>XD</td><td>DeniedCallback</td></tr><tr><td>ZA</td><td>AllowedCallbackObject</td></tr><tr><td>XU</td><td>AuditCallback</td></tr><tr><td>ML</td><td>MandatoryLabel</td></tr><tr><td>RA</td><td>ResourceAttribute</td></tr><tr><td>SP</td><td>ScopedPolicyId</td></tr><tr><td>TL</td><td>ProcessTrustLabel</td></tr><tr><td>FL</td><td>AccessFilter</td></tr></table>
 
-
 The next component is flags, which represents the ACE flags. The audit entry in the SACL from Listing 5-15 shows the flag string FA, which represents FailedAccess. Table 5-9 shows other mappings.
 
 Table 5-9: Mappings of Flag Strings to ACE Flags
 
 <table><tr><td>ACE flag string</td><td>ACE flag</td></tr><tr><td>OI</td><td>ObjectInherit</td></tr><tr><td>CI</td><td>ContainerInherit</td></tr><tr><td>NP</td><td>NoPropagateInherit</td></tr><tr><td>IO</td><td>InheritOnly</td></tr><tr><td>ID</td><td>Inherited</td></tr><tr><td>CR</td><td>Critical</td></tr></table>
-
 
 (continued)
 
@@ -759,19 +743,17 @@ Table 5-9: Mappings of Flag Strings to ACE Flags (continued)
 
 <table><tr><td>ACE flag string</td><td>ACE flag</td></tr><tr><td>SA</td><td>SuccessfulAccess</td></tr><tr><td>FA</td><td>FailedAccess</td></tr><tr><td>TP</td><td>TrustProtected</td></tr></table>
 
-
 Next is Access, which represents the access mask in the ACE. This can be a number in hexadecimal (0x1234), octal (010604), or decimal (4660) format, or a list of short access strings. If no string is specified, then an empty access mask is used. Table 5-10 shows the access strings.
 
 Table 5-10: Mappings of Access Strings to Access Masks
 
 <table><tr><td>Access string</td><td>Access name</td><td>Access mask</td></tr><tr><td>GR</td><td>Generic Read</td><td>0x80000000</td></tr><tr><td>GW</td><td>Generic Write</td><td>0x40000000</td></tr><tr><td>GX</td><td>Generic Execute</td><td>0x20000000</td></tr><tr><td>GA</td><td>Generic All</td><td>0x10000000</td></tr><tr><td>WD</td><td>Write Owner</td><td>0x00000000</td></tr><tr><td>WD</td><td>Write DAC</td><td>0x00040000</td></tr><tr><td>RC</td><td>Read Control</td><td>0x00020000</td></tr><tr><td>SD</td><td>Delete</td><td>0x00010000</td></tr><tr><td>CR</td><td>Control Access</td><td>0x00000100</td></tr><tr><td>LO</td><td>List Object</td><td>0x00000080</td></tr><tr><td>DT</td><td>Delete Tree</td><td>0x00000040</td></tr><tr><td>WP</td><td>Write Property</td><td>0x00000020</td></tr><tr><td>RP</td><td>Read Property</td><td>0x00000010</td></tr><tr><td>SW</td><td>Self Write</td><td>0x00000008</td></tr><tr><td>LC</td><td>List Children</td><td>0x00000004</td></tr><tr><td>DC</td><td>Delete Child</td><td>0x00000002</td></tr><tr><td>CC</td><td>Create Child</td><td>0x00000001</td></tr></table>
 
-
 Note that the available access strings do not cover the entire access mask range. This is because SDDL was designed to represent the masks for directory service objects, which don't define access mask values outside of a limited range. This is also why the names of the rights are slightly confusing; for example, @lete @ild does not necessarily map to an arbitrary object type's idea of deleting a child, and you can see in Listing 5-15 that the file type's specific access maps to directory service object access, even though it has nothing to do with Active Directory.
 
 To better support other types, the SDDL format provides access strings for common file and registry key access masks, as shown in Table 5 - 11 . If the
 
-168    Chapter 5
+168 Chapter 5
 
 ---
 
@@ -781,13 +763,11 @@ Table 5-11: Access Strings for File and Registry Key Types
 
 <table><tr><td>Access string</td><td>Access name</td><td>Access mask</td></tr><tr><td>FA</td><td>File All Access</td><td>0x001F01FF</td></tr><tr><td>FX</td><td>File Execute</td><td>0x001200A0</td></tr><tr><td>FW</td><td>File Write</td><td>0x00120116</td></tr><tr><td>FR</td><td>File Read</td><td>0x00120089</td></tr><tr><td>KA</td><td>Key All Access</td><td>0x000F003F</td></tr><tr><td>KR</td><td>Key Read</td><td>0x00020019</td></tr><tr><td>KX</td><td>Key Execute</td><td>0x00020019</td></tr><tr><td>KW</td><td>Key Write</td><td>0x00020006</td></tr></table>
 
-
 For the ObjectType and InheritedObjectType components, used with object ACEs, SDDL uses a string format for the GUIDs. The GUIDs can be any value. For example, Table 5-12 contains a few well-known ones used by Active Directory.
 
 Table 5-12: Well-Known ObjectType GUIDs Used in Active Directory
 
 <table><tr><td>GUID</td><td>Directory object</td></tr><tr><td>19195a5a-6da0-11d0-afd3-00c04fd90c9</td><td>Domain</td></tr><tr><td>bf967a86-0de6-11d0-a285-00aa003049e2</td><td>Computer</td></tr><tr><td>bf967aba-0de6-11d0-a285-00aa003049e2</td><td>User</td></tr><tr><td>bf967a9c-0de6-11d0-a285-00aa003049e2</td><td>Group</td></tr></table>
-
 
 Here is an example ACE string for an AllowedObject ACE with the ObjectType set:
 
@@ -817,15 +797,13 @@ Table 5-13: Example Values for Different Conditional Expression Types
 
 <table><tr><td>Type</td><td>Examples</td></tr><tr><td>Number</td><td>Decimal: 100, -100; octal: 0100; hexadecimal: 0x100</td></tr><tr><td>String</td><td>&quot;ThisIsAString&quot;</td></tr><tr><td>Fully qualified binary name</td><td>&quot;O=MICROSOFT CORPORATION, L=REDMOND, S=WASHINGTON,1004&quot;</td></tr><tr><td>SID</td><td>SID(BA), SID(S-1-0-0)</td></tr><tr><td>Octet string</td><td>#0011223344</td></tr></table>
 
-
 The syntax then defines operators to evaluate an expression, starting with the unary operators in Table 5 - 44 .
 
 Table 5-14: Unary Operators for Conditional Expressions
 
 <table><tr><td>Operator</td><td>Description</td></tr><tr><td>Exists ATTR</td><td>Checks whether the security attribute ATTR exists</td></tr><tr><td>Not_Exists ATTR</td><td>Inverse of Exists</td></tr><tr><td>Member_of {SIDLIST}</td><td>Checks whether the token groups contain all SIDs in SIDLIST</td></tr><tr><td>Not_Member_of {SIDLIST}</td><td>Inverse of Member_of</td></tr><tr><td>Device_Member_of {SIDLIST}</td><td>Checks whether the token device groups contain all SIDs in SIDLIST</td></tr><tr><td>Not_Device_Member_of {SIDLIST}</td><td>Inverse of Device_Member_of</td></tr><tr><td>Member_of_Any {SIDLIST}</td><td>Checks whether the token groups contain any SIDs in SIDLIST</td></tr><tr><td>Not_Member_of_Any {SIDLIST}</td><td>Inverse of Not_Member_of_Any</td></tr><tr><td>Device_Member_of_Any {SIDLIST}</td><td>Checks whether the token device groups contain any SIDs in SIDLIST</td></tr><tr><td>Not_Device_Member_of_Any {SIDLIST}</td><td>Inverse of Device_Member_of_Any</td></tr><tr><td>I(EXPR)</td><td>The logical NOT of an expression</td></tr></table>
 
-
-170    Chapter 5
+170 Chapter 5
 
 ---
 
@@ -834,7 +812,6 @@ In Table 5-14, ATTR is the name of an attribute to test. SIDLIST is a list of SI
 Table 5-15: Infix Operators for Conditional Expressions
 
 <table><tr><td>Operator</td><td>Description</td></tr><tr><td>ATTR Contains VALUE</td><td>Checks whether the security attribute contains the value</td></tr><tr><td>ATTR Not_Contains VALUE</td><td>Inverse of Contains</td></tr><tr><td>ATTR Any_of {VALUELIST}</td><td>Checks whether the security attribute contains any of the values</td></tr><tr><td>ATTR Not_Any_of {VALUELIST}</td><td>Inverse of Any_of</td></tr><tr><td>ATTR == VALUE</td><td>Checks whether the security attribute equals the value</td></tr><tr><td>ATTR != VALUE</td><td>Checks whether the security attribute does not equal the value</td></tr><tr><td>ATTR &lt; VALUE</td><td>Checks whether the security attribute is less than the value</td></tr><tr><td>ATTR &lt;= VALUE</td><td>Checks whether the security attribute is less than or equal to the value</td></tr><tr><td>ATTR &gt; VALUE</td><td>Checks whether the security attribute is greater than the value</td></tr><tr><td>ATTR &gt;= VALUE</td><td>Checks whether the security attribute is greater than or equal to the value</td></tr><tr><td>EXPR &amp;amp; EXPR</td><td>The logical AND between two expressions</td></tr><tr><td>EXPR | | EXPR</td><td>The logical OR between two expressions</td></tr></table>
-
 
 In Table 5-15, VALUE can be either a single value from Table 5-13 or a list of values enclosed in braces. The Any_of and Not_Any_of operators work only on lists, and the conditional expression must always be placed in parentheses in the SDDL ACE. For example, if you wanted to use the conditional expression shown back in Listing 5-5 with an AccessCallback ACE, the ACE string would be as follows:
 
@@ -856,9 +833,7 @@ Table 5-16: Security Attribute SDDL Type Strings
 
 <table><tr><td>Attribute type</td><td>Type name</td><td>Example value</td></tr><tr><td>TI</td><td>Int64</td><td>Decimal: 100, -100; octal: 0100; hexadecimal: 0x100</td></tr><tr><td>TU</td><td>UInt64</td><td>Decimal: 100; octal: 0100; hexadecimal: 0x100</td></tr><tr><td>TS</td><td>String</td><td>&quot;XYZ&quot;</td></tr><tr><td>TD</td><td>SID</td><td>BA, S-1-0-0</td></tr><tr><td>TB</td><td>Boolean</td><td>0, 1</td></tr><tr><td>RX</td><td>OctetString</td><td>#0011223344</td></tr></table>
 
-
 To give an example, the following SDDL string represents a Resource
-
 
 Attribute ACE with the name Classification. It contains two string values, TopSecret and MostSecret, and has the CaseSensitive and NonInheritable flags set:
 
@@ -872,9 +847,7 @@ Table 5-17: Mandatory Label Access Strings
 
 <table><tr><td>Access string</td><td>Access name</td><td>Access mask</td></tr><tr><td>NX</td><td>No Execute Up</td><td>0x00000004</td></tr><tr><td>NR</td><td>No Read Up</td><td>0x00000002</td></tr><tr><td>NW</td><td>No Write Up</td><td>0x00000001</td></tr></table>
 
-
 The SID represents the integrity level of the mandatory label; again, special SID aliases are defined. Anything outside the list shown in
-
 
 Table 5-18 needs to be represented as a full SID.
 
@@ -882,13 +855,11 @@ Table 5-18: Mandatory Label Integrity Level SIDs
 
 <table><tr><td>SID alias</td><td>Name</td><td>SDDL SID</td></tr><tr><td>LW</td><td>Low integrity level</td><td>S-1-16-4096</td></tr><tr><td>ME</td><td>Medium integrity level</td><td>S-1-16-8192</td></tr><tr><td>MP</td><td>MediumPlus integrity level</td><td>S-1-16-8448</td></tr><tr><td>HI</td><td>High integrity level</td><td>S-1-16-12288</td></tr><tr><td>SI</td><td>System integrity level</td><td>S-1-16-16384</td></tr></table>
 
-
-172    Chapter 5
+172 Chapter 5
 
 ---
 
 The SDDL format doesn't preserve all information you can store in a security descriptor. For example, the SDDL format can't represent the
-
 
 OwnerDefaulted or GroupDefaulted control flag, so these are discarded. SDDL also doesn't support some ACE types, so I omitted those from Table 5-8.
 
@@ -926,7 +897,7 @@ Although PowerShell can perform these conversions for you, you'll find it valuab
 
 The best way to learn how to parse a binary structure is to write a parser, as we do in Listing 5-19.
 
-Security Descriptors  |   173
+Security Descriptors | 173
 
 ---
 
@@ -969,7 +940,7 @@ We now enter a loop to read the RIDs from the binary structure and append them t
 
 This listing gives you an example of how to manually parse a SID (or, in fact, any binary structure) using PowerShell. If you're adventurous, you could implement your own parser for the binary security descriptor
 
-174      Chapter 5
+174 Chapter 5
 
 ---
 
@@ -1038,7 +1009,7 @@ Next, we explored the use of the New-NtSecurityDescriptor and Add-NtSecurityDesc
 
 Finally, we covered the SDDL format used for representing security descriptors. We discussed how to represent the various types of security descriptor values, such as ACEs, and how you can write your own. Some tasks we haven't yet covered are how to query a security descriptor from a kernel object and how to assign a new one. We'll get to these topics in the next chapter.
 
-## 6    READING AND ASSIGNING SECURITY DESCRIPTORS
+## 6 READING AND ASSIGNING SECURITY DESCRIPTORS
 
 ![Figure](figures/WindowsSecurityInternals_page_207_figure_002.png)
 
@@ -1060,7 +1031,6 @@ Table 6-1: The SecurityInformation Flags and Their Required Access
 
 <table><tr><td>Flag name</td><td>Description</td><td>Location</td><td>Handle access required</td></tr><tr><td>Owner</td><td>Query the owner SID.</td><td>Owner</td><td>ReadControl</td></tr><tr><td>Group</td><td>Query the group SID.</td><td>Group</td><td>ReadControl</td></tr><tr><td>DACL</td><td>Query the DACL.</td><td>DACL</td><td>ReadControl</td></tr><tr><td>SACL</td><td>Query the SACL (auditing ACEs only).</td><td>SACL</td><td>AccessSystemSecurity</td></tr><tr><td>Label</td><td>Query the mandatory label.</td><td>SACL</td><td>ReadControl</td></tr><tr><td>Attribute</td><td>Query the system resource attribute.</td><td>SACL</td><td>ReadControl</td></tr><tr><td>Scope</td><td>Query the scoped policy ID.</td><td>SACL</td><td>ReadControl</td></tr><tr><td>ProcessTrustLabel</td><td>Query the process trust label.</td><td>SACL</td><td>ReadControl</td></tr><tr><td>AccessFilter</td><td>Query the access filter.</td><td>SACL</td><td>ReadControl</td></tr><tr><td>Backup</td><td>Query everything except the process trust label and access filter.</td><td>All</td><td>ReadControl and AccessSystemSecurity</td></tr></table>
 
-
 You only need ReadControl access to read most of this information, except for the auditing ACEs from the SACL, which require AccessSystem Security access. (Readcontrol access is sufficient for other ACEs stored in the SACL.)
 
 The only way to get AccessSystemSecurity access is to first enable the SeSecurityPrivilege privilege, then explicitly request the access when opening a kernel object. Listing 6-1 shows this behavior. You must run these commands as an administrator.
@@ -1077,7 +1047,7 @@ AccessSystemSecurity
 Listing 6-1: Requesting AccessSystemSecurity access and enabling SeSecurityPrivilege
 ```
 
-178    Chapter 6
+178 Chapter 6
 
 ---
 
@@ -1120,9 +1090,9 @@ In the output, you can see that only the One column contains valid information; 
 Reading a security descriptor is easy; you just need the correct access to a kernel resource and the ability to parse the relative security descriptor format returned from the NtQuerySecurityObject system call. Assigning a security descriptor is a more complex operation. The security descriptor assigned to a resource depends on multiple factors:
 
 - • Is the resource being created?
-• Did the creator specify a security descriptor during creation?
-• Is the new resource stored in a container, such as a directory or
-registry key?
+  • Did the creator specify a security descriptor during creation?
+  • Is the new resource stored in a container, such as a directory or
+  registry key?
 
 • Is the new resource a container or an object?
 • What control flags are set on the parent or current security descriptor?
@@ -1163,7 +1133,6 @@ Table 6-2: Example Parameters for a New Mutant Object
 
 <table><tr><td>Parameter</td><td>Setting value</td></tr><tr><td>Creator security descriptor</td><td>The value of the SecurityDescriptor field in the object attributes structure.</td></tr><tr><td>Parent security descriptor</td><td>The security descriptor of the parent Directory; not set for an unnamed Mutant.</td></tr><tr><td>Object type</td><td>Not set.</td></tr><tr><td>Container</td><td>Set to False, as a Mutant isn&#x27;t a container.</td></tr><tr><td>Auto-inherit</td><td>Set to AutoInheritDACL if the parent security descriptor&#x27;s control flags include the DacAutoInherited flag and the creator DACL is missing or there is no creator security descriptor; set to AutoInheritSACL if the parent security descriptor&#x27;s control flags include the SacAutoInherited flag and the creator SACL is missing or there is no creator security descriptor.</td></tr><tr><td>Token</td><td>If the caller is impersonating, set to an impersonation token; otherwise, set to the primary token of the caller&#x27;s process.</td></tr><tr><td>Generic mapping</td><td>Set to the generic mapping for the Mutant type.</td></tr></table>
 
-
 You might be wondering why the object type isn't set in Table 6-2. The API supports the parameter, but neither the object manager nor the I/O manager uses it. Its primary purpose is to let Active Directory control inheritance, so we'll discuss it separately in "Determining Object Inheritance" on page 203.
 
 Table 6-2 shows only two possible auto-inherit flags, but we can pass many others to the API. Table 6-3 lists the available auto-inherit flags, some of which we'll encounter in this chapter's examples.
@@ -1173,7 +1142,6 @@ Table 6-2 shows only two possible auto-inherit flags, but we can pass many other
 Table 6-3: The Auto-inherit Flags
 
 <table><tr><td>Flag name</td><td>Description</td></tr><tr><td>DaclAutoInherit</td><td>Auto-inherit the DACL.</td></tr><tr><td>SaclAutoInherit</td><td>Auto-inherit the SACL.</td></tr><tr><td>DefaultDescriptorForObject</td><td>Use the default security descriptor for the new security descriptor.</td></tr><tr><td>AvoidPrivilegeCheck</td><td>Don&#x27;t check for privileges when setting the mandatory label or SACL.</td></tr><tr><td>AvoidOwnerCheck</td><td>Avoid checking whether the owner is valid for the current token.</td></tr><tr><td>DefaultOwnerFromParent</td><td>Copy the owner SID from the parent security descriptor.</td></tr><tr><td>DefaultGroupFromParent</td><td>Copy the group SID from the parent security descriptor.</td></tr><tr><td>MaclNoWriteUp</td><td>Auto-inherit the mandatory label with the NoWriteUp policy.</td></tr><tr><td>MaclNoReadUp</td><td>Auto-inherit the mandatory label with the NoReadUp policy.</td></tr><tr><td>MaclNoExecuteUp</td><td>Auto-inherit the mandatory label with the NoExecuteUp policy.</td></tr><tr><td>AvoidOwnerRestriction</td><td>Ignore restrictions placed on the new DACL by the parent security descriptor.</td></tr><tr><td>ForceUserMode</td><td>Enforce all checks as if called from user mode (only applicable for kernel callers).</td></tr></table>
-
 
 The most important SeAssignSecurityX parameters to consider are the values assigned to the parent and creator security descriptors. Let's go through a few configurations of these two security descriptor parameters to understand the different outcomes.
 
@@ -1266,7 +1234,7 @@ You can set an arbitrary owner SID only when the token used to create the securi
 
 This is not to say that there's no way to set a different owner as a normal user. However, any method of setting an arbitrary owner that you discover is a security vulnerability that Microsoft will likely fix. An example of such a bug is CVE-2018-0748, which allowed users to set an arbitrary owner when creating a file. The user had to create the file via a local filesystem share, causing the owner check to be bypassed.
 
-184    Chapter 6
+184 Chapter 6
 
 ---
 
@@ -1348,7 +1316,6 @@ This call to New-NtSecurityDescriptor requires only the token and kernel object 
 
 But where did the DACL come from? We haven't specified either a parent or a creator security descriptor, so it couldn't have come from either of those. Instead, it's based on the Token object's default DACL, an ACL stored in the token that acts as a fallback when there is no other DACL specified. You can display a token's default DACL by passing the token to
 
-
 Format-NtToken with the DefaultDac1 parameter, as in Listing 6-9.
 
 ```bash
@@ -1362,7 +1329,7 @@ NT AUTHORITY$\LogonSessionId_1_37918: (Allowed)(None)(GenericExecute|GenericRead
 
 Listing 6-9: Displaying a token's default DACL
 
-186    Chapter 6
+186 Chapter 6
 
 ---
 
@@ -1494,7 +1461,6 @@ check for inheritance of the Owner or Group field in any new security descriptor
 
 The function then sets some optional security descriptor control flags. Normally, when we assign a security descriptor to a parent the generic access rights get mapped to type-specific access rights. Here, we use
 
-
 Edit-NtSecurityDescriptor with the MapGeneric parameter to do this mapping for us:
 
 In the Test-NewSD function, we create the parent security descriptor ❸ and calculate any auto-inherit flags ❹. Then we create a new security descriptor, setting the Container property if required, as well as the autoinherit flags we calculated ❹. You can specify a creator security descriptor for this function to use to create the new security descriptor. For now, we'll leave this value as $null, but we'll come back to it in the next section. Finally, we print the parent, the creator (if specified), and the new security descriptors to the console to verify the input and output ❸.
@@ -1563,7 +1529,6 @@ We can solve this access mask problem by specifying a generic access mask in the
 
 To resolve this issue, the ACE can set the InheritOnly flag. As a result, any generic access will remain untouched during the initial assignment.
 
-
 The InheritOnly flag marks the ACE for inheritance only, which prevents the generic access from being an issue for access checking. In Listing 6-17, we check this behavior by modifying the call to the test function.
 
 ```bash
@@ -1607,7 +1572,7 @@ Listing 6-18: Creating a new security descriptor with the ContainerInherit flag
 
 Here, we add the ContainerInherit and InheritOnly flags to the ACE and then pass the function the Container parameter . Unlike in the ObjectInherit case, we now end up with two ACEs in the DACL. The first ACE 2 grants access to the new resource based on the inheritable ACE. The second is a copy of the inheritable ACE, with GenericAll access.
 
-192    Chapter 6
+192 Chapter 6
 
 ---
 
@@ -1654,7 +1619,6 @@ Table 6-4: Parent ACE Flags and Flags Set on the Inherited ACEs
 
 <table><tr><td>Parent ACE flags</td><td>Non-container object</td><td>Container object</td></tr><tr><td>None</td><td>No inheritance</td><td>No inheritance</td></tr><tr><td>ObjectInherit</td><td>None</td><td>InheritOnly ObjectInherit</td></tr><tr><td>ContainerInherit</td><td>No inheritance</td><td>ContainerInherit</td></tr></table>
 
-
 (continued)
 
 ---
@@ -1662,7 +1626,6 @@ Table 6-4: Parent ACE Flags and Flags Set on the Inherited ACEs
 Table 6-4: Parent ACE Flags and Flags Set on the Inherited ACEs (continued)
 
 <table><tr><td>Parent ACE flags</td><td>Non-container object</td><td>Container object</td></tr><tr><td>ObjectInheritNoPropagateInherit</td><td>None</td><td>No inheritance</td></tr><tr><td>ContainerInheritNoPropagateInherit</td><td>No inheritance</td><td>None</td></tr><tr><td>ContainerInheritObjectInherit</td><td>None</td><td>ContainerInheritObjectInherit</td></tr><tr><td>ContainerInheritObjectInheritNoPropagateInherit</td><td>None</td><td>None</td></tr></table>
-
 
 Finally, consider auto-inherit flags. If you return to Table 6-3, you can see that if the DACL has the DacAutoInherited control flag set, the kernel will pass the DacAutoInherit flag to SeAssignSecurityEx, as there is no creator security descriptor. (The SACL has a corresponding SacAutoInherit flag, but we'll focus on the DACL here.) What does the DacAutoInherit flag do? In Listing 6-21, we perform a test to find out.
 
@@ -1688,7 +1651,7 @@ We set the parent security descriptor's control flags to contain the DaclAutoInh
 
 How do the auto-inherit flags differ from the inheritance flags we discussed earlier? Microsoft conserves both inheritance types for compatibility reasons (as it didn't introduce the Inherited flag until Windows 2000). From the kernel's perspective, the two types of inheritance are not very different other than determining whether the new security has the InclutoInherited flag set and whether any inherited ACE gets the Inherited flag. But from a user-mode perspective, this inheritance model indicates which parts of the DACL were inherited from a parent security descriptor. That's important.
 
-194    Chapter 6
+194 Chapter 6
 
 ---
 
@@ -1846,7 +1809,7 @@ We start by generating a creator security descriptor with the Dacl Protected fla
 
 What if we don't know whether the parent security descriptor will have inheritable ACES, and we don't want to end up with the default DACL? This might be important for permanent objects, such as files or keys, as the default DACL contains the ephemeral logon SID, which shouldn't really be
 
-198    Chapter 6
+198 Chapter 6
 
 ---
 
@@ -1854,9 +1817,7 @@ persisted to disk. After all, reusing the logon SID could end up granting access
 
 In this case, we can't set a DACL in the creator security descriptor; according to inheritance rules, this would overwrite any inherited ACEs.
 
-
 Instead, we can handle this scenario using the dacDefaulted security descriptor control flag, which indicates that the provided DACL is a default.
-
 
 Listing 6-27 demonstrates its use.
 
@@ -1907,9 +1868,7 @@ parent does contain inheritable ACEs, the inheritance process will overwrite the
 
 To implement similar behavior for the SACL, you can use the sacl
 
-
 Default control flag. However, tokens don't contain a default SACL, so
-
 
 this flag is somewhat less important.
 
@@ -1921,7 +1880,7 @@ One solution would be to remove all inheritable ACEs. As a result, the new direc
 
 To accommodate features such as shared directories, the inheritance implementation supports four special creator SIDs. When a security descriptor inherits an ACE with any of these SIDs, the inheritance implementation will replace the creator SID with a specific SID from the creator's token:
 
-CREATOR OWNER (5-1-3-0)  Replaced by the token's owner CREATOR GROUP (5-1-3-1)  Replaced by the token's primary group CREATOR OWNER SERVER (5-1-3-2)  Replaced by the server's owner CREATOR GROUP SERVER (5-1-3-3)  Replaced by the server's primary group
+CREATOR OWNER (5-1-3-0) Replaced by the token's owner CREATOR GROUP (5-1-3-1) Replaced by the token's primary group CREATOR OWNER SERVER (5-1-3-2) Replaced by the server's owner CREATOR GROUP SERVER (5-1-3-3) Replaced by the server's primary group
 
 We use the server SIDs only when creating a server security descriptor, which we'll discuss in “Server Security Descriptors and Compound ACEs” on page 213. The conversion from the creator SID to a specific SID is a oneway process: once the SID has been replaced, you can't tell it apart from a SID you set explicitly. However, if a container has inherited the ACE, it will keep the creator SID in the InheritOnly ACE. Listing 6-28 provides an example.
 
@@ -1937,7 +1896,7 @@ We use the server SIDs only when creating a server security descriptor, which we
 // CREATOR GROUP: (Allowed)(ContainerInherit, InheritOnly)(GenericRead)
 ```
 
-200    Chapter 6
+200 Chapter 6
 
 ---
 
@@ -1958,9 +1917,7 @@ We first add two ACEs with the CREATOR OWNER and CREATOR GROUPSIDs to a parent s
 
 As we've created the security descriptor for a container, we also see that there are two InheritOnly ACEs whose creator SID has not been changed.
 
-
 This behavior allows the creator SID to propagate to any future children.
-
 
 1
 
@@ -2025,7 +1982,7 @@ PS> $parent = New-NtSecurityDescriptor -Type Mutant
 
 Listing 6-31: Assigning a mandatory label from a parent security descriptor through inheritance
 
-202    Chapter 6
+202 Chapter 6
 
 ---
 
@@ -2038,7 +1995,6 @@ In the latest versions of Windows, only four types are registered to use these a
 Table 6-5: Types with Integrity Level Auto-inherit Flags Enabled
 
 <table><tr><td>Type name</td><td>Auto-inherit flags</td></tr><tr><td>Process</td><td>Mac1NoWriteUp, Mac1NoReadUp</td></tr><tr><td>Thread</td><td>Mac1NoWriteUp, Mac1NoReadUp</td></tr><tr><td>Job</td><td>Mac1NoWriteUp</td></tr><tr><td>Token</td><td>Mac1NoWriteUp</td></tr></table>
-
 
 We can test the behavior of these auto-inherit flags by specifying them when we create a security descriptor. In Listing 6-32, we specify the MacNoReadUp and MacNoWriteUp auto-inherit flags.
 
@@ -2069,7 +2025,6 @@ The SeAssignSecurityEx API uses the InheritedObjectType GUID in an ACE to calcul
 Table 6-6: Whether to Inherit the ACE Based on InheritedObjectType
 
 <table><tr><td>ObjectType parameter specified?</td><td>InheritedObjectType in ACE?</td><td>Inherited</td></tr><tr><td>No</td><td>No</td><td>Yes</td></tr><tr><td>No</td><td>Yes</td><td>No</td></tr><tr><td>Yes</td><td>No</td><td>Yes</td></tr><tr><td>Yes</td><td>Yes (and the values match)</td><td>Yes</td></tr><tr><td>Yes</td><td>Yes (and the values don’t match)</td><td>No</td></tr></table>
-
 
 I've bolded the cases in Table 6-6 where inheritance doesn't happen. Note that this doesn't supersede any other inheritance decision: the ACE must have the ObjectInherit and/or ContainerInherit flag set to be considered for inheritance.
 
@@ -2121,7 +2076,6 @@ Table 6-7: SecurityInformation Flags and Required Access for Security Descriptor
 
 <table><tr><td>Flag name</td><td>Description</td><td>Location</td><td>Handle access required</td></tr><tr><td>Owner</td><td>Set the owner SID.</td><td>Owner</td><td>WriteOwner</td></tr><tr><td>Group</td><td>Set the group SID.</td><td>Group</td><td>WriteOwner</td></tr><tr><td>DACL</td><td>Set the DACL.</td><td>DACL</td><td>WriteDac</td></tr><tr><td>SACL</td><td>Set the SACL (for auditing ACEs only).</td><td>SACL</td><td>AccessSystemSecurity</td></tr><tr><td>Label</td><td>Set the mandatory label.</td><td>SACL</td><td>WriteOwner</td></tr><tr><td>Attribute</td><td>Set a system resource attribute.</td><td>SACL</td><td>WriteDac</td></tr></table>
 
-
 (continued)
 
 Reading and Assigning Security Descriptors | 205
@@ -2131,7 +2085,6 @@ Reading and Assigning Security Descriptors | 205
 Table 6-7: SecurityInformation Flags and Required Access for Security Descriptor Creation [continued]
 
 <table><tr><td>Flag name</td><td>Description</td><td>Location</td><td>Handle access required</td></tr><tr><td>Scope</td><td>Set a scoped policy ID.</td><td>SACL</td><td>AccessSystemSecurity</td></tr><tr><td>ProcessTrustLabel</td><td>Set the process trust label.</td><td>SACL</td><td>WriteDac</td></tr><tr><td>AccessFilter</td><td>Set an access filter.</td><td>SACL</td><td>WriteDac</td></tr><tr><td>Backup</td><td>Set everything except the process trust label and access filter.</td><td>All</td><td>WriteDac, WriteOwner, and AccessSystemSecurity</td></tr></table>
-
 
 You might notice that the handle access required for setting this information is more complex than the access needed to merely query it (covered in Table 6-1), as it is split across three access rights instead of two. Rather than trying to memorize these access rights, you can retrieve them using the Get-NtAccessMask PowerShell command, specifying the parts of the security descriptor you want to set with the SecurityInformation parameter, as shown in Listing 6-34.
 
@@ -2201,7 +2154,7 @@ PS> Set-NSecurityDescriptor -Path "$BaseNamedObjects\ABC"
 
 Note the "try to," even if you can open a resource with the required access to set a security descriptor component, such as #time@mer access, this doesn't mean the kernel will let you do it. The same rules regarding owner SIDs and mandatory labels apply here as when assigning a security descriptor at creation time.
 
-The SetSecurityDescriptorInfoEx API enforces these rules. If no object security descriptor is specified, then the API returns the STATUS_NO_SECURITY _ON_OBJECT status code. Therefore, you can't set the security descriptor for a type with SecurityRequired set to False; that object won't have a security descriptor, so any attempt to modify it causes the error.
+The SetSecurityDescriptorInfoEx API enforces these rules. If no object security descriptor is specified, then the API returns the STATUS_NO_SECURITY \_ON_OBJECT status code. Therefore, you can't set the security descriptor for a type with SecurityRequired set to False; that object won't have a security descriptor, so any attempt to modify it causes the error.
 
 Reading and Assigning Security Descriptors 207
 
@@ -2291,7 +2244,7 @@ Because SetNamedSecurityInfo always uses auto-inheritance, applying a protected 
 
 Oddly, the API doesn't allow you to specify theaclProtected and SaclProtected control flags directly in the security descriptor. Instead, it introduces some additional SecurityInformation flags to handle setting and unsetting the control flags. To set a protected security descriptor control flag, you can use the ProtectedAcl and ProtectedSacI flags for SecurityInformation. To unset a flag, use UnprotectedAcl and UnprotectedSacI. Listing 6-38 provides examples of setting and unsetting the protected control flag for the DACL.
 
-210    Chapter 6
+210 Chapter 6
 
 ---
 
@@ -2380,7 +2333,7 @@ NT AUTHORITYANONYMOUS LOGON GenericAll
 GenericAll
 ```
 
-212    Chapter 6
+212 Chapter 6
 
 ---
 
@@ -2453,14 +2406,13 @@ If the ServerSecurity control flag is set on the creator security descriptor and
 
 Inheritance is a very important topic to understand. Table 6-8 summarizes the ACL inheritance rules we've discussed in this chapter, to help you make sense of them.
 
-214   Chapter 6
+214 Chapter 6
 
 ---
 
 Table 6-8: Summary of Inheritance Rules for the DACL
 
 <table><tr><td>Parent ACL</td><td>Creator ACL</td><td>Auto-inherit set</td><td>Auto-inherit not set</td></tr><tr><td>None</td><td>None</td><td>Default</td><td>Default</td></tr><tr><td>None</td><td>Present</td><td>Creator</td><td>Creator</td></tr><tr><td>Non-inheritable</td><td>None</td><td>Default</td><td>Default</td></tr><tr><td>Inheritable</td><td>None</td><td>Parent</td><td>Parent</td></tr><tr><td>Non-inheritable</td><td>Present</td><td>Creator</td><td>Creator</td></tr><tr><td>Inheritable</td><td>Present</td><td>Parent and creator</td><td>Creator</td></tr><tr><td>Non-inheritable</td><td>Protected</td><td>Creator</td><td>Creator</td></tr><tr><td>Inheritable</td><td>Protected</td><td>Creator</td><td>Creator</td></tr><tr><td>Non-inheritable</td><td>Defaulted</td><td>Creator</td><td>Creator</td></tr><tr><td>Inheritable</td><td>Defaulted</td><td>Parent</td><td>Parent</td></tr></table>
-
 
 The first two columns in this table describe the state of the parent ACL and the creator ACL; the last two describe the resulting ACL, depending on whether the BacIAutoInherit and/or SaclAutoInherit flag was set. There are six ACL types to consider:
 
@@ -2480,14 +2432,13 @@ Additionally, there are four possible resulting ACLs:
 
 Default The default DACL from the token, or nothing in the case of a SACL
 
-Creator    All ACEs from the creator ACL
+Creator All ACEs from the creator ACL
 
 Parent The inheritable ACEs from the parent ACL
 
 Parent and creator The inheritable ACEs from the parent and explicit ACEs from the creator
 
 When an auto-inherit flag is set, the new security descriptor will have the corresponding DacAutoInherited or SazAutoInherited control flag set.
-
 
 Also, all ACEs that were inherited from the parent ACL will have the Inherited ACE flag set. Note that this table doesn't consider the behavioral changes due to object ACEs, mandatory labels, server security, and creator SIDs, which add more complexity.
 
@@ -2619,7 +2570,7 @@ $_.Owner.Sid.Name
 BUILTIN\Administrators
 ```
 
-218   Chapter 6
+218 Chapter 6
 
 ---
 

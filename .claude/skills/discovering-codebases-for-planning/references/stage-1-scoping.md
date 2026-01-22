@@ -10,18 +10,20 @@
 
 ## Input Requirements
 
-| Input               | Source                     | Required? |
-| ------------------- | -------------------------- | --------- |
-| `design.md`         | Phase 1 (Brainstorming/Design) | Yes       |
-| `scope_paths`       | Orchestrator configuration | Yes       |
-| `OUTPUT_DIR`        | persisting-agent-outputs   | Yes       |
+| Input         | Source                         | Required? |
+| ------------- | ------------------------------ | --------- |
+| `design.md`   | Phase 1 (Brainstorming/Design) | Yes       |
+| `scope_paths` | Orchestrator configuration     | Yes       |
+| `OUTPUT_DIR`  | persisting-agent-outputs       | Yes       |
 
 **design.md** must contain:
+
 - Feature requirements (what we're building)
 - Components mentioned (metrics, authentication, etc.)
 - User stories or acceptance criteria
 
 **scope_paths** examples:
+
 - `modules/chariot/ui/src/` (frontend scope)
 - `modules/chariot/backend/pkg/` (backend scope)
 - `modules/janus/` (framework scope)
@@ -42,6 +44,7 @@ cat $OUTPUT_DIR/design/design.md
 ```
 
 **Extract**:
+
 - Feature name (e.g., "Metrics Dashboard")
 - Key components mentioned (e.g., "metrics", "dashboard", "charts")
 - Technical stack (React? Go? Both?)
@@ -50,6 +53,7 @@ cat $OUTPUT_DIR/design/design.md
 **Output**: `feature_context` string (2-3 sentences summarizing requirements)
 
 **Example**:
+
 ```
 "Building metrics dashboard in React UI to display vulnerability trends.
 Requires backend API for metrics aggregation and frontend components for charts."
@@ -70,6 +74,7 @@ find modules/chariot/backend/pkg -type d -maxdepth 2
 ```
 
 **Candidate filtering**:
+
 - Ignore: `node_modules/`, `dist/`, `build/`, `.git/`, `test/`, `__tests__/`
 - Include: `features/`, `components/`, `hooks/`, `utils/`, `pkg/`, `handlers/`
 
@@ -114,11 +119,13 @@ FOR each candidate_path:
 ```
 
 **Feature keyword extraction**:
+
 - Extract nouns from feature_context (e.g., "metrics", "dashboard", "vulnerability")
 - Convert to lowercase
 - Match against path segments
 
 **Example**:
+
 ```
 Feature: "Metrics Dashboard"
 Keywords: ["metrics", "dashboard", "chart"]
@@ -148,6 +155,7 @@ find $component_path -type f \
 ```
 
 **Thresholds**:
+
 - **< 5 files**: Very small, group with another component
 - **5-50 files**: Standard, 1 agent
 - **50-200 files**: Large, 1 agent (very thorough mode)
@@ -182,6 +190,7 @@ else:
 ```
 
 **Why max 10 agents?**
+
 - Claude Code Task tool handles up to 10 parallel agents efficiently
 - Beyond 10, coordination overhead outweighs parallelization gains
 - Grouping small components (<10 files each) into 1 agent is more efficient than spawning 15 agents

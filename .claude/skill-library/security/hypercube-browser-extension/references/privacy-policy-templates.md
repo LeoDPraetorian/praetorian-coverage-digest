@@ -18,6 +18,7 @@ Last Updated: [Date]
 [Extension Name] does NOT collect, store, or transmit any personal data.
 
 Specifically, we do not:
+
 - Track your browsing history
 - Collect personal information
 - Store visited URLs
@@ -28,6 +29,7 @@ Specifically, we do not:
 ## 2. How the Extension Works
 
 [Extension Name] operates entirely locally within your browser:
+
 - All processing happens on your device
 - No data leaves your computer
 - Extension functions using local algorithms only
@@ -46,6 +48,7 @@ IMPORTANT: Although we request access to [cookies/web requests/etc.], we do NOT 
 ## 4. Updates
 
 Extension updates are delivered via Chrome Web Store. Updates may include:
+
 - New threat detection patterns
 - Bug fixes
 - Performance improvements
@@ -55,6 +58,7 @@ Updates NEVER add data collection mechanisms.
 ## 5. Data Storage
 
 Any data stored remains local:
+
 - **chrome.storage.local**: User preferences only
 - No cloud synchronization
 - No external databases
@@ -63,6 +67,7 @@ Any data stored remains local:
 ## 6. Your Rights
 
 Under GDPR and CCPA:
+
 - **No data collection** = no data access/modification/deletion needed
 - Privacy by design approach
 - No consent required (no data processing)
@@ -85,10 +90,12 @@ For privacy questions: privacy@[your-domain].com
 **Emphasis**: "Threat detection happens locally, no data transmitted"
 
 **Key additions:**
+
 ```markdown
 ## Threat Detection
 
 Our security algorithms run entirely in your browser:
+
 - Analyze URLs against local threat database
 - Compare cookies to known typosquatting patterns
 - All analysis happens on-device
@@ -97,6 +104,7 @@ Our security algorithms run entirely in your browser:
 ## Threat Database Updates
 
 We update threat signatures through Chrome Web Store:
+
 - One-way communication (downloading only)
 - No user data in update requests
 - Updates delivered via HTTPS
@@ -108,10 +116,12 @@ We update threat signatures through Chrome Web Store:
 **Emphasis**: "No logging, true privacy-first architecture"
 
 **Key additions:**
+
 ```markdown
 ## No-Logging Policy
 
 We do NOT log:
+
 - Connection timestamps
 - IP addresses (original or proxied)
 - Websites visited through our service
@@ -121,6 +131,7 @@ We do NOT log:
 ## Encryption
 
 Traffic routing uses:
+
 - End-to-end encryption
 - No plaintext storage
 - Ephemeral session keys
@@ -132,10 +143,12 @@ Traffic routing uses:
 **Emphasis**: "Meeting enhancement happens locally"
 
 **Key additions:**
+
 ```markdown
 ## Meeting Detection
 
 We detect meetings via:
+
 - URL pattern matching (local only)
 - No meeting content access
 - No audio/video recording
@@ -144,6 +157,7 @@ We detect meetings via:
 ## Platform Compatibility
 
 Works with multiple platforms:
+
 - Automatic detection of Zoom, Teams, Meet, etc.
 - No data shared between platforms
 - Each session isolated
@@ -159,6 +173,7 @@ Works with multiple platforms:
 **Why We Need <all_urls> Access:**
 
 We request access to all websites to [provide protection/privacy/functionality] universally. However:
+
 - We do NOT track which sites you visit
 - We do NOT collect URLs
 - All analysis happens locally
@@ -173,6 +188,7 @@ This permission is necessary because [threats/features/functionality] can appear
 **Why We Need webRequest Access:**
 
 We inspect network requests to [detect threats/optimize connections/enhance features]:
+
 - Inspection happens in real-time in your browser
 - No request data is stored
 - No request data is transmitted to servers
@@ -185,6 +201,7 @@ We inspect network requests to [detect threats/optimize connections/enhance feat
 **Why We Need Cookies Access:**
 
 We access cookies to [detect typosquatting/manage sessions/provide functionality]:
+
 - Cookies are analyzed locally only
 - We do NOT collect or store cookie data
 - We do NOT transmit cookies to servers
@@ -209,6 +226,7 @@ As we collect no data, there is no data controller.
 ### Your Rights
 
 Under GDPR, you have rights to:
+
 - Access your data (none collected)
 - Rectify your data (none collected)
 - Erase your data (none collected)
@@ -239,6 +257,7 @@ We do not sell personal information.
 ### Your Rights
 
 California residents have rights to:
+
 - Know what personal information is collected (none)
 - Delete personal information (none collected)
 - Opt-out of sale (no sale occurs)
@@ -250,33 +269,47 @@ California residents have rights to:
 ## Hosting Requirements
 
 **Chrome Store requires:**
+
 - Privacy policy hosted on domain you control
 - Publicly accessible URL
 - Not a PDF (must be HTML page)
 - Remains accessible after extension submission
 
 **Quick hosting options:**
+
 - GitHub Pages (free)
 - Your engagement infrastructure
 - Firebase Hosting (same Firebase project)
 - Netlify/Vercel (free tier)
 
 **Example HTML:**
+
 ```html
 <!DOCTYPE html>
 <html>
-<head>
+  <head>
     <title>Privacy Policy - [Extension Name]</title>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <style>
-        body { font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; line-height: 1.6; }
-        h1 { color: #333; }
-        h2 { color: #555; margin-top: 30px; }
+      body {
+        font-family: Arial, sans-serif;
+        max-width: 800px;
+        margin: 50px auto;
+        padding: 20px;
+        line-height: 1.6;
+      }
+      h1 {
+        color: #333;
+      }
+      h2 {
+        color: #555;
+        margin-top: 30px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <!-- Privacy policy content here -->
-</body>
+  </body>
 </html>
 ```
 
@@ -285,6 +318,7 @@ California residents have rights to:
 ## AI-Generated Privacy Policies
 
 **Prompt:**
+
 ```
 Generate a privacy policy for a Chrome extension that:
 - Extension name: [name]

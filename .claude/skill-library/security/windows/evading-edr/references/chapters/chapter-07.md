@@ -32,7 +32,7 @@ This is where an endpoint-based traffic-monitoring sensor comes into play. By de
 
 Figure 7-2: Endpoint network monitoring
 
-124      Chapter 7
+124 Chapter 7
 
 ---
 
@@ -44,7 +44,7 @@ The host-based sensor can get data related to the originating process, user cont
 
 There are many types of network drivers, most of which are backed by the Network Driver Interface Specification (NDIS). NDIS is a library that abstracts a device's network hardware. It also defines a standard interface between layered network drivers (those operating at different network layers and levels of the operating system) and maintains state information. NDIS supports four types of drivers:
 
-Miniport   Manages a network interface card, such as by sending and receiving data. This is the lowest level of NDIS drivers.
+Miniport Manages a network interface card, such as by sending and receiving data. This is the lowest level of NDIS drivers.
 
 Protocol Implements a transport protocol stack, such as TCP/IP. This is the highest level of NDIS drivers.
 
@@ -96,7 +96,7 @@ You might be wondering how the filter engine knows the order in which to evaluat
 
 During filter arbitration, filters evaluate the data passed from the packet from highest to lowest priority to determine what to do with the packet. Each filter contains conditions and an action, just like common firewall rules (for example, “if the destination port is 4444, block the packet” or “if the application is edge.exe, allow the packet”). The basic actions a filter can return are Block and Permit , but three other supported actions pass
 
-Network Filter Drivers  |  127
+Network Filter Drivers | 127
 
 ---
 
@@ -184,7 +184,7 @@ typedef struct FWPM_CALLOUT0 {
 
 Listing 7-4: The FWPM_CALLOUT structure definition
 
-This structure contains data about the callout, such as its optional friendly name and description in its displayData member, as well as the layers to which the callout should be assigned (for example, FWHM_LAYER_STREAM _v4 for IPv4 streams). Microsoft documents dozens of filter layer identifiers, each of which usually has IPv4 and IPv6 variants. When the function used by the driver to add its callout completes, it returns a runtime identifier for the callout that is preserved for use during unloading.
+This structure contains data about the callout, such as its optional friendly name and description in its displayData member, as well as the layers to which the callout should be assigned (for example, FWHM_LAYER_STREAM \_v4 for IPv4 streams). Microsoft documents dozens of filter layer identifiers, each of which usually has IPv4 and IPv6 variants. When the function used by the driver to add its callout completes, it returns a runtime identifier for the callout that is preserved for use during unloading.
 
 Unlike filter layers, a developer may add their own sublayers to the system. In those cases, the driver will call fWpuCInt( FWpmSublayerAdd(), which receives the engine handle, a pointer to an FWPM_SUBLAYER structure, and an optional security descriptor. The structure passed as input includes the sublayer key, a GUID to uniquely identify the sublayer, an optional friendly name and description, an optional flag to ensure that the sublayer persists between reboots, the sublayer weight, and other members that contain the state associated with a sublayer.
 
@@ -240,13 +240,11 @@ The first member, fieldKey, indicates the attribute to evaluate. Each filtering 
 
 The matchType member specifies the type of match to be performed.
 
-
 These comparison types are defined in the FHP_MATCH_TYPE enumeration
-
 
 shown in Listing 7-7 and can match strings, integers, ranges, and other data types.
 
-Network Filter Drivers  131
+Network Filter Drivers 131
 
 ---
 
@@ -304,7 +302,7 @@ typedef struct FWP_CONDITION_VALUE0_ {
 
 Listing 7-8: The FWP_CONDITION_VALUE structure definition
 
-132   Chapter 7
+132 Chapter 7
 
 ---
 
@@ -326,14 +324,13 @@ What if our driver has filters to, say, both permit traffic on TCP port 1080 and
 
 In addition to assigning the weight, we need to assign the filter to a sublayer so that it is evaluated at the correct time. We do this by specifying a GUID in the 1ayerKey member of the structure. If we created our own sublayer, we would specify its GUID here. Otherwise, we'd use one of the default sublayer GUIDs listed in Table 7-1.
 
-Network Filter Drivers   133
+Network Filter Drivers 133
 
 ---
 
 Table 7-1: Default Sublayer GUIDs
 
 <table><tr><td>Filter sublayer identifier</td><td>Filter type</td></tr><tr><td>FWPM_SUBLAYER_EDGE_TRAVERSAL (BA69DC66-5176-4979-9389-26AB746A8327)</td><td>Edge traversal</td></tr><tr><td>FWPM_SUBLAYER_INSPECTION (877519E1-E6A9-41A5-8184-8C4F118EAAG0)</td><td>Inspection</td></tr><tr><td>FWPM_SUBLAYER_IPSEC_DOSP (E076D572-5D30-48EF-8028-90E9EDB0988D)</td><td>IPsec denial-of-service (DoS) protection</td></tr><tr><td>FWPM_SUBLAYER_IPSEC_FORWARD_OUTBOUND_TUNNEL (45082E73-8F71-4559-8A9A-101CEA04EF97)</td><td>IPsec forward outbound tunnel</td></tr><tr><td>FWPM_SUBLAYER_IPSEC_TUNNEL (33F299ED-9FF4-4967-AF7A-305F4DA827)</td><td>IPsec tunnel</td></tr><tr><td>FWPM_SUBLAYER_LIPS (1B75CCFE-FF60-4711-A70F-B4958C3B2D0)</td><td>Legacy IPsec filters</td></tr><tr><td>FWPM_SUBLAYER_RPC_AUDIT (758CB4FA-FB48-4DE9-9AE8-3ED9551A81FD)</td><td>Remote procedure call (RPC) audit</td></tr><tr><td>FWPM_SUBLAYER_SECURE_SOCKET (15A66E17-3F3C-47f7-A86AC-812AA613DDB2)</td><td>Secure socket</td></tr><tr><td>FWPM_SUBLAYER_TCP_CHIMNEY_OFFLOAD (337608B9-B7D5-4D5F-82F9-36186188C058)</td><td>TCP Chimney Offload</td></tr><tr><td>FWPM_SUBLAYER_TCP_TEMPLATES (24421DCF-0AC5-4CAA-9E14-50F6E366AF0)</td><td>TCP template</td></tr><tr><td>FWPM_SUBLAYER_UNIVERSAL (EEEBEC03-CED4-4380-819A-27349762B74)</td><td>Those not assigned to any other sublayers</td></tr></table>
-
 
 Note that the FWHM_SUBLAYER_IPEC_SECURITY_REAL sublayer identifier is defined in the fwhm_uh header but is undocumented.
 
@@ -389,7 +386,7 @@ Network Filter Drivers 135
 
 ---
 
-The second member contains the number of entries in the array pointed to by the third parameter, incomingValue . This is an array of FWPS _INCOMING_VALUE structures containing the data that the filter engine passes to the callout. Each structure in the array has only an FWPS_VALUE structure, shown in Listing 7-11, that describes the type and value of the data.
+The second member contains the number of entries in the array pointed to by the third parameter, incomingValue . This is an array of FWPS \_INCOMING_VALUE structures containing the data that the filter engine passes to the callout. Each structure in the array has only an FWPS_VALUE structure, shown in Listing 7-11, that describes the type and value of the data.
 
 ```bash
 typedef struct FWP_VALUE0_ {
@@ -419,7 +416,7 @@ typedef struct FWP_VALUE0_ {
 
 Listing 7-11: The FWP_VALUE structure definition
 
-To access the data inside the array, the driver needs to know the index at which the data resides. This index varies based on the layer identifier being processed. For instance, if the layer is FWPS_LAYER_OUTBOUND_IPACKET_V4, the driver would access fields based on their index in the FWPS_FIELDS _OUTBOUND_IPACKET_V4 enumeration, defined in Listing 7-12.
+To access the data inside the array, the driver needs to know the index at which the data resides. This index varies based on the layer identifier being processed. For instance, if the layer is FWPS_LAYER_OUTBOUND_IPACKET_V4, the driver would access fields based on their index in the FWPS_FIELDS \_OUTBOUND_IPACKET_V4 enumeration, defined in Listing 7-12.
 
 ```bash
 typedef enum FWPS_FIELDS_OUTBOUND_IPACKET_V4 {
@@ -439,7 +436,7 @@ typedef enum FWPS_FIELDS_OUTBOUND_IPACKET_V4 {
 
 Listing 7-12: The FWPS_FIELDS_OUTBOUND_IPPACKET_V4 enumeration.
 
-136    Chapter 7
+136 Chapter 7
 
 ---
 
@@ -458,7 +455,7 @@ Listing 7-13: Accessing the remote IP address in the incoming values
 
 In this example, the EDR driver extracts the IP address by referencing the unsigned 32-bit integer ( uint32) value at the index FAPS_FIELD_OUTBOUND
 
-_1PPACKET_V4_IP_REMOTE_ADDRESS in the incoming values.
+\_1PPACKET_V4_IP_REMOTE_ADDRESS in the incoming values.
 
 ## The Metadata
 
@@ -529,28 +526,27 @@ Note that not all values in this structure will be populated. To see which value
 
 After the metadata, the classify function receives information about the layer being filtered and the conditions under which the callout is invoked. For example, if the data originates from the stream layer, the parameter will point to an FPWS_STREAM_CALLOUT_10_PACKAGETO structure. This layer data contains a pointer to an FPWS_STREAM_DATA0 structure, which contains flags that encode the characteristics of the stream (for example, whether it is inbound or outbound, whether it is high priority, and whether the network stack will pass the FIN flag in the final packet). It will also contain the offset to the stream, the size of its data in the stream, and a pointer to a NET_BUFFER_LIST that describes the current portion of the stream.
 
-This buffer list is a linked list of NET_BUFFER structures. Each structure in the list contains a chain of memory descriptor lists used to hold the data sent or received over the network. Note that if the request didn't originate from the stream layer, the layerData parameter will point only to a NET_BUFFER _LIST, assuming it is not null.
+This buffer list is a linked list of NET_BUFFER structures. Each structure in the list contains a chain of memory descriptor lists used to hold the data sent or received over the network. Note that if the request didn't originate from the stream layer, the layerData parameter will point only to a NET_BUFFER \_LIST, assuming it is not null.
 
 The layer data structure also contains a streamAction member, which is
 
-
 an FWPS_STREAM_ACTION_TYPE value describing an action that the callout recommends the stream-layer shim take. These include:
 
-138    Chapter 7
+138 Chapter 7
 
 ---
 
 - • Doing nothing (FWPS_STREAM_ACTION_NONE).
-• Allowing all future data segments in the flow to continue without
-inspection (FWPS_STREAM_ACTION_ALLOW_CONNECTION).
-• Requesting more data. If this is set, the callout must populate the
-countBytesRequired member with the number of bytes of stream data
-required (FWPS_STREAM_ACTION_NEED_MORE_DATA).
-• Dropping the connection (FWPS_STREAM_ACTION_DROP_CONNECTION).
-• Deferring processing until fwpcIncl(FlagsStreamContinue()) is called.
-This is used for flow control, to slow down the rate of incoming data
-(FWPS_STREAM_ACTION_DEFER).
-Don't confuse this streamAction member with the classifyNot parameter passed to the classify function to indicate the result of the filtering operation.
+  • Allowing all future data segments in the flow to continue without
+  inspection (FWPS_STREAM_ACTION_ALLOW_CONNECTION).
+  • Requesting more data. If this is set, the callout must populate the
+  countBytesRequired member with the number of bytes of stream data
+  required (FWPS_STREAM_ACTION_NEED_MORE_DATA).
+  • Dropping the connection (FWPS_STREAM_ACTION_DROP_CONNECTION).
+  • Deferring processing until fwpcIncl(FlagsStreamContinue()) is called.
+  This is used for flow control, to slow down the rate of incoming data
+  (FWPS_STREAM_ACTION_DEFER).
+  Don't confuse this streamAction member with the classifyNot parameter passed to the classify function to indicate the result of the filtering operation.
 
 ## Evading Network Filters
 
@@ -676,7 +672,7 @@ Listing 7-18: Using NiObjectManager to inspect WFP filters
 
 This information helps us determine the type of traffic being inspected, as it includes the layer for which the callout is registered; a description that could make understanding the purpose of the callout more easily identifiable; and the security descriptor, which can be audited to find any potential misconfigurations that would grant excessive control over it. But it still doesn't tell us exactly what the driver is looking for. No two EDR vendors will
 
-Network Filter Drivers  |   141
+Network Filter Drivers | 141
 
 ---
 
@@ -697,4 +693,3 @@ In summary, evading WFP filters is a lot like evading traditional firewalls: we 
 Network filter drivers have the capability to allow, deny, or inspect network traffic on the host. Most relevant to EDR is the inspection function facilitated by these drivers' callouts. When an attacker activity involves the network stack, such as command-and-control agent beaconing and lateral movement, a network filter driver sitting inline of the traffic can pick out indicators of it. Evading these callouts requires understanding the types of traffic they wish to inspect and then identifying gaps in coverage, not dissimilar to a standard firewall rule audit.
 
 ---
-

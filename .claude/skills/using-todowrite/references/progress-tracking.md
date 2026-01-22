@@ -148,7 +148,7 @@ User experience: "I can see exactly what Claude is doing"
 
 | Workflow Type          | TodoWrite Frequency                    |
 | ---------------------- | -------------------------------------- |
-| Simple (≥3 steps)      | Every task completion                  |
+| Simple (≥2 steps)      | Every task completion                  |
 | Medium (5-10 tasks)    | Every 1-2 minutes                      |
 | Complex (10+ tasks)    | Every task start/end + every 5 minutes |
 | Long-running (>30 min) | Every 2-3 minutes minimum              |

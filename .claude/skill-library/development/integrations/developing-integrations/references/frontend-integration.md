@@ -8,9 +8,51 @@
 
 Backend integrations are surfaced in the Chariot UI through:
 
-1. **Enum definition** in TypeScript types
+1. **Integration definition** - TypeScript definition file with form configuration
 2. **Integration logos** (dark mode and light mode)
-3. **Integration card** in the integrations list
+3. **Dynamic form rendering** via IntegrationForm.tsx
+
+**Note**: As of 2026, the Chariot UI uses a **registry-based dynamic form system** instead of hardcoded integration cards. Integration definitions live in `modules/chariot/ui/src/features/integrations/definitions/`.
+
+---
+
+## Current Architecture (2026)
+
+### Directory Structure
+
+```
+modules/chariot/ui/src/features/integrations/
+├── IntegrationForm.tsx              # Dynamic form renderer
+├── IntegrationSetupModal.tsx        # Modal wrapper
+├── utils/
+│   ├── IntegrationRegistry.ts       # Singleton registry
+│   └── fieldBuilders.ts             # 13 factory functions for form fields
+└── definitions/
+    ├── cloud/
+    │   ├── aws.integration.ts
+    │   ├── azure.integration.ts
+    │   └── gcp.integration.ts
+    ├── security/
+    │   ├── wiz.integration.ts
+    │   ├── crowdstrike.integration.ts
+    │   └── qualys.integration.ts
+    └── scm/
+        ├── github.integration.ts
+        └── gitlab.integration.ts
+```
+
+### Legacy Paths (Pre-2026 - DEPRECATED)
+
+**DO NOT use these paths anymore:**
+
+- ❌ `modules/chariot/ui/src/hooks/useIntegration.tsx` (deprecated)
+- ❌ `modules/chariot/ui/src/types.ts` - `IntegrationName` enum (deprecated for form system)
+
+**New integrations should:**
+
+- ✅ Create definition file in `definitions/{category}/{service}.integration.ts`
+- ✅ Use `IntegrationRegistry.register()` for auto-discovery
+- ✅ Use field builders from `utils/fieldBuilders.ts`
 
 **All three components are required** for the integration to appear in the UI.
 
@@ -118,6 +160,62 @@ const integrationConfigs = {
 - `checkbox` - Boolean toggle
 - `url` - URL input with validation
 
+### Validation Settings
+
+**CRITICAL**: The `linkOnValidateFailure` setting controls credential validation enforcement.
+
+```typescript
+{
+  validate: true,                   // ✅ Enable credential validation
+  linkOnValidateFailure: false,     // ✅ DEFAULT - Reject invalid credentials
+  // OR
+  linkOnValidateFailure: true,      // ⚠️ DANGER - Allow invalid credentials
+}
+```
+
+**Default Behavior (Recommended)**:
+
+- `validate: true` - Calls backend `ValidateCredentials()` method
+- `linkOnValidateFailure: false` (or omitted) - Rejects integration if validation fails
+- User sees error message, integration NOT linked
+
+**Bypass Behavior (Use Sparingly)**:
+
+- `linkOnValidateFailure: true` - Links integration even if `ValidateCredentials()` fails
+- User sees warning but integration IS linked anyway
+- **Security risk**: Invalid credentials accepted, integration may fail at runtime
+
+**When to Use `linkOnValidateFailure: true`**:
+
+1. ✅ Testing/development environments where validation endpoint is unavailable
+2. ✅ Staged rollout where backend is deployed before validation endpoint exists
+3. ✅ Degraded mode where service is down but customers need to link integrations
+4. ❌ **NEVER in production for new integrations**
+
+**Example - Standard Integration (Most Cases)**:
+
+```typescript
+shodan: {
+  name: 'Shodan',
+  validate: true,
+  // linkOnValidateFailure: omitted (defaults to false)
+  inputs: [...]
+}
+```
+
+**Example - Bypass Mode (Rare)**:
+
+```typescript
+fastly: {
+  name: 'Fastly',
+  validate: true,
+  linkOnValidateFailure: true,  // ⚠️ Documented exception
+  inputs: [...],
+  // Document why bypass is needed:
+  // "Fastly validation requires global scope which not all customers have"
+}
+```
+
 ---
 
 ## Step 4: Verification
@@ -222,7 +320,11 @@ Before submitting PR:
 - [ ] Light mode logo added (`icons/light/{name}.svg`)
 - [ ] Integration config added to `useIntegration.tsx`
 - [ ] Config fields match backend struct (JSON tags)
+- [ ] **`linkOnValidateFailure` is NOT set (unless explicitly documented exception)**
+- [ ] `validate: true` is set to enable credential validation
 - [ ] Manual testing: integration appears and configures correctly
+- [ ] Manual testing: **invalid credentials are rejected** (validation works)
+- [ ] Manual testing: valid credentials are accepted
 - [ ] UI renders in both dark and light themes
 - [ ] E2E tests pass (if integration flow is testable)
 

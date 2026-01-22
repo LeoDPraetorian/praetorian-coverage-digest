@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/chariot",
+  "version": "1.0.0",
+  "description": "Chariot platform graph database queries and direct API access",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

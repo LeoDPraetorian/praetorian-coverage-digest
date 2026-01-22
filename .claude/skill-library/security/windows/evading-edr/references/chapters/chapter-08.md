@@ -1,4 +1,4 @@
-## 8  EVENT TRACING FOR WINDOWS
+## 8 EVENT TRACING FOR WINDOWS
 
 ![Figure](figures/EvadingEDR_page_169_figure_001.png)
 
@@ -28,13 +28,11 @@ Table 8-1: Default ETW Providers Relevant to Security Monitoring
 
 <table><tr><td>Provider name</td><td>GUID</td><td>Description</td></tr><tr><td>Microsoft-Antimalware-Scan-Interface</td><td>[2A576B87-09A7-520E-C21A-4942F0271D67]</td><td>Supplies details about the data passed through the Antimalware Scan Interface (AMSI)</td></tr><tr><td>Microsoft-Windows-DotNETruntime</td><td>[E13C0D23-CCBC-4E12-931B-D9C2C2EE27E4]</td><td>Provides events related to .NET assemblies executing on the local host</td></tr><tr><td>Microsoft-WindowsAudit-CVE</td><td>[85A6A2AD02-EE17-485F-9D4F-7494287193A6]</td><td>Provides a mechanism for software to report attempts to exploit known vulnerabilities</td></tr><tr><td>Microsoft-Windows-DNS-Client</td><td>[1C95126E-7EEA-49A9-A3FE-A37BB03DDBAD]</td><td>Details the results of domain name resolution on the host</td></tr></table>
 
-
-144    Chapter 8
+144 Chapter 8
 
 ---
 
 <table><tr><td>Provider name</td><td>GUID</td><td>Description</td></tr><tr><td>Microsoft-Windows-Kernel-Process</td><td>(22FB2CD6-0E7B-4228-A0C7-2FAD1FD0E716)</td><td>Provides information related to the creation and termination of processes (similar to what a driver can obtain using a process-creation callback routine)</td></tr><tr><td>Microsoft-Windows-PowerShell</td><td>(A0C18538-5C40-4B15-8766-3CF1C58F985A)</td><td>Provides PowerShell script block-logging functionality</td></tr><tr><td>Microsoft-Windows-RPC</td><td>(46D52B32D-D609-4BE9-AE07-CEBDAE937E39)</td><td>Contains information related to RPC operations on the local system</td></tr><tr><td>Microsoft-Windows-Security-Kerberos</td><td>(98E6CFCBF-E00A-41EO-A57B-622D4E1830B1)</td><td>Provides information related to Kerberos authentication on the host</td></tr><tr><td>Microsoft-Windows-Services</td><td>(00637158-EEDA-4007-9429-AD526462696)</td><td>Emits events related to the installation, operation, and removal of services</td></tr><tr><td>Microsoft-Windows-SmartScreen</td><td>(3CB2A168-FE34-4AE4-BDAD-DCF422F34473)</td><td>Provides events related to Microsoft Defender SmartScreen and its interaction with files downloaded from the internet</td></tr><tr><td>Microsoft-Windows-TaskScheduler</td><td>(DE7824EA-73C8-4A09-985D-5BDADCFA9017)</td><td>Supplies information related to scheduled tasks</td></tr><tr><td>Microsoft-Windows-WebIO</td><td>(50B3E73C-0370-461D-8B9F-26F32D68887D)</td><td>Provides visibility into web requests being made by users of the system</td></tr><tr><td>Microsoft-Windows-WMI-Activity</td><td>(1418E04-8084-4623-B7FE-D74AB47BDDAA)</td><td>Supplies telemetry related to the operation of WMI, including event subscriptions</td></tr></table>
-
 
 ETW providers are securable objects, meaning a security descriptor can be applied to them. A security descriptor provides a way for Windows to restrict access to the object through a discretionary access control list or log access attempts via a system access control list. Listing 8-1 shows the security descriptor applied to the Microsoft-Windows-Services provider.
 
@@ -54,7 +52,7 @@ Listing 8-1: Evaluating the security descriptor applied to a provider
 
 ---
 
-This command parses the binary security descriptor from the provider's registry configuration using its GUID. It then uses the 0x032 _Security@scriptorHelper WMI class to convert the byte array in the registry to a security descriptor definition language string. This string is then passed to the PowerShell cmdlet ConvertFrom-SddString to return the human-readable details of the security descriptor. By default, this security descriptor only allows access to NT AUTHORITYSSYSTEM, NT AUTHORITYLOCAL_SERVICE, and members of the local Administrator group. This means that controller code must be running as admin to directly interact with providers.
+This command parses the binary security descriptor from the provider's registry configuration using its GUID. It then uses the 0x032 \_Security@scriptorHelper WMI class to convert the byte array in the registry to a security descriptor definition language string. This string is then passed to the PowerShell cmdlet ConvertFrom-SddString to return the human-readable details of the security descriptor. By default, this security descriptor only allows access to NT AUTHORITYSSYSTEM, NT AUTHORITYLOCAL_SERVICE, and members of the local Administrator group. This means that controller code must be running as admin to directly interact with providers.
 
 ## Emitting Events
 
@@ -76,7 +74,7 @@ Manifests are XML files containing the elements that define the provider, includ
 
 Introduced in Windows 10, TraceLogging is the newest technology for providing events. Unlike the other technologies, TraceLogging allows for self-describing events, meaning that no class or manifest needs to be registered with the system for the consumer to know how to process them. The consumer uses the Trace Data Helper (TDH) APIs to
 
-146    Chapter 8
+146 Chapter 8
 
 ---
 
@@ -91,17 +89,17 @@ Regardless of which method a developer chooses, the result is the same: events b
 To understand why a provider is emitting certain events, it's often helpful to look at the provider itself. Unfortunately, Windows doesn't provide an easy way to translate a provider's name or GUID into an image on disk. You can sometimes collect this information from the event's metadata, but in many cases, such as when the event source is a DLL or a driver, discovering it requires more effort. In these situations, try considering the following attributes of ETW providers:
 
 - • The provider's .PE file must reference its GUID, most commonly in the
-.sdata section, which holds read-only initialized data.
-• The provider must be an executable code file, typically a .exe, .dll, or .sys .
-• The provider must call a registration API (specifically, advapiIEvent
-Register() or mdtllflteEventRegister() for user-mode applications and
-ntoskrnlFlteRegister() for kernel-mode components).
-• If using a manifest registered with the system, the provider image will
-be in the ResourceFileName value in the registry key HKLM\SOFTWARE\
-Microsoft\Windows\CurrentVersion\WINENT\Publishers\<PROPERTY_GUID>.
-This file will contain a WEV7_TEMPLATE resource, which is the binary
-representation of the manifest.
-You could conduct a scan of files on the operating system and return those that satisfy these requirements. The FindETWProviderImage open source tool available on GitHub makes this process easy. Listing 8.2 uses it to locate images that reference the GUID of the Microsoft-WindowsTaskScheduler provider.
+  .sdata section, which holds read-only initialized data.
+  • The provider must be an executable code file, typically a .exe, .dll, or .sys .
+  • The provider must call a registration API (specifically, advapiIEvent
+  Register() or mdtllflteEventRegister() for user-mode applications and
+  ntoskrnlFlteRegister() for kernel-mode components).
+  • If using a manifest registered with the system, the provider image will
+  be in the ResourceFileName value in the registry key HKLM\SOFTWARE\
+  Microsoft\Windows\CurrentVersion\WINENT\Publishers\<PROPERTY_GUID>.
+  This file will contain a WEV7_TEMPLATE resource, which is the binary
+  representation of the manifest.
+  You could conduct a scan of files on the operating system and return those that satisfy these requirements. The FindETWProviderImage open source tool available on GitHub makes this process easy. Listing 8.2 uses it to locate images that reference the GUID of the Microsoft-WindowsTaskScheduler provider.
 
 ```bash
 PS > \FindTWMProviderImage.exe "Microsoft-Windows-TaskScheduler" "C:\Windows\System32" "
@@ -139,7 +137,6 @@ Listing 8-2: Using FindETWProviderImage to locate provider binaries
 If you consider the output, you'll see that this approach has some gaps. For example, the tool returned the true provider of the events, schedlist.dll , but also three other images. These false positives might occur because images consume events from the target provider and so contain the provider's GUID, or because they produce their own events and so import one of the registration APIs. This method might also produce false negatives; for example, when the source of an event is ntksrnl.exe , the image won't be found in the registry or import either of the registration functions.
 
 To confirm the identity of the provider, you must investigate an image further. You can do this using a relatively simple methodology. In a disassembler, navigate to the offset or relative virtual address reported by
-
 
 FindTWPProviderImage and look for any references to the GUID coming from a function that calls a registration API. You should see the address of the GUID being passed to the registration function in the RCX register, as shown in Listing 8-3.
 
@@ -277,7 +274,7 @@ KeywordsAny:
         0x4000000000000000 (System)
 ```
 
-150      Chapter 8
+150 Chapter 8
 
 ---
 
@@ -307,8 +304,7 @@ Our consumer will ingest filtered events from the Microsoft-WindowsDotNETruntime
 
 To begin consuming events, we must first create a trace session using the
 
-
-eachostStartTrace() API. This function takes a pointer to an EVENT_TRACE _PROPERTIES structure, defined in Listing 8-6. (On systems running versions of Windows later than 1703, the function could choose to take a pointer to an EVENT_TRACE_PROPERTIES_V2 structure instead.)
+eachostStartTrace() API. This function takes a pointer to an EVENT_TRACE \_PROPERTIES structure, defined in Listing 8-6. (On systems running versions of Windows later than 1703, the function could choose to take a pointer to an EVENT_TRACE_PROPERTIES_V2 structure instead.)
 
 Event Tracing for Windows 151
 
@@ -366,7 +362,7 @@ int main()
   pTraceProperties->pLoggerNameOffset = sizeof(EVENT_TRACE_PROPERTIES);
 ```
 
-152    Chapter B
+152 Chapter B
 
 ---
 
@@ -457,7 +453,7 @@ The sechost!EnableTraceX() API can add any number of providers to a trace sessio
         NULL);
 ```
 
-154    Chapter 8
+154 Chapter 8
 
 ---
 
@@ -561,7 +557,7 @@ int main()
      }
 ```
 
-156    Chapter 8
+156 Chapter 8
 
 ---
 
@@ -634,7 +630,7 @@ typedef struct _EVENT_RECORD {
 
 Listing 8-14: The EVENT_RECORD structure definition
 
-This structure might seem simple at first glance, but it could contain a huge amount of information. The first field, EventHeader, loads basic event metadata, such as the process ID of the provider binary; a timestamp; and an EVENT_DESCRIPTOR, which describes the event itself in detail. The ExtendedData member matches the data passed in the EnableProperty parameter of sechost!EnableTrace6x(). This field is a pointer to an EVENT_HEADER _EXTENDED_DATA_ITEM, defined in Listing 8-15.
+This structure might seem simple at first glance, but it could contain a huge amount of information. The first field, EventHeader, loads basic event metadata, such as the process ID of the provider binary; a timestamp; and an EVENT_DESCRIPTOR, which describes the event itself in detail. The ExtendedData member matches the data passed in the EnableProperty parameter of sechost!EnableTrace6x(). This field is a pointer to an EVENT_HEADER \_EXTENDED_DATA_ITEM, defined in Listing 8-15.
 
 ```bash
 typedef struct _EVENT_HEADER_EXTENDED_DATA_ITEM {
@@ -651,7 +647,7 @@ typedef struct _EVENT_HEADER_EXTENDED_DATA_ITEM {
 
 Listing 8-15: The EVENT_HEADER_EXTENDED_DATA_ITEM structure definition
 
-158    Chapter 8
+158 Chapter 8
 
 ---
 
@@ -758,7 +754,7 @@ typedef struct _TRACE EVENT_INFO {
 
 Listing 8-18: The TRACE_EVENT_INFO structure definition
 
-160    Chapter 8
+160 Chapter 8
 
 ---
 
@@ -930,9 +926,7 @@ After the function completes, the name of the property (as in the keyportion of 
 
 The snippet shown in Listing 8-23 comes from our .NET event consumer.
 
-
 It shows the assembly-load event for the Seatbelt reconnaissance tool being
-
 
 loaded into memory via a command-and-control agent.
 
@@ -1098,7 +1092,7 @@ void PatchedAssemblyLoader()
 
 Listing 8-25: Patching the ntdll!EtwEventWrite() function
 
-168    Chapter 8
+168 Chapter 8
 
 ---
 
@@ -1135,7 +1129,7 @@ In his blog post "Universally Evading Symon and ETW," Dylan Halls describes a di
 
 ETW is one of the most important technologies for collecting host-based telemetry on Windows. It provides an EDR with visibility into components and processes, such as the Task Scheduler and local DNS client, that no other sensor can monitor. An agent can consume events from nearly any providers it finds and use that information to gain an immense amount of context about system activities. Evasion of ETW is well researched, with most strategies focusing on disabling, unregistering, or otherwise rendering a provider or consumer unable to handle events.
 
-170    Chapter B
+170 Chapter B
 
 ---
 
@@ -1169,7 +1163,7 @@ While it's hard to quantify the impact of Veil and other tools aimed at tackling
 
 Scanners are software applications that the system should invoke when appropriate. Developers must choose between two models to determine when their scanner will run. This decision is more complex and important than it may seem at face value.
 
-172    Chapter 9
+172 Chapter 9
 
 ---
 
@@ -1213,7 +1207,7 @@ Vendors each develop and implement their own rulesets, but products tend to have
 
 There have been many attempts to standardize scanner rule formats to facilitate the sharing of rules between vendors and the security community. At the time of this writing, the YARA rule format is the most widely adopted, and you'll see it used in open source, community-driven detection efforts as well as by EDR vendors.
 
-174    Chapter 9
+174 Chapter 9
 
 ---
 
@@ -1334,7 +1328,7 @@ The first command extracts the threat names, a way of identifying specific or cl
 
 To the user, however, most of these rules are opaque. Often, the only way to figure out what causes one sample to be flagged as malicious and another to be deemed benign is manual testing. The DefenderCheck tool helps automate this process. Figure 9-4 shows a contrived example of how this tool works under the hood.
 
-178      Chaptor 9
+178 Chaptor 9
 
 ---
 
@@ -1539,7 +1533,7 @@ Inside System.Management.Automation.dll, the DLL that provides the runtime for h
 
 System.Management.Automation.dllCompiledScriptBlockData.PerformSecurityChecks() System.Management.Automation.dllCompiledScriptBlockData.ReallyCompile(bool optimize) System.Management.Automation.dllCompiledScriptBlockData.CompiledUnoptimized() System.Management.Automation.dllCompiledScriptBlockData.CompiledUnoptimized() System.Management.Automation.dllScriptBlockCompile(bool optimized) System.Management.Automation.dllScriptBlockCompile(bool optimized) System.Management.Automation.dllDtlsScriptCommandProcessor.init() System.Management.Automation.dllDtlsScriptCommandProcessor.DlScriptCommandProcessor(x) Block scriptBlock,ExecutionContext context, bool useWksScope, CommandOrigin origin, sessionStateInternalSessionState, Object dllHandleObject System.Management.Automation.dllRunspaces.Command.CreateCommandProcessor(ExecutionContext executionContext, bool addMemory, CommandOrigin origin) System-management.Automation.dllRunspaces.LocalPipeline.CreatePipelineProcessor() System-management.Automation.dllRunspaces.LocalPipeline.InvokeHelper() System-management.Automation.dllRunspaces.LocalPipeline.InvokeThreadProc() System-management.Automation.dllRunspaces.LocalPipeline.InvokeThreadProcImpersonate() System-management.Automation.dllRunspaces.PipelineThread.WorkerProc() System.Private.CoreLib.dllSystem.Threading.Thread.StartHelper.RunWorker() System.Private.CoreLib.dllSystem.Threading.Thread.StartHelper.CallBack(object state) System.Private.CoreLib.dllSystem.Threading.ExecutionContext.runInternal(-snp--)
 
-186      Chapter 10
+186 Chapter 10
 
 ---
 
@@ -1631,7 +1625,7 @@ Listing 10-6: Throwing a ParseError on malicious script detection
 
 Because ANSI threw an exception ❶, the execution of the script halts and the error shown in the ParseError will be returned to the user. Listing 10-7 shows the error the user will see in the PowerShell window.
 
-188    Chapter 10
+188 Chapter 10
 
 ---
 
@@ -1670,7 +1664,7 @@ ATL::CComClassFactory::CreateInstance
 
 Listing 10-8: Creating an instance of IAntimalware
 
-Rather than an explicit call to some functions, you'll occasionally find references to _guard_dispatch_call_fptr(). This is a component of Control Flow Guard (CFG), an anti-exploit technology that attempts to prevent indirect calls, such as in the event of return-oriented programming. In short,
+Rather than an explicit call to some functions, you'll occasionally find references to \_guard_dispatch_call_fptr(). This is a component of Control Flow Guard (CFG), an anti-exploit technology that attempts to prevent indirect calls, such as in the event of return-oriented programming. In short,
 
 ---
 
@@ -1713,7 +1707,7 @@ amsi1AmsiComSecureLoadInProcServer+0x297:
 00007ff9'5ea7569b 48ff15fe770000  call    qword ptr [amsi1_imp_LoadLibraryExW]
 ```
 
-190    Chapter 10
+190 Chapter 10
 
 ---
 
@@ -1814,7 +1808,7 @@ Listing 10-16: The CAMsiAntimalware::Scan() function definition
 
 In the case of the default Microsoft Defender AMSI implementation, MpOow.dll, this function performs some basic initialization and then hands execution over to MpClient.dll, the Windows Defender client interface. Note that Microsoft doesn't supply program database files for Defender
 
-192   Chapter 10
+192 Chapter 10
 
 ---
 
@@ -1894,9 +1888,7 @@ Listing 10-19: The IAMsiStream class definition
 
 The GetAttribute() retrieves metadata about the contents to be scanned.
 
-
 Developers request these attributes by passing an ANSI_ATTRIBUTE value that indicates what information they would like to retrieve, along with an appropriately sized buffer. The ANSI_ATTRIBUTE value is an enumeration defined in
-
 
 Listing 10-20.
 
@@ -2001,7 +1993,7 @@ AMSI is one of the most-studied areas when it comes to evasion. This is due in n
 
 Attackers can employ a variety of evasion techniques to bypass AMSI. While certain vendors have attempted to flag some of these as malicious,
 
-196    Chapter 10
+196 Chapter 10
 
 ---
 
@@ -2040,15 +2032,15 @@ Antimalware Scan Interface 197
 When it comes to patching, attackers commonly target AmsiScanBuffer(), the function responsible for passing buffer contents to the providers. Daniel Duggan describes this technique in a blog post, "Memory Patching AMSI Bypass," where he outlines the steps an attacker's code must take before performing any truly malicious activity:
 
 - 1. Retrieve the address of AmsiScanBuffer() within the amsi.dll currently
-loaded into the process.
+     loaded into the process.
 
 2. Use kernel32jVirtualProtect() to change the memory protections to
-read-write, which allows the attacker to place the patch.
+   read-write, which allows the attacker to place the patch.
 
 3. Copy the patch into the entry point of the AmsiScanBuffer() function.
 4. Use kernel32jVirtualProtect() once again to revert the memory protec-
-tion back to read-execute.
-The patch itself takes advantage of the fact that, internally, AmsiScanBuffer() returns E_INVALIDARG if its initial checks fail. These checks include attempts to validate the address of the buffer to be scanned. Duggan's code adds a byte array that represents the assembly code in Listing 10-25. After this patch, when AmsiScanBuffer() is executed, it will immediately return this error code because the actual instruction that made up the original function of the has been overwritten.
+   tion back to read-execute.
+   The patch itself takes advantage of the fact that, internally, AmsiScanBuffer() returns E_INVALIDARG if its initial checks fail. These checks include attempts to validate the address of the buffer to be scanned. Duggan's code adds a byte array that represents the assembly code in Listing 10-25. After this patch, when AmsiScanBuffer() is executed, it will immediately return this error code because the actual instruction that made up the original function of the has been overwritten.
 
 ```bash
 mov eax, 0x80070057 ; E_INVALIDARG
@@ -2070,7 +2062,7 @@ ret
 
 Listing 10-26: Breaking up hardcoded values to evade patch detection
 
-198   Chapter 10
+198 Chapter 10
 
 ---
 
@@ -2104,7 +2096,4 @@ AMSI is an incredibly important piece of the host-based detection puzzle. Its in
 
 ---
 
-
-
 ---
-

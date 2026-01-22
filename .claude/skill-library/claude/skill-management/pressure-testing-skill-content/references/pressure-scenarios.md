@@ -74,4 +74,4 @@ Make agent believe it's real work, not a quiz.
 
 ## Research Foundation
 
-See `persuasion-principles.md` (in claude-skill-write directory) for research on how authority, scarcity, and commitment principles increase compliance pressure and make pressure scenarios more effective.
+See the `creating-skills` library skill for research on how authority, scarcity, and commitment principles increase compliance pressure and make pressure scenarios more effective.

@@ -1,0 +1,8 @@
+# Examples Directory
+
+This directory contains complete Sigma.js implementation examples.
+
+**TODO**: Add the following example files:
+- graph-explorer.tsx - Full graph explorer with LOD, culling, layout
+- camera-controls.tsx - Custom zoom/pan controls with debouncing
+- node-tooltip.tsx - Hover state management without infinite loops

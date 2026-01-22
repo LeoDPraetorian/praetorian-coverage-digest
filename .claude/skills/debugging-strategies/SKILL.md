@@ -539,10 +539,9 @@ None - This skill provides reference material and does not invoke other skills.
 
 ### Pairs With (conditional)
 
-| Skill                         | Trigger                          | Purpose                                                       |
-| ----------------------------- | -------------------------------- | ------------------------------------------------------------- |
-| `debugging-systematically`    | When systematic process needed   | Provides four-phase debugging framework for methodical fixing |
-| `tracing-root-causes`         | When error deep in call stack    | Traces bugs backward through execution to find origin         |
-| `developing-with-tdd`         | After finding bug                | Creates failing test case before fixing                       |
-| `verifying-before-completion` | After implementing debug fix     | Verifies fix actually resolves issue                          |
-
+| Skill                         | Trigger                        | Purpose                                                       |
+| ----------------------------- | ------------------------------ | ------------------------------------------------------------- |
+| `debugging-systematically`    | When systematic process needed | Provides four-phase debugging framework for methodical fixing |
+| `tracing-root-causes`         | When error deep in call stack  | Traces bugs backward through execution to find origin         |
+| `developing-with-tdd`         | After finding bug              | Creates failing test case before fixing                       |
+| `verifying-before-completion` | After implementing debug fix   | Verifies fix actually resolves issue                          |

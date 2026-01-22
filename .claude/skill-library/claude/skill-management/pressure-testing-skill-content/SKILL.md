@@ -1,6 +1,6 @@
 ---
 name: pressure-testing-skill-content
-description: Use when creating or editing skills, before deployment - applies TDD cycle to process documentation with pressure scenario templates and rationalization detection to verify skills resist agent bypass attempts.
+description: Use when testing skills with pressure scenarios - applies RED-GREEN-REFACTOR to verify skills resist agent bypass attempts.
 allowed-tools: Read, Bash, Grep, Glob, Task
 ---
 
@@ -23,7 +23,7 @@ You run scenarios without the skill (RED - watch agent fail), write skill addres
 1. **Integration Tests** - Realistic tasks WITHOUT skill mentions (tests if agent invokes skills at all)
 2. **Pressure Tests** - Realistic tasks + realistic pressure WITHOUT skill mentions (tests if agent resists bypass under pressure)
 
-**REQUIRED BACKGROUND:** You MUST understand developing-with-tdd before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (integration tests, pressure scenarios, output compliance verification).
+**REQUIRED BACKGROUND:** You MUST understand `developing-with-tdd` (CORE) before using this skill. That skill defines the fundamental RED-GREEN-REFACTOR cycle. This skill provides skill-specific test formats (integration tests, pressure scenarios, output compliance verification).
 
 **Complete worked example:** See examples/CLAUDE_MD_TESTING.md for a full test campaign testing CLAUDE.md documentation variants.
 
@@ -368,10 +368,10 @@ This skill tests **skill content effectiveness** - does the documentation change
 
 **After content testing passes**, verify **deployment configuration** works:
 
-| Skill Type  | Deployed Location        | Agent Access Method      | Verify With                        |
-| ----------- | ------------------------ | ------------------------ | ---------------------------------- |
-| **Core**    | `.claude/skills/`        | `skill: "name"`          | `verifying-agent-skill-invocation` |
-| **Library** | `.claude/skill-library/` | Gateway → `Read("path")` | `verifying-agent-skill-invocation` |
+| Skill Type  | Deployed Location        | Agent Access Method      | Verify With                                  |
+| ----------- | ------------------------ | ------------------------ | -------------------------------------------- |
+| **Core**    | `.claude/skills/`        | `skill: "name"`          | `verifying-agent-skill-invocation` (LIBRARY) |
+| **Library** | `.claude/skill-library/` | Gateway → `Read("path")` | `verifying-agent-skill-invocation` (LIBRARY) |
 
 **Why both tests matter:**
 
@@ -494,3 +494,31 @@ From applying TDD to TDD skill itself (2025-10-03):
 - Each REFACTOR closed specific loopholes
 - Final VERIFY GREEN: 100% compliance under maximum pressure
 - Same process works for any discipline-enforcing skill
+
+## Integration
+
+### Called By
+
+- `creating-skills` (LIBRARY) - Phase 6 (skill validation) - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`
+- `updating-skills` (LIBRARY) - Phase 9 (post-update testing) - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")`
+- `managing-skills` (CORE) - When user requests skill testing via `/skill-manager`
+
+### Requires (invoke before starting)
+
+| Skill                        | When  | Purpose                                                 |
+| ---------------------------- | ----- | ------------------------------------------------------- |
+| `developing-with-tdd` (CORE) | Start | TDD fundamentals - RED-GREEN-REFACTOR cycle methodology |
+
+### Calls (during execution)
+
+| Skill | Phase/Step          | Purpose                                              |
+| ----- | ------------------- | ---------------------------------------------------- |
+| Task  | RED/GREEN phases    | Spawn test subagents for baseline and pressure tests |
+| Read  | Output verification | Read agent output files to verify JSON metadata      |
+| Grep  | Skill discovery     | Find skill references in codebase for validation     |
+
+### Pairs With (conditional)
+
+| Skill                                         | Trigger                     | Purpose                                                                                                                                 |
+| --------------------------------------------- | --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `closing-rationalization-loopholes` (LIBRARY) | Loopholes found in REFACTOR | TDD methodology for plugging holes - `Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")` |

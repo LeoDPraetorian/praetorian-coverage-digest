@@ -11,18 +11,18 @@ The simplest creation function in user mode is CreateThread. This function creat
 current process, accepting the following arguments:
 
 - ■ An optional security attributes structure This specifies the security descriptor to attach to
-the newly created thread. It also specifies whether the thread handle is to be created as inherit-
-able. (Handle inheritance is discussed in Chapter 8, "System mechanisms," in Windows Internals
-Part 2.)
-■ An optional stack size If zero is specified, a default is taken from the executable's header.
-This always applies to the first thread in a user-mode process. (Thread's stack is discussed
-further in Chapter 5, "Memory management.")
-■ A function pointer This serves as the entry point for the new thread's execution.
-■ An optional argument This is to pass to the thread's function.
-■ Optional flags One controls whether the thread starts suspended (CREATE_SUSPENDED). The
-other controls the interpretation of the stack size argument (initial committed size or maximum
-reserved size).
-On successful completion, a non-zero handle is returned for the new thread and, if requested by the
+  the newly created thread. It also specifies whether the thread handle is to be created as inherit-
+  able. (Handle inheritance is discussed in Chapter 8, "System mechanisms," in Windows Internals
+  Part 2.)
+  ■ An optional stack size If zero is specified, a default is taken from the executable's header.
+  This always applies to the first thread in a user-mode process. (Thread's stack is discussed
+  further in Chapter 5, "Memory management.")
+  ■ A function pointer This serves as the entry point for the new thread's execution.
+  ■ An optional argument This is to pass to the thread's function.
+  ■ Optional flags One controls whether the thread starts suspended (CREATE_SUSPENDED). The
+  other controls the interpretation of the stack size argument (initial committed size or maximum
+  reserved size).
+  On successful completion, a non-zero handle is returned for the new thread and, if requested by the
 
 caller, the unique thread ID.
 
@@ -76,8 +76,7 @@ subsystem USER or GDI function, the kernel-mode portion of the Windows subsystem
 
 maintains a per-thread data structure (W32THREAD) that the KTHREAD structure points to.
 
-CHAPTER 4  Threads      195
-
+CHAPTER 4 Threads 195
 
 ---
 
@@ -128,7 +127,7 @@ The following output shows the format of an ETHEAD on a 64-bit Windows 10 system
 +0x7b8 S1to             : Ptr64 _EJOB
 ```
 
-You can display the KTHREAD with a similar command or by typing dt !nt!_ETHREAD Tcb, as
+You can display the KTHREAD with a similar command or by typing dt !nt!\_ETHREAD Tcb, as
 
 shown in the experiment "Displaying the format of an EPROCESS structure" in Chapter 3, "Pro cesses and jobs."
 
@@ -142,8 +141,7 @@ shown in the experiment "Displaying the format of an EPROCESS structure" in Chap
   +0x038 StackBase     : Ptr64 Void
 ```
 
-196   CHAPTER 4   Threads
-
+196 CHAPTER 4 Threads
 
 ---
 
@@ -169,7 +167,7 @@ structures. Some key elements of the information the kernel debugger displays ca
 by any utility, including the following information:
 
 - <table><tr><td>Internal structure addresses</td></tr><tr><td>Priority details</td></tr><tr><td>Stack information</td></tr><tr><td>The pending I/O request list</td></tr><tr><td>For threads in a wait state, the list of objects the thread is waiting for</td></tr></table>
-To display thread information, use either the !process command (which displays all the threads of a process after displaying the process information) or the !thread command with the address of a thread object to display a specific thread.
+  To display thread information, use either the !process command (which displays all the threads of a process after displaying the process information) or the !thread command with the address of a thread object to display a specific thread.
 
 Let's find all instances of explorer.exe:
 
@@ -195,7 +193,7 @@ PROCESS fffffe00018c817c0
         Image: explorer.exe
 ```
 
-CHAPTER 4    Threads      197
+CHAPTER 4 Threads 197
 
 ---
 
@@ -303,8 +301,7 @@ C:\Dbg\tbx6t\list winword
   CWD:          C:\Users\pavely\Documents\
 ```
 
-CHAPTER 4  Threads      199
-
+CHAPTER 4 Threads 199
 
 ---
 
@@ -361,7 +358,7 @@ Office16\GROOVEEX.DLL
     10.0.10586.0  shp  0x693F0000 C:\windows\system32\dataexchange.d1l
 ```
 
-200   CHAPTER 4   Threads
+200 CHAPTER 4 Threads
 
 ---
 
@@ -377,8 +374,7 @@ The TEB stores context information for the image loader and various Windows DLLs
 
 You can dump the TEB structure with the !t eb command in the kernel or user-mode debugger. The command can be used on its own to dump the TEB for the current thread of the debugger or with a TEB address to get it for an arbitrary thread. In case of a kernel debugger, the current process must be set before issuing the command on a TEB address so that the correct process context is used.
 
-CHAPTER 4   Threads      201
-
+CHAPTER 4 Threads 201
 
 ---
 
@@ -439,8 +435,7 @@ TEB at 000000ef125c1000
  7  Id: 21bc.168c Suspend: 1 Teb: 000000ef'125d000 Unfrozen
 ```
 
-202    CHAPTER 4    Threads
-
+202 CHAPTER 4 Threads
 
 ---
 
@@ -503,8 +498,7 @@ TEB at 000000ef125f1000
 +0x1828 EffectiveContainerId : _GUID {00000000-0000-0000-0000-00000000000000}
 ```
 
-CHAPTER 4   Threads      203
-
+CHAPTER 4 Threads 203
 
 ---
 
@@ -593,8 +587,7 @@ The CSR_THREAD, illustrated in Figure 4-4 is analogous to the data structure of 
 
 FIGURE 4-4 Fields of the CSR thread.
 
-CHAPTER 4  Threads      205
-
+CHAPTER 4 Threads 205
 
 ---
 
@@ -633,42 +626,42 @@ FIGURE 4-5 Fields of the Win32x thread.
 
 A thread's life cycle starts when a process (in the context of some thread, such as the thread running the main function) creates a new thread. The request filters down to the Windows executive, where the process manager allocates space for a thread object and calls the kernel to initialize the thread control block (KTHREAD). As mentioned, the various thread-creation functions eventually end up at CreateRemoteThreadEx. The following steps are taken inside this function in Kernel32.dll to create a Windows thread:
 
-206   CHAPTER 4   Threads
-
+206 CHAPTER 4 Threads
 
 ---
 
 - 1. The function converts the Windows API parameters to native flags and builds a native structure
-describing object parameters (OBJECT_ATTRIBUTES, described in Chapter 8 in Part 2).
+     describing object parameters (OBJECT_ATTRIBUTES, described in Chapter 8 in Part 2).
 
 2. It builds an attribute list with two entries: client ID and TEB address. (For more information on
-attribute lists, see the section "Flow of CreateProcess" in Chapter 3.)
+   attribute lists, see the section "Flow of CreateProcess" in Chapter 3.)
 
 3. It determines whether the thread is created in the calling process or another process indicated
-by the handle passed in. If the handle is equal to the pseudo handle returned from GetCurrent-
-Process (with a value of -1), then it's the same process. If the process handle is different, it
-could still be a valid handle to the same process, so a call is made to NtQueryInformation-
-Process (in Ntidll) to find out whether that is indeed the case.
+   by the handle passed in. If the handle is equal to the pseudo handle returned from GetCurrent-
+   Process (with a value of -1), then it's the same process. If the process handle is different, it
+   could still be a valid handle to the same process, so a call is made to NtQueryInformation-
+   Process (in Ntidll) to find out whether that is indeed the case.
 
 4. It calls NtCreateThreadEx (in Ntidll) to make the transition to the executive in kernel mode and
-continues inside a function with the same name and arguments.
+   continues inside a function with the same name and arguments.
 
 5. NtCreateThreadEx (inside the executive) creates and initializes the user-mode thread context
-(its structure is architecture-specific) and then calls PspCreateThread to create a suspended
-executive thread object. (For a description of the steps performed by this function, see the de-
-scriptions of stage 3 and stage 5 in Chapter 3 in the section "Flow of CreateProcess.") Then the
-function returns, eventually ending back in user mode at CreateRemoteThreadEx.
+   (its structure is architecture-specific) and then calls PspCreateThread to create a suspended
+   executive thread object. (For a description of the steps performed by this function, see the de-
+   scriptions of stage 3 and stage 5 in Chapter 3 in the section "Flow of CreateProcess.") Then the
+   function returns, eventually ending back in user mode at CreateRemoteThreadEx.
 
 6. CreateRemoteThreadEx allocates an activation context for the thread used by side-by-side as-
-sembly support. It then queries the activation stack to see if it requires activation and activates
-it if needed. The activation stack pointer is saved in the new thread's TEB.
+   sembly support. It then queries the activation stack to see if it requires activation and activates
+   it if needed. The activation stack pointer is saved in the new thread's TEB.
 
 7. Unless the caller created the thread with the CREATE_SUSPENDED flag set, the thread is now
-resumed so that it can be scheduled for execution. When the thread starts running, it executes
-the steps described in Chapter 3 in the section "Stage 7: performing process initialization in the
-context of the new process" before calling the actual user's specified start address.
+   resumed so that it can be scheduled for execution. When the thread starts running, it executes
+   the steps described in Chapter 3 in the section "Stage 7: performing process initialization in the
+   context of the new process" before calling the actual user's specified start address.
 
 8. The thread handle and the thread ID are returned to the caller.
+
 ## Examining thread activity
 
 Examining thread activity is especially important if you are trying to determine why a process that is hosting multiple services is running (such as Svhost.exe, Dllhost.exe, or Lsass.exe) or why a process has stopped responding.
@@ -677,15 +670,13 @@ There are several tools that expose various elements of the state of Windows thr
 
 To view the threads in a process with Process Explorer, select a process and double-click it to open its Properties dialog box. Alternatively, right-click the process and select the Properties menu item.
 
-CHAPTER 4   Threads      207
-
+CHAPTER 4 Threads 207
 
 ---
 
 Then click the Threads tab. This tab shows a list of the threads in the process and four columns of information for each thread: its ID, the percentage of CPU consumed (based on the refresh interval configured), the number of cycles charged to the thread, and the thread start address. You can sort by any of these four columns.
 
 New threads that are created are highlighted in green, and threads that exit are highlighted in red.
-
 
 (To configure the highlight duration, open the Options menu and choose Difference Highlight Duration.) This might be helpful to discover unnecessary thread creation occurring in a process. (In general, threads should be created at process startup, not every time a request is processed inside a process.)
 
@@ -707,8 +698,7 @@ for the module containing the thread’s start address (for example, the .EXE or
 
 Note For threads created by the Windows CreateThread function, Process Explorer displays the function passed to CreateThread, not the actual thread start function. This is because all Windows threads start at a common thread startup wrapper function (RtlUserThreadStart in Ntdll.dll). If Process Explorer showed the actual start address, most threads in processes would appear to have started at the same address, which would not be helpful in trying to understand what code the thread was executing. However, if Process Explorer can't query the user-defined startup address (such as in the case of a protected process), it will show the wrapper function, so you will see all threads starting at RtlUserThreadStart.
 
-208   CHAPTER 4  Threads
-
+208 CHAPTER 4 Threads
 
 ---
 
@@ -739,6 +729,7 @@ bugger ID, the client ID (ProcessID: ThreadID), its suspend count (this should b
 of the time, as it is suspended because of the breakpoint), the TEB address, and whether
 
 it has been frozen using a debugger command.
+
 ```bash
 0:005s ~
  0  Id: 612c.5f68 Suspend: 1 Feb: 00000022'41da2000 Unfrozen
@@ -749,8 +740,7 @@ it has been frozen using a debugger command.
  5  Id: 612c.9f8 Suspend: 1 Feb: 00000022'41db0000 Unfrozen
 ```
 
-CHAPTER 4  Threads      209
-
+CHAPTER 4 Threads 209
 
 ---
 
@@ -798,7 +788,6 @@ USER32!ZwUserGetMessage+0x14:
 
 8. Note that even though a thread might be in kernel mode at the time, a user-mode
 
-
 debugger shows its last function that's still in user mode (ZwUserGetMessage in the
 
 preceding output).
@@ -812,7 +801,8 @@ and kernel mode). The experiment uses one of Explorer's threads, but you can try
 processes or threads.
 
 - 1. Show all the processes running the image explorer.exe. (Note that you may see more
-than one instance of Explorer if the Launch Folder Windows in a Separate Process
+     than one instance of Explorer if the Launch Folder Windows in a Separate Process
+
 ---
 
 option in Explorer options is selected. One process manages the desktop and taskbar, while the other manages Explore windows.)
@@ -913,12 +903,11 @@ Priority 8 BasePriority 8 PriorityDecrement 0 IoPriority 2 PagePriority 5
 
 As discussed in Chapter 3, protected processes (classic protected or PPL) have several limitations in terms of which access rights will be granted, even to the users with the highest privileges on the system. These limitations also apply to threads inside such a process. This ensures that the actual code running inside the protected process cannot be hijacked or otherwise affected through standard Windows functions, which require access rights that are not granted for protected process threads. In fact, the only permissions granted are THREAD_SUSPEND_MORE and THREAD_SET/query_LIMITED_INFORMATION.
 
-212   CHAPTER 4  Threads
-
+212 CHAPTER 4 Threads
 
 ---
 
-## EXPERIMENT: Viewing protected process thread information with Process  Explorer
+## EXPERIMENT: Viewing protected process thread information with Process Explorer
 
 In this experiment, you’ll view protected process thread information. Follow these steps:
 
@@ -944,8 +933,7 @@ THREAD_QUERYLIMITED_INFORMATION versus full query information access right
 
 5. Try to kill a thread inside a protected process. When you do, notice yet another accessdenied error: recall the lack of THREAD_TERMINATE access.
 
-CHAPTER 4  Threads      213
-
+CHAPTER 4 Threads 213
 
 ---
 
@@ -964,7 +952,7 @@ length of time a thread is allowed to run before another thread at the same prio
 run. Quantum values can vary from system to system and process to process for any of three reasons:
 
 - ■ System configuration settings (long or short quantums, variable or fixed quantums, and priority
-separation)
+  separation)
 
 ■ Foreground or background status of the process
 
@@ -975,15 +963,14 @@ A thread might not get to complete its quantum, however, because Windows impleme
 
 The Windows scheduling code is implemented in the kernel. There's no single "scheduler" module or routine, however. The code is spread throughout the kernel in which scheduling-related events occur.
 
-214   CHAPTER 4  Threads
-
+214 CHAPTER 4 Threads
 
 ---
 
 The routines that perform these duties are collectively called the kernel's dispatcher. The following events might require thread dispatching:
 
 - ■ A thread becomes ready to execute—for example, a thread has been newly created or has just
-been released from the wait state.
+  been released from the wait state.
 
 ■ A thread leaves the running state because its time quantum ends, it terminates, it yields execu-
 tion, or it enters a wait state.
@@ -1006,14 +993,13 @@ Windows uses. As illustrated in Figure 4-6, Windows uses 32 priority levels inte
 to 31 (31 is the highest). These values divide up as follows:
 
 - ■ Sixteen real-time levels (16 through 31)
-■ Sixteen variable levels (0 through 15), out of which level 0 is reserved for the zero page thread
-(described in Chapter 5).
-![Figure](figures/Winternals7thPt1_page_232_figure_007.png)
+  ■ Sixteen variable levels (0 through 15), out of which level 0 is reserved for the zero page thread
+  (described in Chapter 5).
+  ![Figure](figures/Winternals7thPt1_page_232_figure_007.png)
 
 FIGURE 4-6 Thread priority levels.
 
-CHAPTER 4  Threads      215
-
+CHAPTER 4 Threads 215
 
 ---
 
@@ -1021,7 +1007,7 @@ Thread priority levels are assigned from two different perspectives: those of th
 
 those of the Windows kernel. The Windows API first organizes processes by the priority class to which
 
-they are assigned at creation (the numbers in parentheses represent the internal PROCESS_PRIORITY_
+they are assigned at creation (the numbers in parentheses represent the internal PROCESS*PRIORITY*
 
 CLASS index recognized by the kernel):
 
@@ -1037,7 +1023,6 @@ CLASS index recognized by the kernel):
 
 ● Idle (1)
 The Windows API SetPriorityClass allows changing a process's priority class to one of these levels.
-
 
 It then assigns a relative priority of the individual threads within those processes. Here, the numbers
 
@@ -1066,8 +1051,7 @@ This mapping from Windows priority to internal Windows numeric priority is shown
 
 Figure 4-7 and textually in Table 4-1.
 
-216   CHAPTER 4   Threads
-
+216 CHAPTER 4 Threads
 
 ---
 
@@ -1078,7 +1062,6 @@ FIGURE 4-7 A graphic view of available thread priorities from a Windows API pers
 TABLE 4-1 Mapping Windows kernel priorities to the Windows API
 
 <table><tr><td>Priority Class Relative Priority</td><td>Real-Time</td><td>High</td><td>Above-Normal</td><td>Normal</td><td>Below-Normal</td><td>Idle</td></tr><tr><td>Time Critical (+Saturation)</td><td>31</td><td>15</td><td>15</td><td>15</td><td>15</td><td>15</td></tr><tr><td>Highest (+2)</td><td>26</td><td>15</td><td>12</td><td>10</td><td>8</td><td>6</td></tr><tr><td>Above Normal (+1)</td><td>25</td><td>14</td><td>11</td><td>9</td><td>7</td><td>5</td></tr><tr><td>Normal (0)</td><td>24</td><td>13</td><td>10</td><td>8</td><td>6</td><td>4</td></tr><tr><td>Below Normal (-1)</td><td>23</td><td>12</td><td>9</td><td>7</td><td>5</td><td>3</td></tr><tr><td>Lowest (-2)</td><td>22</td><td>11</td><td>8</td><td>6</td><td>4</td><td>2</td></tr><tr><td>Idle (-Saturation)</td><td>16</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr></table>
-
 
 You'll note that the Time-Critical and Idle relative thread priorities maintain their respective values
 
@@ -1095,8 +1078,7 @@ If Idle: -((HIGH_PRIORITY+1) / 2
 
 These values are then recognized by the kernel as a request for saturation, and the Saturaton field in KTHREAD is set. For positive saturation, this causes the thread to receive the highest possible priority within its priority class (dynamic or real-time); for negative saturation, it's the lowest possible one. Additionally, future requests to change the base priority of the process will no longer affect the base priority of these threads because saturated threads are skipped in the processing code.
 
-CHAPTER 4  Threads      217
-
+CHAPTER 4 Threads 217
 
 ---
 
@@ -1136,8 +1118,7 @@ Using the standard Windows APIs, once a process has entered the Real-Time range,
 
 dynamic threads within the same process through standard interfaces. This is because the SetThread Priority API calls the native NtSetInformationThread API with the ThreadBasePriority information
 
-218    CHAPTER 4  Threads
-
+218 CHAPTER 4 Threads
 
 ---
 
@@ -1183,8 +1164,7 @@ To examine and specify process and thread priorities, follow these steps:
 
 3. Add a column named Base Priority. This is the name Task Manager uses for priority
 
-class.
----
+## class.
 
 4. Find Notepad in the list. You should see something like the following:
 
@@ -1202,8 +1182,7 @@ Threads tab.
 
 ![Figure](figures/Winternals7thPt1_page_237_figure_006.png)
 
-220    CHAPTER 4   Threads
-
+220 CHAPTER 4 Threads
 
 ---
 
@@ -1229,8 +1208,7 @@ on the machine for this to succeed. Note that you can also make this change in P
 
 Explorer.)
 
-CHAPTER 4   Threads      221
-
+CHAPTER 4 Threads 221
 
 ---
 
@@ -1272,8 +1250,7 @@ these memory limits.) If this limit is exceeded, WSRM can be configured to eithe
 
 or write an entry to the event log. This behavior can be used to detect a process with a memory
 
-222   CHAPTER 4   Threads
-
+222 CHAPTER 4 Threads
 
 ---
 
@@ -1300,7 +1277,6 @@ Before looking at the thread-scheduling algorithms, you must understand the vari
 • Initialized This state is used internally while a thread is being created.
 
 CHAPTER 4 Threads 223
-
 
 ---
 
@@ -1329,8 +1305,7 @@ by using the Performance Monitor tool, follow these steps:
 clicking it and selecting Activate from the context menu. The tool should look some-
 
 thing like this:
-224    CHAPTER 4   Threads
-
+224 CHAPTER 4 Threads
 
 ---
 
@@ -1356,8 +1331,7 @@ thing like this:
 
 12. Select the first three threads of cpustres (/custers/0, cpustres/1, and cpustres/2) and click the Add >> button. Then click OK. Thread 0 should be in state 5 (waiting), because that's the GUI thread and it's waiting for user input. Threads 1 and 2 should be alternating between states 2 and 5 (running and waiting). (Thread 1 may be hiding thread 2 as they're running with the same activity level and the same priority.)
 
-CHAPTER 4  Threads      225
-
+CHAPTER 4 Threads 225
 
 ---
 
@@ -1371,8 +1345,7 @@ menu. You should see thread 2 in state 2 (running) more often than thread 1:
 
 14. Right-click thread 1 and choose an activity level of Maximum. Then repeat this step for thread 2. Both threads now should be constantly in state 2 because they're running essentially an infinite loop:
 
-226   CHAPTER 4   Threads
-
+226 CHAPTER 4 Threads
 
 ---
 
@@ -1384,8 +1357,7 @@ If you're trying this on a single processor system, you'll see something differe
 
 15. If you're on a multiprocessor system (very likely), you can get the same effect by going to Task Manager, right-clicking the CPUSTRES process, selecting Set Affinity, and then select just one processor—it doesn't matter which one—as shown here. (You can also do it from CPU Stress by opening the Process menu and selecting Affinity.)
 
-CHAPTER 4  Threads      227
-
+CHAPTER 4 Threads 227
 
 ---
 
@@ -1403,8 +1375,7 @@ as the dispatcher database. The dispatcher database keeps track of which threads
 
 and which processors are executing which threads.
 
-228   CHAPTER 4   Threads
-
+228 CHAPTER 4 Threads
 
 ---
 
@@ -1432,8 +1403,7 @@ Note Because the shared data structure must be protected (by a spinlock), the gr
 
 The ready queues, ready summary (described next), and some other information is stored in a kernel structure named KSHARED_READY_QUEUE that is stored in the PRCB. Although it exists for every processor, it's used only on the first processor of each processor group, sharing it with the rest of the processors in that group.
 
-CHAPTER 4   Threads      229
-
+CHAPTER 4 Threads 229
 
 ---
 
@@ -1483,8 +1453,7 @@ Processor 2: No threads in READY state
 Processor 3: No threads in READY state
 ```
 
-230    CHAPTER 4   Threads
-
+230 CHAPTER 4 Threads
 
 ---
 
@@ -1531,8 +1500,7 @@ only for example purposes), and for most x86 and x64 multiprocessors it is about
 
 clock interval is stored in the kernel variable KeMaximumIncrement as hundreds of nanoseconds.
 
-CHAPTER 4  Threads      231
-
+CHAPTER 4 Threads 231
 
 ---
 
@@ -1597,7 +1565,7 @@ Each process has a quantum reset value in the process control block (KPROCESS). 
 
 As a thread runs, CPU clock cycles are charged at different events, such as context switches, interrupts, and certain scheduling decisions. If, at a clock interval timer interrupt, the number of CPU clock cycles charged has reached (or passed) the quantum target, quantum end processing is triggered. If there is another thread at the same priority waiting to run, a context switch occurs to the next thread in the ready queue.
 
-Internally, a quantum unit is represented as one-third of a clock tick. That is, one clock tick equals three quantities. This means that on client Windows systems, threads have a quantum reset value of 6 (2 * 3) and that server systems have a quantum reset value of 36 (12 * 3) by default. For this reason, the KiCyclicsPerClockQuantum value is divided by 3 at the end of the calculation previously described, because the original value describes only CPU clock cycles per clock interval timer tick.
+Internally, a quantum unit is represented as one-third of a clock tick. That is, one clock tick equals three quantities. This means that on client Windows systems, threads have a quantum reset value of 6 (2 _ 3) and that server systems have a quantum reset value of 36 (12 _ 3) by default. For this reason, the KiCyclicsPerClockQuantum value is divided by 3 at the end of the calculation previously described, because the original value describes only CPU clock cycles per clock interval timer tick.
 
 The reason a quantum was stored internally as a fraction of a clock tick rather than as an entire tick was to allow for partial quantum decay-on-wait completion on versions of Windows prior to Windows Vista. Prior versions used the clock interval timer for quantum expiration. If this adjustment had not been made, it would have been possible for threads to never have their quantums reduced. For example, if a thread ran, entered a wait state, ran again, and entered another wait state but was never the currently running thread when the clock interval timer fired, it would never have its quantum charged for the time it was running. Because threads now have CPU clock cycles charged instead of quanṭums, and because this no longer depends on the clock interval timer, these adjustments are not required.
 
@@ -1670,24 +1638,24 @@ FIGURE 4-10 Quantum configuration in the Performance Options dialog box.
 This dialog box contains two key options:
 
 - ■ Programs This setting designates the use of short, variable quantums, which is the default for
-client versions of Windows (and other client-like versions, such as mobile, XBOX, HoloLens, and
-so on). If you install Terminal Services on a server system and configure the server as an applica-
-tion server, this setting is selected so that the users on the terminal server have the same quan-
-tum settings that would normally be set on a desktop or client system. You might also select this
-manually if you were running Windows Server as your desktop OS.
-■ Background Services This setting designates the use of long, fixed quantums—the default
-for server systems. The only reason you might select this option on a workstation system is if
-you were using the workstation as a server system. However, because changes in this option
-take effect immediately, it might make sense to use it if the machine is about to run a back-
-ground or server-style workload. For example, if a long-running computation, encoding, or
-modeling simulation needs to run overnight, you could select the Background Services option
-at night and return the system to Programs mode in the morning.
+  client versions of Windows (and other client-like versions, such as mobile, XBOX, HoloLens, and
+  so on). If you install Terminal Services on a server system and configure the server as an applica-
+  tion server, this setting is selected so that the users on the terminal server have the same quan-
+  tum settings that would normally be set on a desktop or client system. You might also select this
+  manually if you were running Windows Server as your desktop OS.
+  ■ Background Services This setting designates the use of long, fixed quantums—the default
+  for server systems. The only reason you might select this option on a workstation system is if
+  you were using the workstation as a server system. However, because changes in this option
+  take effect immediately, it might make sense to use it if the machine is about to run a back-
+  ground or server-style workload. For example, if a long-running computation, encoding, or
+  modeling simulation needs to run overnight, you could select the Background Services option
+  at night and return the system to Programs mode in the morning.
+
 ## Variable quantums
 
 When variable quantums are enabled, the variable quantum table (PspVariableQuantums), which holds an array of six quantum numbers, is loaded into the PspForegroundQuantum table (a three-element array) that is used by the PspComputeQuantum function. Its algorithm will pick the appropriate quantum index based on whether the process is a foreground process—that is, whether it contains the thread that owns the foreground window on the desktop. If this is not the case, an index of 0 is chosen, which corresponds to the default thread quantum described earlier. If it is a foreground process, the quantum index corresponds to the priority separation.
 
-CHAPTER 4  Threads      235
-
+CHAPTER 4 Threads 235
 
 ---
 
@@ -1704,7 +1672,6 @@ in use.
 TABLE 4-2 Quantum values
 
 <table><tr><td></td><td colspan="3">Short Quantum Index</td><td colspan="3">Long Quantum Index</td></tr><tr><td>Variable</td><td>6</td><td>12</td><td>18</td><td>12</td><td>24</td><td>36</td></tr><tr><td>Fixed</td><td>18</td><td>18</td><td>18</td><td>36</td><td>36</td><td>36</td></tr></table>
-
 
 Thus, when a window is brought into the foreground on a client system, all the threads in the process containing the thread that owns the foreground window have their quantums tripled. Threads in the foreground process run with a quantum of six clock ticks, whereas threads in other processes have the default client quantum of two clock ticks. In this way, when you switch away from a CPU-intensive process, the new foreground process will get proportionally more of the CPU. This is because when its threads run, they will have a longer turn than background threads (again, assuming the thread priorities are the same in both the foreground and background processes).
 
@@ -1727,8 +1694,9 @@ FIGURE 4-11 Fields of the Win32PrioritySeparation registry value.
 The fields shown in Figure 4-11 can be defined as follows:
 
 - ■ Short vs. Long A value of 1 specifies long quantums, and a value of 2 specifies short ones.
-A setting of 0 or 3 indicates that the default appropriate for the system will be used (short for
-client systems, long for server systems).
+  A setting of 0 or 3 indicates that the default appropriate for the system will be used (short for
+  client systems, long for server systems).
+
 ---
 
 - ■ Variable vs. Fixed A value of 1 means to enable the variable quantum table based on the
@@ -1777,18 +1745,19 @@ and Background Services, affect the PspPrioritySeparation and PspForegroundQuant
 as well as modify the QuantumReset value of threads on the system. Take the following steps:
 
 - 1. Open the System utility in Control Panel or right-click the This PC icon on the desktop
-and choose Properties.
+     and choose Properties.
 
 2. Click the Advanced System Settings label, click the Advanced tab, click the Settings
-button in the Performance section, and click the second Advanced tab.
+   button in the Performance section, and click the second Advanced tab.
 
 3. Select the Programs option and click Apply. Keep this dialog box open for the duration
-of the experiment.
+   of the experiment.
 
 4. Dump the values of PsPrioritySeparation and PspForegroundQuantum, as shown
-here. The values shown are what you should see on a Windows system after making the
-change in steps 1–3. Notice how the variable short quantum table is being used and that
-a priority boost of 2 will apply to foreground applications:
+   here. The values shown are what you should see on a Windows system after making the
+   change in steps 1–3. Notice how the variable short quantum table is being used and that
+   a priority boost of 2 will apply to foreground applications:
+
 ---
 
 ```bash
@@ -1852,8 +1821,7 @@ priority-inversion avoidance)
 
 APTER 4 Threads
 
-From the Library
----
+## From the Library
 
 Like any scheduling algorithms, however, these adjustments aren't perfect, and they might not benefit all applications.
 
@@ -1872,16 +1840,16 @@ Client versions of Windows also include a pseudo-boosting mechanism that occurs 
 Whenever a dispatch event occurs, the KIeXeTDiDispatcher routine is called. Its job is to process the deferred ready list by calling KIiProcessThreadwa1tList and then call kzCheckForThreadD1spatch to check whether any threads on the current processor should not be scheduled. Whenever such an event occurs, the caller can also specify which type of boost should be applied to the thread, as well as what priority increment the boost should be associated with. The following scenarios are considered as AdjJust1RawIt dispatch events because they deal with a dispatcher (synchronization) object entering a signaled state, which might cause one or more threads to wake up:
 
 - ■ An asynchronous procedure call (APC; described in Chapter 6 and in more detail in Chapter 8 in
-Part 2) is queued to a thread.
-■ An event is set or pulsed.
-■ A timer was set, or the system time was changed, and timers had to be reset.
-■ A mutex was released or abandoned.
-■ A process exited.
-■ An entry was inserted in a queue (KQUEUE), or the queue was flushed.
-■ A semaphore was released.
-■ A thread was alerted, suspended, resumed, frozen, or thawed.
-■ A primary UMS thread is waiting to switch to a scheduled UMS thread.
-For scheduling events associated with a public API (such as SetEvent), the boost increment applied is specified by the caller. Windows recommends certain values to be used by developers, which will be described later. For alerts, a boost of 2 is applied (unless the thread is put in an alert wait by calling KeAlertThreadByThreadId, in which case the applied boost is 1), because the alert API does not have a parameter allowing a caller to set a custom increment.
+  Part 2) is queued to a thread.
+  ■ An event is set or pulsed.
+  ■ A timer was set, or the system time was changed, and timers had to be reset.
+  ■ A mutex was released or abandoned.
+  ■ A process exited.
+  ■ An entry was inserted in a queue (KQUEUE), or the queue was flushed.
+  ■ A semaphore was released.
+  ■ A thread was alerted, suspended, resumed, frozen, or thawed.
+  ■ A primary UMS thread is waiting to switch to a scheduled UMS thread.
+  For scheduling events associated with a public API (such as SetEvent), the boost increment applied is specified by the caller. Windows recommends certain values to be used by developers, which will be described later. For alerts, a boost of 2 is applied (unless the thread is put in an alert wait by calling KeAlertThreadByThreadId, in which case the applied boost is 1), because the alert API does not have a parameter allowing a caller to set a custom increment.
 
 ---
 
@@ -1894,6 +1862,7 @@ ERESOURCE reader-writer kernel lock.
 ■ A gate is set through the KeSignalGate interface, which is used by various internal mechanisms
 
 when releasing a gate lock.
+
 ## Unwait boosts
 
 Unwait boosts attempt to decrease the latency between a thread waking up due to an object being
@@ -1916,7 +1885,7 @@ objects result in a boost of 1. In the user-mode API, an increment cannot be spe
 
 system calls such as NtSetEvent have parameters to specify such a boost. Instead, when these APIs call
 
-the underlying Ke interface, they automatically use the default _INCREMENT definition. This is also the
+the underlying Ke interface, they automatically use the default \_INCREMENT definition. This is also the
 
 case when mutexes are abandoned or timers are reset due to a system time change: The system uses
 
@@ -1964,8 +1933,7 @@ the scheduler actually applies boosting, which is the subject of the next sectio
 
 Windows gives temporary priority boosts upon completion of certain I/O operations so that threads that were waiting for an I/O have more of a chance to run right away and process whatever was being waited for. Although you'll find recommended boost values in the Windows Driver Kit (WDK) header files (by searching for #define IO, in Wdm.h or Ntdk.h), the actual value for the boost is up to the device driver. (These values are listed in Table 4-3.) It is the device driver that specifies the boost when it completes an I/O request on its call to the kernel function, IoCompleteRequest. In Table 4-3, notice that I/O requests to devices that warrant better responsiveness have higher boost values.
 
-CHAPTER 4  Threads      241
-
+CHAPTER 4 Threads 241
 
 ---
 
@@ -1973,14 +1941,13 @@ TABLE 4-3 Recommended boost values
 
 <table><tr><td>Device</td><td>Boost</td></tr><tr><td>Disk, CD-ROM, parallel, video</td><td>1</td></tr><tr><td>Network, mailslot, named pipe, serial</td><td>2</td></tr><tr><td>Keyboard, mouse</td><td>6</td></tr><tr><td>Sound</td><td>8</td></tr></table>
 
-
 ![Figure](figures/Winternals7thPt1_page_259_figure_002.png)
 
 Note You might intuitively expect better responsiveness from your video card or disk than a boost of 1. However, the kernel is in fact trying to optimize for latency, to which some devices (as well as human sensory inputs) are more sensitive than others. To give you an idea, a sound card expects data around every 1 ms to play back music without perceptible glitches, while a video card needs to output at only 24 frames per second, or about once every 40 ms, before the human eye can notice glitches.
 
 As hinted earlier, these I/O completion boosts rely on the unwait boosts seen in the previous section. Chapter 6 shows the mechanism of I/O completion in depth. For now, the important detail is that the kernel implements the signaling code in the IoCompleteRequest API through the use of either an APC (for asynchronous I/O) or through an event (for synchronous I/O). When a driver passes in—for example, IO_DISK_INCREMENT to IoCompleteRequest for an asynchronous disk read—the kernel calls KeInsertQueueApc with the boost parameter set to IO_DISK_INCREMENT. In turn, when the thread's wait is broken due to the APC, it receives a boost of 1.
 
-Be aware that the boost values given in Table 4-3 are merely recommendations by Microsoft. Driver developers are free to ignore them, and certain specialized drivers can use their own values. For example, a driver handling ultrasound data from a medical device, which must notify a user-mode visualization application of new data, would probably use a boost value of 8 as well, to satisfy the same latency as a sound card. In most cases, however, due to the way Windows driver stacks are built (again, see Chapter 6 for more information), driver developers often write minidrivers, which call into a Microsoft-owned driver that supplies its own boost to IoCompleteRequest. For example, RAID or SATA controller card developers typically call StorPortCompleteRequest to complete processing their requests. This call does not have any parameter for a boost value, because the StorPort.sys driver fills in the right value when calling the kernel. Additionally, whenever any file system driver (identified by setting its device type to FILE_ DEVICE_DISK_FILE_SYSTEM or FILE_DEVICE_NETWORK_FILE_SYSTEM) completes its request, a boost of IO_DISK_INCREMENT is always applied if the driver passed in IO_NO_INCREMENT (0) instead. So this boost value has become less of a recommendation and more of a requirement enforced by the kernel.
+Be aware that the boost values given in Table 4-3 are merely recommendations by Microsoft. Driver developers are free to ignore them, and certain specialized drivers can use their own values. For example, a driver handling ultrasound data from a medical device, which must notify a user-mode visualization application of new data, would probably use a boost value of 8 as well, to satisfy the same latency as a sound card. In most cases, however, due to the way Windows driver stacks are built (again, see Chapter 6 for more information), driver developers often write minidrivers, which call into a Microsoft-owned driver that supplies its own boost to IoCompleteRequest. For example, RAID or SATA controller card developers typically call StorPortCompleteRequest to complete processing their requests. This call does not have any parameter for a boost value, because the StorPort.sys driver fills in the right value when calling the kernel. Additionally, whenever any file system driver (identified by setting its device type to FILE\_ DEVICE_DISK_FILE_SYSTEM or FILE_DEVICE_NETWORK_FILE_SYSTEM) completes its request, a boost of IO_DISK_INCREMENT is always applied if the driver passed in IO_NO_INCREMENT (0) instead. So this boost value has become less of a recommendation and more of a requirement enforced by the kernel.
 
 ## Boosts during waiting on executive resources
 
@@ -1992,8 +1959,7 @@ must enter a wait state until the other thread has released the resource. To lim
 
 the executive performs this wait in intervals of 500 ms instead of doing an infinite wait on the resource.
 
-242    CHAPTER 4  Threads
-
+242 CHAPTER 4 Threads
 
 ---
 
@@ -2028,12 +1994,13 @@ EXPERIMENT: Watching foreground priority boosts and decays
 Using the CPU Stress tool, you can watch priority boosts in action. Take the following steps:
 
 - 1. Open the System utility in Control Panel or right-click the This Computer icon on the
-desktop and choose Properties.
+     desktop and choose Properties.
 
 2. Click the Advanced System Settings label, click the Advanced tab, click the Settings
-button in the Performance section, and click the Advanced tab.
+   button in the Performance section, and click the Advanced tab.
 
 3. Select the Programs option. This gives PsPrioritySeparation a value of 2.
+
 ---
 
 4. Run CPU Stress, right-click thread 1, and choose Busy from the context menu.
@@ -2093,6 +2060,7 @@ button in the Performance section, and click the Advanced tab.
 3. Select the Programs option. This gives PsPrioritySeparation a value of 2.
 
 4. Run Notepad.
+
 ---
 
 5. Start the Performance Monitor tool.
@@ -2125,8 +2093,7 @@ Note You won't likely catch Notepad at 8. This is because it runs so little afte
 
 Imagine the following situation: A priority 7 thread is running, preventing a priority 4 thread from ever receiving CPU time. However, a priority 11 thread is waiting for some resource that the priority 4 thread has locked. But because the priority 7 thread in the middle is eating up all the CPU time, the priority 4 thread will never run long enough to finish whatever it's doing and release the resource blocking the priority 11 thread. This scenario is known as priority inversion.
 
-246   CHAPTER 4  Threads
-
+246 CHAPTER 4 Threads
 
 ---
 
@@ -2175,6 +2142,7 @@ Using the CPU Stress tool, you can watch priority boosts in action. In this expe
 2. The activity level of thread 1 is Low. Change it to Maximum.
 
 3. The thread priority of thread 1 is Normal. Change it to Lowest.
+
 ---
 
 4. Click thread 2. Its activity level is Low. Change it to Maximum.
@@ -2201,8 +2169,7 @@ Using the CPU Stress tool, you can watch priority boosts in action. In this expe
 
 13. Exit Performance Monitor and CPU Stress.
 
-248    CHAPTER 4  Threads
-
+248 CHAPTER 4 Threads
 
 ---
 
@@ -2236,8 +2203,7 @@ In all cases where a Prio rityDecrement is present, the quantum of the thread is
 
 After this work is complete, AdjustReason is now set to AdjustNone.
 
-CHAPTER 4  Threads      249
-
+CHAPTER 4 Threads 249
 
 ---
 
@@ -2263,7 +2229,7 @@ quantum end.
 
 FIGURE 4-12 Priority boosting and decay.
 
-250    CHAPTER 4   Threads
+250 CHAPTER 4 Threads
 
 ---
 
@@ -2314,7 +2280,6 @@ TABLE 4-4 Scheduling categories
 
 <table><tr><td>Category</td><td>Priority</td><td>Description</td></tr><tr><td>High</td><td>23-26</td><td>Pro Audio threads running at a higher priority than any other thread on the system except for critical system threads</td></tr><tr><td>Medium</td><td>16-22</td><td>The threads part of a foreground application such as Windows Media Player</td></tr><tr><td>Low</td><td>8-15</td><td>All other threads that are not part of the previous categories</td></tr><tr><td>Exhausted</td><td>4-6</td><td>Threads that have exhausted their share of the CPU and will continue running only if no other higher-priority threads are ready to run</td></tr></table>
 
-
 The main mechanism behind MMCSS boosts the priority of threads inside a registered process to the priority level matching their scheduling category and relative priority within this category for a guaranteed period. It then lowers those threads to the exhausted category so that other, non-multimedia threads on the system can also get a chance to execute.
 
 By default, multimedia threads get 80 percent of the CPU time available, while other threads receive 20 percent. (Based on a sample of 10 ms, that would be 8 ms and 2 ms, respectively.) You can change this percentage by modifying the SystemResponsiveness registry value under the HKLM\SOFTWARE\ Microsoft\Windows NT\CurrentVersionOn\Multimedia1SystemProfile key. The value can range from 10 to 100 percent (20 is the default; setting a value lower than 10 evaluates to 10), which indicates the CPU percentage guaranteed to the system (not the registered audio apps). MMCS5 scheduling thread runs at priority 27 because they need to preempt any Pro Audio threads to lower their priority to the exhausted category.
@@ -2326,17 +2291,18 @@ As discussed, changing the relative thread priorities within a process does not 
 In this experiment, you'll see the effects of MMCSS priority boosting.
 
 - 1. Run Windows Media Player (wmplayer.exe). (Other playback programs might not take
-advantage of the API calls required to register with MMCSS.)
+     advantage of the API calls required to register with MMCSS.)
 
 2. Play some audio content.
 
 3. Using Task Manager or Process Explorer, set the affinity of the Wmplayer.exe process so
-that it runs on only one CPU.
+   that it runs on only one CPU.
 
 4. Start the Performance Monitor tool.
 
 5. Using Task Manager, change Performance Monitor's priority class to Realtime so it will
-have a better chance of recording activity.
+   have a better chance of recording activity.
+
 ---
 
 - 6. Click the Add Counter toolbar button or press Ctrl+I to open the Add Counters dialog box.
@@ -2350,8 +2316,8 @@ have a better chance of recording activity.
 10. Open the Action menu and choose Properties.
 
 11. On the Graph tab, change the maximum vertical scale to 32. You should see one or more
-priority-16 threads inside Wmplayer, which will be constantly running unless there is a
-higher-priority thread requiring the CPU after they are dropped to the exhausted category.
+    priority-16 threads inside Wmplayer, which will be constantly running unless there is a
+    higher-priority thread requiring the CPU after they are dropped to the exhausted category.
 
 12. Run CPU Stress.
 
@@ -2362,15 +2328,14 @@ higher-priority thread requiring the CPU after they are dropped to the exhausted
 15. Change the CPUSTRES priority class to High.
 
 16. Change the CPUSTRES affinity to use the same CPU used for Wmplayer. The system
-should slow down considerably, but the music playback should continue. Every so often,
-you'll be able to get back some responsiveness from the rest of the system.
+    should slow down considerably, but the music playback should continue. Every so often,
+    you'll be able to get back some responsiveness from the rest of the system.
 
 17. In Performance Monitor, notice that the WmPlayer priority 16 threads drop from time to
-time as shown here:
-![Figure](figures/Winternals7thPt1_page_270_figure_001.png)
+    time as shown here:
+    ![Figure](figures/Winternals7thPt1_page_270_figure_001.png)
 
-CHAPTER 4  Threads      253
-
+CHAPTER 4 Threads 253
 
 ---
 
@@ -2405,7 +2370,7 @@ Windows 8 and Server 2012 introduced an optimization called Direct Switch, that 
 
 ![Figure](figures/Winternals7thPt1_page_272_figure_006.png)
 
-FIGURE 4-13   Direct Switch.
+FIGURE 4-13 Direct Switch.
 
 ---
 
@@ -2416,13 +2381,14 @@ If possible, the KiDi1rectSwi tchThread function performs the actual switch. It'
 Direct Switch is currently used in the following scenarios:
 
 - ■ If a thread calls the SignalObjectAndWait Windows API (or its kernel equivalent
-NtSignalAndWaitForSingleObject)
+  NtSignalAndWaitForSingleObject)
 
 ■ ALPC (described in Chapter 8 in Part 2)
 
 ■ Synchronous remote procedure call (RPC) calls
 
 ■ COM remote calls (currently MTA [multithreaded apartment] to MTA only)
+
 ## Scheduling scenarios
 
 Windows answers the question of "Who gets the CPU?" based on thread priority, but how does this approach work in practice? The following sections illustrate just how priority-driven preemptive multitasking works on the thread level.
@@ -2443,16 +2409,16 @@ Figure 4-14 illustrates a thread entering a wait state and Windows selecting a n
 
 ![Figure](figures/Winternals7thPt1_page_274_figure_000.png)
 
-FIGURE 4-14   Voluntary switching.
+FIGURE 4-14 Voluntary switching.
 
 ## Preemption
 
 In this scheduling scenario, a lower-priority thread is preempted when a higher-priority thread becomes ready to run. This situation might occur for a couple of reasons:
 
 - ■ A higher-priority thread's wait completes (the event that the other thread was waiting for has
-occurred).
-■ A thread priority is increased or decreased.
-In either of these cases, Windows must determine whether the currently running thread should continue to run or be preempted to allow a higher-priority thread to run.
+  occurred).
+  ■ A thread priority is increased or decreased.
+  In either of these cases, Windows must determine whether the currently running thread should continue to run or be preempted to allow a higher-priority thread to run.
 
 ![Figure](figures/Winternals7thPt1_page_274_figure_006.png)
 
@@ -2468,8 +2434,7 @@ When a thread is preempted, it is put at the head of the ready queue for the pri
 
 FIGURE 4-15 Preemptive thread scheduling.
 
-CHAPTER 4  Threads     257
-
+CHAPTER 4 Threads 257
 
 ---
 
@@ -2504,17 +2469,18 @@ As you saw, instead of simply relying on a clock interval timer-based quantum to
 Using a scheduling model that relies only on the clock interval timer, the following situation can occur:
 
 - ■ Threads A and B become ready to run during the middle of an interval. (Scheduling code runs
-not just at each clock interval, so this is often the case.)
-■ Thread A starts running but is interrupted for a while. The time spent handling the interrupt is
-charged to the thread.
-■ Interrupt processing finishes and thread A starts running again, but it quickly hits the next clock
-interval. The scheduler can assume only that thread A had been running all this time and now
-switches to thread B.
+  not just at each clock interval, so this is often the case.)
+  ■ Thread A starts running but is interrupted for a while. The time spent handling the interrupt is
+  charged to the thread.
+  ■ Interrupt processing finishes and thread A starts running again, but it quickly hits the next clock
+  interval. The scheduler can assume only that thread A had been running all this time and now
+  switches to thread B.
+
 ---
 
 - ■ Thread 8 starts running and has a chance to run for a full clock interval (barring preemption or
-interrupt handling).
-In this scenario, thread A was unfairly penalized in two different ways. First, the time it spent handling a device interrupt was counted against its own CPU time, even though the thread probably had nothing to do with the interrupt. (Interrupts are handled in the context of whichever thread was running at the time, as discussed in Chapter 6.) It was also unfairly penalized for the time the system was idling inside that clock interval before it was scheduled. Figure 4-17 illustrates this scenario.
+  interrupt handling).
+  In this scenario, thread A was unfairly penalized in two different ways. First, the time it spent handling a device interrupt was counted against its own CPU time, even though the thread probably had nothing to do with the interrupt. (Interrupts are handled in the context of whichever thread was running at the time, as discussed in Chapter 6.) It was also unfairly penalized for the time the system was idling inside that clock interval before it was scheduled. Figure 4-17 illustrates this scenario.
 
 ![Figure](figures/Winternals7thPt1_page_276_figure_002.png)
 
@@ -2523,22 +2489,21 @@ FIGURE 4-17 Unfair time slicing in pre-Vista versions of Windows.
 Windows keeps an accurate count of the exact number of CPU clock cycles spent doing work that the thread was scheduled to do (which means excluding interrupts). It also keeps a quantum target of clock cycles that should have been spent by the thread at the end of its quantum. Therefore, both of the unfair decisions that would have been made against thread A as described in the preceding paragraph will not happen in Windows. Instead, the following situation occurs:
 
 - ■ Threads A and B become ready to run during the middle of an interval.
-■ Thread A starts running but is interrupted for a while. The CPU clock cycles spent handling the
-interrupt are not charged to the thread.
-■ Interrupt processing finishes and thread A starts running again, but it quickly hits the next clock
-interval. The scheduler looks at the number of CPU clock cycles charged to the thread and com-
-pares them to the expected CPU clock cycles that should have been charged at quantum end.
-■ Because the former number is much smaller than it should be, the scheduler assumes that
-thread A started running in the middle of a clock interval and might have been additionally
-interrupted.
-■ Thread A gets its quantum increased by another clock interval, and the quantum target is
-recalculated. Thread A now has its chance to run for a full clock interval.
-■ At the next clock interval, thread A has finished its quantum, and thread B now gets a chance
-to run.
-Figure 4-18 illustrates this scenario.
+  ■ Thread A starts running but is interrupted for a while. The CPU clock cycles spent handling the
+  interrupt are not charged to the thread.
+  ■ Interrupt processing finishes and thread A starts running again, but it quickly hits the next clock
+  interval. The scheduler looks at the number of CPU clock cycles charged to the thread and com-
+  pares them to the expected CPU clock cycles that should have been charged at quantum end.
+  ■ Because the former number is much smaller than it should be, the scheduler assumes that
+  thread A started running in the middle of a clock interval and might have been additionally
+  interrupted.
+  ■ Thread A gets its quantum increased by another clock interval, and the quantum target is
+  recalculated. Thread A now has its chance to run for a full clock interval.
+  ■ At the next clock interval, thread A has finished its quantum, and thread B now gets a chance
+  to run.
+  Figure 4-18 illustrates this scenario.
 
-CHAPTER 4   Threads      259
-
+CHAPTER 4 Threads 259
 
 ---
 
@@ -2588,8 +2553,7 @@ KPCR for Processor 0 at ffff80174b0000:
         Ntlib.UserPointer: FFFFF80174b000001
 ```
 
-260   CHAPTER 4   Threads
-
+260 CHAPTER 4 Threads
 
 ---
 
@@ -2638,9 +2602,7 @@ Priority 0 BasePriority 0 PriorityDecrement 0 IoPriority 0 PagePriority 5
 
 Finally, use the !process command on the owning process shown in the preceding output.
 
-
 For brevity, we'll add a second parameter value of 3, which causes !process to emit only minimal
-
 
 information for each thread:
 
@@ -2693,8 +2655,7 @@ Token                          ffff800a52e17040
 
 The preceding experiment shows some of the anomalies associated with the idle process and its threads. The debugger indicates an Image name of Idle (which comes from the EPROCESS structure's ImageFileName member), but various Windows utilities report the idle process using different names. Task Manager and Process Explorer call it System Idle Process, while t11st calls it System Process. The process ID and thread IDs (the client IDs, or Cid in the debugger's output) are 0, as are the PEB and TEB pointers and potentially many other fields in the idle process or its threads. Because the idle process has no user-mode address space and its threads execute no user-mode code, they have no need of the various data required to manage a user-mode environment. Also, the idle process is not an objectmanager process object, and its idle threads are not object-manager thread objects. Instead, the initial idle thread and idle process structures are statically allocated and used to bootstrap the system before the process manager and the object manager are initialized. Subsequent idle thread structures are allocated dynamically (as simple allocations from a non-paged pool, bypassing the object manager) as additional processors are brought online. Once process management initializes, it uses the special variable PSEidleProcess to refer to the idle process.
 
-262   CHAPTER 4  Threads
-
+262 CHAPTER 4 Threads
 
 ---
 
@@ -2719,7 +2680,6 @@ Although some details of the flow vary between architectures (this is one of the
 7. The idle thread calls the registered power-management processor idle routine (in case any power-management functions need to be performed), which is either in the processor power driver (such as intelppm.sys) or in the HAL if such a driver is unavailable.
 
 CHAPTER 4 Threads 263
-
 
 ---
 
@@ -2841,8 +2801,7 @@ job at 8f575030
         TotalUserTime:       0x0
 ```
 
-CHAPTER 4   Threads      265
-
+CHAPTER 4 Threads 265
 
 ---
 
@@ -2882,44 +2841,44 @@ Whenever a logical processor needs to pick the next thread to run, it calls the 
 scheduler function. This can happen in a variety of scenarios:
 
 - ■ A hard affinity change has occurred, making the currently running or standby thread ineligible
-for execution on its selected logical processor. Therefore, another must be chosen.
-■ The currently running thread reached its quantum end, and the Symmetric Multithreading
-(SMT) set it was running on has become busy while other SMT sets within the ideal node are
-fully idle. (Symmetric Multithreading is the technical name for the hyper-threading technol-
-ogy described in Chapter 2.) The scheduler performs a quantum-end migration of the current
-thread, so another must be chosen.
-■ A wait operation has finished, and there were pending scheduling operations in the wait status
-register (in other words, the priority and/or affinity bits were set).
+  for execution on its selected logical processor. Therefore, another must be chosen.
+  ■ The currently running thread reached its quantum end, and the Symmetric Multithreading
+  (SMT) set it was running on has become busy while other SMT sets within the ideal node are
+  fully idle. (Symmetric Multithreading is the technical name for the hyper-threading technol-
+  ogy described in Chapter 2.) The scheduler performs a quantum-end migration of the current
+  thread, so another must be chosen.
+  ■ A wait operation has finished, and there were pending scheduling operations in the wait status
+  register (in other words, the priority and/or affinity bits were set).
+
 ---
 
 In these scenarios, the behavior of the scheduler is as follows:
 
 - ■ The scheduler calls KiSelectReadyThreadEx to search for the next ready thread that the pro-
-cessor should run and check whether one was found.
-■ If a ready thread was not found, the idle scheduler is enabled, and the idle thread is selected for
-execution. If a ready thread was found, it is put in the ready state in the local or shared ready
-queue, as appropriate.
-The KiSelectNextThread operation is performed only when the logical processor needs to pick— but not yet run—the next schedulable thread (which is why the thread will enter the Ready state). Other times, however, the logical processor is interested in immediately running the next ready thread or performing another action if one is not available (instead of going idle), such as when the following occurs:
+  cessor should run and check whether one was found.
+  ■ If a ready thread was not found, the idle scheduler is enabled, and the idle thread is selected for
+  execution. If a ready thread was found, it is put in the ready state in the local or shared ready
+  queue, as appropriate.
+  The KiSelectNextThread operation is performed only when the logical processor needs to pick— but not yet run—the next schedulable thread (which is why the thread will enter the Ready state). Other times, however, the logical processor is interested in immediately running the next ready thread or performing another action if one is not available (instead of going idle), such as when the following occurs:
 
 - ■ A priority change causes the current standby or running thread to no longer be the highest-pri-
-ority ready thread on its selected logical processor, meaning that a higher priority ready thread
-must now run.
-■ The thread has explicitly yielded with YieldProcessor or NtYieldExecution and another
-thread might be ready for execution.
-■ The quantum of the current thread has expired, and other threads at the same priority level
-need their chance to run as well.
-■ A thread has lost its priority boost, causing a similar priority change to the scenario just de-
-scribed.
-■ The idle scheduler is running and needs to check whether a ready thread has not appeared in
-the interval between when the idle scheduling was requested and the idle scheduler ran.
-A simple way to remember the difference between which routine runs is to check whether the logical processor must run a different thread (in which case KIsectNextThread is called) or if it should if possible run a different thread (in which case KIsectReadyThreadEx is called). In either case, because each processor belongs to a shared ready queue (pointed to by the KPRCB), KIsectReadyThreadEx can simply check the current logical processor's (LP's) queues, removing the first highestpriority thread that it finds unless this priority is lower than the one of the currently running thread (depending on whether the current thread is still allowed to run, which would not be the case in the KIsectNextThread scenario). If there is no higher-priority thread (or no threads are ready at all), no thread is returned.
+  ority ready thread on its selected logical processor, meaning that a higher priority ready thread
+  must now run.
+  ■ The thread has explicitly yielded with YieldProcessor or NtYieldExecution and another
+  thread might be ready for execution.
+  ■ The quantum of the current thread has expired, and other threads at the same priority level
+  need their chance to run as well.
+  ■ A thread has lost its priority boost, causing a similar priority change to the scenario just de-
+  scribed.
+  ■ The idle scheduler is running and needs to check whether a ready thread has not appeared in
+  the interval between when the idle scheduling was requested and the idle scheduler ran.
+  A simple way to remember the difference between which routine runs is to check whether the logical processor must run a different thread (in which case KIsectNextThread is called) or if it should if possible run a different thread (in which case KIsectReadyThreadEx is called). In either case, because each processor belongs to a shared ready queue (pointed to by the KPRCB), KIsectReadyThreadEx can simply check the current logical processor's (LP's) queues, removing the first highestpriority thread that it finds unless this priority is lower than the one of the currently running thread (depending on whether the current thread is still allowed to run, which would not be the case in the KIsectNextThread scenario). If there is no higher-priority thread (or no threads are ready at all), no thread is returned.
 
 ## Idle scheduler
 
 Whenever the idle thread runs, it checks whether idle scheduling has been enabled. If so, the idle thread begins scanning other processors' ready queues for threads it can run by calling K!SearchForNewThread. The run-time costs associated with this operation are not charged as idle thread time, but are instead charged as interrupt and DPC time (charged to the processor), so idle scheduling time is considered system time. The K!SearchForNewThread algorithm, which is based on the functions described earlier in this section, is explained shortly.
 
-CHAPTER 4   Threads      267
-
+CHAPTER 4 Threads 267
 
 ---
 
@@ -2950,10 +2909,9 @@ Id1eSummary:
 
 ---
 
-No PRC1 SMTP Set 0 ffffffff80a37546180 **-------------------(0000000000000003) 0x00000001 0 ffffffffba01cb31a180 **-------------------(0000000000000003) 0x00000002 0 ffffffffba01cb3122180 **-------------------(0000000000000003) 0x00000003 0 ffffffffba01cb366180 **-------------------(0000000000000003) 0x00000004 0 ffffffffba01cab6180 **-------------------(0000000000000003) 0x00000005 0 ffffffffba01cb491180 **-------------------(0000000000000003) 0x00000006 0 ffffffffba01cb491280 **-------------------(0000000000000003) 0x00000007
+No PRC1 SMTP Set 0 ffffffff80a37546180 **-------------------(0000000000000003) 0x00000001 0 ffffffffba01cb31a180 **-------------------(0000000000000003) 0x00000002 0 ffffffffba01cb3122180 **-------------------(0000000000000003) 0x00000003 0 ffffffffba01cb366180 **-------------------(0000000000000003) 0x00000004 0 ffffffffba01cab6180 **-------------------(0000000000000003) 0x00000005 0 ffffffffba01cb491180 **-------------------(0000000000000003) 0x00000006 0 ffffffffba01cb491280 \*\*-------------------(0000000000000003) 0x00000007
 
 Maximum cores per physical processor: 8 Maximum logical processor per core: 2
-
 
 NUMA systems
 
@@ -2961,8 +2919,7 @@ Another type of multiprocessor system supported by Windows is a non-uniform memo
 
 The kernel maintains information about each node in a NUMA system. If the KNODE structure called KNODE. The kernel variable KNodeBlock is an array of pointers to the KNODE structures for each node. You can reveal the format of the KNODE structure using the dt command in the kernel debugger, as shown here:
 
-
-1kdt _ dt _ nti _ KNODE 0x0000 0xd00000000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0
+1kdt _ dt _ nti \_ KNODE 0x0000 0xd00000000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0x0000 0x00000000 0
 
 ---
 
@@ -3001,8 +2958,7 @@ Allowed on a Socket boxes:
 NUMA Summary:
 ```
 
-270    CHAPTER 4   Threads
-
+270 CHAPTER 4 Threads
 
 ---
 
@@ -3050,10 +3006,8 @@ While querying the topology of the system to build the various relationships bet
 
 node—that is, how many logical processors can be part of the node. This value is stored in
 
-
 MaximumProcessors in the KeNodeBlock array, which identifies all NUMA nodes on the system.
-CHAPTER 4  Threads      271
-
+CHAPTER 4 Threads 271
 
 ---
 
@@ -3091,22 +3045,22 @@ Note NUMA node 0 is always assigned to group 0, no matter what.
 
 6. If there is more than one node, Windows checks the static NUMA node distances (if any). It then sorts all the nodes by their capacity so that the largest nodes come first. In the groupminimization mode, the kernel figures out the maximum processors there can be by adding up
 
-272    CHAPTER 4    Threads
-
+272 CHAPTER 4 Threads
 
 ---
 
 all the capacities. By dividing that by the number of processors per group, the kernel assumes there will be this many total groups on the machine (limited to a maximum of 20). In groupmaximization mode, the initial estimate is that there will be as many groups as nodes (limited again to 20).
 
 - 7. The kernel begins the final assignment process. All fixed assignments from earlier are now com-
-mitted and groups are created for those assignments.
+     mitted and groups are created for those assignments.
 
 8. All the NUMA nodes are reshuffled to minimize the distance between the different nodes
-within a group. In other words, closer nodes are put in the same group and sorted by distance.
+   within a group. In other words, closer nodes are put in the same group and sorted by distance.
 
 9. The same process is performed for any dynamically configured node to group assignments.
 
 10. Any remaining empty nodes are assigned to group 0.
+
 ## Logical processors per group
 
 Generally, Windows assigns 64 processors per group. But you can also customize this configuration by using different load options such as the /GROUPSIZE option, which is configured through the groupsize BCD element. By specifying a number that is a power of 2, you can force groups to contain fewer processors than normal for purposes such as testing group awareness in the system. For example, a system with eight logical processors can be made to appear to have one, two, or four groups. To force the issue, the /FORCEGROUPWARE option (BCD element groupaware) causes the kernel to avoid group 0 whenever possible, assigning the highest group number available in actions such as thread and DPC affinity selection and process group assignment. You should avoid setting a group size of 1 because this will force almost all applications on the system to behave as if they're running on a uniprocessor machine. This is because the kernel sets the affinity mask of a given process to span only one group until the application requests otherwise (which most applications will not do).
@@ -3115,8 +3069,7 @@ In the edge case where the number of logical processors in a package cannot fit 
 
 Other than causing significant driver and application compatibility problems—which they are designed to identify and root out, when used by developers—these options have an even greater impact on the machine: They force NUMA behaviors even on a non-NUMA machine. This is because Windows will never allow a NUMA node to span multiple groups, as was shown in the assignment algorithms. So, if the kernel is creating artificially small groups, those two groups must each have their own NUMA node. For example, on a quad-core processor with a group size of 2, this will create two groups, and thus two NUMA nodes, which will be subnodes of the main node. This will affect scheduling and memorymanagement policies in the same way a true NUMA system would, which can be useful for testing.
 
-CHAPTER 4  Threads      273
-
+CHAPTER 4 Threads 273
 
 ---
 
@@ -3125,15 +3078,15 @@ CHAPTER 4  Threads      273
 In addition to the shared and local ready queues and summaries, Windows maintains two bitmasks that track the state of the processors on the system. (How these bitmasks are used is explained in the upcoming "Processor selection" section.) Following are the bitmasks that Windows maintains:
 
 - ■ KeActiveProcessors This is the active processor mask, which has a bit set for each usable
-processor on the system. These might be fewer than the number of actual processors if
-the licensing limits of the version of Windows running supports fewer than the number of available
-physical processors. Use the KeRegisteredProcessors variable to see how many processors
-are actually licensed on the machine. In this instance, processors refers to physical packages.
-■ KeMaximumProcessors This is the maximum number of logical processors (including all future
-possible dynamic processor additions) bounded within the licensing limit. It also reveals any
-platform limitations that are queried by calling the HAL and checking with the ACPI SRAT table,
-if any.
-Part of the node's data (KNODE) is the set of idle CPUs in this node (the IdleCPUSet member), idle CPUs that are not parked (IdleNonParkedCPUSet), and idle MTSets (IdleEsatSet).
+  processor on the system. These might be fewer than the number of actual processors if
+  the licensing limits of the version of Windows running supports fewer than the number of available
+  physical processors. Use the KeRegisteredProcessors variable to see how many processors
+  are actually licensed on the machine. In this instance, processors refers to physical packages.
+  ■ KeMaximumProcessors This is the maximum number of logical processors (including all future
+  possible dynamic processor additions) bounded within the licensing limit. It also reveals any
+  platform limitations that are queried by calling the HAL and checking with the ACPI SRAT table,
+  if any.
+  Part of the node's data (KNODE) is the set of idle CPUs in this node (the IdleCPUSet member), idle CPUs that are not parked (IdleNonParkedCPUSet), and idle MTSets (IdleEsatSet).
 
 ## Scheduler scalability
 
@@ -3176,7 +3129,7 @@ EXPERIMENT: Viewing and changing process affinity
 
 In this experiment, you will modify the affinity settings for a process and see that process affinity is inherited by new processes:
 
-CHAPTER 4  Threads      275
+CHAPTER 4 Threads 275
 
 ---
 
@@ -3212,8 +3165,7 @@ To support more than 64 processors, which is the limit enforced by the original 
 
 This is an array of affinity masks, one for each supported processor group (currently defined at 20).
 
-276   CHAPTER 4  Threads
-
+276 CHAPTER 4 Threads
 
 ---
 
@@ -3246,9 +3198,9 @@ Windows drivers usually execute in the context of the calling thread or an arbit
 Each thread has three CPU numbers stored in the kernel thread control block:
 
 - ■ Ideal processor This is the preferred processor that this thread should run on.
-■ Last processor This is the processor the thread last ran on.
-■ Next processor This is the processor that the thread will be or is already running on.
-The ideal processor for a thread is chosen when a thread is created using a seed in the process
+  ■ Last processor This is the processor the thread last ran on.
+  ■ Next processor This is the processor that the thread will be or is already running on.
+  The ideal processor for a thread is chosen when a thread is created using a seed in the process
 
 control block. The seed is incremented each time a thread is created so that the ideal processor for
 
@@ -3262,8 +3214,7 @@ its first thread's ideal processor set to 1, the second to 2, and so on. In that
 
 process are spread across the processors. On SMT systems (hyper-threading), the next ideal processor
 
-CHAPTER 4   Threads      277
-
+CHAPTER 4 Threads 277
 
 ---
 
@@ -3305,8 +3256,7 @@ while the rest of the system is diverted to use other processors. CPU sets provi
 
 The documented user model API is somewhat limited at the time of this writing. GetSystemCPUSet Information returns an array of SYSTEM_CPU_SET_INFORMATION that contains data for each CPU set.
 
-278   CHAPTER 4   Threads
-
+278 CHAPTER 4 Threads
 
 ---
 
@@ -3357,8 +3307,7 @@ CPU Set 1
 
 (Aim for something around 25 percent CPU usage.)
 
-CHAPTER 4  Threads      279
-
+CHAPTER 4 Threads 279
 
 ---
 
@@ -3384,8 +3333,7 @@ Recorder. Then accept the elevation prompt. You should see the following dialog 
 
 ![Figure](figures/Winternals7thPt1_page_297_figure_007.png)
 
-280    CHAPTER 4   Threads
-
+280 CHAPTER 4 Threads
 
 ---
 
@@ -3417,8 +3365,7 @@ something like so:
 
 15. At the moment, we're interested in CPU 0. In the next step, you'll make CPU 0 work for CPUSTRES only. To begin, expand the CPU 0 node. You should see various processes, including CPUSTRES, but certainly not exclusively:
 
-CHAPTER 4  Threads      281
-
+CHAPTER 4 Threads 281
 
 ---
 
@@ -3426,9 +3373,7 @@ CHAPTER 4  Threads      281
 
 16. Enter the following command to restrict the system to use all processors except the first.
 
-
 In this system, the number of processors is eight, so a full mask is 255 (0xff). Removing
-
 
 CPU 0 produces 254 (0xfe). Replace the mask with the correct one for your system:
 
@@ -3452,8 +3397,7 @@ appearing occasionally:
 
 21. Run CPUSET.exe with no arguments again. The first set (CPU 0) is marked Allocated: True because it's now allocated to a particular process and not for general system use.
 
-282    CHAPTER 4    Threads
-
+282 CHAPTER 4 Threads
 
 ---
 
@@ -3493,8 +3437,7 @@ Barring these two scenarios, the work-stealing loop now runs. This code looks at
 
 If no candidate ready thread is found, the next—lower numbered logical processor is attempted, and so on, until all logical processors have been exhausted on the current NUMA node. In this case,
 
-CHAPTER 4  Threads     283
-
+CHAPTER 4 Threads 283
 
 ---
 
@@ -3509,45 +3452,46 @@ We've described how Windows picks a thread when a logical processor needs to mak
 When a thread becomes ready to run, the KiDeferredReadyThread scheduler function is called. This prompts Windows to perform two tasks:
 
 - ■ Adjust priorities and refresh quantums as needed (as explained in the "Priority boosts" section).
-■ Pick the best logical processor for the thread.
-Windows first looks up the thread's ideal processor and then it computes the set of idle processors
+  ■ Pick the best logical processor for the thread.
+  Windows first looks up the thread's ideal processor and then it computes the set of idle processors
 
 within the thread's hard affinity mask. This set is then pruned as follows:
 
 - 1. Any idle logical processors that have been parked by the core-parking mechanism are re-
-moved. (See Chapter 6 for more information on core parking.) If this causes no idle processors
-to remain, idle processor selection is aborted, and the scheduler behaves as if no idle proces-
-sors were available (described in the next section).
+     moved. (See Chapter 6 for more information on core parking.) If this causes no idle processors
+     to remain, idle processor selection is aborted, and the scheduler behaves as if no idle proces-
+     sors were available (described in the next section).
 
 2. Any idle logical processors that are not on the ideal node (defined as the node containing the
-ideal processor) are removed (unless this would cause all idle processors to be eliminated).
+   ideal processor) are removed (unless this would cause all idle processors to be eliminated).
 
 3. On an SMT system, any non-idle SMT sets are removed, even if this might cause the elimination
-of the ideal processor itself. In other words, Windows prioritizes a non-ideal, idle SMT set over
-an ideal processor.
+   of the ideal processor itself. In other words, Windows prioritizes a non-ideal, idle SMT set over
+   an ideal processor.
 
 4. Windows checks whether the ideal processor is among the remaining set of idle processors. If
-not, it must then find the most appropriate idle processor. To do this, it first checks whether the
-processor that the thread last ran on is part of the remaining idle set. If so, it considers this pro-
-cessor to be a temporary ideal processor and selects it. (Recall that the ideal processor attempts
-to maximize processor cache hits, and picking the last processor a thread run on is a good way
-of doing so.) If the last processor is not part of the remaining idle set, Windows checks whether
-the current processor (that is, the processor currently executing this scheduling code) is part of
-this set. If so, it applies the same logic as before.
+   not, it must then find the most appropriate idle processor. To do this, it first checks whether the
+   processor that the thread last ran on is part of the remaining idle set. If so, it considers this pro-
+   cessor to be a temporary ideal processor and selects it. (Recall that the ideal processor attempts
+   to maximize processor cache hits, and picking the last processor a thread run on is a good way
+   of doing so.) If the last processor is not part of the remaining idle set, Windows checks whether
+   the current processor (that is, the processor currently executing this scheduling code) is part of
+   this set. If so, it applies the same logic as before.
+
 ---
 
 - 5. If neither the last nor the current processor is idle, Windows performs one more pruning opera-
-tion, removing any idle logical processors that are not on the same SMT set as the ideal proces-
-sor. If there are none left, Windows instead removes any processors not on the SMT set of the
-current processor (unless this, too, eliminates all idle processors). In other words, Windows
-prefers idle processors that share the same SMT set as the unavailable ideal processor and/or
-last processor it would've liked to pick in the first place. Because SMT implementations share
-the cache on the core, this has nearly the same effect as picking the ideal or last processor from
-a caching perspective.
+     tion, removing any idle logical processors that are not on the same SMT set as the ideal proces-
+     sor. If there are none left, Windows instead removes any processors not on the SMT set of the
+     current processor (unless this, too, eliminates all idle processors). In other words, Windows
+     prefers idle processors that share the same SMT set as the unavailable ideal processor and/or
+     last processor it would've liked to pick in the first place. Because SMT implementations share
+     the cache on the core, this has nearly the same effect as picking the ideal or last processor from
+     a caching perspective.
 
 6. If after the previous step more than one processor remains in the idle set, Windows picks the
-lowest-numbered processor as the thread's current processor.
-After a processor has been selected for the thread to run on, that thread is put in the standby state
+   lowest-numbered processor as the thread's current processor.
+   After a processor has been selected for the thread to run on, that thread is put in the standby state
 
 and the idle processor's PRCB is updated to point to this thread. If the processor is idle but not halted,
 
@@ -3569,8 +3513,7 @@ If this fails, Windows must decide whether to preempt the currently running thre
 
 After a processor is selected, the next question is whether the new thread should preempt the current one on that processor. This is done by comparing the ranks of the two threads. This is an internal scheduling number that indicates the relative power of a thread based on its scheduling group and other factors. (See the section "Group-based scheduling" later in this chapter for a detailed discussion of group scheduling and rank.) If the rank of the new thread is zero (highest) or lower than the current thread's rank, or the ranks are equal but the priority of the new thread is higher than the currently executing one, then preemption should occur. The currently running thread is marked to be preempted, and Windows queues a DPC interrupt to the target processor to preempt the currently running thread in favor of this new thread.
 
-CHAPTER 4  Threads     285
-
+CHAPTER 4 Threads 285
 
 ---
 
@@ -3597,25 +3540,23 @@ The kernel assumes an SMP system, as previously described. However, some ARM-bas
 Windows 10 introduced the ability to distinguish between these cores and schedule threads based on the core's size and policy, including the foreground status of the thread, its priority, and its expected run time. Windows initializes the set of processors when the Power Manager is initialized by calling PopInitializeHelperProcessors (and if processors are hot-added to the system). The function allows the simulation of hetero systems (for example, for testing purposes) by adding keys under the registry key HKLM\System\CurrentControlSet\Control\SessionManager\Kernel\KGroups as follows:
 
 - ■ A key should use two decimal digits to identify a processor group number. (Recall that each
-group holds at most 64 processors.) For example, 00 is the first group, 01 is the second, etc.
-(On most systems, one group would suffice.)
-■ Each key should contain a DWORD value named Sma11ProcessorMask that is a mask of proces-
-sors that would be considered small. For example, if the value is 3 (the first two bits are on) and
-the group has six total processors, that would mean processors 0 and 1 (3 = 1 or 2) are small,
-while the other four processors are big. This is essentially the same as an affinity mask.
-The kernel has several policy options that can be tweaked when dealing with hetero systems, stored
+  group holds at most 64 processors.) For example, 00 is the first group, 01 is the second, etc.
+  (On most systems, one group would suffice.)
+  ■ Each key should contain a DWORD value named Sma11ProcessorMask that is a mask of proces-
+  sors that would be considered small. For example, if the value is 3 (the first two bits are on) and
+  the group has six total processors, that would mean processors 0 and 1 (3 = 1 or 2) are small,
+  while the other four processors are big. This is essentially the same as an affinity mask.
+  The kernel has several policy options that can be tweaked when dealing with hetero systems, stored
 
 in global variables. Table 4-5 shows some of these variables and their meaning.
 
-TABLE 4-5  Hetero kernel variables
+TABLE 4-5 Hetero kernel variables
 
 <table><tr><td>Variable Name</td><td>Meaning</td><td>Default Value</td></tr><tr><td>KiHeteroSystem</td><td>Is the system heterogeneous?</td><td>False</td></tr><tr><td>PopHeteroSystem</td><td>System hetero type: None (0) Simulated(1) EfficiencyClass (2) FavoredCore (3)</td><td>None (0)</td></tr><tr><td colspan="3">CHAPTER 4 Threads</td></tr><tr><td colspan="3">From the Library of</td></tr></table>
-
 
 ---
 
 <table><tr><td>PpmHeteroPolicy</td><td>Scheduling policy: None (0) Manual (1) SmallOnly (2) LargeOnly (3) Dynamic (4)</td><td>Dynamic (4)</td></tr><tr><td>KiDynamicHeteroCpuPolicyMask</td><td>Determine what is considered in assessing whether a thread is important</td><td>7 (foreground status = 1, priority = 2, expected run time = 4)</td></tr><tr><td>KiDefaultDynamicHeteroCpuPolicy</td><td>Behavior of Dynamic hetero policy (see above): A11 (0) (all available) Large (1) LargeOrIdle (2) Small (3) SmallOrIdle (4) Dynamic (5) (use priority and other metrics to decide) BiasedSmall (6) (use priority and other metrics, but prefer small) BiasedLarge (7)</td><td>Small (3)</td></tr><tr><td>KiDynamicHeteroCpuPolicyImportant</td><td>Policy for a dynamic thread that is deemed important (see possible values above)</td><td>LargeOrIdle (2)</td></tr><tr><td>KiDynamicHeteroCpuPolicyImportantShort</td><td>Policy for dynamic thread that is deemed important but run a short amount of time</td><td>Small (3)</td></tr><tr><td>KiDynamicCpuPolicyExpectedRuntime</td><td>Run-time value that is considered heavy</td><td>5,200 msec</td></tr><tr><td>KiDynamicHeteroCpuPolicyImportantPriority</td><td>Priority above which threads are considered important if priority-based dynamic policy is chosen</td><td>8</td></tr></table>
-
 
 Dynamic policies (refer to Table 4-5) must be translated to an importance value based on KiDynamicHeteroPolicyMask and the thread's state. This is done by the KiConvertDynamicHeteroPolicy function, which checks, in order, the foreground state of the thread, its priority relative to KiDynamicHeteroCpuPolicyImportantPriority, and its expected run time. If the thread is deemed important (if running time is the determining factor, then it could be short as well), the important-related policy is used for scheduling decisions. (In Table 4-5, this would be KiDynamicHeteroCpuPolicyImportantShort or KiDynamicHeteroCpuPolicyImportant.)
 
@@ -3635,7 +3576,7 @@ of threads to users and the potential for certain users to benefit from more ove
 
 expense of other users. This is problematic in terminal-services environments, in which dozens of users
 
-CHAPTER 4  Threads      287
+CHAPTER 4 Threads 287
 
 ---
 
@@ -3645,17 +3586,17 @@ Windows 8 and Server 2012 introduced a group-based scheduling mechanism, built a
 
 ![Figure](figures/Winternals7thPt1_page_305_figure_002.png)
 
-FIGURE 4-19   Scheduling group.
+FIGURE 4-19 Scheduling group.
 
 Here are some terms related to group scheduling:
 
 - ■ Generation This is the amount of time over which to track CPU usage.
-■ Quota This is the amount of CPU usage allowed to a group per generation. Over quota means
-the group has used up all its budget. Under quota means the group has not used its full budget.
-■ Weight This is the relative importance of a group, between 1 and 9, where the default is 5.
-■ Fair-share scheduling With this type of scheduling, idle cycles can be given to threads that
-are over quota if no under-quota threads want to run.
-The KSCB structure contains CPU-related information as follows:
+  ■ Quota This is the amount of CPU usage allowed to a group per generation. Over quota means
+  the group has used up all its budget. Under quota means the group has not used its full budget.
+  ■ Weight This is the relative importance of a group, between 1 and 9, where the default is 5.
+  ■ Fair-share scheduling With this type of scheduling, idle cycles can be given to threads that
+  are over quota if no under-quota threads want to run.
+  The KSCB structure contains CPU-related information as follows:
 
 - ■ Cycle usage for this generation
 
@@ -3669,8 +3610,7 @@ assigned quota, it will not be used to give the thread extra CPU time
 never part of a scheduling group)
 An important parameter maintained by a scheduling group is called rank, which can be considered a scheduling priority of the entire group of threads. A rank with a value of 0 is the highest. A higherrank number means the group has used more CPU time and so is less likely to get more CPU time.
 
-288    CHAPTER 4  Threads
-
+288 CHAPTER 4 Threads
 
 ---
 
@@ -3717,8 +3657,7 @@ PspReadFssConfigurationValues again to update the configuration values. Table 4-
 
 values and their meaning.
 
-CHAPTER 4  Threads      289
-
+CHAPTER 4 Threads 289
 
 ---
 
@@ -3726,12 +3665,11 @@ TABLE 4-6 DFSS registry configuration parameters
 
 <table><tr><td>Registry Value Name</td><td>Kernel Variable Name</td><td>Meaning</td><td>Default Value</td></tr><tr><td>DfssShortTermSharingMS</td><td>PsDfssShortTermSharingMS</td><td>The time it takes for the group rank to increase within a generation cycle</td><td>30 ms</td></tr><tr><td>DfssLongTermSharingMS</td><td>PsDfssLongTermSharingMS</td><td>The time it takes to jump from rank 0 to a non-zero rank when the threads exceed their quota within the generation cycle</td><td>15 ms</td></tr><tr><td>DfssGenerationLengthMS</td><td>PsDfssGenerationLengthMS</td><td>The generation time over which to track CPU usage</td><td>600 ms</td></tr><tr><td>DfssLongTermFraction1024</td><td>PsDfssLongTermFraction1024</td><td>The value used in a formula for an exponential moving average used for long-term cycles computation</td><td>512</td></tr></table>
 
-
 After DFSS is enabled, whenever a new session is created (other than session 0), MySessionObject Create allocates a scheduling group associated with the session with the default weight of 5, which is the
 
 middle ground between the minimum of 1 and the maximum of 9. A scheduling group manages either
 
-DFSS or CPU rate-control (see the next section) information based on a policy structure (KSCHEDULING_
+DFSS or CPU rate-control (see the next section) information based on a policy structure (KSCHEDULING\_
 
 GROUP_POLICY) that is part of a scheduling group. The Type member indicates whether it's configured for
 
@@ -3771,8 +3709,7 @@ ffffffffd28cb9b0b40 RUNNING on processor 1
 IRP List:
 ```
 
-290    CHAPTER 4  Threads
-
+290 CHAPTER 4 Threads
 
 ---
 
@@ -3829,8 +3766,7 @@ three-processor virtual machine:
 
 ![Figure](figures/Winternals7thPt1_page_308_figure_006.png)
 
-CHAPTER 4   Threads      291
-
+CHAPTER 4 Threads 291
 
 ---
 
@@ -3867,20 +3803,19 @@ CPU_RATE_CONTROL_INFORMATION containing the actual control data. The structure c
 flags that enable you to apply one of three settings to limit CPU time:
 
 - • CPU rate This value can be between 1 and 10000 and represents a percent multiplied by 100
-(for example, for 40 percent the value should be 4000).
-292   CHAPTER 4  Threads
-
+  (for example, for 40 percent the value should be 4000).
+  292 CHAPTER 4 Threads
 
 ---
 
 - ■ Weight-based This value can be between 1 and 9, relative to the weight of other jobs. (DFSS
-is configured with this setting.)
-■ Minimum and maximum CPU rates These values are specified similarly to the first option.
-When the threads in the job reach the maximum percentage specified in the measuring interval
-(600 ms by default), they cannot get any more CPU time until the next interval begins. You can
-use a control flag to specify whether to use hard capping to enforce the limit even if there is
-spare CPU time available.
-The net result of setting these limits is to place all threads from all processes that are in the job in a
+  is configured with this setting.)
+  ■ Minimum and maximum CPU rates These values are specified similarly to the first option.
+  When the threads in the job reach the maximum percentage specified in the measuring interval
+  (600 ms by default), they cannot get any more CPU time until the next interval begins. You can
+  use a control flag to specify whether to use hard capping to enforce the limit even if there is
+  spare CPU time available.
+  The net result of setting these limits is to place all threads from all processes that are in the job in a
 
 new scheduling group and configuring the group as specified.
 
@@ -4018,8 +3953,7 @@ To address this requirement, the latest generation of server motherboards and sy
 
 Dynamic processor support is provided through the HAL, which notifies the kernel of a new processor on the system through the KeStartDynamicProcessor function. This routine does similar work to that performed when the system detects more than one processor at startup and needs to initialize the structures related to them. When a dynamic processor is added, various system components perform some additional work. For example, the memory manager allocates new pages and memory structures optimized for the CPU. It also initializes a new DPC kernel stack while the kernel initializes the global descriptor table (GDT), the interrupt dispatch table (IDT), the processor control region (PCR), the process control block (PRCB), and other related structures for the processor.
 
-CHAPTER 4  Threads      295
-
+CHAPTER 4 Threads 295
 
 ---
 
@@ -4102,13 +4036,13 @@ numbers provided), this increases the scalability of applications using the new 
 ---
 
 - ■ Dynamic thread creation is enabled.
-■ The number of available workers is lower than the maximum number of workers configured for
-the factory (default of 500).
-■ The worker factory has bound objects (for example, an ALPC port that this worker thread is
-waiting on) or a thread has been activated into the pool.
-■ There are pending I/O request packets (IRPs; see Chapter 6 for more information) associated
-with a worker thread.
-In addition, it will terminate threads whenever they've become idle—that is, they haven't processed any work item—for more than 10 seconds (by default). Furthermore, although developers have always been able to take advantage of as many threads as possible (based on the number of processors on the system) through the old implementation, it's now possible for applications using thread pools to automatically take advantage of new processors added at run time. This is through its support for dynamic processors in Windows Server (as discussed earlier in this chapter).
+  ■ The number of available workers is lower than the maximum number of workers configured for
+  the factory (default of 500).
+  ■ The worker factory has bound objects (for example, an ALPC port that this worker thread is
+  waiting on) or a thread has been activated into the pool.
+  ■ There are pending I/O request packets (IRPs; see Chapter 6 for more information) associated
+  with a worker thread.
+  In addition, it will terminate threads whenever they've become idle—that is, they haven't processed any work item—for more than 10 seconds (by default). Furthermore, although developers have always been able to take advantage of as many threads as possible (based on the number of processors on the system) through the old implementation, it's now possible for applications using thread pools to automatically take advantage of new processors added at run time. This is through its support for dynamic processors in Windows Server (as discussed earlier in this chapter).
 
 ## Worker factory creation
 
@@ -4128,8 +4062,7 @@ Windows API does not, however, provide a way to override these defaults. This is
 
 allocate smaller stacks.
 
-298   CHAPTER 4  Threads
-
+298 CHAPTER 4 Threads
 
 ---
 
@@ -4161,7 +4094,6 @@ Because of the advantages of the thread-pool mechanism, many core system compone
 
 CHAPTER 4 Threads 299
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_317_figure_000.png)
@@ -4192,8 +4124,6 @@ decides which threads should run, for how long, and on which processor or proces
 
 chapter, you'll look at one of the most important aspects of any OS memory management.
 
-300   CHAPTER 4   Threads
-
+300 CHAPTER 4 Threads
 
 ---
-

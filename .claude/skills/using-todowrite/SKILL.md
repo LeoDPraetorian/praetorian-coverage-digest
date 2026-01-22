@@ -1,6 +1,6 @@
 ---
 name: using-todowrite
-description: Use when planning multi-step tasks - enforces TodoWrite for ≥3 steps, multi-phase workflows, real-time progress tracking
+description: Use when planning multi-step tasks - enforces TodoWrite for ≥2 steps, multi-phase workflows, real-time progress tracking
 allowed-tools: TodoWrite, Read, AskUserQuestion
 ---
 
@@ -97,8 +97,8 @@ Use TodoWrite when you encounter ANY of these complexity triggers:
 
 ### Advanced Usage
 
-- **[Multi-Agent Workflows](references/multi-agent.md)** - TodoWrite in sub-agents, handoff patterns
-- **[Custom Configurations](references/custom-config.md)** - CLAUDE.md customization options
+- **Multi-Agent Workflows** - Sub-agent TodoWrite updates are internal only (known limitation); sub-agents should return todo status in JSON output for parent tracking
+- **Custom Configurations** - CLAUDE.md can set project-specific TodoWrite thresholds (e.g., minimum task count)
 
 ## Core Workflow
 
@@ -396,8 +396,6 @@ See [examples/refactoring-workflow.md](examples/refactoring-workflow.md) for com
 
 **Workaround:** Sub-agents should return todo status in their output JSON for parent to track.
 
-See [Multi-Agent Workflows](references/multi-agent.md) for details.
-
 ### Issue: "Should I use TodoWrite for this?"
 
 **Answer:** Run the complexity check:
@@ -426,14 +424,32 @@ See [When to Use TodoWrite](references/when-to-use.md) for decision flowchart.
 
 **Granularity:** Each task should be 5-15 minutes of work.
 
-See [Custom Configurations](references/custom-config.md) for CLAUDE.md options.
+**Tip:** CLAUDE.md can override these defaults for project-specific needs.
 
-## Related Skills
+## Integration
 
-- `adhering-to-yagni` - Scope discipline complements TodoWrite planning
-- `developing-with-tdd` - TDD workflow uses TodoWrite for test phases
-- `debugging-systematically` - Debugging uses TodoWrite for investigation steps
-- `orchestrating-multi-agent-workflows` - Multi-agent coordination with TodoWrite
+### Called By
+
+- System prompt (built-in TodoWrite guidance)
+- Entry point skill (no direct callers)
+
+### Requires (invoke before starting)
+
+None - standalone skill
+
+### Calls (during execution)
+
+None - instructional skill (teaches TodoWrite usage, doesn't invoke other skills)
+
+### Pairs With (conditional)
+
+| Skill                                                                                                                                        | Trigger                  | Purpose                                                         |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------ | --------------------------------------------------------------- |
+| `adhering-to-yagni`                                                                                                                          | Scope discipline needed  | Prevents feature creep in task list                             |
+| `developing-with-tdd`                                                                                                                        | TDD workflow             | TodoWrite tracks RED-GREEN-REFACTOR                             |
+| `debugging-systematically`                                                                                                                   | Bug investigation        | TodoWrite tracks hypothesis testing                             |
+| `orchestrating-multi-agent-workflows`                                                                                                        | Multi-agent coordination | Parent tracks sub-agent progress                                |
+| `pressure-testing-skill-content` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")` | Skill validation         | Systematic pressure test scenarios for skill content validation |
 
 ## References
 
@@ -446,5 +462,3 @@ See [Custom Configurations](references/custom-config.md) for CLAUDE.md options.
 
 - [ClaudeLog: What is TODO list in Claude Code](https://claudelog.com/faqs/what-is-todo-list-in-claude-code/)
 - [TodoWrite Orchestration Plugin](https://claude-plugins.dev/skills/@MadAppGang/claude-code/todowrite-orchestration)
-
-See [references/sources.md](references/sources.md) for complete list of research sources.

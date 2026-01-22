@@ -1,17 +1,17 @@
 # Skill Fixing Rationalization Table
 
-Extends [shared rationalization prevention](../../../../../skills/using-skills/references/rationalization-prevention.md).
+Extends [shared rationalization prevention](.claude/skills/using-skills/references/rationalization-prevention.md).
 
 ## Step-Specific Rationalizations
 
-### Step 1: Run Audit
+### Step 2: Run Audit
 
 | Rationalization               | Why It's Wrong                           | Response                        |
 | ----------------------------- | ---------------------------------------- | ------------------------------- |
 | 'I know what's wrong'         | Audit finds issues you didn't know about | DENIED. Run full audit first.   |
 | 'Just fix the reported issue' | Reported issue may have related issues   | DENIED. Audit finds all issues. |
 
-### Step 2: Create Backup
+### Step 3: Create Backup
 
 | Rationalization                         | Why It's Wrong                        | Response                        |
 | --------------------------------------- | ------------------------------------- | ------------------------------- |
@@ -19,14 +19,14 @@ Extends [shared rationalization prevention](../../../../../skills/using-skills/r
 | 'Skip backup, I can undo with git'      | Uncommitted fixes aren't in git       | DENIED. Create .local backup.   |
 | 'Deterministic fixes don't need backup' | Deterministic doesn't mean infallible | DENIED. Backup takes 2 seconds. |
 
-### Step 3: Categorize Issues
+### Step 4: Categorize Issues
 
 | Rationalization                      | Why It's Wrong                               | Response                                                     |
 | ------------------------------------ | -------------------------------------------- | ------------------------------------------------------------ |
 | 'All issues look deterministic'      | Misclassification causes wrong fix approach  | NOT ACCEPTED. Check each issue against phase categorization. |
 | 'Skip categorization, just fix them' | Different categories need different handlers | DENIED. Categorize before fixing.                            |
 
-### Step 4: Apply Fixes
+### Step 5: Apply Fixes
 
 | Rationalization                         | Why It's Wrong                                     | Response                               |
 | --------------------------------------- | -------------------------------------------------- | -------------------------------------- |
@@ -38,15 +38,15 @@ Extends [shared rationalization prevention](../../../../../skills/using-skills/r
 
 ### Step 4: Phase 26 Specific Rationalizations
 
-| Rationalization                               | Reality                                    | Required Action                     |
-| --------------------------------------------- | ------------------------------------------ | ----------------------------------- |
-| 'I populated the main stub, others are minor' | ALL stubs identified by audit must be fixed | DENIED. Complete EVERY stub in TodoWrite list |
-| 'This stub only needs a few lines'            | Stubs need substantive content (>50 lines) | DENIED. Research and populate fully |
-| 'I can add placeholder and fix later'         | Placeholders ARE the problem Phase 26 fixes | DENIED. Never create placeholders  |
-| 'Research didn't cover this stub type'        | Re-run research with adjusted query OR ask user | DENIED. Don't skip - resolve the gap |
-| 'The audit only flagged one stub'             | Check audit output again - may have missed others | DENIED. Re-read audit, enumerate ALL stubs |
+| Rationalization                               | Reality                                           | Required Action                               |
+| --------------------------------------------- | ------------------------------------------------- | --------------------------------------------- |
+| 'I populated the main stub, others are minor' | ALL stubs identified by audit must be fixed       | DENIED. Complete EVERY stub in TodoWrite list |
+| 'This stub only needs a few lines'            | Stubs need substantive content (>50 lines)        | DENIED. Research and populate fully           |
+| 'I can add placeholder and fix later'         | Placeholders ARE the problem Phase 26 fixes       | DENIED. Never create placeholders             |
+| 'Research didn't cover this stub type'        | Re-run research with adjusted query OR ask user   | DENIED. Don't skip - resolve the gap          |
+| 'The audit only flagged one stub'             | Check audit output again - may have missed others | DENIED. Re-read audit, enumerate ALL stubs    |
 
-### Step 5: Verify Fixes
+### Step 6: Verify Fixes
 
 | Rationalization                               | Why It's Wrong                                 | Response                           |
 | --------------------------------------------- | ---------------------------------------------- | ---------------------------------- |
@@ -54,7 +54,7 @@ Extends [shared rationalization prevention](../../../../../skills/using-skills/r
 | 'Deterministic fixes don't need verification' | Even mechanical transforms can fail            | DENIED. Verify all fix categories. |
 | 'Most issues fixed, close enough'             | Partial compliance is non-compliance           | DENIED. All phases must pass.      |
 
-### Step 6: Update Changelog
+### Step 7: Update Changelog
 
 | Rationalization                   | Why It's Wrong                             | Response                        |
 | --------------------------------- | ------------------------------------------ | ------------------------------- |
@@ -93,6 +93,6 @@ Extends [shared rationalization prevention](../../../../../skills/using-skills/r
 
 | Rationalization                       | Why It's Wrong                           | Response                      |
 | ------------------------------------- | ---------------------------------------- | ----------------------------- |
-| '5/6 steps is close enough'           | Fixing workflow is all-or-nothing        | DENIED. Complete all 6 steps. |
+| '6/7 steps is close enough'           | Fixing workflow is all-or-nothing        | DENIED. Complete all 7 steps. |
 | 'Issues are fixed, skip verification' | Verification catches regressions         | DENIED. Always re-audit.      |
 | 'Changelog is just documentation'     | Changelog enables debugging and tracking | DENIED. Update changelog.     |

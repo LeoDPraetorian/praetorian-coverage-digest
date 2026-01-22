@@ -25,6 +25,7 @@ Quality scoring replaces subjective "good enough" judgments with measurable thre
 **Formula**: `quality_score = Σ(factor.weight × factor.score / 100)`
 
 **Example calculation**:
+
 ```
 completeness: 40 × 90 / 100 = 36
 correctness:  30 × 85 / 100 = 25.5
@@ -52,6 +53,7 @@ edge_cases:   10 × 75 / 100 = 7.5
 ```
 
 **Rationale**:
+
 - Correctness (40%): Does it work as specified?
 - Completeness (30%): All requirements implemented?
 - Maintainability (20%): Can others understand and modify?
@@ -59,14 +61,14 @@ edge_cases:   10 × 75 / 100 = 7.5
 
 **Example Scoring**:
 
-| Scenario | Correctness | Completeness | Maintainability | Performance | Total |
-|----------|-------------|--------------|-----------------|-------------|-------|
-| All tests pass, complete, clean code | 100 | 100 | 90 | 80 | **93** ✅ |
-| Tests pass, missing 1 feature | 100 | 70 | 90 | 80 | **86** ✅ |
-| Tests failing, all features present | 60 | 100 | 90 | 80 | **77** ✅ |
-| Tests pass, spaghetti code | 100 | 100 | 40 | 80 | **83** ✅ |
-| Tests failing, missing features | 60 | 70 | 90 | 80 | **70** ⚠️ |
-| Half-implemented, messy | 50 | 60 | 40 | 70 | **53** ❌ |
+| Scenario                             | Correctness | Completeness | Maintainability | Performance | Total     |
+| ------------------------------------ | ----------- | ------------ | --------------- | ----------- | --------- |
+| All tests pass, complete, clean code | 100         | 100          | 90              | 80          | **93** ✅ |
+| Tests pass, missing 1 feature        | 100         | 70           | 90              | 80          | **86** ✅ |
+| Tests failing, all features present  | 60          | 100          | 90              | 80          | **77** ✅ |
+| Tests pass, spaghetti code           | 100         | 100          | 40              | 80          | **83** ✅ |
+| Tests failing, missing features      | 60          | 70           | 90              | 80          | **70** ⚠️ |
+| Half-implemented, messy              | 50          | 60           | 40              | 70          | **53** ❌ |
 
 ### Testing Workflow
 
@@ -85,6 +87,7 @@ edge_cases:   10 × 75 / 100 = 7.5
 ```
 
 **Rationale**:
+
 - Coverage (40%): Percentage of code tested
 - Edge cases (30%): Error scenarios, boundaries, null handling
 - Test quality (20%): Meaningful assertions, behavior vs implementation
@@ -93,6 +96,7 @@ edge_cases:   10 × 75 / 100 = 7.5
 **Scoring Guidelines**:
 
 **Coverage** (40%):
+
 - 95-100% → 100 points
 - 85-94% → 90 points
 - 75-84% → 80 points
@@ -100,18 +104,21 @@ edge_cases:   10 × 75 / 100 = 7.5
 - <65% → 50 points
 
 **Edge Cases** (30%):
+
 - All error scenarios tested → 100 points
 - Most error scenarios → 85 points
 - Some error scenarios → 70 points
 - Happy path only → 40 points
 
 **Test Quality** (20%):
+
 - Behavior testing, meaningful assertions → 100 points
 - Mix of behavior + implementation → 80 points
 - Mostly implementation testing → 60 points
 - Mock-only tests → 30 points
 
 **Flakiness** (10%):
+
 - All tests deterministic → 100 points
 - Minor timing sensitivity → 85 points
 - Occasional flakiness → 60 points
@@ -134,12 +141,14 @@ edge_cases:   10 × 75 / 100 = 7.5
 ```
 
 **Rationale**:
+
 - Completeness (50%): All topics covered, no gaps
 - Clarity (30%): Easy to understand, good examples
 - Accuracy (15%): Correct information, up-to-date
 - Formatting (5%): Markdown compliance, readable
 
 **Scoring Example**:
+
 ```
 Completeness: 85 (covers most topics, missing edge case docs)
 Clarity: 90 (clear examples, well-structured)
@@ -168,6 +177,7 @@ Score = 50×0.85 + 30×0.90 + 15×0.95 + 5×1.00
 ```
 
 **Rationale**:
+
 - Scalability (35%): Can handle growth, extensible
 - Maintainability (30%): Clean boundaries, understandable
 - Security (25%): Threat modeling, attack surface
@@ -192,6 +202,7 @@ Score = 50×0.85 + 30×0.90 + 15×0.95 + 5×1.00
 **Note**: Security has higher threshold (80 vs 70) - less tolerance for issues.
 
 **Rationale**:
+
 - Input validation (30%): Injection prevention, sanitization
 - Auth/Authz (30%): Proper access controls
 - Data protection (20%): Encryption, secure storage
@@ -199,12 +210,12 @@ Score = 50×0.85 + 30×0.90 + 15×0.95 + 5×1.00
 
 ## Score Interpretation
 
-| Score | Interpretation | Action |
-|-------|----------------|--------|
-| 90-100 | Excellent | Proceed immediately |
-| 70-89 | Good, acceptable | Proceed |
-| 50-69 | Needs improvement | Feedback loop (respect retry limits) |
-| <50 | Significant issues | Escalate to user |
+| Score  | Interpretation     | Action                               |
+| ------ | ------------------ | ------------------------------------ |
+| 90-100 | Excellent          | Proceed immediately                  |
+| 70-89  | Good, acceptable   | Proceed                              |
+| 50-69  | Needs improvement  | Feedback loop (respect retry limits) |
+| <50    | Significant issues | Escalate to user                     |
 
 ## Using Quality Scores in Orchestration
 
@@ -239,17 +250,20 @@ if quality_score < 50:
 Default threshold is 70, but adjust based on:
 
 **Higher threshold (75-80):**
+
 - Security-critical code
 - Production deployment
 - Public-facing APIs
 - Payment processing
 
 **Standard threshold (70):**
+
 - Internal tools
 - MVP development
 - Prototype features
 
 **Lower threshold (60-65):**
+
 - Exploratory work
 - Proof of concept
 - Non-critical utilities
@@ -268,10 +282,12 @@ Default threshold is 70, but adjust based on:
 Quality scoring works within gated verification:
 
 **Stage 1 (Spec Compliance)**:
+
 - Binary: COMPLIANT | NOT_COMPLIANT
 - No quality score (compliance is yes/no)
 
 **Stage 2 (Quality Assessment)**:
+
 - Returns quality_score
 - Uses threshold for proceed decision
 
@@ -291,6 +307,7 @@ Result: Proceed to next phase
 4. **Ensure sum = 100%**
 
 **Anti-pattern**: Equal weights for all factors
+
 ```json
 // WRONG - treats everything as equally important
 {
@@ -324,6 +341,7 @@ if quality_score < threshold:
 **Same agent should score same quality consistently**
 
 Test calibration:
+
 ```
 Input A → Agent scores 85
 Input A (retry) → Agent should score ~85 (within ±5)
@@ -377,6 +395,7 @@ if quality_score < threshold:
 **WRONG**: "This looks pretty good, I'll give it 80"
 
 **RIGHT**: Objective criteria per factor
+
 - Completeness: 5/5 requirements → 100, 4/5 → 80, 3/5 → 60
 - Coverage: 95% → 100, 85% → 90, 75% → 80
 
@@ -415,6 +434,7 @@ if quality_score < threshold:
    - → Score: 90
 
 **Calculation**:
+
 ```
 quality_score = (40×95 + 30×100 + 20×85 + 10×90) / 100
               = (3800 + 3000 + 1700 + 900) / 100
@@ -425,6 +445,7 @@ Verdict: PASS (94 >= 75) ✅
 ```
 
 **Returned to orchestrator**:
+
 ```json
 {
   "quality_score": 94,
@@ -443,6 +464,7 @@ Verdict: PASS (94 >= 75) ✅
 ## Summary
 
 **Quality scoring benefits:**
+
 1. **Objective**: Replaces "looks good" with numbers
 2. **Actionable**: Shows which factors need improvement
 3. **Consistent**: Same criteria across all reviews
@@ -450,12 +472,14 @@ Verdict: PASS (94 >= 75) ✅
 5. **Customizable**: Adjust weights per workflow type
 
 **Use quality scoring when:**
+
 - Validation/review phases
 - Need objective proceed/retry decision
 - Want to track quality trends
 - Multiple quality dimensions matter
 
 **Skip quality scoring when:**
+
 - Binary decision sufficient (works/doesn't work)
 - Single quality dimension (e.g., "does it build?")
 - Overhead not justified for simple tasks

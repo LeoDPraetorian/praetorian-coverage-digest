@@ -38,12 +38,14 @@ Praetorian's PlexTrac master template is built on the VKB layout. This layout:
 **Content type**: Markdown
 
 **What to include**:
+
 - Prerequisites (authentication, tools, access level)
 - Numbered exploitation steps
 - Expected vs observed behavior
 - Command outputs or request/response pairs (inline or referenced in Evidence)
 
 **Example**:
+
 ```markdown
 ### Verification and Attack Information
 
@@ -68,12 +70,14 @@ Praetorian's PlexTrac master template is built on the VKB layout. This layout:
 **Content type**: Markdown
 
 **What to include**:
+
 - Specific URLs, IPs, hostnames
 - Component or module names
 - Scope (single endpoint vs platform-wide)
 - User roles affected (all users, admins only, etc.)
 
 **Example**:
+
 ```markdown
 ### Systems Impacted
 
@@ -84,6 +88,7 @@ Praetorian's PlexTrac master template is built on the VKB layout. This layout:
 ```
 
 **For multiple systems**:
+
 ```markdown
 ### Systems Impacted
 
@@ -107,6 +112,7 @@ The following endpoints are vulnerable:
 **Content type**: Dropdown selection (not markdown)
 
 **NOT required for**:
+
 - Cloud security assessments
 - Internal network assessments
 - External network assessments
@@ -115,11 +121,13 @@ The following endpoints are vulnerable:
 - Red team engagements
 
 **How to add**:
+
 1. In PlexTrac UI, edit the finding
 2. Look for "ASVS" dropdown (added via VKB layout)
 3. Select appropriate category
 
 **ASVS Categories**:
+
 - V1: Architecture, Design and Threat Modeling
 - V2: Authentication Verification
 - V3: Session Management Verification
@@ -185,11 +193,13 @@ VKB layout ensures fields render in this order:
 **Symptom**: "Verification and Attack Information" and "Systems Impacted" missing from rendered PDF
 
 **Causes**:
+
 1. Findings Layout not set to "VKB"
 2. Custom fields not added via layout button
 3. Custom field names don't match VKB layout exactly
 
 **Solution**:
+
 1. Go to Report Details → Findings Layout
 2. Select "VKB"
 3. Edit each finding
@@ -203,6 +213,7 @@ VKB layout ensures fields render in this order:
 **Cause**: Fields manually created instead of added via layout
 
 **Solution**:
+
 1. Delete manually created custom fields
 2. Use "Add custom fields from layout" button
 3. Copy/paste content back into correct fields
@@ -222,6 +233,7 @@ VKB layout ensures fields render in this order:
 **Cause**: Findings Layout not set to VKB at report level
 
 **Solution**:
+
 1. Exit finding editor
 2. Go to Report Details → Findings Layout
 3. Set to "VKB"
@@ -233,17 +245,20 @@ VKB layout ensures fields render in this order:
 ## VKB Layout vs Other Layouts
 
 ### VKB Layout (Praetorian Standard)
+
 - Custom fields: Verification and Attack Information, Systems Impacted, ASVS
 - Field order: Optimized for security assessment findings
 - PDF rendering: Professional format
 - **Use for**: All Praetorian engagements
 
 ### Default Layout
+
 - Minimal custom fields
 - Generic ordering
 - **Use for**: Never (not Praetorian standard)
 
 ### OWASP Layout
+
 - OWASP-specific fields
 - Different rendering
 - **Use for**: Never (Praetorian uses VKB with OWASP tags instead)
@@ -261,11 +276,13 @@ VKB layout ensures fields render in this order:
 **Tone**: Technical, step-by-step, reproducible
 
 **Avoid**:
+
 - Vague statements ("The application is vulnerable")
 - Missing steps (assume reader has zero context)
 - Assuming prior knowledge ("Do the obvious thing")
 
 **Include**:
+
 - Exact URLs, parameter names, payloads
 - Tool names and versions
 - Expected vs observed behavior
@@ -278,11 +295,13 @@ VKB layout ensures fields render in this order:
 **Tone**: Specific, concise
 
 **Avoid**:
+
 - Generic statements ("The application")
 - Omitting scope ("Some users")
 - Missing identifiers (no URLs/IPs)
 
 **Include**:
+
 - Specific asset identifiers (URLs, IPs, hostnames)
 - Component names (API, frontend, backend, service)
 - Scope (all users, specific roles, geographic limitations)

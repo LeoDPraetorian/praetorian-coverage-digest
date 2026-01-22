@@ -9,6 +9,7 @@
 **ALL models receive the SAME prompt.** Diversity emerges from model architecture differences, not prompt variations.
 
 **Template structure:**
+
 1. Role definition (security researcher, authorized testing)
 2. Target description
 3. Analysis instructions
@@ -292,11 +293,13 @@ Encryption Implementation:
 ## Prompt Customization Guidelines
 
 **What to customize:**
+
 - Target description (architecture, components, data flows)
 - Domain-specific focus areas (based on attack surface)
 - Output format (if you need specific structure)
 
 **What NOT to customize:**
+
 - Role definition - keep consistent across all models
 - Analysis goal - always find exploitable vulnerabilities
 - Severity/confidence requirements - maintain consistency
@@ -403,6 +406,7 @@ await test_prompt(AUTH_TEMPLATE.format(target=jwt_spec), 'anthropic/claude-sonne
 ```
 
 **Validation checklist:**
+
 - ✅ Model understands the target
 - ✅ Model provides actionable vulnerabilities
 - ✅ Model includes attack vectors

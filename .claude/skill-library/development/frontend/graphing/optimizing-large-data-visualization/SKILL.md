@@ -36,9 +36,9 @@ Reduce rendering detail based on zoom level or viewport size.
 ```typescript
 // Zoom-based LOD for graph visualization
 const LOD_THRESHOLDS = {
-  far: 0.3,    // ratio < 0.3: simplified rendering
+  far: 0.3, // ratio < 0.3: simplified rendering
   medium: 1.0, // ratio < 1.0: partial detail
-  near: 2.0,   // ratio >= 1.0: full detail
+  near: 2.0, // ratio >= 1.0: full detail
 };
 
 const useLOD = (zoomRatio: number) => {
@@ -64,14 +64,14 @@ Only render items visible in the current viewport using efficient spatial querie
 
 ```typescript
 // Using d3-quadtree for O(log N) spatial queries
-import { quadtree } from 'd3-quadtree';
+import { quadtree } from "d3-quadtree";
 
 const useViewportCulling = (items: Item[], viewport: Bounds) => {
   // Build quadtree once when items change
   const tree = useMemo(() => {
     return quadtree<Item>()
-      .x(d => d.x)
-      .y(d => d.y)
+      .x((d) => d.x)
+      .y((d) => d.y)
       .addAll(items);
   }, [items]);
 
@@ -80,8 +80,7 @@ const useViewportCulling = (items: Item[], viewport: Bounds) => {
     const visible: Item[] = [];
     tree.visit((node, x0, y0, x1, y1) => {
       // Skip nodes outside viewport
-      if (x1 < viewport.minX || x0 > viewport.maxX ||
-          y1 < viewport.minY || y0 > viewport.maxY) {
+      if (x1 < viewport.minX || x0 > viewport.maxX || y1 < viewport.minY || y0 > viewport.maxY) {
         return true; // Skip this subtree
       }
       if (node.data) visible.push(node.data);
@@ -118,7 +117,7 @@ const useProgressiveLoad = <T>(
       const chunk = await fetchFn(offset, chunkSize);
       if (cancelled) return;
 
-      setItems(prev => [...prev, ...chunk]);
+      setItems((prev) => [...prev, ...chunk]);
 
       // Continue if more data and under limit
       if (chunk.length === chunkSize && offset + chunkSize < maxItems) {
@@ -130,7 +129,9 @@ const useProgressiveLoad = <T>(
     };
 
     loadChunk(0);
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [fetchFn, chunkSize, maxItems]);
 
   return { items, isLoading, progress: items.length / maxItems };
@@ -186,24 +187,24 @@ const VirtualizedList = ({ items }: { items: Item[] }) => {
 
 ## Strategy Selection Matrix
 
-| Data Size   | Interaction | Recommended Strategy             |
-| ----------- | ----------- | -------------------------------- |
-| 100-1000    | Static      | None needed                      |
-| 100-1000    | Scroll      | Virtualization                   |
-| 1000-5000   | Zoom/Pan    | LOD + Debouncing                 |
-| 5000-10000  | Zoom/Pan    | LOD + Viewport Culling           |
-| 10000+      | Any         | All strategies + Progressive     |
+| Data Size  | Interaction | Recommended Strategy         |
+| ---------- | ----------- | ---------------------------- |
+| 100-1000   | Static      | None needed                  |
+| 100-1000   | Scroll      | Virtualization               |
+| 1000-5000  | Zoom/Pan    | LOD + Debouncing             |
+| 5000-10000 | Zoom/Pan    | LOD + Viewport Culling       |
+| 10000+     | Any         | All strategies + Progressive |
 
 **See**: [references/strategy-selection.md](references/strategy-selection.md) for detailed decision trees and combination patterns.
 
 ## Performance Targets
 
-| Metric              | Target           | Measurement                  |
-| ------------------- | ---------------- | ---------------------------- |
-| Initial render      | < 1s first paint | Performance.mark()           |
-| Interaction FPS     | > 30 FPS         | requestAnimationFrame        |
-| Memory              | < 500MB heap     | Chrome DevTools Memory       |
-| Time to interactive | < 3s             | Lighthouse                   |
+| Metric              | Target           | Measurement            |
+| ------------------- | ---------------- | ---------------------- |
+| Initial render      | < 1s first paint | Performance.mark()     |
+| Interaction FPS     | > 30 FPS         | requestAnimationFrame  |
+| Memory              | < 500MB heap     | Chrome DevTools Memory |
+| Time to interactive | < 3s             | Lighthouse             |
 
 **See**: [references/performance-measurement.md](references/performance-measurement.md) for profiling tools, bottleneck identification, and regression testing.
 
@@ -223,9 +224,9 @@ const useDebouncedViewport = (sigma: Sigma, delay = 150) => {
       }, delay);
     };
 
-    sigma.getCamera().on('updated', handleUpdate);
+    sigma.getCamera().on("updated", handleUpdate);
     return () => {
-      sigma.getCamera().off('updated', handleUpdate);
+      sigma.getCamera().off("updated", handleUpdate);
       if (timerRef.current) clearTimeout(timerRef.current);
     };
   }, [sigma, delay]);
@@ -296,12 +297,12 @@ Use the Strategy Selection Matrix above to choose appropriate techniques.
 
 ## Library Selection
 
-| Library                  | Use Case                    | Performance Characteristics     |
-| ------------------------ | --------------------------- | ------------------------------- |
-| d3-quadtree              | Spatial indexing            | O(log N) queries, 2D only       |
-| @tanstack/react-virtual  | List/table virtualization   | Variable heights, smooth scroll |
-| react-window             | Simple virtualization       | Fixed heights, lightweight      |
-| sigma.js                 | Graph visualization         | WebGL, 100k+ edges              |
+| Library                 | Use Case                  | Performance Characteristics     |
+| ----------------------- | ------------------------- | ------------------------------- |
+| d3-quadtree             | Spatial indexing          | O(log N) queries, 2D only       |
+| @tanstack/react-virtual | List/table virtualization | Variable heights, smooth scroll |
+| react-window            | Simple virtualization     | Fixed heights, lightweight      |
+| sigma.js                | Graph visualization       | WebGL, 100k+ edges              |
 
 **See**: [references/library-comparison.md](references/library-comparison.md) for detailed feature matrices, bundle sizes, and migration guides.
 
@@ -322,10 +323,10 @@ Use the Strategy Selection Matrix above to choose appropriate techniques.
 
 ### Requires (invoke before starting)
 
-| Skill                                    | When                | Purpose                              |
-| ---------------------------------------- | ------------------- | ------------------------------------ |
-| `preventing-react-hook-infinite-loops`   | Start               | Ensure stable dependencies in hooks  |
-| `profiling-react-performance`            | Start               | Measure baseline before optimization |
+| Skill                                  | When  | Purpose                              |
+| -------------------------------------- | ----- | ------------------------------------ |
+| `preventing-react-hook-infinite-loops` | Start | Ensure stable dependencies in hooks  |
+| `profiling-react-performance`          | Start | Measure baseline before optimization |
 
 ### Calls (during execution)
 
@@ -333,10 +334,10 @@ None - terminal skill with concrete implementation patterns.
 
 ### Pairs With (conditional)
 
-| Skill                            | Trigger                   | Purpose                              |
-| -------------------------------- | ------------------------- | ------------------------------------ |
-| `coordinating-competing-systems` | Using LOD with layouts    | Prevent LOD/layout thrashing         |
-| `debugging-react-performance`    | Optimization not working  | Systematic bottleneck identification |
+| Skill                            | Trigger                  | Purpose                              |
+| -------------------------------- | ------------------------ | ------------------------------------ |
+| `coordinating-competing-systems` | Using LOD with layouts   | Prevent LOD/layout thrashing         |
+| `debugging-react-performance`    | Optimization not working | Systematic bottleneck identification |
 
 ## Changelog
 

@@ -1,4 +1,4 @@
-## 4  OBJECT NOTIFICATIONS
+## 4 OBJECT NOTIFICATIONS
 
 ![Figure](figures/EvadingEDR_page_087_figure_001.png)
 
@@ -24,9 +24,7 @@ RegistrationHandle, which receives a value passed when the driver wishes to unre
 
 Despite the function's simple definition, the structure passed in via
 
-
 the CallbackRegistration parameter is anything but. Listing 4-1 shows its
-
 
 definition.
 
@@ -54,7 +52,7 @@ typedef struct _OB_OPERATION_REGISTRATION {
   POBJ_PRE_OPERATION_CALLBACK  PreOperation;
 ```
 
-62    Chapter 4
+62 Chapter 4
 
 ---
 
@@ -70,7 +68,6 @@ Table 4-1 describes each member and its purpose. If you're curious about what ex
 Table 4-1: Members of the OB_OPERATION_REGISTRATION Structure
 
 <table><tr><td>Member</td><td>Purpose</td></tr><tr><td>ObjectType</td><td>A pointer to the type of object the driver developer wishes to monitor. At the time of this writing, there are three supported values:  • PsProcessType (processes)  • PsThreadType (threads)  • ExDesktopObjectType (desktops)</td></tr><tr><td>Operations</td><td>A flag indicating the type of handle operation to be monitored. This can be either OB_OPERATION_HANDLE_CREATE, to monitor requests for new handles, or OB_OPERATION_HANDLE_DUPLICATE, to monitor handle-duplication requests.</td></tr><tr><td>PreOperation</td><td>A pointer to a pre-operation callback routine. This routine will be invoked before the handle operation completes.</td></tr><tr><td>PostOperation</td><td>A pointer to a post-operation callback routine. This routine will be invoked after the handle operation completes.</td></tr></table>
-
 
 We'll discuss these members further in "Detecting a Driver's Actions Once Triggered" on page 66.
 
@@ -130,7 +127,7 @@ How can we detect which objects an EDR is monitoring? As with the other types of
 
 Remember those pointers we passed into the operation-registration structure to say what type of object we were interested in monitoring? So
 
-64    Chapter 4
+64 Chapter 4
 
 ---
 
@@ -178,7 +175,7 @@ Browse full module list
 start              end              module name
 ```
 
-Object Notifications      65
+Object Notifications 65
 
 ---
 
@@ -198,7 +195,7 @@ ffffffff802 73b80000 ffff8f02 73bf2000 WdfFilter (no symbols)
 
 Listing 4-6: Enumerating pre-operation callbacks for process-handle operations
 
-This debugger command essentially says, "Traverse the linked list starting at the address pointed to by the CallbackList member of the nt!_0BJCTYPE structure for nt!PspProcessType, printing out the module information if the address pointed to by the PreOperation member is not null."
+This debugger command essentially says, "Traverse the linked list starting at the address pointed to by the CallbackList member of the nt!\_0BJCTYPE structure for nt!PspProcessType, printing out the module information if the address pointed to by the PreOperation member is not null."
 
 On my test system, Defender's WebFilter.sysn ❶ is the only driver with a registered callback. On a real system with an EDR deployed, you will almost certainly see the EDR's driver registered alongside Defender. You can use the same process to enumerate callbacks that monitor thread- or desktop-handle operations, but those are usually far less common. Additionally, if Microsoft were to add the ability to register callbacks for other types of object-handle operations, such as for tokens, this process could enumerate them as well.
 
@@ -247,11 +244,11 @@ typedef struct _OB_PRE_CREATE_HANDLE_INFORMATION {
 
 Listing 4-8: The OB_PRE_CREATE_HANDLE_INFORMATION structure definition.
 
-The two ACCESS_MASK values both specify the access rights to grant to the handle. These might be set to values like PROCESS_VM_OPERATION or THREAD _SET_THREAD_TOKEN, which might be passed to functions in the dwDesiredAccess parameter when opening a process or thread.
+The two ACCESS_MASK values both specify the access rights to grant to the handle. These might be set to values like PROCESS_VM_OPERATION or THREAD \_SET_THREAD_TOKEN, which might be passed to functions in the dwDesiredAccess parameter when opening a process or thread.
 
 You may be wondering why this structure contains two copies of the same value. Well, the reason is that pre-operation notifications give the driver the ability to modify requests. Let's say the driver wants to prevent processes from reading the memory of the lsass.exe process. To read that
 
-Object Notifications  67
+Object Notifications 67
 
 ---
 
@@ -278,7 +275,7 @@ Undeniably one of the processes that attackers target most often is lsass.exe, w
 
 Because attackers have targeted bass.exe so extensively, security vendors have invested considerable time and effort into detecting its abuse. Objectcallback notifications are one of their strongest data sources for this purpose. To determine whether activity is malicious, many EDRs rely on three pieces of information passed to their callback routine on each new processhandle request: the process from which the request was made, the process for which the handle is being requested, and the access mask , or the rights requested by the calling process.
 
-For example, when an operator requests a new process handle to laass.exe , the EDR's driver will determine the identity of the calling process and check whether the target is laass.exe . If so, it might evaluate the requested access rights to see whether the requestor asked for PROCESS_VM _READ , which it would need to read process memory. Next, if the requestor
+For example, when an operator requests a new process handle to laass.exe , the EDR's driver will determine the identity of the calling process and check whether the target is laass.exe . If so, it might evaluate the requested access rights to see whether the requestor asked for PROCESS_VM \_READ , which it would need to read process memory. Next, if the requestor
 
 68 Chapter 4
 
@@ -428,7 +425,7 @@ if (!wcslcmp(pObjectTypeInfo->TypeName.Buffer, L"Process"))
                     0, NULL);
 ```
 
-Object Notifications      71
+Object Notifications 71
 
 ---
 
@@ -449,7 +446,7 @@ Object Notifications      71
 
 Listing 4-12: Evaluating duplicated handles and dumping memory
 
-We first get the image name for the process ❶ and pass it to an internal function, Is.sas.handle(), which makes sure that the process handle is for lsass.exe . Next, we check the handle's access rights, looking for PROCESS_VM _READ and PROCESS_QUERY_INFORMATION , because the API we'll use to read lsass.exe 's process memory requires these. If we find an existing handle to lsass.exe with the required access rights, we pass the duplicated handle to the API and extract its information ❷ .
+We first get the image name for the process ❶ and pass it to an internal function, Is.sas.handle(), which makes sure that the process handle is for lsass.exe . Next, we check the handle's access rights, looking for PROCESS_VM \_READ and PROCESS_QUERY_INFORMATION , because the API we'll use to read lsass.exe 's process memory requires these. If we find an existing handle to lsass.exe with the required access rights, we pass the duplicated handle to the API and extract its information ❷ .
 
 Using this new handle, we could create and process an lsass.exe memory dump with a tool such as Mimikatz. Listing 4-13 shows this workflow.
 
@@ -595,7 +592,7 @@ void GetChildHandles(HANDLE* hIoCompletionPort)
           hChild = OpenProcess(
 ```
 
-Object Notifications  75
+Object Notifications 75
 
 ---
 
@@ -697,7 +694,6 @@ Additionally, both techniques focus on defeating the EDR's preventive controls a
 
 Monitoring handle operations, especially handles being opened to sensitive processes, provides a robust way to detect adversary tradecraft. A driver with a registered object-notification callback stands directly inline of an adversary whose tactics rely on opening or duplicating handles to things such as loas.exe. When this callback routine is implemented well, the opportunities for evading this sensor are limited, and many attackers have adapted their tradecraft to limit the need to open new handles to processes altogether.
 
-78    Chapter 4
+78 Chapter 4
 
 ---
-

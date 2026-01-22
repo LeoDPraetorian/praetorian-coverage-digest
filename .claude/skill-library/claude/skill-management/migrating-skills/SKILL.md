@@ -1,6 +1,6 @@
 ---
 name: migrating-skills
-description: Use when moving skills between core and library - safe migration with gateway and dependency updates
+description: Use when promoting/demoting skills between core and library - handles two-tier system transitions including gateway routing updates, command structural pattern changes (skill: vs Read()), invocation syntax updates, and dependency tracking
 allowed-tools: Read, Edit, Bash, Grep, TodoWrite, AskUserQuestion
 ---
 
@@ -8,7 +8,7 @@ allowed-tools: Read, Edit, Bash, Grep, TodoWrite, AskUserQuestion
 
 **Safe skill migration between core ↔ library with comprehensive updates.**
 
-> **You MUST use TodoWrite** before starting to track all 7 steps. Missing steps can break skill discovery.
+> **You MUST use TodoWrite** before starting to track all 9 steps. Missing steps can break skill discovery.
 
 ---
 
@@ -16,13 +16,15 @@ allowed-tools: Read, Edit, Bash, Grep, TodoWrite, AskUserQuestion
 
 Safely migrates skills by:
 
-1. ✅ Validating source skill exists
-2. ✅ Determining target location
-3. ✅ Moving directory to target
-4. ✅ Updating gateway references
-5. ✅ Updating command references
-6. ✅ Updating invocation syntax (skill: vs Read)
-7. ✅ Verifying no broken references
+1. ✅ Navigating to repository root
+2. ✅ Validating source skill exists
+3. ✅ Determining target location
+4. ✅ Moving directory to target
+5. ✅ Updating gateway references
+6. ✅ Updating command structural patterns (Core vs Library)
+7. ✅ Updating invocation syntax (skill: vs Read)
+8. ✅ Updating Related Skills and Integration references
+9. ✅ Verifying no broken references
 
 **Critical:** Core ↔ Library migration impacts skill discovery (token budget vs on-demand).
 
@@ -61,7 +63,7 @@ Safely migrates skills by:
 
 ---
 
-## Step 0: Navigate to Repository Root (MANDATORY)
+## Step 1: Navigate to Repository Root (MANDATORY)
 
 **Execute BEFORE any migrate operation:**
 
@@ -79,9 +81,9 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Workflow
 
-Follow these 7 steps to safely migrate a skill between core and library locations. Each step is critical to prevent broken references and discovery failures.
+Follow these 9 steps to safely migrate a skill between core and library locations. Each step is critical to prevent broken references and discovery failures.
 
-### Step 1: Validate Source
+### Step 2: Validate Source
 
 **Check skill exists:**
 
@@ -98,7 +100,7 @@ find .claude/skill-library -name "{skill-name}" -type d
 - Record full path
 - Note category if library skill
 
-### Step 2: Determine Target
+### Step 3: Determine Target
 
 **If promoting to Core:**
 
@@ -123,7 +125,7 @@ Options:
 # Target: .claude/skill-library/{category}/{skill-name}
 ```
 
-### Step 3: Move Directory
+### Step 4: Move Directory
 
 **Create target if needed:**
 
@@ -144,26 +146,26 @@ ls {target-path}  # Should exist
 ls {source-path}  # Should error
 ```
 
-### Step 4: Update Gateway References (Automated)
+### Step 5: Update Gateway References
 
 **Why gateways need updating:**
 
 - **Promoting to Core (Library → Core):** The library gateway entry now points to a non-existent path (skill moved out of library) - becomes a "broken path" that needs removal
 - **Demoting to Library (Core → Library):** The skill now exists in library but isn't in any gateway routing table - becomes an "orphaned skill" that needs addition
 
-**How to update (automated):**
+**How to update:**
 
-Use `syncing-gateways` skill to automatically detect and fix gateway inconsistencies:
+Load and follow the `syncing-gateways` skill workflow to detect and fix gateway inconsistencies:
 
 ```typescript
 Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
 
-**What syncing-gateways does:**
+**What the syncing-gateways workflow does:**
 
 1. **Library → Core migration:**
    - Detects old gateway entry has broken path (skill no longer in library)
-   - Automatically removes stale entry from gateway
+   - Guides you to remove stale entry from gateway
    - Skill becomes auto-discovered via core
 
 2. **Core → Library migration:**
@@ -174,15 +176,17 @@ Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
      - `testing/*` → `gateway-testing`
      - `security/*` → `gateway-security`
      - etc.
-   - Automatically adds skill to correct gateway routing table
+   - Guides you to add skill to correct gateway routing table
 
 **Run sync after migration:**
 
-After completing Step 3 (Move Directory), execute the `syncing-gateways` workflow to update all affected gateways automatically. This ensures gateway routing tables stay consistent with actual skill locations.
+After completing Step 4 (Move Directory), execute the `syncing-gateways` workflow to update all affected gateways. This ensures gateway routing tables stay consistent with actual skill locations.
 
-### Step 5: Update Command References
+### Step 6: Update Command Structural Pattern
 
-**Find command references:**
+**Critical:** Commands that invoke the migrated skill need **structural changes**, not just path updates. Core and Library commands have different patterns.
+
+#### 6.1 Find Command References
 
 ```typescript
 Grep({
@@ -192,25 +196,13 @@ Grep({
 });
 ```
 
-**Update each:**
+#### 6.2 Apply Structural Updates
 
-```typescript
-// If promoting to Core
-Edit({
-  file_path: "{command}",
-  old_string: ".claude/skill-library/{cat}/{skill-name}",
-  new_string: ".claude/skills/{skill-name}",
-});
+Commands need complete structural transformation (frontmatter, tools, body), not just path updates. Demoting requires removing `skills:` frontmatter and switching to `Read()` pattern. Promoting requires adding `skills:` frontmatter and switching to Skill tool pattern.
 
-// If demoting to Library
-Edit({
-  file_path: "{command}",
-  old_string: ".claude/skills/{skill-name}",
-  new_string: ".claude/skill-library/{cat}/{skill-name}",
-});
-```
+**See:** [references/command-pattern-transformations.md](references/command-pattern-transformations.md) for complete before/after examples.
 
-### Step 6: Update Invocation Syntax
+### Step 7: Update Invocation Syntax
 
 **Critical:** Skill invocation method changes based on location (two-tier system).
 
@@ -266,7 +258,103 @@ Edit({
 - Library skills: Must use `Read()` (Read tool with full path)
 - Wrong invocation method = skill fails after migration
 
-### Step 7: Verify Integrity
+### Step 8: Update Related Skills and Integration References
+
+**Critical:** Other skills reference the migrated skill in Related Skills sections and Integration documentation. These need annotation and path updates.
+
+#### 8.1 Find Related Skills References
+
+```bash
+# Find skills mentioning the migrated skill in Related Skills sections
+grep -r "\`{skill-name}\`" .claude/ --include="*.md" | grep -i "related"
+```
+
+#### 8.2 Find Integration Section References
+
+```bash
+# Find integration documentation referencing the skill
+grep -r "{skill-name}" .claude/ --include="*.md" 2>/dev/null | grep -E "(integration|reference)"
+```
+
+#### 8.3 Update Annotations
+
+**If demoting to Library (Core → Library):**
+
+Update each reference from:
+
+```
+- `{skill-name}` (CORE) - Description
+```
+
+To:
+
+```
+- `{skill-name}` (LIBRARY) - `Read(".claude/skill-library/{category}/{skill-name}/SKILL.md")` - Description
+```
+
+**If promoting to Core (Library → Core):**
+
+Update each reference from:
+
+```
+- `{skill-name}` (LIBRARY) - `Read(".claude/skill-library/...")` - Description
+```
+
+To:
+
+```
+- `{skill-name}` (CORE) - Description
+```
+
+#### 8.4 Update Integration Tables
+
+For integration-skills.md files, update the Type column:
+
+**Demoting:**
+
+```
+| `{skill-name}` | (CORE) | Purpose |
+```
+
+→
+
+```
+| `{skill-name}` | (LIBRARY) `Read(...)` | Purpose |
+```
+
+**Promoting:**
+
+```
+| `{skill-name}` | (LIBRARY) `Read(...)` | Purpose |
+```
+
+→
+
+```
+| `{skill-name}` | (CORE) | Purpose |
+```
+
+#### 8.5 Update Agent and Documentation References
+
+**Critical:** Agents spawn skills, documentation references them, tools may depend on them. Missing these references leaves broken paths after migration.
+
+```bash
+# Find agent files referencing the skill
+grep -r "{skill-name}" .claude/agents/ --include="*.md"
+
+# Find documentation referencing the skill
+grep -r "{skill-name}" .claude/docs/ --include="*.md"
+
+# Find tool files referencing the skill
+grep -r "{skill-name}" .claude/tools/ --include="*.md"
+```
+
+Update each reference with correct path/invocation syntax based on migration direction:
+
+- **Demoting to Library:** Update agent prompts to use `Read()` instead of `skill:`, update doc links to library path
+- **Promoting to Core:** Update agent prompts to use `skill:` instead of `Read()`, update doc links to core path
+
+### Step 9: Verify Integrity
 
 **Search for old path:**
 
@@ -280,6 +368,18 @@ Grep({
 
 **Expected:** Zero matches (or only documentation/changelog)
 
+**Search for stale annotations:**
+
+```bash
+# If demoted: Should find no (CORE) annotations for this skill
+grep -r "\`{skill-name}\` (CORE)" .claude/ --include="*.md"
+
+# If promoted: Should find no (LIBRARY) annotations for this skill
+grep -r "\`{skill-name}\` (LIBRARY)" .claude/ --include="*.md"
+```
+
+**Expected:** Zero matches (annotations updated to match new location)
+
 **Test skill access:**
 
 ```typescript
@@ -292,105 +392,40 @@ Read(".claude/skill-library/{cat}/{skill-name}/SKILL.md"); // Should work
 
 ---
 
-## Migration Examples
+## Examples, Impact Analysis, and Rollback
 
-These examples demonstrate the complete migration process for both promotion to Core and demotion to Library.
-
-### Example 1: Promote to Core
-
-**Scenario:** `updating-skills` used in every session, promote to Core
-
-**Before:**
-
-```plaintext
-.claude/skill-library/claude/skill-management/updating-skills/
-```
-
-**After:**
-
-```plaintext
-.claude/skills/updating-skills/
-```
-
-**Updates:**
-
-- Remove from `gateway-claude` (now auto-discovered)
-- Update `/skill-manager` command path
-- Update other skills that reference it
-
-### Example 2: Demote to Library
-
-**Scenario:** `specialty-skill` rarely used, free Core slot
-
-**Before:**
-
-```plaintext
-.claude/skills/specialty-skill/
-```
-
-**After:**
-
-```plaintext
-.claude/skill-library/operations/specialty-skill/
-```
-
-**Updates:**
-
-- Add to `gateway-operations`
-- Update commands to use library path
-- Update skills that reference it
+**For detailed examples, impact analysis templates, and rollback procedures, see:** [references/migration-examples.md](references/migration-examples.md)
 
 ---
 
-## Impact Analysis
+## Integration
 
-Before migrating, show user the impact:
+### Called By
 
-```plaintext
-Migration Impact for '{skill-name}':
+- `managing-skills` (CORE) - Migrate operation delegation
+- `/skill-manager migrate` command
 
-Direction: {Core → Library | Library → Core}
-Source: {current-path}
-Target: {new-path}
+### Requires (invoke before starting)
 
-Changes required:
-- Gateway: {add/remove/update}
-- Commands: {count} files to update
-- Skills: {count} references to update
+None - standalone skill
 
-Token budget impact:
-- Core → Library: Frees ~100 chars from discovery budget
-- Library → Core: Consumes ~100 chars from discovery budget
+### Calls (during execution)
 
-Continue with migration?
-```
+| Skill                        | Phase/Step | Purpose                                                                                                                           |
+| ---------------------------- | ---------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| `syncing-gateways` (LIBRARY) | Step 5     | Update gateway routing tables after migration - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` |
 
----
+### Pairs With (conditional)
 
-## Rollback
-
-If migration fails:
-
-**Move directory back:**
-
-```bash
-mv {target-path} {source-path}
-```
-
-**Revert file edits:**
-
-```typescript
-Edit({
-  file_path: "{file}",
-  old_string: "{new-path}",
-  new_string: "{old-path}",
-});
-```
+| Skill                                                                                                          | Trigger                                                               | Purpose                                                                                                                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `renaming-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")` | Skill needs name change without moving between core/library locations | Use when skill's name is misleading or needs update but location (core vs library) is correct. Example: Renaming `creating-mcp-tools` to `managing-mcp-tools` while staying in library. Do NOT use if also changing core ↔ library location. |
+| `creating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` | Need to recreate skill from scratch at new location instead of moving | Use when migration would be more complex than recreation (e.g., skill needs complete rewrite, or has extensive dependencies that would break). Rare edge case - prefer migration for simple moves.                                           |
 
 ---
 
 ## Related Skills
 
-- `syncing-gateways` - Automate gateway routing table updates after migration
-- `renaming-skills` - Rename skills (different operation)
-- `creating-skills` - Create new skills
+- `syncing-gateways` (LIBRARY) - Gateway routing table updates after migration
+- `renaming-skills` (LIBRARY) - Rename skills (different operation)
+- `creating-skills` (LIBRARY) - Create new skills

@@ -16,8 +16,8 @@ Start by understanding the current project context, then ask questions one at a 
 
 ### Library Skills (Read before use)
 
-| Skill | Path | Purpose |
-|-------|------|---------|
+| Skill                         | Path                                                                   | Purpose                                       |
+| ----------------------------- | ---------------------------------------------------------------------- | --------------------------------------------- |
 | orchestration-prompt-patterns | .claude/skill-library/prompting/orchestration-prompt-patterns/SKILL.md | Progressive disclosure patterns for questions |
 
 Before starting brainstorming, read the progressive disclosure patterns:
@@ -33,24 +33,29 @@ Read('.claude/skill-library/prompting/orchestration-prompt-patterns/references/p
 Questions must follow progressive disclosure levels. Do NOT skip levels.
 
 **Level 1 - Orientation** (ask first):
+
 - What problem are you trying to solve?
 - Who will use this?
 - What does success look like?
 
 **Level 2 - Constraints** (after Level 1):
+
 - What systems does this integrate with?
 - What are the performance/security requirements?
 - What's the timeline?
 
 **Level 3 - Decisions** (after Level 2, prefer multiple choice):
+
 - "Should this be: A) [option], B) [option], or C) [option]?"
 - Lead with your recommendation and explain why
 
 **Level 4 - Details** (after Level 3):
+
 - Specific fields, validation rules, error messages
 - Edge case behaviors
 
 **Rules:**
+
 - ONE question per message
 - Complete each level before moving to next
 - Prefer multiple choice over open-ended when possible
@@ -117,10 +122,10 @@ When presenting 2-3 approaches, use this structure for EACH:
 
 ## Anti-Patterns
 
-| Anti-Pattern | Why It's Wrong | Correct Approach |
-|--------------|----------------|------------------|
-| Jumping to details | Missing context leads to wrong design | Complete Level 1-2 before Level 3-4 |
-| Multiple questions per message | Overwhelming, answers get confused | ONE question per message |
-| Open-ended when multiple choice works | Harder to answer, vague responses | Offer A/B/C options with recommendation |
-| Recommending without trade-off analysis | User can't evaluate decision | Walk through each option step-by-step |
-| First option bias | May miss better alternatives | Self-consistency check before recommending |
+| Anti-Pattern                            | Why It's Wrong                        | Correct Approach                           |
+| --------------------------------------- | ------------------------------------- | ------------------------------------------ |
+| Jumping to details                      | Missing context leads to wrong design | Complete Level 1-2 before Level 3-4        |
+| Multiple questions per message          | Overwhelming, answers get confused    | ONE question per message                   |
+| Open-ended when multiple choice works   | Harder to answer, vague responses     | Offer A/B/C options with recommendation    |
+| Recommending without trade-off analysis | User can't evaluate decision          | Walk through each option step-by-step      |
+| First option bias                       | May miss better alternatives          | Self-consistency check before recommending |

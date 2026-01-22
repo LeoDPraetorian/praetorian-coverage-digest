@@ -149,7 +149,7 @@
 
 ## GREEN Phase: Write Minimal time-calibration Skill
 
-### Skill Content (Following claude-skill-write template)
+### Skill Content (Following creating-skills template)
 
 **Frontmatter:**
 
@@ -519,6 +519,6 @@ Add to Calibration Protocol after line 73:
 - ✅ All loopholes closed
 - ✅ TDD validation documented
 - ✅ Skill is minimal and focused
-- ✅ Following claude-skill-write methodology
+- ✅ Following creating-skills methodology
 
 **Ready for commit.**

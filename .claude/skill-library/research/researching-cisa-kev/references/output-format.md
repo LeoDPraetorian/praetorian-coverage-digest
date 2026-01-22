@@ -18,6 +18,7 @@
 ### Executive Summary
 
 {2-3 paragraphs summarizing:}
+
 - Number of CVEs found
 - Key vendors/products affected
 - Most urgent vulnerabilities (by due date)
@@ -94,6 +95,7 @@
 #### Exploitation Timeline
 
 {2-3 paragraphs discussing:}
+
 - When vulnerabilities were added to KEV (recent surge? steady?)
 - Common exploitation patterns observed
 - Notable threat actors or campaigns
@@ -101,26 +103,27 @@
 
 #### Remediation Complexity
 
-| Complexity       | CVE Count | Notes                              |
-| ---------------- | --------- | ---------------------------------- |
-| Simple Patch     | X         | Vendor patch available, tested     |
-| Complex Patch    | X         | Patch with compatibility issues    |
-| Mitigation Only  | X         | No patch, workarounds available    |
-| No Fix Available | X         | EOL products, awaiting vendor      |
+| Complexity       | CVE Count | Notes                           |
+| ---------------- | --------- | ------------------------------- |
+| Simple Patch     | X         | Vendor patch available, tested  |
+| Complex Patch    | X         | Patch with compatibility issues |
+| Mitigation Only  | X         | No patch, workarounds available |
+| No Fix Available | X         | EOL products, awaiting vendor   |
 
 ---
 
 ### Remediation Priority Matrix
 
-| Priority | CVE ID           | Due Date   | Days Left | Product        | Relevance |
-| -------- | ---------------- | ---------- | --------- | -------------- | --------- |
-| P0       | CVE-YYYY-000001  | 2024-MM-DD | X         | {Product}      | Direct    |
-| P0       | CVE-YYYY-000002  | 2024-MM-DD | X         | {Product}      | Direct    |
-| P1       | CVE-YYYY-000003  | 2024-MM-DD | X         | {Product}      | Similar   |
-| P1       | CVE-YYYY-000004  | 2024-MM-DD | X         | {Product}      | Direct    |
-| P2       | CVE-YYYY-000005  | 2024-MM-DD | X         | {Product}      | Indirect  |
+| Priority | CVE ID          | Due Date   | Days Left | Product   | Relevance |
+| -------- | --------------- | ---------- | --------- | --------- | --------- |
+| P0       | CVE-YYYY-000001 | 2024-MM-DD | X         | {Product} | Direct    |
+| P0       | CVE-YYYY-000002 | 2024-MM-DD | X         | {Product} | Direct    |
+| P1       | CVE-YYYY-000003 | 2024-MM-DD | X         | {Product} | Similar   |
+| P1       | CVE-YYYY-000004 | 2024-MM-DD | X         | {Product} | Direct    |
+| P2       | CVE-YYYY-000005 | 2024-MM-DD | X         | {Product} | Indirect  |
 
 **Priority Legend:**
+
 - **P0 (Critical):** Due date ≤7 days, direct product match, active campaigns
 - **P1 (High):** Due date 7-14 days, high relevance, known exploitation
 - **P2 (Medium):** Due date 14-21 days, moderate relevance
@@ -133,6 +136,7 @@
 #### Existing Coverage
 
 {List capabilities/detections already in place:}
+
 - Capability 1: Covers CVE-YYYY-NNNNN, CVE-YYYY-NNNNN
 - Detection Rule 2: Covers attack pattern X
 - Scanner Config 3: Identifies vulnerable versions
@@ -140,6 +144,7 @@
 #### Coverage Gaps
 
 {Identify what's missing:}
+
 1. **Gap 1:** No detection for {attack pattern/vulnerability class}
    - Affected CVEs: CVE-YYYY-NNNNN, CVE-YYYY-NNNNN
    - Recommendation: Create Nuclei template for {pattern}
@@ -187,18 +192,21 @@
 #### Known Threat Actors
 
 {List threat actors exploiting these vulnerabilities:}
+
 - **{Threat Actor 1}:** Exploiting CVE-YYYY-NNNNN, CVE-YYYY-NNNNN
 - **{Ransomware Group 2}:** Mass exploitation of CVE-YYYY-NNNNN
 
 #### Exploitation Campaigns
 
 {Describe known campaigns:}
+
 - **Campaign 1:** {Description, timeline, targets}
 - **Campaign 2:** {Description, timeline, targets}
 
 #### IOCs and Detection Artifacts
 
 {List any indicators of compromise mentioned:}
+
 - File hashes: {MD5/SHA256}
 - Network indicators: {IPs, domains, URLs}
 - Behavioral patterns: {Process chains, registry keys}
@@ -208,6 +216,7 @@
 ### Related CVEs (Not in KEV)
 
 {Optional: List related CVEs not yet in KEV but worth monitoring:}
+
 - **CVE-YYYY-NNNNN:** Related to {KEV CVE}, not yet confirmed exploited
 - **CVE-YYYY-NNNNN:** Same product family, monitor for KEV inclusion
 

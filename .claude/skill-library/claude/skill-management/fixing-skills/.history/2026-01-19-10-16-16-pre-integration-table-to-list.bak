@@ -1,0 +1,398 @@
+---
+name: fixing-skills
+description: Use when audit failed - three-tier fix orchestration (deterministic/hybrid/Claude-automated) for compliance errors, Phase 26 research-based stub population, Phase 28 Integration section generation, line count extraction
+allowed-tools: Read, Edit, Write, Bash, AskUserQuestion, TodoWrite, Skill
+---
+
+# Fixing Skills
+
+**Intelligent compliance remediation using three-tier fix orchestration.**
+
+> **You MUST use TodoWrite** to track fix progress when handling multiple issues.
+
+**Three-tier fix model:**
+
+- **Deterministic**: Mechanical transformations (phases 2, 5, 6, 7, 12, 19, 21)
+- **Hybrid**: Claude reasoning + confirmation (phases 4, 10, 22)
+- **Claude-Automated**: Claude reasoning only (phases 1, 3, 11, 13, 18, 20, 24, 25, 26)
+- **Validation-Only**: No auto-fix available (phases 15, 16, 17, 29)
+- **Human-Required**: Interactive guidance (phases 8, 9, 23)
+
+**Note:** Phase 14 (table formatting) applies prettier formatting and runs in Step 4f (Final Formatting) after all content-generating phases. Phases 15-17 and 29 are validation-only (code block quality, header hierarchy, prose phase references, logical coherence).
+
+See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete breakdown.
+
+---
+
+## Quick Reference
+
+| Category         | Phases                                       | Handler          | User Interaction        |
+| ---------------- | -------------------------------------------- | ---------------- | ----------------------- |
+| Deterministic    | 2, 5, 6, 7, 12, 19, 21                       | Claude applies   | None (auto-apply)       |
+| Hybrid           | 4, 10, 22                                    | Claude reasoning | Confirm ambiguous cases |
+| Claude-Automated | 1, 3, 11, 13, 18, 20, 24, 25, 26, 28, Crit 7 | Claude reasoning | None (Claude applies)   |
+| Validation-Only  | 15, 16, 17, 29                               | Manual only      | Report issues, no fix   |
+| Human-Required   | 8, 9, 23                                     | Interactive      | Full user guidance      |
+| Final Formatting | 14                                           | Claude applies   | None (runs last)        |
+
+**Compliance Target:**
+Fixes restore compliance with the [Skill Compliance Contract](.claude/skills/managing-skills/references/skill-compliance-contract.md).
+
+---
+
+## Rationalization Prevention
+
+Skill fixing seems mechanical but has shortcuts that leave issues unresolved. Complete all steps fully.
+
+**Reference**: See [shared rationalization prevention](../../../../skills/using-skills/references/rationalization-prevention.md) for:
+
+- Statistical evidence (technical debt ~10% fix rate, 'later' ~5% completion)
+- Phrase detection patterns ('close enough', 'just this once', 'I'll fix it later')
+- Override protocol (requires AskUserQuestion with explicit risk disclosure)
+
+### Skill Fixing Rationalizations
+
+See [references/rationalization-table.md](references/rationalization-table.md) for domain-specific rationalizations.
+
+**Key principle**: If you detect rationalization phrases in your thinking, STOP. Return to the current step. Complete it fully before proceeding.
+
+---
+
+## Workflow Overview
+
+```
+1. Run Audit          → Get issues list
+2. Create Backup      → Protect against mistakes
+3. Categorize Issues  → Route to correct handler
+4. Apply Fixes:
+   a. Deterministic   → Claude applies (no confirmation)
+   b. Claude-Automated→ Claude applies (no confirmation)
+   c. Hybrid          → Claude + confirm ambiguous cases
+   d. Human-Required  → Full interactive guidance
+   e. Validation-Only → Manual resolution required
+   f. Final Formatting→ Apply table formatting (after all content changes)
+5. Verify Fixes       → Check changes resolve issues
+6. Update Changelog   → Document changes
+```
+
+---
+
+## Step 0: Navigate to Repository Root (MANDATORY)
+
+**Execute BEFORE any fix operation:**
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
+```
+
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
+
+**⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
+
+**Statistical evidence**: ~25% of fix failures are caused by wrong working directory. The 2-second navigation check prevents 10+ minutes of debugging 'file not found' errors.
+
+**Cannot proceed without navigating to repo root** ✅
+
+---
+
+## Step 1: Run Audit
+
+Invoke the auditing-skills skill to get issues list:
+
+```
+Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
+# Then audit the target skill
+```
+
+**Capture findings for issue categorization.**
+
+---
+
+## Step 2: Create Backup
+
+**🚨 MANDATORY** - See [Backup Strategy](.claude/skills/managing-skills/references/patterns/backup-strategy.md).
+
+**Statistical evidence**: ~20% of fix attempts require rollback due to unintended side effects. Backups take 2 seconds and save hours of reconstruction.
+
+```bash
+mkdir -p {skill-path}/.local
+TIMESTAMP=$(date +%Y-%m-%d-%H-%M-%S)
+cp {skill-path}/SKILL.md {skill-path}/.local/${TIMESTAMP}-pre-fix.bak
+```
+
+---
+
+## Step 3: Categorize Issues
+
+Based on audit output, group issues by handler:
+
+```
+Issues found:
+  Deterministic:      Phase 2 (allowed-tools), Phase 5 (directories)
+  Claude-Automated:   Phase 1 (description), Phase 3 (line count)
+  Hybrid:             Phase 10 (phantom ref)
+  Human-Required:     Phase 8 (TypeScript errors)
+```
+
+---
+
+## Step 4a: Apply Deterministic Fixes
+
+**Phases: 2, 5, 6, 7, 12, 19, 21**
+
+Claude applies these fixes directly using Edit tool. No confirmation needed - these are mechanical transformations with one correct answer.
+
+---
+
+## Step 4b: Apply Claude-Automated Fixes
+
+**Phases: 1, 3, 11, 13, 18, 20, 24, 25, 26, 28**
+
+Claude applies these fixes directly using Edit tool. No human confirmation needed - these require semantic understanding but have clear correct outcomes.
+
+**Covered phases:**
+
+- Phase 1: Description format
+- Phase 3: Line count >500
+- Phase 11: cd commands
+- Phase 13: TodoWrite missing
+- Phase 18: Orphan detection
+- Phase 20: Gateway structure
+- Phase 24: Line number references
+- Phase 25: Context7 staleness
+- Phase 26: Reference content quality (see [Phase 26 Fix Procedure](#phase-26-fix-procedure) below)
+- Phase 28: Integration section (see [Phase 28 Fix Procedure](#phase-28-fix-procedure) below)
+- **Semantic Criterion 7: Phase Numbering Hygiene** (fractional phase renumbering)
+
+**Additional procedures:** Section organization, visual readability, example quality
+
+### Phase 26 Fix Procedure
+
+**When detected:** Genuine stubs (empty/incomplete reference files) found during semantic review
+
+**Complete procedure:** See [references/phase-26-procedure.md](references/phase-26-procedure.md)
+
+**Summary:**
+
+1. Enumerate ALL stubs from audit output
+2. Ask user about research approach
+3. If yes: Set up TodoWrite with per-stub items, invoke `orchestrating-research`
+4. Populate each stub from SYNTHESIS.md (not training data)
+5. Verify all stubs have >50 lines, no placeholders
+
+**🚨 CRITICAL: Never use training data. Always invoke orchestrating-research for verified content.**
+
+### Phase 28 Fix Procedure
+
+**When detected:** Missing or incomplete Integration section
+
+**Complete procedure:** See [references/phase-28-procedure.md](references/phase-28-procedure.md)
+
+**Summary:**
+
+1. Analyze skill content for skill references
+2. Search for what calls this skill (Called By)
+3. Identify prerequisites (Requires)
+4. Find invoked skills (Calls)
+5. Identify conditional relationships (Pairs With)
+5.5. **Resolve library skill paths (MANDATORY)** - For EACH library skill in Integration tables:
+   - Find full path: `find .claude/skill-library -type f -path "*/$SKILL_NAME/SKILL.md"`
+   - Include in Purpose column: `Purpose - \`Read("$SKILL_PATH")\``
+   - If not found: Flag as broken reference, do not add
+5.6. **Validate skill references per Phase 30** - For EACH skill reference being added:
+   - Check if skill exists in .claude/skills/ (CORE) or .claude/skill-library/ (LIBRARY)
+   - CORE skills: No annotation required (or add (CORE) for clarity)
+   - LIBRARY skills: MUST add (LIBRARY) annotation AND resolve full path for Purpose column
+   - If skill not found: Flag as broken reference, do not add
+6. Generate and insert Integration section
+
+**Migration:** If skill has "Related Skills" but no Integration, generate Integration and optionally consolidate.
+
+### Phase Numbering Hygiene Fix (Semantic Criterion 7)
+
+**When detected:** Fractional major phase numbers (Phase 3.5, Phase 5.4) found during semantic review
+
+**Fix procedure:** Renumber fractional phases sequentially, update all phase headings, markdown links, and prose references across SKILL.md and references/. Do NOT renumber sub-steps (Step 7.1 under Step 7).
+
+**Complete procedure:** See [references/semantic-criterion-7-procedure.md](references/semantic-criterion-7-procedure.md) for detailed steps, examples, and edge cases.
+
+---
+
+## Step 4c: Apply Hybrid Fixes
+
+**Phases: 4, 10, 22**
+
+These have deterministic parts that Claude handles automatically, but ambiguous cases require user confirmation.
+
+**Covered phases:**
+
+- Phase 4: Broken links (auto-correct if file exists, prompt if missing)
+- Phase 10: Phantom references (auto-replace from deprecation registry, fuzzy match otherwise)
+- Phase 22: Broken gateway paths (fuzzy match with user confirmation)
+
+**Additional procedures:** Example quality assessment
+
+See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for complete hybrid workflows and AskUserQuestion patterns.
+
+---
+
+## Step 4d: Guide Human-Required Fixes
+
+**Phases: 8, 9, 23**
+
+These require genuine human judgment. Provide interactive guidance.
+
+**Covered phases:**
+
+- Phase 8: TypeScript errors (explain and guide fixes)
+- Phase 9: Bash scripts (explain TypeScript migration)
+- Phase 23: Coverage gaps (defer to syncing-gateways skill)
+
+See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for guidance protocols.
+
+---
+
+## Step 4e: Validation-Only Phases (No Auto-Fix)
+
+**Phases: 15, 16, 17, 29**
+
+These phases detect issues but cannot auto-fix due to requiring semantic understanding and manual review.
+
+**Covered phases:**
+
+- Phase 15: Code block quality (missing/mismatched language tags, long lines)
+- Phase 16: Header hierarchy (empty headers, incorrect nesting)
+- Phase 17: Prose phase references (stale phase numbers after renumbering)
+- Phase 29: Logical coherence (workflow logic, contradictions, missing steps, purpose alignment)
+
+### Phase 29: Logical Coherence (Manual Resolution)
+
+**When detected:** Audit identifies logical issues such as:
+- Steps in impossible order (Step N needs output from Step M that comes later)
+- Contradictions between sections
+- Missing critical steps in workflow
+- Purpose misalignment (description doesn't match implementation)
+- Broken delegation (skill invokes non-existent sub-skills)
+
+**Why no auto-fix:** Logical coherence issues require understanding the skill's intent and making architectural decisions:
+- Reordering steps may break other dependencies
+- Resolving contradictions requires understanding which section is "correct"
+- Adding missing steps requires domain knowledge
+- Fixing purpose misalignment may require rewriting description OR workflow
+
+**Manual resolution guidance:**
+
+1. **Review the audit finding** - Understand the specific logical issue detected
+2. **Determine intent** - What was the skill trying to accomplish?
+3. **Choose resolution strategy:**
+   - Workflow logic issues → Reorder steps or add missing prerequisites
+   - Contradictions → Determine which section reflects intended behavior, update the other
+   - Missing steps → Add the step with appropriate content
+   - Purpose misalignment → Update description to match workflow OR update workflow to match description
+   - Broken delegation → Fix skill reference or remove the delegation
+4. **Apply fix manually** - Use Edit tool with careful consideration
+5. **Re-run audit** - Verify Phase 29 passes after fix
+
+**See:** [Phase 29 details](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md#phase-29-logical-coherence--internal-consistency)
+
+See [Phase Categorization](.claude/skills/managing-skills/references/patterns/phase-categorization.md) for manual remediation steps.
+
+---
+
+## Step 4f: Apply Final Formatting
+
+**Phase: 14 (Table Formatting)**
+
+This step runs AFTER all content-generating phases (26, 28) to ensure ALL tables are formatted, including those newly created by previous steps.
+
+**Why it runs last:**
+- Content-generating phases (26, 28) add new tables in Steps 4b-4d
+- Formatting must occur after all content exists
+- Ensures consistent table formatting across entire skill
+
+**Apply prettier formatting** - see [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)
+
+---
+
+## Step 5: Verify Fixes
+
+Re-run audit to verify all issues are resolved:
+
+```
+Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
+# Then re-audit the target skill
+```
+
+**Statistical evidence**: Fix attempts that skip verification have ~30% incomplete fix rate (some issues remain or new issues introduced). Re-audit takes 30 seconds and catches regressions.
+
+**Expected:** All phases pass. If failures remain, return to Step 3.
+
+---
+
+## Step 6: Update Changelog
+
+See [Changelog Format](.claude/skills/managing-skills/references/patterns/changelog-format.md).
+
+```bash
+mkdir -p {skill-path}/.history
+```
+
+Document fixes applied with method (Deterministic, Claude-Automated, Hybrid, Manual).
+
+---
+
+## Common Scenarios
+
+For detailed fix scenarios and recommended fix orders, see [references/common-scenarios.md](references/common-scenarios.md).
+
+**Quick reference:**
+
+| Scenario               | Typical Issues              | Fix Order              |
+| ---------------------- | --------------------------- | ---------------------- |
+| New Skill Cleanup      | Phase 1, 4, 5               | Deterministic → Hybrid |
+| Over-Long Skill        | Phase 3 (>500 lines)        | Claude-Auto (extract)  |
+| Legacy Migration       | Phase 9, 11, 13             | Claude-Auto → Human    |
+| Visual/Style Cleanup   | Phase 14, 15, 16            | Deterministic → Manual |
+| Orphan Library Skill   | Phase 18                    | Claude-Auto (gateway)  |
+| Missing Integration    | Phase 28                    | Claude-Auto (generate) |
+| Stub Reference Files   | Phase 26                    | Claude-Auto (research) |
+| Broken References      | Phase 10                    | Hybrid (registry/fuzz) |
+
+---
+
+## Integration
+
+### Called By
+
+- `managing-skills` (audit → fix workflow delegation)
+- `/skill-manager` command (fix operation)
+- `creating-skills` (Phase 6 - final compliance cleanup)
+- `updating-skills` (Phase 8 - post-update compliance)
+
+### Requires (invoke before starting)
+
+| Skill             | When   | Purpose                     |
+| ----------------- | ------ | --------------------------- |
+| `auditing-skills` | Step 1 | Identify compliance issues to fix |
+
+### Calls (during execution)
+
+| Skill                    | Phase/Step | Purpose                          |
+| ------------------------ | ---------- | -------------------------------- |
+| `auditing-skills`        | Step 1     | Get initial issues list          |
+| `auditing-skills`        | Step 5     | Verify fixes resolved issues     |
+| `orchestrating-research` (LIBRARY) | Phase 26 | Populate stub reference files - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+
+### Pairs With (conditional)
+
+| Skill               | Trigger                 | Purpose                    |
+| ------------------- | ----------------------- | -------------------------- |
+| `syncing-gateways`  | Phase 23 (coverage gaps) | Gateway consistency fixes |
+
+---
+
+## Related Skills
+
+- `creating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` - Create new skills (uses this for final cleanup)
+- `updating-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` - Update existing skills (uses this for compliance)
+- `auditing-skills` (LIBRARY) - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` - Validate skills (identifies issues to fix)

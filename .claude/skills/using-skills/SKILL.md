@@ -1,6 +1,7 @@
 ---
 name: using-skills
-description: Use when starting any conversation or performing any task - establishes how to find and use skills, requiring Skill tool invocation for core skills (.claude/skills) or Read Tool innovation for library skills (.claude/skill-library) before ANY response or action including clarifying questions.
+description: Use when starting any conversation or performing any task - establishes how to find and use skills, requiring Skill tool invocation for core skills (.claude/skills) or Read tool invocation for library skills (.claude/skill-library) before ANY response or action including clarifying questions.
+allowed-tools: Read, Skill, TodoWrite, AskUserQuestion
 ---
 
 <EXTREMELY-IMPORTANT>
@@ -14,6 +15,12 @@ This is not negotiable. This is not optional. You cannot rationalize your way ou
 ## How to Access Skills
 
 - **Core skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "skill-name"`
+- **Gateway Skills** (in `.claude/skills/`): Invoke via Skill tool → `skill: "gateway-name"`
+
+**ALWAYS read your gateway skills to locate task relevant skills. You MUST follow the gateway's instructions.** It tells you which library skills to load.
+
+After invoking the gateway, use its routing tables to find and Read relevant library skills:
+
 - **Library skills** (in `.claude/skill-library/`): Load via Read tool → `Read("path/from/gateway")`
 
 # Using Skills
@@ -110,3 +117,33 @@ The skill itself tells you which.
 ## User Instructions
 
 Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
+
+## Integration
+
+### Called By
+
+- Session start hooks (`session-start.sh`, `user-prompt-submit.sh`)
+- CLAUDE.md project instructions (referenced at top of file)
+- All agents (foundational skill for skill discovery)
+
+### Requires (invoke before starting)
+
+None - Entry point skill providing skill access framework
+
+### Calls (during execution)
+
+This skill provides the framework for calling other skills but doesn't invoke specific skills itself. It instructs agents to:
+
+- Use `Skill()` tool for core skills in `.claude/skills/`
+- Use `Read()` tool for library skills in `.claude/skill-library/`
+- Use gateway skills to discover library skills
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                       | Purpose                       |
+| ----------------------------- | ----------------------------- | ----------------------------- |
+| All skills                    | Every task                    | Provides discovery framework  |
+| Gateway skills                | Task requires library skill   | Route to appropriate domain   |
+| `verifying-before-completion` | Before claiming task complete | Prevents premature completion |
+| `brainstorming`               | "Let's build X"               | Process skills come first     |
+| `debugging-systematically`    | "Fix this bug"                | Process skills come first     |

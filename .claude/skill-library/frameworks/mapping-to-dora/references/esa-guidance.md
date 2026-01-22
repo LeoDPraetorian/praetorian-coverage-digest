@@ -11,6 +11,7 @@
 **Website:** https://www.eba.europa.eu/regulation-and-policy/digital-operational-resilience-act-dora
 
 **Key Guidance Published:**
+
 - **Q&A on DORA Implementation** (ongoing updates)
 - **Guidelines on ICT Risk Management** (cross-reference to EBA/GL/2019/04)
 - **RTS on Incident Classification** (lead author, January 2024)
@@ -19,11 +20,13 @@
 - **Third-Party Risk Management Practices** (based on supervisory reviews)
 
 **Sector Focus:**
+
 - Credit institutions (banks, building societies)
 - Payment institutions
 - E-money institutions
 
 **Contact:**
+
 - Email: info@eba.europa.eu
 - DORA-specific queries: DORA@eba.europa.eu
 
@@ -34,6 +37,7 @@
 **Website:** https://www.esma.europa.eu/policy-activities/digital-operational-resilience-act-dora
 
 **Key Guidance Published:**
+
 - **DORA Implementation Roadmap** (timeline and milestones)
 - **Guidelines for Investment Firms** (proportionality for smaller firms)
 - **Trading Venue Resilience Standards** (TLPT requirements for exchanges)
@@ -41,6 +45,7 @@
 - **Crypto-Asset Provider Coordination** (DORA + MiCA interplay)
 
 **Sector Focus:**
+
 - Investment firms
 - Trading venues (stock exchanges, MTFs, OTFs)
 - Central securities depositories (CSDs)
@@ -48,6 +53,7 @@
 - Crypto-asset service providers
 
 **Contact:**
+
 - Email: communications@esma.europa.eu
 - DORA queries: DORA@esma.europa.eu
 
@@ -58,6 +64,7 @@
 **Website:** https://www.eiopa.europa.eu/browse/regulation/digital-operational-resilience_en
 
 **Key Guidance Published:**
+
 - **DORA Implementation Guide for Insurance Undertakings**
 - **Proportionality for Small Insurance Companies**
 - **IORPs Specific Guidance** (occupational pension schemes)
@@ -65,11 +72,13 @@
 - **Cyber Risk Scenarios for Insurance** (stress testing methodologies)
 
 **Sector Focus:**
+
 - Insurance and reinsurance companies
 - Occupational retirement provision schemes (IORPs)
 - Pension funds
 
 **Contact:**
+
 - Email: info@eiopa.europa.eu
 - DORA queries: DORA@eiopa.europa.eu
 
@@ -84,6 +93,7 @@
 **Members:** EBA + ESMA + EIOPA (integrated cross-sectoral)
 
 **Purpose:**
+
 - Unified oversight of critical ICT third-party service providers (CTPPs)
 - Cross-sectoral coordination
 - Consistent supervisory approach across ESAs
@@ -92,16 +102,19 @@
 ### Governance Structure
 
 **Joint Committee:**
+
 - Representatives from all three ESAs
 - Rotating chairmanship (annual)
 - Decisions require consensus or qualified majority
 
 **Lead Overseer Model:**
+
 - Each CTPP assigned a "Lead Overseer" (EBA, ESMA, or EIOPA)
 - Lead Overseer coordinates oversight activities
 - Other ESAs participate based on provider's client base
 
 **Example Lead Overseer Assignments:**
+
 - AWS, Azure, Google Cloud → **EBA** (banking is largest user segment)
 - FIS, Finastra, Temenos → **EBA** (core banking software)
 - ION Group → **ESMA** (trading platform focus)
@@ -110,18 +123,21 @@
 ### Oversight Activities
 
 **Annual Oversight Plan:**
+
 - Published Q1 each year
 - Priority CTPPs for inspection
 - Thematic reviews (e.g., ransomware resilience, AI/ML governance)
 - Cross-sectoral risk assessments
 
 **Information Requests:**
+
 - Ad-hoc and scheduled data requests
 - Governance documentation
 - Security architecture reviews
 - Incident reports and remediation
 
 **On-Site Inspections:**
+
 - Coordinated inspection teams
 - Data center visits
 - Personnel interviews
@@ -129,12 +145,14 @@
 - Documentation review
 
 **Supervisory Dialogue:**
+
 - Regular meetings with CTPP senior management
 - Emerging risk discussions
 - Regulatory interpretation clarification
 - Good practice sharing
 
 **Enforcement Coordination:**
+
 - Joint decision-making for non-compliance
 - Consistent penalty frameworks
 - Public disclosure coordination
@@ -149,6 +167,7 @@
 **Mandate:** Day-to-day supervision of financial entities (not CTPPs)
 
 **Key Responsibilities:**
+
 - Entity-level DORA compliance monitoring
 - Incident report review and analysis
 - ICT third-party register validation
@@ -157,11 +176,13 @@
 - Coordination with ESAs
 
 **NOT Responsible For:**
+
 - CTPP oversight (this is ESA jurisdiction)
 
 ### National Authority Examples
 
 **Banking:**
+
 - Germany: **BaFin** (Federal Financial Supervisory Authority)
 - France: **ACPR** (Autorité de Contrôle Prudentiel et de Résolution)
 - Netherlands: **DNB** (De Nederlandsche Bank)
@@ -169,12 +190,14 @@
 - Spain: **Banco de España**
 
 **Securities:**
+
 - Germany: **BaFin**
 - France: **AMF** (Autorité des Marchés Financiers)
 - Netherlands: **AFM** (Autoriteit Financiële Markten)
 - Italy: **CONSOB**
 
 **Insurance:**
+
 - Germany: **BaFin**
 - France: **ACPR**
 - Netherlands: **DNB**
@@ -183,17 +206,20 @@
 ### Coordination with ESAs
 
 **Information Sharing:**
+
 - Incident reports escalated to ESAs (systemic incidents)
 - Register submissions forwarded to ESAs (concentration risk analysis)
 - TLPT results shared (sector-wide lessons learned)
 - Enforcement actions coordinated
 
 **Supervisory Colleges:**
+
 - Cross-border entity supervision
 - Home-host authority coordination
 - Joint inspections for large groups
 
 **Convergence:**
+
 - ESA guidelines ensure consistent national practices
 - Peer review of supervisory approaches
 - Training and capacity building
@@ -207,6 +233,7 @@
 **DORA Article 4:** Proportionality based on size, complexity, nature, risk profile
 
 **Application:**
+
 - **Microenterprises**: Simplified framework (Article 15)
 - **Small entities**: Streamlined requirements
 - **Medium entities**: Standard requirements with flexibility
@@ -215,18 +242,21 @@
 ### Proportionate ICT Risk Framework
 
 **Risk Assessment:**
+
 - **Microenterprises**: Annual simplified assessment (template-based)
 - **Small**: Biannual risk assessment (focus on critical systems)
 - **Medium**: Annual comprehensive assessment
 - **Large**: Continuous risk assessment with quarterly updates
 
 **Testing Frequency:**
+
 - **Microenterprises**: Annual vulnerability scans (external-facing only)
 - **Small**: Quarterly scans + annual penetration test
 - **Medium**: Quarterly scans + biannual penetration tests
 - **Large/Significant**: Continuous scanning + annual pen test + TLPT every 3 years
 
 **Third-Party Management:**
+
 - **Microenterprises**: Core Article 30 provisions only
 - **Small**: Core provisions + concentration risk assessment
 - **Medium**: Core + enhanced for critical functions
@@ -235,21 +265,25 @@
 ### Sector-Specific Proportionality
 
 **Small Payment Institutions:**
+
 - Simplified incident classification (focus on payment system availability)
 - Proportionate TLPT (can use pooled approach)
 - Streamlined register (critical providers only)
 
 **Small Investment Firms:**
+
 - Class 3 investment firms: Simplified requirements
 - Class 2: Standard requirements
 - Class 1: Full requirements including mandatory TLPT
 
 **Small Insurance Companies:**
+
 - Non-life insurance (property/casualty): Proportionate based on premium volume
 - Life insurance: Enhanced requirements due to long-term obligations
 - Reinsurance: Complexity-based (not just size)
 
 **Credit Unions and Building Societies:**
+
 - Member-based institutions: Proportionate to member count and asset base
 - Limited product range: Focused risk assessment on offered services
 - Local/regional: Reduced cross-border complexity
@@ -315,6 +349,7 @@
 
 **Q: What are typical DORA compliance costs?**
 **A:** Varies by entity size:
+
 - Microenterprise: €10K-50K (contract remediation, simplified framework)
 - Small: €100K-500K (testing, third-party management, training)
 - Medium: €500K-2M (TLPT, enhanced controls, register maintenance)
@@ -325,6 +360,7 @@
 
 **Q: How many FTEs needed for DORA compliance?**
 **A:** Depends on size:
+
 - Micro/Small: 0.5-2 FTEs (part-time or shared resources)
 - Medium: 2-5 FTEs (dedicated ICT risk function)
 - Large: 5-15 FTEs (ICT risk, compliance, testing teams)
@@ -337,16 +373,19 @@
 ### Current Posture
 
 **Education First:**
+
 - Regulators emphasizing guidance over immediate penalties
 - Webinars, workshops, one-on-one consultations
 - Published implementation checklists
 
 **Tolerance for Documented Plans:**
+
 - "Action plan" defense accepted initially
 - Must demonstrate good-faith effort
 - Progress tracking and milestone validation
 
 **Focus Areas:**
+
 - Incident reporting compliance (Article 19 timelines)
 - Register submission accuracy (Article 28 first submission April 2025)
 - Contract remediation progress (Article 30)
@@ -354,16 +393,19 @@
 ### Expected Evolution
 
 **2025-2026: Transition Period**
+
 - Educational approach continues
 - Warning letters for minor non-compliance
 - Public guidance on common mistakes
 
 **2027+: Enforcement Intensification**
+
 - Public enforcement actions for egregious cases
 - Financial penalties for repeated non-compliance
 - Precedent-setting cases published
 
 **Aggravating Factors:**
+
 - Delayed incident reporting (beyond 4h/72h/1m timelines)
 - Failure to maintain register (Article 28)
 - Refusal of competent authority inspections

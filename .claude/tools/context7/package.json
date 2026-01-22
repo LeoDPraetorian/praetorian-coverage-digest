@@ -1,17 +1,11 @@
 {
   "name": "@claude-tools/context7",
   "version": "1.0.0",
+  "description": "Library documentation search and up-to-date code examples via Context7",
   "type": "module",
   "main": "index.ts",
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts"
-  },
-  "dependencies": {
-    "zod": "^3.23.8",
-    "@modelcontextprotocol/sdk": "^1.0.4"
-  },
-  "devDependencies": {
-    "@claude/testing": "*"
   }
 }

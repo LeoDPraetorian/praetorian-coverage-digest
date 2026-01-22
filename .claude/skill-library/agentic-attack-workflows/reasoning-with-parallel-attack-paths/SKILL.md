@@ -15,6 +15,7 @@ allowed-tools: Read, Bash, TodoWrite, AskUserQuestion, Task
 All models receive the IDENTICAL attacker-focused prompt. Each model's unique architecture, training data, and reasoning patterns naturally produce different attack vectors.
 
 **Inspired by ParaThinker Research** (arxiv:2509.04475):
+
 - Tunnel vision occurs when early mistakes propagate through sequential reasoning
 - Parallel width beats sequential depth for complex reasoning
 - Isolated paths prevent error contamination
@@ -26,12 +27,14 @@ All models receive the IDENTICAL attacker-focused prompt. Each model's unique ar
 ## When to Use
 
 Use for security analysis where:
+
 - Multiple perspectives help (different models find different vulnerabilities)
 - Blind spot coverage matters (any single model has gaps)
 - Thoroughness over speed (can afford 4 parallel API calls)
 - Authorized penetration testing context
 
 **Do NOT use for:**
+
 - Non-security tasks
 - Time-critical decisions (4x API latency cost)
 - Simple code reviews
@@ -41,20 +44,20 @@ Use for security analysis where:
 
 ## Quick Reference
 
-| Model     | Same Attacker Prompt | Natural Strength                                 |
-| --------- | -------------------- | ------------------------------------------------ |
-| Claude    | Attacker mindset     | Auth edge cases, safety implications, behaviors  |
-| GPT-4     | Attacker mindset     | Known CVE patterns, injection vectors, vulns     |
-| Gemini    | Attacker mindset     | API design flaws, architecture weaknesses        |
-| DeepSeek  | Attacker mindset     | Implementation bugs, logic errors, code-level    |
+| Model    | Same Attacker Prompt | Natural Strength                                |
+| -------- | -------------------- | ----------------------------------------------- |
+| Claude   | Attacker mindset     | Auth edge cases, safety implications, behaviors |
+| GPT-4    | Attacker mindset     | Known CVE patterns, injection vectors, vulns    |
+| Gemini   | Attacker mindset     | API design flaws, architecture weaknesses       |
+| DeepSeek | Attacker mindset     | Implementation bugs, logic errors, code-level   |
 
 **Cross-Reference Confidence Matrix:**
 
-| Models Agreeing | Confidence  | Action                              |
-| --------------- | ----------- | ----------------------------------- |
-| 4/4             | CRITICAL    | Definitely exploitable - prioritize |
-| 3/4             | HIGH        | Very likely exploitable - verify    |
-| 2/4             | MEDIUM-HIGH | Likely real - needs verification    |
+| Models Agreeing | Confidence  | Action                               |
+| --------------- | ----------- | ------------------------------------ |
+| 4/4             | CRITICAL    | Definitely exploitable - prioritize  |
+| 3/4             | HIGH        | Very likely exploitable - verify     |
+| 2/4             | MEDIUM-HIGH | Likely real - needs verification     |
 | 1/4             | MEDIUM      | Investigate based on model specialty |
 
 ---
@@ -64,6 +67,7 @@ Use for security analysis where:
 ### Phase 1: Setup LiteLLM Environment
 
 **Prerequisites:**
+
 - LiteLLM installed (`pip install litellm`)
 - API keys configured for: Anthropic, OpenAI, Google Cloud, DeepSeek
 
@@ -132,12 +136,14 @@ Identify the same vulnerability described differently by models. See [references
 **Step 4.3: Cross-Reference**
 
 Build confidence matrix based on model agreement:
+
 - Count how many models found each vulnerability
 - Apply confidence scoring from Quick Reference table
 
 **Step 4.4: Preserve Unique Findings**
 
 Don't dismiss 1/4 findings - they may represent model-specific insights:
+
 - DeepSeek finding alone → investigate code-level implementation
 - Claude finding alone → investigate auth/safety edge case
 - GPT-4 finding alone → check against CVE database
@@ -168,16 +174,19 @@ See [Example Output Structure](#example-output-structure) below.
 ## Multi-Model Security Analysis Synthesis
 
 ### High-Confidence Findings (2+ models agree)
-| Vulnerability       | Severity | Found By              | Confidence |
-| ------------------- | -------- | --------------------- | ---------- |
-| SQLi in /api/login  | CRITICAL | Claude, GPT, DeepSeek | 3/4 - HIGH |
+
+| Vulnerability      | Severity | Found By              | Confidence |
+| ------------------ | -------- | --------------------- | ---------- |
+| SQLi in /api/login | CRITICAL | Claude, GPT, DeepSeek | 3/4 - HIGH |
 
 ### Model-Unique Findings (investigate)
-| Vulnerability     | Severity | Found By       | Notes               |
-| ----------------- | -------- | -------------- | ------------------- |
-| Integer overflow  | HIGH     | DeepSeek only  | Code-level specialty |
+
+| Vulnerability    | Severity | Found By      | Notes                |
+| ---------------- | -------- | ------------- | -------------------- |
+| Integer overflow | HIGH     | DeepSeek only | Code-level specialty |
 
 ### Model Contributions
+
 - Claude: 3 findings (auth edge cases)
 - GPT-4: 3 findings (CVE patterns)
 - Gemini: 3 findings (architecture gaps)
@@ -190,13 +199,13 @@ Total: 9 unique vulnerabilities from 4 models
 
 ## Anti-Patterns
 
-| Anti-Pattern                 | Why It Fails                 | Correct Approach          |
-| ---------------------------- | ---------------------------- | ------------------------- |
-| Different prompts per model  | Defeats model diversity      | Same attacker prompt      |
-| Skipping synthesis           | Misses cross-reference value | Always aggregate/dedupe   |
-| Dismissing 1/4 findings      | Loses model-specific insights | Investigate by specialty |
-| Sequential execution         | Wastes time                  | Use asyncio.gather()      |
-| Averaging severity           | Hides worst-case risk        | Use maximum severity      |
+| Anti-Pattern                | Why It Fails                  | Correct Approach         |
+| --------------------------- | ----------------------------- | ------------------------ |
+| Different prompts per model | Defeats model diversity       | Same attacker prompt     |
+| Skipping synthesis          | Misses cross-reference value  | Always aggregate/dedupe  |
+| Dismissing 1/4 findings     | Loses model-specific insights | Investigate by specialty |
+| Sequential execution        | Wastes time                   | Use asyncio.gather()     |
+| Averaging severity          | Hides worst-case risk         | Use maximum severity     |
 
 See [references/anti-patterns.md](references/anti-patterns.md) for detailed examples.
 
@@ -221,9 +230,9 @@ See [references/anti-patterns.md](references/anti-patterns.md) for detailed exam
 
 ### Requires (invoke before starting)
 
-| Skill                         | When  | Purpose                           |
-| ----------------------------- | ----- | --------------------------------- |
-| None - standalone methodology | -     | Can be invoked directly           |
+| Skill                         | When | Purpose                 |
+| ----------------------------- | ---- | ----------------------- |
+| None - standalone methodology | -    | Can be invoked directly |
 
 ### Calls (during execution)
 
@@ -233,10 +242,10 @@ See [references/anti-patterns.md](references/anti-patterns.md) for detailed exam
 
 ### Pairs With (conditional)
 
-| Skill                          | Trigger                         | Purpose                    |
-| ------------------------------ | ------------------------------- | -------------------------- |
-| `verifying-before-completion`  | Before reporting findings       | Verify all findings tested |
-| `debugging-systematically`     | When results are ambiguous      | Investigate discrepancies  |
+| Skill                         | Trigger                    | Purpose                    |
+| ----------------------------- | -------------------------- | -------------------------- |
+| `verifying-before-completion` | Before reporting findings  | Verify all findings tested |
+| `debugging-systematically`    | When results are ambiguous | Investigate discrepancies  |
 
 ---
 
@@ -259,4 +268,5 @@ See [references/anti-patterns.md](references/anti-patterns.md) for detailed exam
 - [references/anti-patterns.md](references/anti-patterns.md) - Common mistakes and fixes
 
 **Examples:**
+
 - [examples/security-analysis.md](examples/security-analysis.md) - Complete JWT auth analysis walkthrough with 4 models

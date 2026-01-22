@@ -1,4 +1,4 @@
-## 3  USER-MODE APPLICATIONS
+## 3 USER-MODE APPLICATIONS
 
 ![Figure](figures/WindowsSecurityInternals_page_093_figure_001.png)
 
@@ -24,7 +24,7 @@ To allow for these multiple APIs, the Windows kernel implements a generic set of
 
 Figure 3-1: The Win32 API modules
 
-64    Chapter 3
+64 Chapter 3
 
 ---
 
@@ -91,7 +91,7 @@ NtEnumerateKey        7FFA090BC6F0
 NtTerminateProcess       7FFA090BC630
 ```
 
-66    Chapter 3
+66 Chapter 3
 
 ---
 
@@ -112,7 +112,6 @@ API SETS
 You might notice something odd in the list of imported DLL names in Listing 3-2. If you search your filesystem for the api-ms-win-core-tlsupport1-1-0 dll file, you won't find it. This is because the DLL name refers to an API set. API sets were introduced in Windows 7 to modularize the system libraries, and they abstract from the name of the set to the DLL that exports the API.
 
 API sets allow an executable to run on multiple different versions of
-
 
 Windows, such as a client, a server, or an embedded version, and change its
 
@@ -163,24 +162,26 @@ When loading a DLL, the loader creates an image section object from the executab
 Let's say you pass the string ABC.DLL to the loadLibrary API. How does the API know where to find that DLL? If the file hasn't been specified as an absolute path, the API implements a path-searching algorithm. The algorithm, as originally implemented in Windows NT 3.1, searches for files in the following order:
 
 - 1. The same directory as the current process's executable file
+
 2. The current working directory
 3. The Windows System32 directory
 4. The Windows directory
 5. Each semicolon-separated location in the PATH environment variable
-The problem with this load order is that it can lead to a privileged process loading a DLL from an insecure location. For example, if a privileged process changed its current working directory using the SetCurrentDirectory API to a location a less privileged user could write to, the DLL would be loaded from that location before any DLL from the System32 directory. This attack is called DLL hijacking , and it's a persistent problem on Windows.
+   The problem with this load order is that it can lead to a privileged process loading a DLL from an insecure location. For example, if a privileged process changed its current working directory using the SetCurrentDirectory API to a location a less privileged user could write to, the DLL would be loaded from that location before any DLL from the System32 directory. This attack is called DLL hijacking , and it's a persistent problem on Windows.
 
-68    Chapter 3
+68 Chapter 3
 
 ---
 
 Vista changed the default load order to the following, which is safer:
 
 - 1. The same directory as the current process's executable file
+
 2. The Windows System32 directory
 3. The Windows directory
 4. The current working directory
 5. Each semicolon-separated location in the PATH environment variable
-Now we no longer load from the current working directory before the System32 or Windows directory. However, if an attacker could write to the executable's directory, a DLL hijack could still take place. Therefore, if an executable is run as a privileged process, only administrators should be able to modify its directory to prevent a DLL hijack from occurring.
+   Now we no longer load from the current working directory before the System32 or Windows directory. However, if an attacker could write to the executable's directory, a DLL hijack could still take place. Therefore, if an executable is run as a privileged process, only administrators should be able to modify its directory to prevent a DLL hijack from occurring.
 
 ## THE .DLL FILE EXTENSION
 
@@ -222,7 +223,7 @@ Figure 3-2: The Win32 GUI modules
 
 You might notice that the left-hand side of Figure 3 - 2 looks a lot like Figure 3 - 1 , which showed the modules for the normal Win32 APIs. In place
 
-70    Chapter 3
+70 Chapter 3
 
 ---
 
@@ -303,7 +304,7 @@ Handle ProcessId ThreadId ClassName
 
 ## Listing 3-6: Enumerating windows for the current desktop
 
-72    Chapter 3
+72 Chapter 3
 
 ---
 
@@ -364,7 +365,7 @@ The first version of Windows NT allowed multiple users to be authenticated at th
 
 RDS is a service on Windows workstations and servers that allows you to remotely connect to the GUI and interact with the system. It's used for remote administration and to provide shared hosting for multiple users on the same network-connected system. In addition, its functionality has been repurposed to support a mechanism that can switch between users on the same system without having to log users out.
 
-74    Chapter 3
+74 Chapter 3
 
 ---
 
@@ -418,7 +419,7 @@ PS> ls NTObjectSession:\ | Group-Object TypeName
 
 Listing 3-9: The contents of a session's BNO directory
 
-76    Chapter 3
+76 Chapter 3
 
 ---
 
@@ -493,7 +494,7 @@ PS> $m.FullPath
 
 Listing 3-13: Creating a new Mutant with -Win32Path
 
-78    Chapter 3
+78 Chapter 3
 
 ---
 
@@ -565,10 +566,9 @@ Table 3-1: Predefined Registry Handles and Their Native Equivalents
 
 <table><tr><td>Predefined handle name</td><td>OMNS path</td></tr><tr><td>HKEY_LOCAL_MACHINE</td><td>\REGISTRY\_MACHINE</td></tr><tr><td>HKEY_USERS</td><td>\REGISTRY\_USER</td></tr><tr><td>HKEY_CURRENT_CONFIG</td><td>\REGISTRY\_MACHINE\SYSTEM\CurrentControlSet\HardwareProfiles\Current</td></tr><tr><td>HKEY_CURRENT_USER</td><td>\REGISTRY\_USER\&gt;\SDDL\_SID&gt;</td></tr><tr><td>HKEY_CLASSES_ROOT</td><td>Merged view of \REGISTRY\_MACHINE\SOFTWARE\Classes and \REGISTRY\_USER\&gt;\SDDL\_SID&gt; Classes</td></tr></table>
 
-
 The first three predefined handles, HKEY_LOCAL_MACHINE, HKEY_USERS, and HKEY_CURRENT_CONFIG, are not particularly special; they directly map to a single
 
-80    Chapter 3
+80 Chapter 3
 
 ---
 
@@ -632,7 +632,7 @@ It's also possible to get a mismatch if some software uses the native system cal
 
 The built-in registry provider does have an advantage too: it can be used without the installation of an external module. It also allows you to create new keys and add values, which the module's provider does not allow you to do.
 
-82    Chapter 3
+82 Chapter 3
 
 ---
 
@@ -677,14 +677,13 @@ Table 3-2: Win32 Path Types
 
 <table><tr><td>DOS path</td><td>Native path</td><td>Description</td></tr><tr><td>some\path</td><td>\??C\ABC\some\path</td><td>Relative path to current directory</td></tr><tr><td>C.\some\path</td><td>\??C\C\some\path</td><td>Absolute path</td></tr><tr><td>C.\some\path</td><td>\??C\ABC\some\path</td><td>Drive relative path</td></tr><tr><td>\some\path</td><td>\??C\C\some\path</td><td>Rooted to current drive</td></tr><tr><td>\LC\some\..\path</td><td>\??C\path</td><td>Device path, canonicalized</td></tr><tr><td>\LC\some\..\path</td><td>\??C\C\some\..\path</td><td>Device path, non-canonicalized</td></tr><tr><td>\??C\some\path</td><td>\??C\C\some\path</td><td>Device path, non-canonicalized</td></tr><tr><td>\server\share\path</td><td>\??C\UNC\server\share\path</td><td>UNC path to share on server</td></tr></table>
 
-
 Due to the way DOS paths are specified, multiple DOS paths might represent the same native path. To ensure the final native path is correct, the DOS path must go through a canonicalization process to convert these different representations into the same canonical form.
 
 One simple operation undertaken in canonicalization is the handling of path separators. For native paths, there is only one path separator; the backslash (\) character. If you use a forward slash (/), the object manager will treat it as just another filename character. However, DOS paths support both forward slashes and backslashes as path separators. The canonicalization process takes care of this by ensuring all forward slashes are converted to backslashes. Therefore, C:\Windows and C:\Windows are equivalent.
 
 Another canonicalization operation is the resolving of parent directory references. When writing a DOS path, you might specify a filename with one dot (.) or two dots (.), each of which has a special meaning. A single dot refers to the current directory, and the canonicalization process will remove it from the path. A double dot refers to the parent, so the parent directory will be removed. Therefore, the path C\ABC\XYZ will get converted to C\ABC\XYZ, and C\ABC\XYZ will get converted to C\XYZ. As with the
 
-84    Chapter 3
+84 Chapter 3
 
 ---
 
@@ -752,7 +751,7 @@ Name        Type  DataObject
     LongPathsEnabled Dword 1
 ```
 
-86    Chapter 3
+86 Chapter 3
 
 ---
 
@@ -800,15 +799,16 @@ The first thing New-Win32Process will do is parse the command line using an algo
 The command will then search the following locations for the execut-able, much like the DLL path searching we discussed in “Searching for DLLs ” on page 68. Note that the executable search path is the same as the unsafe DLL search path:
 
 - 1. The same directory as the current process's executable file
+
 2. The current working directory
 3. The Windows System32 directory
 4. The Windows directory
 5. Each semicolon-separated location in the PATH environment variable
-If New-Win32Process can't find notepad.exe, it will next try to find the file notepad_test.txt, in case that's what we meant. As the filename has an extension already, it won't replace it with .exe. If New-Win32Process can't find the file, it returns an error. Note that if we passed notepad surrounded by double quotes, as in "notepad" test.txt, then New-Win32Process would search for notepad .exe only and never fall back to trying all combinations of the name with the whitespace.
+   If New-Win32Process can't find notepad.exe, it will next try to find the file notepad_test.txt, in case that's what we meant. As the filename has an extension already, it won't replace it with .exe. If New-Win32Process can't find the file, it returns an error. Note that if we passed notepad surrounded by double quotes, as in "notepad" test.txt, then New-Win32Process would search for notepad .exe only and never fall back to trying all combinations of the name with the whitespace.
 
 This command line parsing behavior has two security implications. First, if the process is being created by a more privileged process and a less
 
-88    Chapter 3
+88 Chapter 3
 
 ---
 
@@ -818,17 +818,15 @@ The second security implication is that the path-searching algorithm changes if 
 
 Let's look at an example. If we specify a command line of \:\Program files\
 
-
 \abc.exe, then the following paths will be searched for the executable file:
 
 - • C:\Program
-• C:\Program.exe
-• C:\Program Files\abc.exe
-• C:\Program Files\abc.exe.exe
-If the user could write the file C:\Program or C:\Program.exe, then they could hijack execution. Fortunately, on a default installation of Windows, a normal user can't write files to the root of the system drive; however, con figuration changes sometimes allow this. Also, the executable path might be on a different drive that does allow writing to the root.
+  • C:\Program.exe
+  • C:\Program Files\abc.exe
+  • C:\Program Files\abc.exe.exe
+  If the user could write the file C:\Program or C:\Program.exe, then they could hijack execution. Fortunately, on a default installation of Windows, a normal user can't write files to the root of the system drive; however, con figuration changes sometimes allow this. Also, the executable path might be on a different drive that does allow writing to the root.
 
 To avoid both security implications, the caller can specify the executable's full pathname by setting the ApplicationName property when calling
-
 
 New-Win32Process:
 
@@ -856,9 +854,9 @@ The reason Explorer can start the editor is that it doesn't use the underlying C
 For our purposes, we need to specify three parameters to ShellExecute:
 
 - • The path to the file to execute
-• The verb to use on the file
-• Any additional arguments
-The first thing ShellExecute does is look up the handler for the extension of the file to execute. For example, if the file is test.txt , then it needs to look up the handler for the .txt extension. The handlers are registered in the registry under the HKEY _ CLASSES _ ROOT key, which, as we saw earlier in the chapter, is a merged view of parts of the machine software and the user's registry hive. In Listing 3-23, we query the handler.
+  • The verb to use on the file
+  • Any additional arguments
+  The first thing ShellExecute does is look up the handler for the extension of the file to execute. For example, if the file is test.txt , then it needs to look up the handler for the .txt extension. The handlers are registered in the registry under the HKEY _ CLASSES _ ROOT key, which, as we saw earlier in the chapter, is a merged view of parts of the machine software and the user's registry hive. In Listing 3-23, we query the handler.
 
 ```bash
 PS> $base_key = "NTkey\:\MACHINE\SOFTWARE\Classes"
@@ -884,18 +882,17 @@ Listing 3-23: Querying the shell handler for .txt files
 
 We start by querying the machine class's key for the .txt extension ❶ . Although we could have checked for a user-specific key, checking the machine class's key ensures that we inspect the system default. The .txt registry key doesn't directly contain the handler. Instead, the default value, represented by an empty name, refers to another key: in this case, the txtfile ❷ . We then list the subkeys of txtfile and find three keys: open, print, and printto ❸ . We can pass these verbs by name to ShellExecute .
 
-Each of these verb keys can have a subkey, called Command, that contains a command line to execute . We can see that the default for a .txt file is to open Notepad ❸, the $1 is replaced with the path to the file being executed. (The command could also contain %*, which includes any additional arguments passed to ShellExecute.) The CreateProcess API can now start the executable and handle the file.
+Each of these verb keys can have a subkey, called Command, that contains a command line to execute . We can see that the default for a .txt file is to open Notepad ❸, the $1 is replaced with the path to the file being executed. (The command could also contain %\*, which includes any additional arguments passed to ShellExecute.) The CreateProcess API can now start the executable and handle the file.
 
 There are many different standard verbs you can pass to ShellExecute. Table 3-5 shows a list of common ones you'll encounter.
 
-90    Chapter 3
+90 Chapter 3
 
 ---
 
 Table 3-3: Common Shell Verbs
 
 <table><tr><td>Verb</td><td>Description</td></tr><tr><td>open</td><td>Open the file; this is typically the default.</td></tr><tr><td>edit</td><td>Edit the file.</td></tr><tr><td>print</td><td>Print the file.</td></tr><tr><td>printto</td><td>Print to a specified printer.</td></tr><tr><td>explore</td><td>Explore a directory; this is used to open a directory in an Explorer window.</td></tr><tr><td>runas</td><td>Open the file as an administrator; typically, defined for executables only.</td></tr><tr><td>runauser</td><td>Open the file as another user; typically, defined for executables only.</td></tr></table>
-
 
 You might find it odd that there is both an open and an edit verb. If you opened a .list file, for example, the file would open in Notepad, and you'd be able to edit it. But the distinction is useful for files such as batch files, where the open verb would execute the file and edit would open it in a text editor.
 
@@ -933,6 +930,7 @@ The Session Manager Subsystem (SMS) is the first user-mode process started by th
 • Initializing base DOS devices such as serial ports
 
 • Running automatic disk integrity checks
+
 ## The Windows Logon Process
 
 The Windows logon process is responsible for setting up a new console session, as well as displaying the logon user interface (primarily through the LogonUI application). It's also responsible for starting the user-mode font driver (UMFD) process, which renders fonts to the screen, and the desktop window manager (DWM) process, which performs desktop compositing operations to allow for fancy, transparent windows and modern GUI touches.
@@ -949,7 +947,7 @@ Each service is a securable resource with fine-grained controls determining whic
 
 Remote Procedure Call Subsystem (RPCSS) The RPCSS service manages the registration of remote procedure call endpoints, exposing the registration to local clients as well as over the network. This service is essential to a running system; in fact, if this process crashes, it will force Windows to reboot.
 
-92   Chapter 3
+92 Chapter 3
 
 ---
 
@@ -992,7 +990,6 @@ Let's walk through some worked examples to practice using the various commands c
 
 At the beginning of this chapter, you saw how to use the Get-Win32Module
 
-
 Import command to extract an executable file's imported APIs. Use one for this command that I find especially helpful when I'm trying to track down security issues is identifying all the executables that use a particular API such as CreateProcess, and then using this list to reduce the files I need to reverse engineer. You can perform such a search with the basic PowerShell script shown in Listing 3-25.
 
 ```bash
@@ -1018,7 +1015,7 @@ You can use the same technique to enumerate DLL files or drivers and quickly dis
 
 In "Listing the Registry's Contents" on page 81, I mentioned that one of the big advantages of using the native system calls over the Win32 APIs to interact with the registry is that they allow you to access keys and values with NUL characters in their names. It would be useful to be able to find these keys and values so you can try to detect software on your system that is actively trying to hide registry keys or values from the user (some malware families, such as Kovter and Poweliks, are known to use this technique). Let's start by finding keys with NUL characters in the name (Listing 3-26).
 
-94    Chapter 3
+94 Chapter 3
 
 ---
 
@@ -1064,7 +1061,7 @@ Listing 3-27: Finding hidden registry values
 
 We start by creating a normal key, then adding a value with a NUL character in the name ❶ . We then define a function, Select+HiddenValue =
 
-User Mode Applications   95
+User Mode Applications 95
 
 ---
 
@@ -1088,7 +1085,4 @@ PART Ⅱ THE WINDOWS SECURITY REFERENCE MONITOR
 
 ---
 
-
-
 ---
-

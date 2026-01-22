@@ -1,4 +1,4 @@
-## 11  EARLY LAUNCH ANTIMALWARE DRIVERS
+## 11 EARLY LAUNCH ANTIMALWARE DRIVERS
 
 ![Figure](figures/EvadingEDR_page_227_figure_001.png)
 
@@ -26,7 +26,7 @@ To publish an ELAM driver, developers must be part of the Microsoft Virus Initia
 
 The Microsoft Virus Initiative and ELAM are closely tied. To create a production driver (one that can be deployed to systems not in test-signing mode), Microsoft must countersign the driver. This countersignature uses a special certificate, visible in the ELAM driver's digital signature information under Microsoft Windows Early Launch Anti-malware Publisher , as shown in Figure 11 - 1 . This countersignature is available to participants of the Microsoft Virus Initiative program only.
 
-202    Chapter 11
+202 Chapter 11
 
 ---
 
@@ -100,7 +100,7 @@ typedef struct _BOCB_IMAGE_INFORMATION {
     UNICODE_STRING CertificateIssuer;
 ```
 
-204    Chapter Ⅱ
+204 Chapter Ⅱ
 
 ---
 
@@ -152,7 +152,7 @@ Listing 11-5: The BDCB_CLASSIFICATION enumeration
 
 Microsoft defines these values as follows, from top to bottom: the image hasn't been analyzed, or a determination regarding its maliciousness can't be made; the ELAM driver has found no malware; the ELAM driver detected malware; the boot-load driver is malware, but it is critical to the boot process; and the boot-load driver is reserved for system use. The ELAM driver sets one of these classifications for each boot-start driver until it receives the 8cDxStatusPrepareForload status update instructing it to clean up. The ELAM driver is then unloaded.
 
-206    Chapter Ⅱ
+206 Chapter Ⅱ
 
 ---
 
@@ -162,12 +162,11 @@ Table 11-1: Possible Driver Load-Policy Values
 
 <table><tr><td>Value</td><td>Description</td></tr><tr><td>0</td><td>Good drivers only</td></tr><tr><td>1</td><td>Good and unknown drivers</td></tr><tr><td>3</td><td>Good, unknown, and bad but critical to the boot process (Default)</td></tr><tr><td>7</td><td>All drivers</td></tr></table>
 
-
 The kernel (specifically, the Plug and Play manager) uses the classification specified by the ELAM driver to prevent any banned drivers from loading. All other drivers are allowed to load, and system boot continues as normal.
 
 NOTE
 
-If the ELAM driver identifies a known malicious boot-start driver and is running on a system that leverages Measured Boot, developers must call tbsi!Revoke _Attestation(). What this function does is a bit technical; essentially, it extends a platform configuration register bank in the TPM, specifically PCR[12], by an unspecified value and then increments the TPM's event counter, breaking trust in the security state of the system.
+If the ELAM driver identifies a known malicious boot-start driver and is running on a system that leverages Measured Boot, developers must call tbsi!Revoke \_Attestation(). What this function does is a bit technical; essentially, it extends a platform configuration register bank in the TPM, specifically PCR[12], by an unspecified value and then increments the TPM's event counter, breaking trust in the security state of the system.
 
 ## An Example Driver: Preventing Mimidrv from Loading
 
@@ -234,7 +233,7 @@ PS & 'C:\Program Files (x86)\Windows Kits\10\bin\10.0.19042.0\x64\makecert.exe'
 
 Listing 11-7. Generating a self-signed certificate
 
-208    Chapter Ⅱ
+208 Chapter Ⅱ
 
 ---
 
@@ -280,7 +279,7 @@ If so, you may deploy the driver to the system. As for most drivers, the system 
 
 When creating a boot-start service on Windows, the developer can specify when it should be loaded in the boot order. This is useful in cases when the driver depends on the availability of another service or otherwise needs to load at a specific time.
 
-210    Chapter 11
+210 Chapter 11
 
 ---
 
@@ -347,7 +346,7 @@ If the attacker takes the Bring Your Own Vulnerable Driver (BYOVD) approach, the
 
 Another approach involves the deployment of firmware rootkits or bootkits. While this technique is exceedingly rare, it can effectively evade ELAM's boot-start protections. For example, the ESPecter toolkit patched
 
-212   Chapter II
+212 Chapter II
 
 ---
 
@@ -371,7 +370,4 @@ Early Launch Antimalware Drivers 213
 
 ---
 
-
-
 ---
-

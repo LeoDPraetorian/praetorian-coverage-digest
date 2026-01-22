@@ -22,6 +22,7 @@ Examples:
 **When to use:** Vulnerability research for specific vendors in your environment.
 
 **URL Format:**
+
 ```
 https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=apache&field_date_added_wrapper=all&sort_by=field_date_added&items_per_page=20
 ```
@@ -45,6 +46,7 @@ Examples:
 **When to use:** Identifying vulnerabilities across similar technology classes.
 
 **URL Format:**
+
 ```
 https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=web+server&field_date_added_wrapper=all&sort_by=field_date_added&items_per_page=20
 ```
@@ -68,6 +70,7 @@ Examples:
 **When to use:** Understanding exploitation patterns for specific attack classes.
 
 **URL Format:**
+
 ```
 https://www.cisa.gov/known-exploited-vulnerabilities-catalog?search_api_fulltext=remote+code+execution&field_date_added_wrapper=90&items_per_page=50
 ```
@@ -86,6 +89,7 @@ Examples:
 **When to use:** Validating if a known CVE is in the KEV catalog.
 
 **URL Format:**
+
 ```
 https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve=CVE-2024-1234
 ```
@@ -256,15 +260,16 @@ Query 3: Cross-reference with asset inventory
 
 Special characters must be URL-encoded:
 
-| Character | Encoded |
-| --------- | ------- |
+| Character | Encoded      |
+| --------- | ------------ |
 | Space     | `+` or `%20` |
-| /         | `%2F`   |
-| ?         | `%3F`   |
-| &         | `%26`   |
-| =         | `%3D`   |
+| /         | `%2F`        |
+| ?         | `%3F`        |
+| &         | `%26`        |
+| =         | `%3D`        |
 
 **Examples:**
+
 - `SQL injection` → `SQL+injection`
 - `Cross-site scripting (XSS)` → `Cross-site+scripting+%28XSS%29`
 

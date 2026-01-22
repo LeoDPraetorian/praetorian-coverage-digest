@@ -1,6 +1,6 @@
 ---
 name: developing-integrations
-description: Use when creating or updating Chariot backend integrations (Go) - enforces mandatory requirements (VMFilter, CheckAffiliation, ValidateCredentials), prevents security bugs (race conditions, infinite loops), provides pre-PR checklist, and routes to integration-chariot-patterns for detailed implementation examples
+description: Use when creating or updating Chariot backend integrations (Go) - enforces mandatory requirements (VMFilter, CheckAffiliation, ValidateCredentials), prevents security bugs (race conditions, infinite loops), provides pre-PR checklist and detailed implementation patterns in references/
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion
 ---
 
@@ -21,18 +21,89 @@ Use this skill when:
 
 ## Quick Reference
 
-| Requirement          | Status | Description                                 |
-| -------------------- | ------ | ------------------------------------------- |
-| VMFilter             | P0     | REQUIRED for all Asset/Risk emissions       |
-| CheckAffiliation     | P0     | REQUIRED - use Pattern A/B/C                |
-| ValidateCredentials  | P0     | REQUIRED - verify before processing         |
-| errgroup Safety      | P0     | SetLimit + loop variable capture            |
-| Error Handling       | P0     | Never ignore errors                         |
+| Requirement          | Status | Description                                    |
+| -------------------- | ------ | ---------------------------------------------- |
+| BaseCapability       | P0     | REQUIRED embedding in struct                   |
+| init() registration  | P0     | REQUIRED for capability discovery              |
+| Integration() method | P0     | REQUIRED - must return true                    |
+| Match() method       | P0     | REQUIRED for class validation                  |
+| VMFilter             | P0     | REQUIRED for all Asset/Risk emissions          |
+| CheckAffiliation     | P0     | REQUIRED - use Pattern A/B/C                   |
+| ValidateCredentials  | P0     | REQUIRED - verify before processing            |
+| errgroup Safety      | P0     | SetLimit + loop variable capture               |
+| Error Handling       | P0     | Never ignore errors                            |
 | Pagination Safety    | P0     | Termination guarantee (maxPages OR API signal) |
-| File Size Limit      | P1     | <400 lines (split at 500+)                  |
-| Frontend Integration | P1     | UI card + enum + logos                      |
+| File Size Limit      | P1     | <400 lines (split at 500+)                     |
+| Frontend Integration | P1     | UI card + enum + logos                         |
 
-**For detailed patterns and code examples**, see [integration-chariot-patterns](.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md).
+**For detailed patterns and code examples**, see the references in this skill.
+
+---
+
+## Integration Skeleton
+
+**Every integration MUST include these 6 critical patterns for runtime discovery and execution:**
+
+```go
+package integrations
+
+import (
+	"context"
+	"fmt"
+
+	"github.com/praetorian-inc/chariot/pkg/base"
+	"github.com/praetorian-inc/chariot/pkg/filter"
+	"github.com/praetorian-inc/chariot/pkg/model"
+	"github.com/praetorian-inc/chariot/pkg/registries"
+)
+
+// 1. REQUIRED: Struct with BaseCapability embedding
+type VendorName struct {
+	Job    model.Job
+	Asset  model.Integration  // NOTE: model.Integration, NOT model.Asset
+	Filter model.Filter
+	base.BaseCapability        // REQUIRED - provides GetClient(), AWS, Collectors
+}
+
+// 2. REQUIRED: init() registration
+func init() {
+	registries.RegisterChariotCapability(&VendorName{}, NewVendorName)
+}
+
+// 3. REQUIRED: Constructor with NewBaseCapability
+func NewVendorName(job model.Job, asset *model.Integration, opts ...base.Option) model.Capability {
+	opts = append(opts, base.WithStatic())  // For static IP compliance
+	baseCapability := base.NewBaseCapability(job, opts...)
+	return &VendorName{
+		Job:            job,
+		Asset:          *asset,  // NOTE: Dereference pointer
+		Filter:         filter.NewVMFilter(baseCapability.AWS, baseCapability.Collectors),
+		BaseCapability: baseCapability,
+	}
+}
+
+// 4. REQUIRED: Integration() returns true
+func (t *VendorName) Integration() bool { return true }
+
+// 5. REQUIRED: Match() validates class
+func (t *VendorName) Match() error {
+	if !t.Asset.IsClass("vendorname") {
+		return fmt.Errorf("expected class 'vendorname', got '%s'", t.Asset.Class)
+	}
+	return nil
+}
+
+// 6. REQUIRED: Type distinction - *model.Integration in constructor, model.Integration in struct
+```
+
+**Without these patterns, integrations compile but fail at runtime with:**
+
+- Registration errors (missing init)
+- Class validation failures (missing Match)
+- Type errors (model.Asset vs model.Integration)
+- Missing capabilities (no BaseCapability)
+
+**See [Integration Skeleton](references/integration-skeleton.md) for complete working template with all required methods.**
 
 ---
 
@@ -81,6 +152,8 @@ Use [Pre-PR Checklist](references/pre-pr-checklist.md) to verify compliance:
 - [ ] Frontend card added to `modules/chariot/ui/src/hooks/useIntegration.tsx`
 - [ ] Enum name in `modules/chariot/ui/src/types.ts` matches backend `Name()` (lowercase)
 - [ ] Logos added to both `icons/dark/` AND `icons/light/` directories
+- [ ] **`linkOnValidateFailure` is NOT set (validation bypass disabled)**
+- [ ] `validate: true` is set and invalid credentials are rejected
 - [ ] Tests added with `-race` flag enabled
 
 ### Step 4: Anti-Pattern Detection
@@ -109,11 +182,7 @@ This skill now includes comprehensive validated code examples in `references/`:
 
 #### Additional Resources
 
-**[integration-chariot-patterns](.claude/skill-library/development/integrations/integration-chariot-patterns/SKILL.md)** provides:
-
-- Additional batch processing patterns
-- HTTP client configuration
-- Rate limiting strategies
+All integration patterns are documented in the references/ directory of this skill.
 
 ### Step 6: Frontend Integration
 
@@ -155,147 +224,17 @@ go test -race ./modules/chariot/backend/pkg/tasks/integrations/...
 
 ---
 
-## Violation Examples (What NOT to Do)
+## Common Violations
 
-### ❌ Missing VMFilter (DigitalOcean, GitHub, GitLab, Cloudflare)
+Integration code reviews frequently identify 6 categories of violations. Before submitting your integration, review these patterns to ensure compliance.
 
-```go
-// WRONG - emits assets without filtering
-task.Job.Send(&asset)
-```
+**See [Violation Examples](references/violation-examples.md) for detailed code examples and corrections:**
 
-```go
-// RIGHT - filter before emission
-task.Filter.Asset(&asset)
-task.Job.Send(&asset)
-```
-
-### ❌ Stub CheckAffiliation - Use Approved Patterns Instead
-
-```go
-// WRONG - stub implementation without verification
-func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    return true, nil // VIOLATION - doesn't use any approved pattern
-}
-```
-
-**RIGHT - Choose the appropriate pattern based on API capability:**
-
-**Decision Flowchart:**
-```
-Does the vendor API have a single-asset lookup endpoint?
-├── YES → Implement Pattern A (direct query)
-└── NO → Is this a cloud provider integration (AWS/Azure/GCP)?
-    ├── YES → Use Pattern B (CheckAffiliationSimple)
-    └── NO → Is integration seed-scoped (only discovers from user seeds)?
-        ├── YES → Implement Pattern C (seed-based)
-        └── NO → Consult with integration-lead for custom approach
-```
-
-**Pattern A Example (PREFERRED):**
-```go
-func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    resp, err := t.client.GetAsset(asset.CloudId)
-    if err != nil {
-        if isNotFoundError(err) {
-            return false, nil
-        }
-        return false, fmt.Errorf("querying asset: %w", err)
-    }
-    return resp.ID != "" && resp.DeletedAt == "", nil
-}
-```
-
-**Pattern B Example (cloud providers):**
-```go
-func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    return t.BaseCapability.CheckAffiliationSimple(asset)
-}
-```
-
-**Pattern C Example (seed-scoped):**
-```go
-func (t *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
-    // Check all relevant asset fields against user-provided seeds
-    for _, seed := range t.Job.Seeds {
-        if strings.Contains(asset.Key, seed.Value) {
-            return true, nil
-        }
-        if asset.DNS != "" && strings.Contains(asset.DNS, seed.Value) {
-            return true, nil
-        }
-    }
-    return false, nil
-}
-```
-
-See [checkaffiliation-patterns.md](references/checkaffiliation-patterns.md) for complete implementation guidance.
-
-### ❌ Missing errgroup Limits (wiz.go, github.go, tenable-vm.go)
-
-```go
-// WRONG - unlimited goroutines
-g, ctx := errgroup.WithContext(ctx)
-for _, item := range items {
-    g.Go(func() error { // RACE: captures wrong item
-        return process(item)
-    })
-}
-```
-
-```go
-// RIGHT - limit goroutines and capture loop variable
-g, ctx := errgroup.WithContext(ctx)
-g.SetLimit(10) // REQUIRED
-for _, item := range items {
-    item := item // REQUIRED - capture loop variable
-    g.Go(func() error {
-        return process(item)
-    })
-}
-```
-
-### ❌ Ignored Errors (wiz, okta, xpanse, tenable_vm)
-
-```go
-// WRONG - ignores marshal error
-data, _ := json.Marshal(obj) // VIOLATION
-```
-
-```go
-// RIGHT - handle all errors
-data, err := json.Marshal(obj)
-if err != nil {
-    return fmt.Errorf("marshaling object: %w", err)
-}
-```
-
-### ❌ Infinite Pagination (MS Defender, EntraID, CrowdStrike, Xpanse, InsightVM, GitLab)
-
-```go
-// WRONG - no safety limit
-for pageToken != "" {
-    resp, err := api.ListAssets(pageToken)
-    // ... infinite loop if API bugs out
-    pageToken = resp.NextToken
-}
-```
-
-```go
-// RIGHT - enforce maxPages limit
-const maxPages = 1000
-page := 0
-for pageToken != "" {
-    if page >= maxPages {
-        log.Warn("reached maxPages limit, stopping pagination")
-        break
-    }
-    resp, err := api.ListAssets(pageToken)
-    // ...
-    pageToken = resp.NextToken
-    page++
-}
-```
+1. **Missing VMFilter** - Emitting assets without filtering (DigitalOcean, GitHub, GitLab, Cloudflare)
+2. **Stub CheckAffiliation** - Returning `true` without using Pattern A/B/C
+3. **Missing errgroup Limits** - Unlimited goroutines without `SetLimit(10)` (wiz.go, github.go, tenable-vm.go)
+4. **Ignored Errors** - Using `_, _` with error-returning functions (wiz, okta, xpanse, tenable_vm)
+5. **Infinite Pagination** - No `maxPages` safety limit (MS Defender, EntraID, CrowdStrike, Xpanse, InsightVM, GitLab)
 
 ---
 
@@ -303,10 +242,37 @@ for pageToken != "" {
 
 | Skill                                 | Purpose                                            |
 | ------------------------------------- | -------------------------------------------------- |
-| **integration-chariot-patterns**      | Detailed code examples and implementation patterns |
+| (See references/ directory)           | Detailed code examples and implementation patterns |
 | **go-errgroup-concurrency**           | Deep dive on errgroup safety and concurrency       |
 | **error-handling-patterns**           | Go error wrapping and propagation best practices   |
 | **reviewing-backend-implementations** | Code review criteria for backend Go code           |
+
+---
+
+## Integration
+
+### Called By
+
+- `/integration` command - Entry point for integration development workflow via `gateway-integrations`
+- `orchestrating-integration-development` (LIBRARY) - 8-phase orchestration for complete integration lifecycle - `Read(".claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md")`
+- `gateway-integrations` (CORE) - Routes integration-related tasks to appropriate library skills - `skill: "gateway-integrations"`
+
+### Requires (invoke before starting)
+
+None - This is an implementation guidance skill, not an orchestrator
+
+### Calls (during execution)
+
+This skill is documentation-based and does not invoke other skills. It provides reference patterns that developers follow when implementing integrations.
+
+### Pairs With (conditional)
+
+| Skill                                             | Trigger                                      | Purpose                                                                                                                                                         |
+| ------------------------------------------------- | -------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `validating-integrations` (LIBRARY)               | After implementation                         | Validates P0 compliance before PR submission - `Read(".claude/skill-library/development/integrations/validating-integrations/SKILL.md")`                        |
+| `testing-integrations` (LIBRARY)                  | When writing tests                           | Unit/integration test patterns for integrations - `Read(".claude/skill-library/testing/testing-integrations/SKILL.md")`                                         |
+| `go-best-practices` (LIBRARY)                     | When implementing Go code                    | Go coding patterns and conventions - `Read(".claude/skill-library/development/backend/go-best-practices/SKILL.md")`                                             |
+| `orchestrating-integration-development` (LIBRARY) | When orchestrating full integration workflow | Provides 8-phase workflow using this skill's guidance - `Read(".claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md")` |
 
 ---
 
@@ -316,11 +282,13 @@ All detailed content has been extracted to `references/` for progressive disclos
 
 ### Requirements & Compliance
 
-- [Mandatory Requirements](references/mandatory-requirements.md) - P0 blocking requirements with violation examples
+- [Mandatory Requirements](references/mandatory-requirements.md) - P0 blocking requirements (6 critical patterns + VMFilter, CheckAffiliation, etc.)
+- [Integration Skeleton](references/integration-skeleton.md) - Complete working template with all required methods
 - [Pre-PR Checklist](references/pre-pr-checklist.md) - Complete checklist before submitting PR
 - [Anti-Patterns](references/anti-patterns.md) - Common mistakes and how to avoid them
+- [Violation Examples](references/violation-examples.md) - Real violations with corrected patterns
 
-### Implementation Patterns (NEW - Validated from Production)
+### Implementation Patterns (Validated from Production)
 
 - [CheckAffiliation Patterns](references/checkaffiliation-patterns.md) - Real implementations with file:line references
 - [Pagination Patterns](references/pagination-patterns.md) - Token, page, cursor, SDK patterns from Okta, GitHub, Xpanse, DigitalOcean
@@ -329,9 +297,14 @@ All detailed content has been extracted to `references/` for progressive disclos
 - [ValidateCredentials Patterns](references/validatecredentials-patterns.md) - API call, OAuth2, JWT, HMAC auth patterns
 - [Test Patterns](references/test-patterns.md) - Table-driven, mock server, mock collector, race detection patterns
 
+### Utilities & Helpers
+
+- [pkg/lib Utilities](references/lib-utilities.md) - web.Request, format.Target, cvss.CVSStoStatus, filter.NewVMFilter
+- [Timeout Guidelines](references/timeout-guidelines.md) - Timeout values by integration type (30s/60s/120s/180s)
+
 ### Frontend & Testing
 
-- [Frontend Integration](references/frontend-integration.md) - UI card setup and enum configuration
+- [Frontend Integration](references/frontend-integration.md) - Dynamic form system (2026 architecture with definitions/)
 - [Testing Strategy](references/testing-strategy.md) - Test coverage requirements and race detection
 
 ---

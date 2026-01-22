@@ -9,6 +9,7 @@
 After running parallel analysis across 4 models, you have 4 independent vulnerability assessments. Synthesis transforms these into a unified, confidence-calibrated threat analysis.
 
 **Key challenges:**
+
 - Same vulnerability described with different words
 - Conflicting severity assessments
 - Unique findings from single models (signal or noise?)
@@ -102,10 +103,12 @@ def semantic_dedup(findings: List[Dict], threshold=0.75) -> List[Dict]:
 ```
 
 **Advantages:**
+
 - Catches paraphrasing ("SQL injection" vs "unsanitized database query")
 - Language-agnostic
 
 **Disadvantages:**
+
 - Requires additional dependency
 - May group dissimilar findings with similar wording
 
@@ -158,11 +161,13 @@ def rule_based_dedup(findings: List[Dict]) -> List[Dict]:
 ```
 
 **Advantages:**
+
 - No external dependencies
 - Fast
 - Deterministic
 
 **Disadvantages:**
+
 - Requires manual synonym mapping
 - May miss edge cases
 
@@ -232,6 +237,7 @@ def analyze_unique_findings(group: List[Dict]) -> Dict:
 **Pattern:** Unique findings aligned with model specialty are MORE likely valid, not less.
 
 **Examples:**
+
 - DeepSeek finds integer overflow → Investigate code implementation
 - Claude finds auth edge case → Investigate safety implications
 - GPT-4 finds CVE match → Check CVE database for details

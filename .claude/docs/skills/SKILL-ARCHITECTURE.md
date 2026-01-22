@@ -156,11 +156,11 @@ Router skills manage lifecycle operations for infrastructure components. They're
 
 ### Available Routers
 
-| Router                  | Domain                | Operations                                                              |
-| ----------------------- | --------------------- | ----------------------------------------------------------------------- |
-| `managing-skills`       | Skill lifecycle       | create, update, audit, fix, delete, rename, migrate, search, list, sync |
-| `managing-agents`       | Agent lifecycle       | create, update, test, audit, fix, rename, search, list                  |
-| `managing-commands`     | Command lifecycle     | create, audit, fix, list                                                |
+| Router                   | Domain                | Operations                                                              |
+| ------------------------ | --------------------- | ----------------------------------------------------------------------- |
+| `managing-skills`        | Skill lifecycle       | create, update, audit, fix, delete, rename, migrate, search, list, sync |
+| `managing-agents`        | Agent lifecycle       | create, update, test, audit, fix, rename, search, list                  |
+| `managing-commands`      | Command lifecycle     | create, audit, fix, list                                                |
 | `managing-tool-wrappers` | MCP wrapper lifecycle | create, verify-red, generate, verify-green, update, audit, fix, test    |
 
 ### Router Architecture
@@ -763,8 +763,8 @@ The library isn't auto-discovered, so structure doesn't affect tokens. Nested or
 
 ## References
 
-
 ### Anthropic Official Guidance
+
 Skills Overview
 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview
 
@@ -778,5 +778,6 @@ Agent Skills Best Practices
 https://platform.claude.com/docs/en/agents-and-tools/agent-skills/best-practices
 
 ### Community Resources
+
 ORBA Superpower. REQUIRED SUB-SKILL pattern, Integration sections, prompt templates, workflow chains
-https://github.com/obra/superpowers 
+https://github.com/obra/superpowers

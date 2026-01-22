@@ -1,5 +1,38 @@
 # Changelog - pressure-testing-skill-content
 
+## 2026-01-19 - Compliance Fixes from Audit
+
+**Change Type:** Compliance Remediation
+
+**Method:** Claude-Automated fixes via fixing-skills workflow
+
+**What Changed:**
+1. **Phase 1 (Description Format)** - Reduced description from 209 to 118 characters
+   - Removed verbose explanation, kept core triggers
+   - Optimized for discoverability while maintaining accuracy
+2. **Phase 28 (Integration Section)** - Added complete Integration section
+   - Called By: creating-skills, updating-skills, managing-skills
+   - Requires: developing-with-tdd (CORE)
+   - Calls: Task, Read, Grep tools
+   - Pairs With: closing-rationalization-loopholes (LIBRARY)
+3. **Phase 30 (Skill Annotations)** - Added skill type annotations
+   - developing-with-tdd marked as (CORE)
+   - verifying-agent-skill-invocation marked as (LIBRARY)
+
+**Files Modified:**
+- SKILL.md:3 - Description field shortened
+- SKILL.md:26 - Added (CORE) annotation to developing-with-tdd
+- SKILL.md:373-375 - Added (LIBRARY) annotations to verifying-agent-skill-invocation table
+- SKILL.md:489-524 - Added Integration section with all required subsections
+
+**Impact:**
+- Description now under 120-char limit (Phase 1 compliant)
+- Skill dependencies explicitly documented (Phase 28 compliant)
+- Skill references properly annotated (Phase 30 compliant)
+- Note: Line count increased from 497 to 524 lines (104.8% of limit, minor WARNING)
+
+**Audit Status:** PASSED WITH WARNINGS (line count overage)
+
 ## 2026-01-04 - Output Path Migration
 
 **Change Type:** Path Update

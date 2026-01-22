@@ -7,26 +7,26 @@ suite
 
 ## Document Suite Overview
 
-| Property               | Value                                              |
-| ---------------------- | -------------------------------------------------- |
-| **Total Documents**    | 6 + Index                                          |
-| **Total Token Count**  | ~11,000 tokens                                     |
-| **Total Read Time**    | 60-90 minutes                                      |
-| **Last Synchronized**  | 2026-01-10                                         |
-| **Status**             | Ready for Implementation                           |
+| Property              | Value                    |
+| --------------------- | ------------------------ |
+| **Total Documents**   | 6 + Index                |
+| **Total Token Count** | ~11,000 tokens           |
+| **Total Read Time**   | 60-90 minutes            |
+| **Last Synchronized** | 2026-01-10               |
+| **Status**            | Ready for Implementation |
 
 ---
 
 ## Quick Navigation
 
-| Doc | Title                     | Tokens  | Read Time | Purpose                                    |
-| --- | ------------------------- | ------- | --------- | ------------------------------------------ |
-| 01  | Overview & Architecture   | ~1,200  | 5-10 min  | MVP scope, design decisions, architecture  |
-| 02  | Scope & Checkpoints       | ~1,600  | 8-12 min  | Scope selection, human-in-the-loop         |
-| 03  | Methodology               | ~700    | 5-8 min   | STRIDE + PASTA + DFD frameworks            |
-| 04  | Phase Details             | ~4,000  | 25-35 min | Phase 1-6 specifications (core content)    |
-| 05  | State & Output            | ~1,400  | 8-12 min  | Session state, output formats              |
-| 06  | Implementation & Roadmap  | ~2,700  | 15-20 min | Implementation, tools, future plans        |
+| Doc | Title                    | Tokens | Read Time | Purpose                                   |
+| --- | ------------------------ | ------ | --------- | ----------------------------------------- |
+| 01  | Overview & Architecture  | ~1,200 | 5-10 min  | MVP scope, design decisions, architecture |
+| 02  | Scope & Checkpoints      | ~1,600 | 8-12 min  | Scope selection, human-in-the-loop        |
+| 03  | Methodology              | ~700   | 5-8 min   | STRIDE + PASTA + DFD frameworks           |
+| 04  | Phase Details            | ~4,000 | 25-35 min | Phase 1-6 specifications (core content)   |
+| 05  | State & Output           | ~1,400 | 8-12 min  | Session state, output formats             |
+| 06  | Implementation & Roadmap | ~2,700 | 15-20 min | Implementation, tools, future plans       |
 
 ---
 
@@ -171,10 +171,10 @@ Jump directly to phase details and output formats.
 
 ## Change History
 
-| Date       | Change                                      | Documents Affected |
-| ---------- | ------------------------------------------- | ------------------ |
-| 2026-01-10 | Renumbered phases 0-4 to 1-6, added Phase 2 Codebase Sizing | All |
-| 2026-01-10 | Initial split from THREAT-MODELING-PROCESS.md | All (created)      |
+| Date       | Change                                                      | Documents Affected |
+| ---------- | ----------------------------------------------------------- | ------------------ |
+| 2026-01-10 | Renumbered phases 0-4 to 1-6, added Phase 2 Codebase Sizing | All                |
+| 2026-01-10 | Initial split from THREAT-MODELING-PROCESS.md               | All (created)      |
 
 ---
 

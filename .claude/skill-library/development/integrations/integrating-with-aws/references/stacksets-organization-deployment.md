@@ -19,10 +19,10 @@ AWS CloudFormation StackSets extends CloudFormation to enable multi-account, mul
 
 ## Permission Models
 
-| Model | IAM Management | Use Case | AutoDeployment |
-|-------|---------------|----------|----------------|
-| `SERVICE_MANAGED` | Automatic (AWS creates roles) | AWS Organizations deployments | **Required** |
-| `SELF_MANAGED` | Manual (you create roles) | Non-Organizations or fine-grained control | Not supported |
+| Model             | IAM Management                | Use Case                                  | AutoDeployment |
+| ----------------- | ----------------------------- | ----------------------------------------- | -------------- |
+| `SERVICE_MANAGED` | Automatic (AWS creates roles) | AWS Organizations deployments             | **Required**   |
+| `SELF_MANAGED`    | Manual (you create roles)     | Non-Organizations or fine-grained control | Not supported  |
 
 **Decision Guide:**
 
@@ -35,11 +35,11 @@ AWS CloudFormation StackSets extends CloudFormation to enable multi-account, mul
 
 ### When to Use Each Value
 
-| Scenario | CallAs Value | Required? | Notes |
-|----------|--------------|-----------|-------|
-| Management account creating SERVICE_MANAGED StackSet | `SELF` | Optional (default) | Works without specifying |
-| Delegated admin account creating SERVICE_MANAGED StackSet | `DELEGATED_ADMIN` | **REQUIRED** | Fails without it |
-| Any account creating SELF_MANAGED StackSet | `SELF` | N/A | CallAs doesn't apply to SELF_MANAGED |
+| Scenario                                                  | CallAs Value      | Required?          | Notes                                |
+| --------------------------------------------------------- | ----------------- | ------------------ | ------------------------------------ |
+| Management account creating SERVICE_MANAGED StackSet      | `SELF`            | Optional (default) | Works without specifying             |
+| Delegated admin account creating SERVICE_MANAGED StackSet | `DELEGATED_ADMIN` | **REQUIRED**       | Fails without it                     |
+| Any account creating SELF_MANAGED StackSet                | `SELF`            | N/A                | CallAs doesn't apply to SELF_MANAGED |
 
 **Critical Rule**: When deploying from a **delegated admin account** with `SERVICE_MANAGED` permission model, you **MUST** specify `CallAs: DELEGATED_ADMIN` or the deployment fails with:
 
@@ -68,6 +68,7 @@ aws organizations register-delegated-administrator \
 ```
 
 **Limits:**
+
 - Maximum of 5 delegated administrators per organization
 - Delegated admins have full StackSet permissions (cannot scope to specific OUs)
 
@@ -108,7 +109,7 @@ aws organizations list-delegated-administrators \
 }
 ```
 
-**Critical**: Must include `organizations:ListDelegatedAdministrators` or you'll get error: *"ValidationError: Account used is not a delegated administrator"*
+**Critical**: Must include `organizations:ListDelegatedAdministrators` or you'll get error: _"ValidationError: Account used is not a delegated administrator"_
 
 ---
 
@@ -117,7 +118,7 @@ aws organizations list-delegated-administrators \
 ### Complete Example with Delegated Admin Support
 
 ```yaml
-AWSTemplateFormatVersion: '2010-09-09'
+AWSTemplateFormatVersion: "2010-09-09"
 Description: StackSet with delegated admin support
 
 Parameters:
@@ -144,7 +145,7 @@ Resources:
     Properties:
       StackSetName: !Sub ${AWS::StackName}
       PermissionModel: SERVICE_MANAGED
-      CallAs: !Ref CallAsMode  # Critical for delegated admin
+      CallAs: !Ref CallAsMode # Critical for delegated admin
       AutoDeployment:
         Enabled: true
         RetainStacksOnAccountRemoval: false
@@ -271,13 +272,13 @@ terraform import aws_cloudformation_stack_set_instance.example \
 
 ## Common Failure Scenarios
 
-| Error Message | Cause | Solution |
-|--------------|-------|----------|
-| "You must be the management account or delegated admin account of an organization before operating a SERVICE_MANAGED stack set" | Missing `CallAs: DELEGATED_ADMIN` parameter | Add CallAs parameter to template/resource |
-| "couldn't find resource" (Terraform) | Terraform lookup missing call_as | Upgrade to provider v5.47.0+ |
-| "Account used is not a delegated administrator" | Missing `organizations:ListDelegatedAdministrators` permission | Add IAM permission to delegated admin role |
-| "ValidationError" on terraform apply | `call_as` not on stack_set_instance | Add call_as to both stack_set AND stack_set_instance |
-| Stack instances don't deploy to new accounts | AutoDeployment not enabled or missing DependsOn | Enable AutoDeployment and check dependencies |
+| Error Message                                                                                                                   | Cause                                                          | Solution                                             |
+| ------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- | ---------------------------------------------------- |
+| "You must be the management account or delegated admin account of an organization before operating a SERVICE_MANAGED stack set" | Missing `CallAs: DELEGATED_ADMIN` parameter                    | Add CallAs parameter to template/resource            |
+| "couldn't find resource" (Terraform)                                                                                            | Terraform lookup missing call_as                               | Upgrade to provider v5.47.0+                         |
+| "Account used is not a delegated administrator"                                                                                 | Missing `organizations:ListDelegatedAdministrators` permission | Add IAM permission to delegated admin role           |
+| "ValidationError" on terraform apply                                                                                            | `call_as` not on stack_set_instance                            | Add call_as to both stack_set AND stack_set_instance |
+| Stack instances don't deploy to new accounts                                                                                    | AutoDeployment not enabled or missing DependsOn                | Enable AutoDeployment and check dependencies         |
 
 ---
 
@@ -327,6 +328,7 @@ AutoDeployment:
 ```
 
 **Limits:**
+
 - Up to 10 dependencies per StackSet
 - Up to 100 dependencies per account total
 - Prevents circular dependencies with validation
@@ -369,6 +371,7 @@ AutoDeployment:
 ```
 
 **Use Cases:**
+
 - Deploy networking StackSet before security StackSet
 - Ensure IAM roles exist before Lambda functions
 - Sequence infrastructure layers (foundation → compute → application)
@@ -385,6 +388,7 @@ aws cloudformation list-stack-set-auto-deployment-targets \
 ```
 
 **Use Cases:**
+
 - Audit auto-deployment configuration
 - Verify which OUs have automatic provisioning enabled
 - Troubleshoot deployment coverage gaps
@@ -396,6 +400,7 @@ aws cloudformation list-stack-set-auto-deployment-targets \
 **Minimum Version**: v5.47.0 (April 2024)
 
 **Why**: Earlier versions had bugs with delegated admin support:
+
 - [Issue #32536](https://github.com/hashicorp/terraform-provider-aws/issues/32536): Service managed stacksets with delegated admin not working
 - [Issue #23378](https://github.com/hashicorp/terraform-provider-aws/issues/23378): call_as parameter not used in lookup functions
 

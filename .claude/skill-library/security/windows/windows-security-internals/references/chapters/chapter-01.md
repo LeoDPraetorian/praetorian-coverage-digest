@@ -1,4 +1,4 @@
-## 1   SETTING UP A POWERSHELL   TESTING ENVIRONMENT
+## 1 SETTING UP A POWERSHELL TESTING ENVIRONMENT
 
 ![Figure](figures/WindowsSecurityInternals_page_033_figure_001.png)
 
@@ -28,9 +28,7 @@ The command changes the execution policy for the current user only, not the enti
 
 If you're using the open source version of PowerShell or version 5.1 on
 
-
 Windows Server, then the default script execution policy is RemoteSigned and
-
 
 you do not need to change anything.
 
@@ -40,7 +38,6 @@ To install a module from the PowerShell Gallery, we use PowerShell's
 
 Install-Module command. For this book, we'll need to install the NtObject
 
-
 Manager module, which we can do using the following command:
 
 ```bash
@@ -49,7 +46,7 @@ PS> Install-Module NtObjectManager -Scope CurrentUser -Force
 
 Make sure to say yes if the installer asks you any questions (after you've read and understood the question, of course). If you have the module installed already, you can ensure that you have the latest version by using the Update-Module command:
 
-4    Chapter 1
+4 Chapter 1
 
 ---
 
@@ -81,9 +78,7 @@ If everything is working and you're comfortable with PowerShell, you can move on
 
 A complete introduction to PowerShell is beyond the scope of this book.
 
-
 However, this section touches on various language features you'll need to
-
 
 be familiar with to use the book most effectively.
 
@@ -95,19 +90,17 @@ Table 1-1: Common Basic PowerShell Types with .NET Types and Examples
 
 <table><tr><td>Type</td><td>.NET type</td><td>Examples</td></tr><tr><td>int</td><td>System.Int32</td><td>142, 0x8E, 0216</td></tr><tr><td>long</td><td>System.Int64</td><td>142L, 0x8EL, 0216L</td></tr><tr><td>string</td><td>System.String</td><td>&quot;Hello&quot;, &quot;World!&quot;</td></tr><tr><td>double</td><td>System.Double</td><td>1.0, 1e10</td></tr><tr><td>bool</td><td>System.Boolean</td><td>$true, $false</td></tr><tr><td>array</td><td>System.Object[]</td><td>@(1, &quot;ABC&quot;, $true)</td></tr><tr><td>hashtable</td><td>System.Collections.Hashtable</td><td>@(A=1, B=&quot;ABC&quot;)</td></tr></table>
 
-
 Setting Up a PowerShell Testing Environment | 5
 
 ---
 
-To perform calculations on basic types, we can use well-known operators such as +, -, *, and /. These operators can be overloaded; for example, + is used for addition as well as for concatenating strings and arrays. Table 1.2 provides a list of common operators, with simple examples and their results. You can test the examples yourself to check the output of each operator.
+To perform calculations on basic types, we can use well-known operators such as +, -, \*, and /. These operators can be overloaded; for example, + is used for addition as well as for concatenating strings and arrays. Table 1.2 provides a list of common operators, with simple examples and their results. You can test the examples yourself to check the output of each operator.
 
 Table 1-2: Common Operators
 
 <table><tr><td>Operator</td><td>Name</td><td>Examples</td><td>Results</td></tr><tr><td>+</td><td>Addition or concatenation</td><td>1 + 2, &quot;Hello&quot; + &quot;World!&quot;</td><td>3, &quot;HelloWorld!&quot;</td></tr><tr><td>-</td><td>Subtraction</td><td>2 - 1</td><td>1</td></tr><tr><td>*</td><td>Multiplication</td><td>2 * 4</td><td>8</td></tr><tr><td>/</td><td>Division</td><td>8 / 4</td><td>2</td></tr><tr><td>%</td><td>Modulus</td><td>6 % 4</td><td>2</td></tr><tr><td>[]</td><td>Index</td><td>0(3, 2, 1, 0)[1]</td><td>2</td></tr><tr><td>-f</td><td>String formatter</td><td>&quot;0x{0:X} {1}&quot; -f 42, 123 &quot;0x2A 123&quot;</td><td></td></tr><tr><td>-band</td><td>Bitwise AND</td><td>0xFF -band 0xFF</td><td>255</td></tr><tr><td>-bor</td><td>Bitwise OR</td><td>0x100 -bor 0x20</td><td>288</td></tr><tr><td>-bxor</td><td>Bitwise XOR</td><td>0xCC -bxor 0xDD</td><td>17</td></tr><tr><td>-bnot</td><td>Bitwise NOT</td><td>-bnot 0xEE</td><td>-239</td></tr><tr><td>-and</td><td>Boolean AND</td><td>$true -and$false</td><td>$false</td></tr><tr><td>-or</td><td>Boolean OR</td><td>$true -or$false</td><td>$true</td></tr><tr><td>-not</td><td>Boolean NOT</td><td>-not$true</td><td>$false</td></tr><tr><td>-eq</td><td>Equals</td><td>&quot;Hello&quot; -eq &quot;Hello&quot;</td><td>$true</td></tr><tr><td>-ne</td><td>Not equals</td><td>&quot;Hello&quot; -ne &quot;Hello&quot;</td><td>$false</td></tr><tr><td>-lt</td><td>Less than</td><td>4 -lt 10</td><td>$true</td></tr><tr><td>-gt</td><td>Greater than</td><td>4 -gt 10</td><td>$false</td></tr></table>
 
-
-You can assign values to variables using the assignment operator, *. A variable has an alphanumeric name prefixed with the $ character. For example, Listing 1-2 shows how you can capture an array in a variable and use the indexing operator to look up a value.
+You can assign values to variables using the assignment operator, \*. A variable has an alphanumeric name prefixed with the $ character. For example, Listing 1-2 shows how you can capture an array in a variable and use the indexing operator to look up a value.
 
 ```bash
 ---
@@ -122,9 +115,9 @@ There are also some predefined variables we'll use in the rest of this book. The
 
 $null Represents the NULL value, which indicates the absence of a value in comparisons
 
-$pwd   Contains the current working directory
+$pwd Contains the current working directory
 
-6    Chapter 1
+6 Chapter 1
 
 ---
 
@@ -156,7 +149,6 @@ Table 1-3: String Character Escapes
 
 <table><tr><td>Character escape</td><td>Name</td></tr><tr><td>'o'</td><td>NUL character, with a value of zero</td></tr><tr><td>'a'</td><td>Bell</td></tr><tr><td>'b'</td><td>Backspace</td></tr><tr><td>'n'</td><td>Line feed</td></tr><tr><td>'r'</td><td>Carriage return</td></tr><tr><td>'t'</td><td>Horizontal tab</td></tr><tr><td>'v'</td><td>Vertical tab</td></tr></table>
 
-
 (continued)
 
 Setting Up a PowerShell Testing Environment | 7
@@ -166,7 +158,6 @@ Setting Up a PowerShell Testing Environment | 7
 Table 1-3: String Character Escapes (continued)
 
 <table><tr><td>Character escape</td><td>Name</td></tr><tr><td>- .</td><td>Backtick character</td></tr><tr><td>- \</td><td>Double quote character</td></tr></table>
-
 
 If you want to insert a double quote character into a double-quoted string, you'll need to use the " " escape. To insert a single quote into a singlequoted string, you double the quote character: for example, "Hello " There' would convert to #HelloThere. Note also the mention of a NUL character in this table. As PowerShell uses the .NET string type, it can contain embedded NUL characters. Unlike in the C language, adding a NUL will not terminate the string prematurely.
 
@@ -208,7 +199,7 @@ PS> New-Object -TypeName Guid -ArgumentList "6c0a3a17-4459-4339-a3b6-1cdb1b3e897
 
 This example is equivalent to the call to the static new function.
 
-8    Chapter 1
+8 Chapter 1
 
 ---
 
@@ -278,13 +269,11 @@ Function      Clear-NtSecurityDescriptorSacl   NtObjectManager
 
 Listing 1-4: Using Get-Command to enumerate commands
 
-This command uses wildcard syntax to list only commands whose names include the specified word. Wildcard syntax uses a * character to represent any character or series of characters. Here, we've put the * on both sides of SecurityDescriptor to indicate that any text can come before or after it.
+This command uses wildcard syntax to list only commands whose names include the specified word. Wildcard syntax uses a _ character to represent any character or series of characters. Here, we've put the _ on both sides of SecurityDescriptor to indicate that any text can come before or after it.
 
 You can also list the commands available in a module. For example,
 
-
 Listing 1-5 will list only the commands that are exported by the Module
-
 
 Manager module and begin with the verb Start.
 
@@ -304,7 +293,7 @@ Listing 1-5: Using Get-Command to enumerate commands in the NtObjectManager modu
 
 Once you've found a command that looks promising, you can use the Get-Help command to inspect its parameters and get some usage examples. In Listing 1-6, we take the Start-Nowait command from Listing 1-5 and pass it to Get-Help.
 
-10    Chapter I
+10 Chapter I
 
 ---
 
@@ -332,7 +321,6 @@ Listing 1-6: Displaying help for the Start-NtWait command
 
 By default, get-help outputs the name of the command ❶, a short synopsis ❷, the syntax of the command ❸, and a more in-depth description ❸.
 
-
 In the command syntax section, you can see its multiple possible modes of operation: in this case, either specifying a time in hours, minutes, seconds, and/or milliseconds, or specifying Infinite to wait indefinitely.
 
 When any part of the syntax is shown in brackets, [], that means it's optional. For example, the only required parameter is objobject, which takes an array of NOTobj values. Even the name of this parameter is optional, as
@@ -354,7 +342,7 @@ PS> Get-Help Start-NtWait -Parameter Object
 
 Listing 1-7: Querying the details of the Object parameter with the Parameter command
 
-You can use wildcard syntax to select a group of similar parameter names. For example, if you specify 0bj*, then you'll get information about any parameters whose names start with the 0bj prefix.
+You can use wildcard syntax to select a group of similar parameter names. For example, if you specify 0bj\*, then you'll get information about any parameters whose names start with the 0bj prefix.
 
 If you want usage examples for a command, use the Examples parameter, as demonstrated in Listing 1-8.
 
@@ -390,15 +378,13 @@ One final topic to mention about commands is that you can set up aliases, or alt
 PS> New-Alias -Name swt -Value Start-NtWait
 ```
 
-12    Chapter 1
+12 Chapter 1
 
 ---
 
 To display a list of all the defined aliases, use the get-alias command.
 
-
 We'll avoid using aliases unnecessarily throughout this book, as it can make
-
 
 the scripts more confusing if you don't know what an alias represents.
 
@@ -424,7 +410,7 @@ Listing 1-9: Defining a simple PowerShell function called Get-NameValue
 
 The syntax for defining a function starts with the keyword function followed by the name of the function you want to define. While it's not required to use the standard PowerShell command naming convention of a verb followed by a noun, it pays to do so, as it makes it clear to the user what your function does.
 
-Next, you define the function's named parameters. Like variables, parameters are defined using a name prefixed with $, as you can see in Listing 1-9. You can specify a type in brackets, but this is optional; in this example, $name is a string, but the $value parameter can take any value from the caller. Specifying named parameters is not required. If no param block is included, then any passed arguments are placed in the $_args array. The first parameter is located at $args[0], the second at $args[1], and so on.
+Next, you define the function's named parameters. Like variables, parameters are defined using a name prefixed with $, as you can see in Listing 1-9. You can specify a type in brackets, but this is optional; in this example, $name is a string, but the $value parameter can take any value from the caller. Specifying named parameters is not required. If no param block is included, then any passed arguments are placed in the $\_args array. The first parameter is located at $args[0], the second at $args[1], and so on.
 
 The body of the Get-NameValue function takes the parameters and builds a string using string interpolation. The function returns the string using the return keyword, which also immediately finishes the function. You can omit the return keyword in this case, as PowerShell will return any values uncaptured in variables.
 
@@ -477,7 +463,7 @@ PS> Get-Process | Select-Object Id, ProcessName
 
 Listing 1-12: Selecting only the Id and ProcessName properties
 
-14    Chapter 1
+14 Chapter 1
 
 ---
 
@@ -515,7 +501,7 @@ ExitTime        Property    datetime ExitTime {get;}
 Listing 1-14: Using the Get-Member command to list properties of the Process object
 ```
 
-You might notice that there are other properties not included in the output. To display them, you need to override the custom formatting. The simplest way to access the hidden properties is to use Select-object to extract the values explicitly, or specify the properties to display to the Format-Table or Format-list command. You can use * as a wildcard to show all properties, as in Listing 1-15.
+You might notice that there are other properties not included in the output. To display them, you need to override the custom formatting. The simplest way to access the hidden properties is to use Select-object to extract the values explicitly, or specify the properties to display to the Format-Table or Format-list command. You can use \* as a wildcard to show all properties, as in Listing 1-15.
 
 ```bash
 PS> Get-Process | Format-List *
@@ -591,7 +577,7 @@ PS> $output
 Hello
 ```
 
-16    Chapter 1
+16 Chapter 1
 
 ---
 
@@ -632,7 +618,6 @@ In Listing 1-18, we pass through only Process objects where the Process Name equ
 Table 1-4: Common Operators for Where-Object
 
 <table><tr><td>Operator</td><td>Example</td><td>Description</td></tr><tr><td>-EQ</td><td>ProcessName -EQ &quot;explorer&quot;</td><td>Equal to the value</td></tr><tr><td>-NE</td><td>ProcessName -NE &quot;explorer&quot;</td><td>Not equal to the value</td></tr><tr><td>-Match</td><td>ProcessName -Match &quot;ex.&quot;</td><td>Matches a string against a regular expression</td></tr><tr><td>-NotMatch</td><td>ProcessName -NotMatch &quot;ex.&quot;</td><td>Inverse of the -Match operator</td></tr><tr><td>-Like</td><td>ProcessName -Like &quot;ex.&quot;</td><td>Matches a string against a wildcard</td></tr><tr><td>-NotLike</td><td>ProcessName -NotLike &quot;ex.&quot;</td><td>Inverse of the -Like operator</td></tr><tr><td>-GT</td><td>ProcessName -GT &quot;ex&quot;</td><td>Greater-than comparison</td></tr><tr><td>-LT</td><td>ProcessName -LT &quot;ex&quot;</td><td>Less-than comparison</td></tr></table>
-
 
 You can investigate all of the supported operators by using Get-Help on the Where-Object command. If the condition to filter on is more complex than a simple comparison, you can use a script block. The script block should return True to keep the object in the pipeline or False to filter it. For example, you could also write Listing 1-18 as the following:
 
@@ -785,7 +770,4 @@ With the basics of PowerShell out of the way, we can start to dive into the inne
 
 ---
 
-
-
 ---
-

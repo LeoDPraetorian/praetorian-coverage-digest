@@ -9,6 +9,7 @@
 **FedRAMP Continuous Monitoring (ConMon)** is the ongoing assessment and reporting of security controls to maintain an Authorization to Operate (ATO).
 
 **Purpose**:
+
 - Maintain security posture between annual assessments
 - Detect and respond to new vulnerabilities
 - Demonstrate ongoing compliance to Authorizing Officials (AOs)
@@ -27,6 +28,7 @@
 **Version**: 1.0 (11/17/2025)
 
 **Contains**:
+
 - ConMon strategy and framework
 - Roles and responsibilities
 - Deliverable requirements
@@ -39,6 +41,7 @@
 **Format**: Excel spreadsheet
 
 **Contains**:
+
 - Activity frequency requirements
 - Deliverable descriptions
 - Control ID cross-references
@@ -56,43 +59,43 @@
 
 ### Monthly Requirements (Due 30 Days After Month End)
 
-| Activity | Control(s) | Method | Deliverable |
-|---|---|---|---|
-| **Operating System Vulnerability Scans** | RA-5 | Automated scanner (authenticated) | Scan reports + POA&M updates |
-| **Web Application Vulnerability Scans** | RA-5 | Automated scanner (DAST) | Scan reports + POA&M updates |
-| **Database Vulnerability Scans** | RA-5 | Automated scanner (authenticated) | Scan reports + POA&M updates |
-| **POA&M Updates** | Multiple | Manual review + updates | Updated POA&M Excel file |
-| **Scan Findings Remediation** | SI-2 | Patching/configuration changes | Evidence of remediation |
+| Activity                                 | Control(s) | Method                            | Deliverable                  |
+| ---------------------------------------- | ---------- | --------------------------------- | ---------------------------- |
+| **Operating System Vulnerability Scans** | RA-5       | Automated scanner (authenticated) | Scan reports + POA&M updates |
+| **Web Application Vulnerability Scans**  | RA-5       | Automated scanner (DAST)          | Scan reports + POA&M updates |
+| **Database Vulnerability Scans**         | RA-5       | Automated scanner (authenticated) | Scan reports + POA&M updates |
+| **POA&M Updates**                        | Multiple   | Manual review + updates           | Updated POA&M Excel file     |
+| **Scan Findings Remediation**            | SI-2       | Patching/configuration changes    | Evidence of remediation      |
 
 **Critical**: All monthly scans must be authenticated (credentialed) scans, not unauthenticated.
 
 ### Quarterly Requirements
 
-| Activity | Control(s) | Method | Deliverable |
-|---|---|---|---|
-| **Access Control Review** | AC-2 | Manual review of user accounts | Access review report |
-| **Privilege Review** | AC-6 | Review of elevated privileges | Privilege audit report |
-| **Configuration Baseline Validation** | CM-6 | Automated compliance scanning (SCAP) | Configuration compliance report |
-| **Security Control Changes** | Multiple | Review of control modifications | Change summary + documentation |
+| Activity                              | Control(s) | Method                               | Deliverable                     |
+| ------------------------------------- | ---------- | ------------------------------------ | ------------------------------- |
+| **Access Control Review**             | AC-2       | Manual review of user accounts       | Access review report            |
+| **Privilege Review**                  | AC-6       | Review of elevated privileges        | Privilege audit report          |
+| **Configuration Baseline Validation** | CM-6       | Automated compliance scanning (SCAP) | Configuration compliance report |
+| **Security Control Changes**          | Multiple   | Review of control modifications      | Change summary + documentation  |
 
 ### Annual Requirements
 
-| Activity | Control(s) | Method | Deliverable |
-|---|---|---|---|
-| **3PAO Annual Assessment** | All controls | Independent 3PAO assessment | SAR (Security Assessment Report) |
-| **Penetration Testing** | CA-8 | Independent penetration test | Penetration test report |
-| **Incident Response Testing** | IR-4 | Tabletop exercise or simulation | IR exercise report |
-| **Disaster Recovery Testing** | CP-4 | DR failover test | DR test report |
-| **Security Awareness Training** | AT-2 | Required for all personnel | Training completion records |
+| Activity                        | Control(s)   | Method                          | Deliverable                      |
+| ------------------------------- | ------------ | ------------------------------- | -------------------------------- |
+| **3PAO Annual Assessment**      | All controls | Independent 3PAO assessment     | SAR (Security Assessment Report) |
+| **Penetration Testing**         | CA-8         | Independent penetration test    | Penetration test report          |
+| **Incident Response Testing**   | IR-4         | Tabletop exercise or simulation | IR exercise report               |
+| **Disaster Recovery Testing**   | CP-4         | DR failover test                | DR test report                   |
+| **Security Awareness Training** | AT-2         | Required for all personnel      | Training completion records      |
 
 ### Continuous (Real-Time) Requirements
 
-| Activity | Control(s) | Method | Deliverable |
-|---|---|---|---|
-| **Security Event Logging** | AU-2, AU-6 | SIEM with automated alerting | Log retention + incident tickets |
-| **Configuration Drift Detection** | CM-6 | CSAM tools (Continuous monitoring) | Drift alerts + remediation tickets |
-| **Intrusion Detection** | SI-4 | IDS/IPS with SIEM integration | IDS alerts + incident reports |
-| **Malware Protection** | SI-3 | Antivirus/EDR with auto-updates | Malware alerts + remediation |
+| Activity                          | Control(s) | Method                             | Deliverable                        |
+| --------------------------------- | ---------- | ---------------------------------- | ---------------------------------- |
+| **Security Event Logging**        | AU-2, AU-6 | SIEM with automated alerting       | Log retention + incident tickets   |
+| **Configuration Drift Detection** | CM-6       | CSAM tools (Continuous monitoring) | Drift alerts + remediation tickets |
+| **Intrusion Detection**           | SI-4       | IDS/IPS with SIEM integration      | IDS alerts + incident reports      |
+| **Malware Protection**            | SI-3       | Antivirus/EDR with auto-updates    | Malware alerts + remediation       |
 
 ---
 
@@ -103,18 +106,21 @@
 **Frequency**: Monthly (minimum)
 
 **Requirements**:
+
 - Authenticated scans (must use credentials)
 - All system types: OS, web apps, databases, containers
 - Automated scanning tools (Nessus, Qualys, Rapid7, etc.)
 - Scan all production systems in authorization boundary
 
 **Deliverables**:
+
 - Complete scan reports
 - Vulnerability summary (by severity)
 - POA&M updates for new High/Critical findings
 - Evidence of remediation for closed vulnerabilities
 
 **Remediation Timelines**:
+
 - High: 30 days
 - Moderate: 90 days
 - Low: 180 days
@@ -124,12 +130,14 @@
 **Frequency**: Monthly validation
 
 **Requirements**:
+
 - Patch deployment within remediation timelines
 - Testing in non-production before production deployment
 - Change management approval (CM-3)
 - Rollback plan for failed patches
 
 **Deliverables**:
+
 - Patch compliance report
 - List of applied patches (with dates)
 - Outstanding patches with POA&Ms
@@ -140,12 +148,14 @@
 **Frequency**: Continuous monitoring with quarterly validation
 
 **Requirements**:
+
 - Automated configuration drift detection (continuous)
 - SCAP compliance scanning (quarterly)
 - Comparison against CIS Benchmarks or DISA STIGs
 - Remediation of unauthorized configuration changes
 
 **Deliverables**:
+
 - Configuration compliance reports (quarterly)
 - Drift detection alerts (continuous)
 - Remediation tickets for non-compliant configs
@@ -156,12 +166,14 @@
 **Frequency**: Quarterly
 
 **Requirements**:
+
 - Review all user accounts (active, inactive, suspended)
 - Identify and disable orphaned/stale accounts
 - Validate account privileges match job role
 - Review service accounts and API keys
 
 **Deliverables**:
+
 - Access review report (list of all accounts)
 - Accounts disabled/removed
 - Privilege changes documented
@@ -172,12 +184,14 @@
 **Frequency**: Continuous
 
 **Requirements**:
+
 - SIEM with automated alerting for security events
 - Log aggregation from all systems
 - SOC or security team review of alerts
 - Incident ticket creation for suspicious activity
 
 **Deliverables**:
+
 - SIEM reports (weekly/monthly summaries)
 - Incident tickets for security events
 - Log retention evidence (per AU-11 requirements)
@@ -188,12 +202,14 @@
 **Frequency**: Continuous (monitoring) + Annual (testing)
 
 **Requirements**:
+
 - 24/7 incident detection and response capability
 - Incident response plan (IR-8) maintained
 - Annual IR tabletop exercise or simulation
 - Incident reporting to AOs within required timeframes
 
 **Deliverables**:
+
 - Incident reports (per incident)
 - Annual IR exercise report
 - Lessons learned documentation
@@ -204,12 +220,14 @@
 **Frequency**: Annual
 
 **Requirements**:
+
 - Independent penetration test by 3PAO or qualified tester
 - Test all layers: network, application, social engineering
 - Test from both external and internal perspectives
 - Rules of Engagement (RoE) document
 
 **Deliverables**:
+
 - Penetration test report
 - Executive summary with risk ratings
 - Detailed findings with remediation recommendations
@@ -259,12 +277,14 @@
 **Purpose**: Centralized logging, real-time alerting, compliance reporting
 
 **Leading Tools**:
+
 - Splunk (most common in FedRAMP)
 - Elastic Stack (ELK)
 - IBM QRadar
 - Azure Sentinel (for Azure FedRAMP)
 
 **Integration Points**:
+
 - AU-2 (Event Logging)
 - AU-6 (Audit Review)
 - SI-4 (System Monitoring)
@@ -275,12 +295,14 @@
 **Purpose**: Configuration compliance, drift detection, asset inventory
 
 **Leading Tools**:
+
 - Tenable.sc (Nessus + compliance)
 - Qualys VMDR
 - Rapid7 InsightVM
 - Tanium
 
 **Integration Points**:
+
 - CM-6 (Configuration Settings)
 - CM-8 (System Component Inventory)
 - RA-5 (Vulnerability Monitoring)
@@ -290,12 +312,14 @@
 **Purpose**: Authenticated vulnerability scanning, patch validation
 
 **Leading Tools**:
+
 - Tenable Nessus
 - Qualys
 - Rapid7 Nexpose
 - OpenVAS (open source alternative)
 
 **Requirements**:
+
 - FedRAMP-authorized scanner or equivalent
 - Authenticated (credentialed) scanning
 - Monthly scan frequency minimum
@@ -306,6 +330,7 @@
 **Purpose**: ConMon workflow automation, POA&M management, evidence collection
 
 **Leading Tools**:
+
 - GovReady
 - Tugboat Logic
 - Hyperproof
@@ -313,6 +338,7 @@
 - Vanta
 
 **Features**:
+
 - Automated evidence collection
 - POA&M workflow tracking
 - ConMon report generation
@@ -347,6 +373,7 @@
 **Problem**: Monthly authenticated scans impact system performance
 
 **Solutions**:
+
 - Schedule scans during low-usage windows
 - Use agent-based scanning (Tenable.io agents, Qualys agents)
 - Implement scan throttling
@@ -357,6 +384,7 @@
 **Problem**: Scanners report vulnerabilities that don't apply
 
 **Solutions**:
+
 - Document false positives in POA&M with justification
 - Tune scanner plugins (disable irrelevant checks)
 - Use authenticated scans to reduce false positives
@@ -367,6 +395,7 @@
 **Problem**: Vendor hasn't released patch within remediation window
 
 **Solutions**:
+
 - Create POA&M with vendor dependency documented
 - Implement compensating controls (firewall rules, WAF rules)
 - Request timeline extension from AO
@@ -377,6 +406,7 @@
 **Problem**: Container, serverless, and IaC findings don't map cleanly to NIST controls
 
 **Solutions**:
+
 - Use cloud-specific scanners (Prisma Cloud, Aqua, Wiz)
 - Map cloud findings to infrastructure controls (CM-2, CM-6)
 - Supplement with cloud-native controls (not in 800-53)
@@ -388,15 +418,15 @@
 
 **Track these metrics for AO visibility:**
 
-| Metric | Target | Warning Threshold |
-|---|---|---|
-| Mean Time to Remediate (MTTR) - High | ≤15 days | >20 days |
-| Mean Time to Remediate (MTTR) - Moderate | ≤45 days | >60 days |
-| Open POA&Ms (total) | Decreasing trend | Increasing for 3+ months |
-| Overdue POA&Ms | 0 | >5 |
-| Scan Coverage (% of systems) | 100% | <95% |
-| False Positive Rate | <10% | >20% |
-| Repeat Findings (same vuln, multiple months) | 0 | >3 occurrences |
+| Metric                                       | Target           | Warning Threshold        |
+| -------------------------------------------- | ---------------- | ------------------------ |
+| Mean Time to Remediate (MTTR) - High         | ≤15 days         | >20 days                 |
+| Mean Time to Remediate (MTTR) - Moderate     | ≤45 days         | >60 days                 |
+| Open POA&Ms (total)                          | Decreasing trend | Increasing for 3+ months |
+| Overdue POA&Ms                               | 0                | >5                       |
+| Scan Coverage (% of systems)                 | 100%             | <95%                     |
+| False Positive Rate                          | <10%             | >20%                     |
+| Repeat Findings (same vuln, multiple months) | 0                | >3 occurrences           |
 
 ---
 

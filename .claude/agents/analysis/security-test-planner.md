@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - load Phase 1/3/5 artifacts before planning                             |
-| `gateway-security`                  | Routes to security-test-planning library skill (Phase 6 methodology)                                 |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST                 |
-| `using-todowrite`                   | Track Phase 6 workflow progress                                                                      |
-| `verifying-before-completion`       | Ensures all 6 artifacts produced before claiming done                                                |
+| Skill                               | Why Always Invoke                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure.     |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing          |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                   |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - load Phase 1/3/5 artifacts before planning             |
+| `gateway-security`                  | Routes to security-test-planning library skill (Phase 6 methodology)                 |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST |
+| `using-todowrite`                   | Track Phase 6 workflow progress                                                      |
+| `verifying-before-completion`       | Ensures all 6 artifacts produced before claiming done                                |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -121,13 +121,13 @@ You generate prioritized security test plans for threat modeling **Phase 6**. Yo
 
 ## Test Planning Workflow
 
-For the complete 5-step workflow (load phases, apply prioritization formula, generate 4 test categories, prioritization matrix, summary), use `gateway-security` to load the `planning-security-tests` skill:
+For the complete 5-step workflow (load phases, apply prioritization formula, generate 4 test categories, prioritization matrix, summary), use `gateway-security` to load the `security-test-planning` skill:
 
 ```
-Read(".claude/skill-library/security/planning-security-tests/SKILL.md")
+Read(".claude/skill-library/security/threat-model/security-test-planning/SKILL.md")
 ```
 
-The `planning-security-tests` skill provides:
+The `security-test-planning` skill provides:
 
 - **Step 1**: Load Phase Outputs (Phase 1/3/5 artifacts table with paths)
 - **Step 2**: Apply Prioritization Formula (Risk + Crown Jewel + Compliance bonuses)

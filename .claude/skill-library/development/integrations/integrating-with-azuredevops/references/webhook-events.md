@@ -8,28 +8,28 @@ Complete reference for Azure DevOps webhook events and payloads.
 
 ### Git Events
 
-| Event ID | Description | Use Case |
-|----------|-------------|----------|
-| `git.push` | Code pushed to repository | Trigger security scans |
-| `git.pullrequest.created` | New PR created | Initiate PR review |
-| `git.pullrequest.updated` | PR updated | Re-run checks |
-| `git.pullrequest.merged` | PR merged | Update assets |
+| Event ID                  | Description               | Use Case               |
+| ------------------------- | ------------------------- | ---------------------- |
+| `git.push`                | Code pushed to repository | Trigger security scans |
+| `git.pullrequest.created` | New PR created            | Initiate PR review     |
+| `git.pullrequest.updated` | PR updated                | Re-run checks          |
+| `git.pullrequest.merged`  | PR merged                 | Update assets          |
 
 ### Build/Pipeline Events
 
-| Event ID | Description | Use Case |
-|----------|-------------|----------|
-| `build.complete` | Build finished | Analyze logs for secrets |
-| `ms.vss-pipelines.stage-state-changed` | Pipeline stage changed | Monitor deployments |
-| `ms.vss-pipelines.run-state-changed` | Pipeline run changed | Track execution |
+| Event ID                               | Description            | Use Case                 |
+| -------------------------------------- | ---------------------- | ------------------------ |
+| `build.complete`                       | Build finished         | Analyze logs for secrets |
+| `ms.vss-pipelines.stage-state-changed` | Pipeline stage changed | Monitor deployments      |
+| `ms.vss-pipelines.run-state-changed`   | Pipeline run changed   | Track execution          |
 
 ### Work Item Events
 
-| Event ID | Description | Use Case |
-|----------|-------------|----------|
-| `workitem.created` | Work item created | Link to security findings |
-| `workitem.updated` | Work item updated | Track remediation progress |
-| `workitem.commented` | Comment added | Collaboration notifications |
+| Event ID             | Description       | Use Case                    |
+| -------------------- | ----------------- | --------------------------- |
+| `workitem.created`   | Work item created | Link to security findings   |
+| `workitem.updated`   | Work item updated | Track remediation progress  |
+| `workitem.commented` | Comment added     | Collaboration notifications |
 
 ---
 

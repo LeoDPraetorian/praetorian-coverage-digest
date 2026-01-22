@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/ghydra",
+  "version": "1.0.0",
+  "description": "Binary reverse engineering and decompilation analysis",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

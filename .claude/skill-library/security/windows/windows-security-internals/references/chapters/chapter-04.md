@@ -1,4 +1,4 @@
-## 4  SECURITY ACCESS TOKENS
+## 4 SECURITY ACCESS TOKENS
 
 ![Figure](figures/WindowsSecurityInternals_page_129_figure_001.png)
 
@@ -20,7 +20,6 @@ Every process has an assigned token that describes its identity for any resource
 
 You can open a process's token using the NTOpenProcessToken system call, which will return a handle that you can use to query token information.
 
-
 Because the Token object is a securable resource, the caller needs to pass an access check to get the handle. Note that you also need a handle to the process with QueryLimitedInformation access to be able to query the token.
 
 When opening a Token object, you can request the following access rights:
@@ -33,15 +32,15 @@ Impersonate Impersonates the Token object
 
 Query Queries the properties of the Token object, such as its groups and privileges
 
-QuerySource   Queries the source of the Token object
+QuerySource Queries the source of the Token object
 
-AdjustPrivileges    Adjusts a Token object's privilege list
+AdjustPrivileges Adjusts a Token object's privilege list
 
 AdjustGroups Adjusts a Token object’s group list
 
 AdjustDefault Adjusts properties of a Token object not covered by the other access rights
 
-AdjustSessionId  Adjusts the Token object's session ID
+AdjustSessionId Adjusts the Token object's session ID
 
 You can see a list of accessible processes and their tokens by running the PowerShell command Show-AtToken -All . This should open the Token Viewer application, as shown in Figure 4-1.
 
@@ -51,7 +50,7 @@ Figure 4-1. The Token Viewer lists all accessible processes
 
 and their tokens.
 
-100      Chapter 4
+100 Chapter 4
 
 ---
 
@@ -73,7 +72,7 @@ Origin Login ID The authentication identifier of the parent logon session
 
 Modified ID A unique value that is updated when certain token values are modified
 
-Security Access Tokens   101
+Security Access Tokens 101
 
 ---
 
@@ -84,7 +83,6 @@ The origin login identifier indicates who created the token's logon session. If 
 Table 4-1: Authentication Identifiers and User SIDs for Fixed Logon Sessions
 
 <table><tr><td>Authentication identifier</td><td>User SID</td><td>Logon session username</td></tr><tr><td>00000000-000003E4</td><td>S-1-5-20</td><td>NT AUTHORITY_NETWORK_SERVICE</td></tr><tr><td>00000000-000003E5</td><td>S-1-5-19</td><td>NT AUTHORITY_LOCAL_SERVICE</td></tr><tr><td>00000000-000003E6</td><td>S-1-5-7</td><td>NT AUTHORITY_ANONYMOUS_LOGON</td></tr><tr><td>00000000-000003E7</td><td>S-1-5-18</td><td>NT_AUTHORITY_SYSTEM</td></tr></table>
-
 
 After the identifiers in the detail view is a field indicating the integrity level of the token. Windows Vista first added the integrity level to implement a simple mandatory access control mechanism, whereby system-wide policies enforce access to resources, rather than allowing an individual resource to specify its access. We'll discuss integrity levels in "Token Groups" on page 109.
 
@@ -145,7 +143,7 @@ Everyone            Mandatory, EnabledByDefault
 
 Listing 4-2: Displaying properties of a token using Format-NtToken
 
-Security Access Tokens   103
+Security Access Tokens 103
 
 ---
 
@@ -158,7 +156,7 @@ The other type of token you'll encounter is the impersonation token . Impersonat
 Impersonation tokens are assigned to threads, not processes. This means that only the code running in that thread will take on the impersonated identity. There are three ways an impersonation token can be assigned to a thread:
 
 - • By explicitly granting a Token object Impersonate access and a Thread
-object SetThreadToken access
+  object SetThreadToken access
 
 • By explicitly granting a Thread object DirectImpersonation access
 • Implicitly, by impersonating an RPC request
@@ -171,31 +169,31 @@ What if you don't want to give the service the ability to impersonate your ident
 The impersonation level in the SQoS is the most important field for controlling what a service can do with your identity. It defines the level of access granted to the service when it implicitly impersonates the caller. The level can be one of four values, in ascending order of privilege:
 
 - 1. Anonymous: Prevents the service from opening the Token object and
-querying the user's identity. This is the lowest level; only a limited set of
-services would function if the caller specified this level.
-104    Chapter 4
+     querying the user's identity. This is the lowest level; only a limited set of
+     services would function if the caller specified this level.
+     104 Chapter 4
 
 ---
 
 - 2. Identification: Allows the service to open the Token object and query the
-user's identity, groups, and privileges. However, the thread cannot open
-any secured resources while impersonating the user.
+     user's identity, groups, and privileges. However, the thread cannot open
+     any secured resources while impersonating the user.
 
 3. Impersonation: Allows the service to fully exercise the user's identity
-on the local system. The service can open local resources secured by
-the user and manipulate them. It can also access remote resources for
-the user if the user has locally authenticated to the system. However,
-if the user authenticated over a network connection, such as via the
-Server Message Block (SMB) protocol, then the service can't use the
-Token object to access remote resources.
+   on the local system. The service can open local resources secured by
+   the user and manipulate them. It can also access remote resources for
+   the user if the user has locally authenticated to the system. However,
+   if the user authenticated over a network connection, such as via the
+   Server Message Block (SMB) protocol, then the service can't use the
+   Token object to access remote resources.
 
 4. Delegation: Enables the service to open all local and remote resources
-as if they were the user. This is the highest level. To access a remote
-resource from network-authenticated users, however, it's not enough
-to have this impersonation level. The Windows domain must also be
-configured to allow it. We'll discuss this impersonation level more in
-Chapter 14, on Kerberos authentication.
-You can specify the impersonation level in the SQoS either when calling a service or when creating a copy of an existing token. To restrict what a service can do, specify the Identification or Anonymous level. This will prevent the service from accessing any resources, although at the Identification level the service will still be able to access the token and perform operations on the caller's behalf.
+   as if they were the user. This is the highest level. To access a remote
+   resource from network-authenticated users, however, it's not enough
+   to have this impersonation level. The Windows domain must also be
+   configured to allow it. We'll discuss this impersonation level more in
+   Chapter 14, on Kerberos authentication.
+   You can specify the impersonation level in the SQoS either when calling a service or when creating a copy of an existing token. To restrict what a service can do, specify the Identification or Anonymous level. This will prevent the service from accessing any resources, although at the Identification level the service will still be able to access the token and perform operations on the caller's behalf.
 
 Let's run a test using the Invoke-ItToken PowerShell command. In Listing 4-3, we impersonate a token at two different levels and attempt to execute a script that opens a secured resource. We specify the impersonation level using the ImpersonationLevel property.
 
@@ -217,7 +215,6 @@ Get-NtDirectory : (0xC0000A05) - A specified impersonation level is invalid.
 Listing 4-3: Impersonating a token at different levels and opening a secured resource
 
 The first command we execute gets a handle to the current process's primary token. We then call Invoke-ItToken to impersonate the token at the
-
 
 Impersonation level and run a script that calls Get-ItDirectory to open the root OMNS directory. The open operation succeeds, and we print the directory object to the console.
 
@@ -245,13 +242,13 @@ Effective token mode changes the token passed to the server in a different way. 
 
 By default, if no SQuS structure is specified when opening the interprocess communication (IPC) channel, the caller's level is Impersonation with static tracking and a noneffective token. If an impersonation context is captured and the caller is already impersonating, then the impersonation level of the thread token must be greater than or equal to the Impersonation level; otherwise, the capture will fail. This is enforced even if the SQuS requests the Identification level. This is an important security feature; it prevents a caller at the Identification level or below from calling over an RPC channel and pretending to be another user.
 
-106    Chapter 4
+106 Chapter 4
 
 ---
 
 NOTE
 
-I've described how QoS is specified at the native system call level, as the SECURITY _QUALITY_OF_service structure is not exposed through the Win32 APIs directly. Instead, it's usually specified using additional flags, for example, CreateFile exposes QoS by specifying the SECURITY_SOS_PRESENT flag.
+I've described how QoS is specified at the native system call level, as the SECURITY \_QUALITY_OF_service structure is not exposed through the Win32 APIs directly. Instead, it's usually specified using additional flags, for example, CreateFile exposes QoS by specifying the SECURITY_SOS_PRESENT flag.
 
 ### Explicit Token Impersonation
 
@@ -323,7 +320,7 @@ To access a token, you must open a handle to the Token object, then remember to 
 
 Primary (-4) The primary token for the current process Impersonation (-5) The impersonation token for the current thread; fails if the thread is not impersonating Effective (-6) The impersonation token for the current thread, if it is impersonating; otherwise, the primary token
 
-108    Chapter 4
+108 Chapter 4
 
 ---
 
@@ -369,7 +366,6 @@ Table 4-2: Group Attributes in SDK and PowerShell Format
 
 <table><tr><td>SDK attribute name</td><td>PowerShell attribute name</td></tr><tr><td>SE_GROUP_ENABLED</td><td>Enabled</td></tr><tr><td>SE_GROUP_ENABLED_BY_DEFAULT</td><td>EnabledByDefault</td></tr><tr><td>SE_GROUP_MANDATORY</td><td>Mandatory</td></tr><tr><td>SE_GROUP_LOGON_ID</td><td>LogonId</td></tr><tr><td>SE_GROUP_OWNER</td><td>Owner</td></tr><tr><td>SE_GROUP_USE_FOR_DENY_ONLY</td><td>UseForDenyOnly</td></tr><tr><td>SE_GROUP_INTEGRITY</td><td>Integrity</td></tr><tr><td>SE_GROUP_INTEGRITY_ENABLED</td><td>IntegrityEnabled</td></tr><tr><td>SE_GROUP_RESOURCE</td><td>Resource</td></tr></table>
 
-
 The following sections describe what each of these flags means.
 
 ## Enabled, EnabledByDefault, and Mandatory
@@ -378,7 +374,7 @@ The most important flag is enabled. When it's set, the SRM considers the group d
 
 It's possible to disable a group (excluding it from the access check process) using the %AddJustGroupsToken system call if you have AddJustGroups access on the token handle; the Set-NetTokenGroup PowerShell command exposes this system call. However, you can't disable groups that have the Mandatory flag set. This flag is set for all groups in a normal user's token, but certain system tokens have nonmandatory groups. If a group is disabled when you pass an impersonation token over RPC and the effective token mode flag is set in the SQoS, the impersonation token will delete the group.
 
-110    Chapter 4
+110 Chapter 4
 
 ---
 
@@ -386,7 +382,7 @@ It's possible to disable a group (excluding it from the access check process) us
 
 The logonf tag identifies any SID that is granted to all tokens on the same desktop. For example, if you run a process as a different user using the runs utility, the new process's token will have the same logon SID as the caller, even though it's a different identity. This behavior allows the SRM to grant access to session-specific resources, such as the session object directory. The SID is always in the format 5-1-4-x-Y, where X and Y are the two 32-bit values of the LUID that was allocated when the authentication session was created. We'll come back to the logon SID and where it applies in the next chapter.
 
-## $$  Owner  $$
+## $$ Owner $$
 
 All securable resources on the system belong to either a group SID or a user SID. Tokens have an Owner property that contains a SID to use as the default owner when creating a resource. The SRM allows only a specific set of the users' SIDs to be specified in the Owner property: either the user's SID or any group SID that is marked with the Owner flag.
 
@@ -426,7 +422,6 @@ Table 4-3: Predefined Integrity Level Values
 
 <table><tr><td>Integrity level</td><td>SDK name</td><td>PowerShell name</td></tr><tr><td>0</td><td>SECURITY_MANDATORY_UNTRUSTED_RID</td><td>Untrusted</td></tr><tr><td>4096</td><td>SECURITY_MANDATORY_LOW_RID</td><td>Low</td></tr><tr><td>8192</td><td>SECURITY_MANDATORY_MEDIUM_RID</td><td>Medium</td></tr><tr><td>8448</td><td>SECURITY_MANDATORY_MEDIUM_PLUS_RID</td><td>MediumPlus</td></tr><tr><td>12288</td><td>SECURITY_MANDATORY_HIGH_RID</td><td>High</td></tr><tr><td>16384</td><td>SECURITY_MANDATORY_SYSTEM_RID</td><td>System</td></tr><tr><td>20480</td><td>SECURITY_MANDATORY_PROTECTED_PROCESS_RID</td><td>ProtectedProcess</td></tr></table>
 
-
 The default level for a user is Medium . Administrators are usually assigned High , and services are assigned System . We can query a token's integrity SID using Get-NTTokenSid , as shown in Listing 4-10.
 
 ```bash
@@ -440,7 +435,7 @@ Listing 4-10: Getting a token's integrity level SID
 
 We can also set a new token integrity level, provided it's less than or equal to the current value. It's possible to increase the level too, but this requires special privileges and having SetcPrivilege enabled.
 
-112   Chapter 4
+112 Chapter 4
 
 ---
 
@@ -539,7 +534,7 @@ PS> Enable-NtTokenPrivilege SeTimeZonePrivilege -Token $token -PassThru
 PS> Disable-NtTokenPrivilege SeTimeZonePrivilege -Token $token -PassThru
 ```
 
-114      Chapter 4
+114 Chapter 4
 
 ---
 
@@ -586,7 +581,6 @@ Listing 4-17: Performing privilege checks
 
 This listing demonstrates some example privilege checks using test
 
-
 -NTokenPrivilege. We start by enabling $ChangeNotifyPrivilege and disabling SetTimeZonePrivilege. These are common privileges granted to all users, but you might need to change the example if your token doesn't have them.
 
 ---
@@ -611,7 +605,6 @@ SetChPrivilege The name of this privilege comes from trusted computing base (TCB
 
 SeLoadDriverPrivilege We can load a new kernel driver through the MtoLoader system call, although it's more common to use the SCM.
 
-
 This privilege is required to successfully execute that system call. Note that having this privilege doesn't allow you to circumvent kernel driver checks such as code signing.
 
 ---
@@ -634,7 +627,7 @@ Any access check must allow both the normal list of groups and the list of restr
 
 It's easy to build a restricted token that can't access any resources. Such a restriction produces a good sandbox but also makes it impossible to use the token as a process's primary token, as the process won't be able to start. This puts a serious limitation on how effective a sandbox using restricted
 
-Security Access Tokens   117
+Security Access Tokens 117
 
 ---
 
@@ -697,7 +690,6 @@ WRITE_RESTRICTED flag to NtFilterToken.
 
 Windows XP SP2 introduced this token type to harden system services.
 
-
 It's much easier to use as a sandbox than a restricted token, as you don't need to worry about the token not being able to read critical resources such as DLLs. However, it creates a less useful sandbox. For example, if you can read files for a user, you might be able to steal their private information, such as passwords stored by a web browser, without needing to escape the sandbox.
 
 For completeness, let's create a write-restricted token and view its properties (Listing 4-19).
@@ -721,7 +713,7 @@ We start by creating the token using the Get-NToken command. We specify one rest
 
 Next, we display the token's properties. In the list of restricted SIDs, we see NT AUTHORITYWRITE RESTRICTED. Displaying the Restricted property shows that the token is considered restricted; however, we can see that it's also marked as WRITERestricted.
 
-Security Access Tokens   119
+Security Access Tokens 119
 
 ---
 
@@ -741,8 +733,7 @@ Table 4-4: legacy Capability SIDs
 
 <table><tr><td>Capability name</td><td>SID</td></tr><tr><td>Your internet connection</td><td>S-1-15-3-1</td></tr><tr><td>Your internet connection, including incoming connections from the internet</td><td>S-1-15-3-2</td></tr><tr><td>Your home or work networks</td><td>S-1-15-3-3</td></tr><tr><td>Your pictures library</td><td>S-1-15-3-4</td></tr><tr><td>Your videos library</td><td>S-1-15-3-5</td></tr><tr><td>Your music library</td><td>S-1-15-3-6</td></tr><tr><td>Your documents library</td><td>S-1-15-3-7</td></tr><tr><td>Your Windows credentials</td><td>S-1-15-3-8</td></tr><tr><td>Software and hardware certificates or a smart card</td><td>S-1-15-3-9</td></tr><tr><td>Removable storage</td><td>S-1-15-3-10</td></tr><tr><td>Your appointments</td><td>S-1-15-3-11</td></tr><tr><td>Your contacts</td><td>S-1-15-3-12</td></tr><tr><td>Internet Explorer</td><td>S-1-15-3-4096</td></tr></table>
 
-
-120    Chapter 4
+120 Chapter 4
 
 ---
 
@@ -775,7 +766,7 @@ The first capability SID ❶ is a legacy capability for internet access. Note th
 
 Windows also supports a capability group, a group SID that can be added to the normal list of groups . A capability group sets the first RID to 32 and the rest of the RIDs to the same SHA256 hash that was derived from the capability name.
 
-Security Access Tokens      121
+Security Access Tokens 121
 
 ---
 
@@ -812,14 +803,13 @@ We've covered making a user less privileged by converting their token into a san
 
 If you come from a Unix background, you'll know user ID 0 as the administrator account, or root. As root, you can access any resource and configure the system however you'd like. When you install Windows, the first account you configure will also be an administrator. However, unlike root, the account won't have a special SID that the system treats differently. So, what makes an administrator account on Windows?
 
-122    Chapter 4
+122 Chapter 4
 
 ---
 
 The basic answer is that Windows is configured to give certain groups and privileges special access. Administrator access is inherently discretionary, meaning it's possible to be an administrator but still be locked out of resources; there is no real equivalent of a root account (although the SYSTEM user comes close).
 
 Administrators generally have three characteristics. First, when you configure a user to be an administrator, you typically add them to the BUILTIN Administrators group, then configure Windows to allow access to the group when performing an access check. For example, the system folders, such as
-
 
 C:\Windows, are configured to allow the group to create new files and directories.
 
@@ -859,8 +849,7 @@ If the token has one of the following privileges, it's automatically considered 
 
 • SeRelabelPrivilege
 
-• SeDelegateSessionUserImpersonatePrivilege
----
+## • SeDelegateSessionUserImpersonatePrivilege
 
 The privilege doesn't have to be enabled, just available in the token.
 
@@ -880,7 +869,7 @@ However, prior to Windows Vista, this default behavior was a massive security li
 
 In Vista, Microsoft changed this default behavior by introducing User Account Control (UAC) and the split-token administrator. In this model, the default user remains an administrator; however, by default, all programs run with a token whose administrator groups and privileges have been removed. When a user needs to perform an administrative task, the system
 
-124      Chapter 4
+124 Chapter 4
 
 ---
 
@@ -932,7 +921,7 @@ When you run this command, you should see the UAC prompt. If you click Yes in th
 
 When an administrator authenticates to the desktop, the system tracks two tokens for the user:
 
-Limited  The unelevated token used for most running processes
+Limited The unelevated token used for most running processes
 
 Full The full administrator token, used only after elevation
 
@@ -1035,7 +1024,7 @@ PS> Use-NTObject($token = Get-NTToken - Anonymous) { $token.ElevationType }
 Default:
 ```
 
-128    Chapter 4
+128 Chapter 4
 
 ---
 
@@ -1073,7 +1062,7 @@ New-NTfile - (0x00000022) - (Access Denied)
   access rights.
 ```
 
-Security Access Tokens   129
+Security Access Tokens 129
 
 ---
 
@@ -1097,17 +1086,15 @@ Table 4-5: Security Attribute Types
 
 <table><tr><td>Type name</td><td>Description</td></tr><tr><td>Int64</td><td>A signed 64-bit integer</td></tr><tr><td>UInt64</td><td>An unsigned 64-bit integer</td></tr><tr><td>String</td><td>A Unicode string</td></tr><tr><td>Fqbn</td><td>A fully qualified binary name; contains a version number and a Unicode string</td></tr><tr><td>Sid</td><td>A SID</td></tr><tr><td>Boolean</td><td>A true or false value, stored as an Int64, with 0 being false and 1 being true</td></tr><tr><td>OctetString</td><td>An arbitrary array of bytes</td></tr></table>
 
-
 A set of flags can be assigned to the security attribute to change aspects of its behavior, such as whether new tokens can inherit it. Table 4-6 shows the defined flags.
 
-130    Chapter 4
+130 Chapter 4
 
 ---
 
 Table 4-6: Security Attribute Flags
 
 <table><tr><td>Flag name</td><td>Description</td></tr><tr><td>NonInheritable</td><td>The security attribute can&#x27;t be inherited by a child process token.</td></tr><tr><td>CaseSensitive</td><td>If the security attribute contains a string value, the comparison should be case sensitive.</td></tr><tr><td>UseForDenyOnly</td><td>The security attribute is used only when checking for denied access.</td></tr><tr><td>DisabledByDefault</td><td>The security attribute is disabled by default.</td></tr><tr><td>Disabled</td><td>The security attribute is disabled.</td></tr><tr><td>Mandatory</td><td>The security attribute is mandatory.</td></tr><tr><td>Unique</td><td>The security attribute should be unique on the local system.</td></tr><tr><td>InheritOnce</td><td>The security attribute can be inherited once by a child, then should be set NonInheritable.</td></tr></table>
-
 
 Almost every process token has the TSA::/ProcNoDebug security attribute. This security attribute contains a unique LUID allocated during process creation. We can display its value for the effective token using Show-NToken Effective, as shown in Listing 4-28.
 
@@ -1124,9 +1111,7 @@ Listing 4-28: Querying the security attributes for the current process
 
 From the output, we can see that the name of the attribute is TSA://
 
-
 ProcName. It has two UInt64 values, which form a LUID when combined.
-
 
 Finally, it has two flags: NonInheritable, which means the security attribute won't be passed to new process tokens, and Unique, which means the kernel shouldn't try to merge the security attribute with any other attribute on the system with the same name.
 
@@ -1136,7 +1121,7 @@ To set local security attributes, the caller needs to have the SetCh Privilege p
 
 Typically, LSASS creates tokens when a user authenticates to the computer. However, it can also create tokens for users that don't exist, such as virtual accounts used for services. These tokens might be interactive, for use in a console session, or they could be network tokens for use over the local
 
-Security Access Tokens      131
+Security Access Tokens 131
 
 ---
 
@@ -1146,19 +1131,19 @@ We won't discuss LSASS at length until Chapter 10. However, it's worth understan
 
 While you won't often have to call NtCreateToken from PowerShell, you can do so through the New-NtToken command so long as you have SeCreateTokenPrivilege enabled. The NtCreateToken system call takes the following parameters:
 
-Token type   Either primary or impersonation
+Token type Either primary or impersonation
 
 Authentication ID The LUID authentication ID; can be set to any value you'd like
 
-Expiration time  Allows the token to expire after a set period
+Expiration time Allows the token to expire after a set period
 
 User The user SID
 
 Groups The list of group SIDs
 
-Privileges   The list of privileges
+Privileges The list of privileges
 
-Owner    The owner SID
+Owner The owner SID
 
 Primary group The primary group SID
 
@@ -1166,7 +1151,7 @@ Source The source information name
 
 In addition, Windows 8 introduced the following new features to the system call, which you can access through the %state%token system call:
 
-Device groups   A list of additional SIDs for the device
+Device groups A list of additional SIDs for the device
 
 Device claim attributes A list of security attributes to define device claims
 
@@ -1175,7 +1160,6 @@ User claim attributes A list of security attributes to define user claims.
 A policy A set of flags that indicate the token's mandatory integrity policy
 
 Anything not in these two lists can be configured only by calling
-
 
 TSetInformationToken after the new token has been created. Depending on
 
@@ -1191,7 +1175,7 @@ PS> Enable-NtTokenPrivilege SeDebugPrivilege
   } PS> $token = Invoke-NtToken $imp
 ```
 
-132    Chapter 4
+132 Chapter 4
 
 ---
 
@@ -1232,7 +1216,7 @@ the CreateProcessAsUser API).
 
 • The token can be set after process creation using NtSetInformationProcess,
 before the process starts.
-Security Access Tokens   133
+Security Access Tokens 133
 
 ---
 
@@ -1250,11 +1234,11 @@ Let's first cover the case of a child token. A user process can create a new tok
 
 A sibling token is a token created as part of the same authentication session as the existing token. To test this criterion, the function compares the parent token ID and the authentication IDs of the two tokens. If they're the same, then the token can be assigned. This check also tests whether the authentication sessions are special sibling sessions set by the kernel (a rare configuration). Common examples of a sibling token include tokens duplicated from the current process token and lowbox tokens.
 
-134    Chapter 4
+134 Chapter 4
 
 ---
 
-Note that the function doesn't check the user that the token represents, and if the token matches one of the criteria, it's possible to assign it to a new process. If it doesn't match the criteria, then the STATUS_PRIVILEGE_NOT _INCLUDED error will be returned during token assignment.
+Note that the function doesn't check the user that the token represents, and if the token matches one of the criteria, it's possible to assign it to a new process. If it doesn't match the criteria, then the STATUS_PRIVILEGE_NOT \_INCLUDED error will be returned during token assignment.
 
 How does the runas utility create a new process as a normal user with these restrictions? It uses the CreateProcessWithLogon API, which authentiates a user and starts the process from a system service that has the required privileges to bypass these checks.
 
@@ -1298,7 +1282,7 @@ Set-NToken : (0xCCCCCCBB) - The request is not supported.
 
 Listing 4-31: Setting an access token after a process has started
 
-Security Access Tokens   135
+Security Access Tokens 135
 
 ---
 
@@ -1321,11 +1305,11 @@ Figure 4-5: The SeTokenCanImpersonate impersonation token checks
 Let's walk through each check and describe what it considers on both the impersonation and the primary token. Note that, because it's possible to assign an impersonation token to a thread in another process (if you have an appropriate handle to that thread), the primary token being checked is the one assigned to the process that encapsulates the thread, and not the primary token of the calling thread. The function performs the following verification steps:
 
 - 1. Check for an Identification or Anonymous impersonation level. If the
-impersonation token has one of these levels, assigning it to the thread
-isn't a security risk, and the SRM immediately allows the assignment.
-This check also allows assignment if the impersonation token repre-
-sents the anonymous user based on its authentication ID.
-136    Chapter 4
+     impersonation token has one of these levels, assigning it to the thread
+     isn't a security risk, and the SRM immediately allows the assignment.
+     This check also allows assignment if the impersonation token repre-
+     sents the anonymous user based on its authentication ID.
+     136 Chapter 4
 
 ---
 
@@ -1345,7 +1329,7 @@ Note that this check has an interesting consequence. As discussed earlier in thi
 
 8. Check the console session. This final step checks whether the console session is session 0 or not. This prevents a user from impersonating a token in session 0, which can grant elevated privileges (such as being able to create global Section objects).
 
-Security Access Tokens   137
+Security Access Tokens 137
 
 ---
 
@@ -1376,7 +1360,7 @@ Let's walk through some worked examples so you can see how to use the various co
 
 It's sometimes useful to enumerate all the processes you can access and check the properties of their primary tokens. This can help you find processes running as specific users or with certain properties. For example, you could identify processes with the UI access flag set. Earlier in this chapter,
 
-138    Chapter 4
+138 Chapter 4
 
 ---
 
@@ -1456,7 +1440,7 @@ We start by filtering the current token and specifying the luaToken flag. This f
 
 To see the effect in action, we can now write a file to an administratoronly location, such as the Windows directory. When we try this using the current process token, the operation succeeds. However, when we try to perform the operation while impersonating the token, it fails with an
 
-140    Chapter 4
+140 Chapter 4
 
 ---
 
@@ -1474,7 +1458,4 @@ In the next chapter we're going to discuss security descriptors. These define wh
 
 ---
 
-
-
 ---
-

@@ -4,64 +4,64 @@
 
 ## Structural Changes
 
-| Aspect | ISO 27001:2013 | ISO 27001:2022 | Change |
-|--------|----------------|----------------|--------|
-| **Controls** | 114 | 93 | -21 controls (consolidation) |
-| **Structure** | 14 domains (A.5-A.18) | 4 themes (A.5-A.8) | Simplified |
-| **Numbering** | A.x.y.z (e.g., A.6.1.1) | A.x.y (e.g., A.5.1) | Flattened |
-| **New Controls** | N/A | 11 new controls | Modern threats |
-| **Deprecated** | N/A | 0 (all preserved) | No removals |
+| Aspect           | ISO 27001:2013          | ISO 27001:2022      | Change                       |
+| ---------------- | ----------------------- | ------------------- | ---------------------------- |
+| **Controls**     | 114                     | 93                  | -21 controls (consolidation) |
+| **Structure**    | 14 domains (A.5-A.18)   | 4 themes (A.5-A.8)  | Simplified                   |
+| **Numbering**    | A.x.y.z (e.g., A.6.1.1) | A.x.y (e.g., A.5.1) | Flattened                    |
+| **New Controls** | N/A                     | 11 new controls     | Modern threats               |
+| **Deprecated**   | N/A                     | 0 (all preserved)   | No removals                  |
 
-##  Control Consolidation
+## Control Consolidation
 
 **57 controls from 2013 merged into 24 controls in 2022.**
 
 ### Example Mergers
 
-| 2013 Controls | 2022 Control | Rationale |
-|---------------|--------------|-----------|
-| A.12.4.1, A.12.4.2, A.12.4.3 (3 logging controls) | A.8.15 Logging | Consolidated logging requirements |
-| A.9.1.1, A.9.1.2 (2 access policy controls) | A.5.15 Access control | Combined policy and procedure |
-| A.6.1.1, A.6.1.2, A.6.1.3 (3 org responsibility) | A.5.1, A.5.2 | Simplified organizational governance |
+| 2013 Controls                                     | 2022 Control          | Rationale                            |
+| ------------------------------------------------- | --------------------- | ------------------------------------ |
+| A.12.4.1, A.12.4.2, A.12.4.3 (3 logging controls) | A.8.15 Logging        | Consolidated logging requirements    |
+| A.9.1.1, A.9.1.2 (2 access policy controls)       | A.5.15 Access control | Combined policy and procedure        |
+| A.6.1.1, A.6.1.2, A.6.1.3 (3 org responsibility)  | A.5.1, A.5.2          | Simplified organizational governance |
 
 ## 11 New Controls in 2022
 
-| Control | Name | Rationale |
-|---------|------|-----------|
-| **A.5.7** | Threat intelligence | Cyber threat intelligence feeds, threat analysis |
-| **A.5.23** | Cloud security | Cloud-specific security requirements |
-| **A.5.30** | ICT business continuity | Technical continuity planning |
-| **A.7.4** | Physical security monitoring | Camera systems, badge access logging |
-| **A.8.9** | Configuration management | Infrastructure as code, baseline hardening |
-| **A.8.10** | Information deletion | Secure data wiping, retention compliance |
-| **A.8.11** | Data masking | PII protection in non-production |
-| **A.8.12** | Data leakage prevention | DLP tools, exfiltration detection |
-| **A.8.16** | Monitoring activities | SIEM, security dashboards |
-| **A.8.23** | Web filtering | Content filtering, malicious site blocking |
-| **A.8.28** | Secure coding | OWASP Top 10, SAST/DAST |
+| Control    | Name                         | Rationale                                        |
+| ---------- | ---------------------------- | ------------------------------------------------ |
+| **A.5.7**  | Threat intelligence          | Cyber threat intelligence feeds, threat analysis |
+| **A.5.23** | Cloud security               | Cloud-specific security requirements             |
+| **A.5.30** | ICT business continuity      | Technical continuity planning                    |
+| **A.7.4**  | Physical security monitoring | Camera systems, badge access logging             |
+| **A.8.9**  | Configuration management     | Infrastructure as code, baseline hardening       |
+| **A.8.10** | Information deletion         | Secure data wiping, retention compliance         |
+| **A.8.11** | Data masking                 | PII protection in non-production                 |
+| **A.8.12** | Data leakage prevention      | DLP tools, exfiltration detection                |
+| **A.8.16** | Monitoring activities        | SIEM, security dashboards                        |
+| **A.8.23** | Web filtering                | Content filtering, malicious site blocking       |
+| **A.8.28** | Secure coding                | OWASP Top 10, SAST/DAST                          |
 
 ## Example Mappings
 
 ### Direct 1:1 Mappings
 
-| 2013 Control | 2022 Control | Name |
-|--------------|--------------|------|
-| A.9.2.1 | A.5.16 | User registration → Identity management |
-| A.12.6.1 | A.8.24 | Cryptographic controls → Use of cryptography |
-| A.15.1.1 | A.5.19 | Supplier security policy → Supplier relationships |
+| 2013 Control | 2022 Control | Name                                              |
+| ------------ | ------------ | ------------------------------------------------- |
+| A.9.2.1      | A.5.16       | User registration → Identity management           |
+| A.12.6.1     | A.8.24       | Cryptographic controls → Use of cryptography      |
+| A.15.1.1     | A.5.19       | Supplier security policy → Supplier relationships |
 
 ### Many-to-One Mergers
 
-| 2013 Controls | 2022 Control | Name |
-|---------------|--------------|------|
-| A.6.1.1, A.6.1.2, A.6.1.3 | A.5.1, A.5.2 | Roles/responsibilities → Policies/responsibilities |
-| A.12.4.1, A.12.4.2, A.12.4.3 | A.8.15 | Event/clock logging → Logging |
+| 2013 Controls                | 2022 Control | Name                                               |
+| ---------------------------- | ------------ | -------------------------------------------------- |
+| A.6.1.1, A.6.1.2, A.6.1.3    | A.5.1, A.5.2 | Roles/responsibilities → Policies/responsibilities |
+| A.12.4.1, A.12.4.2, A.12.4.3 | A.8.15       | Event/clock logging → Logging                      |
 
 ### One-to-Many Splits
 
-| 2013 Control | 2022 Controls | Name |
-|--------------|---------------|------|
-| A.9.4.1 | A.8.2, A.8.3 | Restriction of access → Privileged access + Information access restriction |
+| 2013 Control | 2022 Controls | Name                                                                       |
+| ------------ | ------------- | -------------------------------------------------------------------------- |
+| A.9.4.1      | A.8.2, A.8.3  | Restriction of access → Privileged access + Information access restriction |
 
 ## Migration Timeline
 
@@ -91,11 +91,11 @@
 
 ## Timeline by Organization Size
 
-| Size | Employees | Timeline | Budget Range |
-|------|-----------|----------|--------------|
-| **Small** | 1-50 | 2-6 months | $15K - $50K |
-| **Medium** | 51-500 | 6-12 months | $50K - $200K |
-| **Large** | 500+ | 12-24 months | $200K - $1M+ |
+| Size       | Employees | Timeline     | Budget Range |
+| ---------- | --------- | ------------ | ------------ |
+| **Small**  | 1-50      | 2-6 months   | $15K - $50K  |
+| **Medium** | 51-500    | 6-12 months  | $50K - $200K |
+| **Large**  | 500+      | 12-24 months | $200K - $1M+ |
 
 ## Migration Roadmap
 
@@ -113,11 +113,13 @@
 ## Resources
 
 **Official ISO Documents:**
+
 - ISO/IEC 27001:2022 - Information security management systems
 - ISO/IEC 27002:2022 - Implementation guidance
 - ISO/IEC 27001:2022/Amd 1:2024 - Climate action amendment
 
 **Transition Guidance:**
+
 - Certification body mapping tables (A-LIGN, BSI, NQA)
 - Compliance platforms (ISOPlanner, 6clicks, Advisera, ISMS.online)
 

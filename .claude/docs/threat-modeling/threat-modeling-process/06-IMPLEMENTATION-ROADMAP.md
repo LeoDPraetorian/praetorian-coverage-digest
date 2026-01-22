@@ -8,13 +8,13 @@ Implementation details, tool requirements, roadmap, and future enhancements
 
 ## Document Metadata
 
-| Property           | Value                                        |
-| ------------------ | -------------------------------------------- |
-| **Document ID**    | 06-IMPLEMENTATION-ROADMAP                    |
-| **Token Count**    | ~2,700 tokens                                |
-| **Read Time**      | 15-20 minutes                                |
-| **Prerequisites**  | 01-05 (Complete process understanding)       |
-| **Next Documents** | None (final document)                        |
+| Property           | Value                                  |
+| ------------------ | -------------------------------------- |
+| **Document ID**    | 06-IMPLEMENTATION-ROADMAP              |
+| **Token Count**    | ~2,700 tokens                          |
+| **Read Time**      | 15-20 minutes                          |
+| **Prerequisites**  | 01-05 (Complete process understanding) |
+| **Next Documents** | None (final document)                  |
 
 ---
 
@@ -59,7 +59,7 @@ After reading this document, you should understand:
 
 ```
 /threat-model {prompt}
-├── skill: "threat-modeling-orchestrator"     # Core skill manages flow
+├── Read(".claude/skill-library/security/threat-model/threat-modeling-orchestrator/SKILL.md")     # Library skill manages flow
 │
 ├── SCOPE SELECTION (AskUserQuestion)
 │      User selects: full | component | incremental
@@ -69,7 +69,7 @@ After reading this document, you should understand:
 │      → CHECKPOINT (user approval required)
 │
 ├── Phase 2: AUTOMATIC codebase sizing
-│      Orchestrator reads codebase-sizing skill
+│      Orchestrator reads sizing-codebases skill
 │      (NO CHECKPOINT - deterministic, auto-progresses)
 │
 ├── Phase 3: DYNAMIC PARALLEL agents for mapping
@@ -97,15 +97,15 @@ After reading this document, you should understand:
 ```
 .claude/
 ├── commands/
-│   └── threat-model.md                      # Router: skill: "threat-modeling-orchestrator"
+│   └── threat-model.md                      # Router: invokes threat-modeling-orchestrator
 │
-├── skills/
-│   └── threat-modeling-orchestrator/        # Core skill (~600 lines)
+├── skill-library/security/threat-model/
+│   └── threat-modeling-orchestrator/        # Library skill (~600 lines)
 │       ├── SKILL.md
 │       └── references/
 │           ├── handoff-protocol.md
 │           ├── parallel-execution-and-error-handling.md
-│           ├── phase-2-codebase-sizing-workflow.md
+│           ├── phase-2-sizing-codebases-workflow.md
 │           ├── phase-3-codebase-mapping-workflow.md
 │           ├── phase-4-batched-execution.md
 │           ├── phase-5-threat-modeling-workflow.md
@@ -116,7 +116,7 @@ After reading this document, you should understand:
 │   └── security/
 │       ├── business-context-discovery/      # Phase 1 methodology
 │       │   └── SKILL.md
-│       ├── codebase-sizing/                 # Phase 2 methodology
+│       ├── sizing-codebases/                 # Phase 2 methodology
 │       │   └── SKILL.md
 │       ├── codebase-mapping/                # Phase 3 methodology
 │       │   └── SKILL.md
@@ -160,20 +160,20 @@ After reading this document, you should understand:
 **MVP Components (Phases 1-6)**:
 
 - [x] Create `business-context-discovery` skill (Phase 1)
-  - Location: `.claude/skill-library/security/business-context-discovery/`
+  - Location: `.claude/skill-library/security/threat-model/business-context-discovery/`
   - Type: Process/Pattern (PASTA Stage 1)
   - Produces: 7 required output files + summary.md
   - Gateway integrated: gateway-security
   - Drives all subsequent phases with business context
 
-- [x] Create `codebase-sizing` skill (Phase 2)
-  - Location: `.claude/skill-library/security/codebase-sizing/`
+- [x] Create `sizing-codebases` skill (Phase 2)
+  - Location: `.claude/skill-library/security/threat-model/sizing-codebases/`
   - Automatic, no checkpoint
   - Produces: sizing-report.json with parallelization strategy
   - Configures Phase 3 agent count dynamically
 
-- [x] Create `codebase-mapping` skill (Phase 3)
-  - Location: `.claude/skill-library/security/codebase-mapping/`
+- [x] Create `mapping-codebases` skill (Phase 3)
+  - Location: `.claude/skill-library/security/threat-model/mapping-codebases/`
   - Dynamic parallel agent execution (from Phase 2)
   - Uses Phase 1 crown jewels for prioritization
   - Gateway integrated: gateway-security
@@ -185,7 +185,7 @@ After reading this document, you should understand:
   - Skills: gateway-security (routes to codebase-mapping)
 
 - [x] Create `security-controls-mapping` skill (Phase 4)
-  - Location: `.claude/skill-library/security/security-controls-mapping/`
+  - Location: `.claude/skill-library/security/threat-model/security-controls-mapping/`
   - Batched execution by severity (CRITICAL → HIGH → MEDIUM → LOW)
   - Evaluates against Phase 1 compliance requirements
   - Gateway integrated: gateway-security
@@ -196,20 +196,20 @@ After reading this document, you should understand:
   - One agent per security concern, batched by severity
 
 - [x] Create `threat-modeling` skill (Phase 5)
-  - Location: `.claude/skill-library/security/threat-modeling/`
+  - Location: `.claude/skill-library/security/threat-model/threat-modeling/`
   - CVSS 4.0 scoring with Environmental scores from Phase 1
   - Uses threat actor profiles and business impact
   - Gateway integrated: gateway-security
 
 - [x] Create `security-test-planning` skill (Phase 6)
-  - Location: `.claude/skill-library/security/security-test-planning/`
+  - Location: `.claude/skill-library/security/threat-model/security-test-planning/`
   - Produces: 7 required output files (JSON + summary.md)
   - Tests prioritized by CVSS Environmental scores
   - Gateway integrated: gateway-security
 
 - [x] Create `threat-modeling-orchestrator` skill
-  - Location: `.claude/skills/threat-modeling-orchestrator/`
-  - ~600 lines (core skill, process/pattern type)
+  - Location: `.claude/skill-library/security/threat-model/threat-modeling-orchestrator/`
+  - ~600 lines (library skill, process/pattern type)
   - Features:
     - Scope selection flow (full/component/incremental)
     - Human checkpoints for phases 1, 3, 4, 5, 6 (Phase 2 auto-progresses)
@@ -243,13 +243,13 @@ Phase 7: Security Test Execution
 
 **Tools to integrate**:
 
-| Tool     | Type    | Purpose                        |
-| -------- | ------- | ------------------------------ |
-| semgrep  | SAST    | Pattern-based static analysis  |
-| trivy    | SCA     | Dependency vulnerabilities     |
-| gitleaks | Secrets | Hardcoded secrets detection    |
-| nuclei   | DAST    | API security testing           |
-| codeql   | SAST    | Semantic code analysis         |
+| Tool     | Type    | Purpose                       |
+| -------- | ------- | ----------------------------- |
+| semgrep  | SAST    | Pattern-based static analysis |
+| trivy    | SCA     | Dependency vulnerabilities    |
+| gitleaks | Secrets | Hardcoded secrets detection   |
+| nuclei   | DAST    | API security testing          |
+| codeql   | SAST    | Semantic code analysis        |
 
 ### CI/CD Integration (v2.0)
 
@@ -306,17 +306,17 @@ Phase 7: Security Test Execution
 
 ## Changelog
 
-| Date       | Change                                              | Author              |
-| ---------- | --------------------------------------------------- | ------------------- |
-| 2026-01-10 | Aligned documentation to Phase 1-6 numbering        | Claude (Opus 4.5)   |
-| 2026-01-10 | Added Phase 2 (Codebase Sizing) documentation       | Claude (Opus 4.5)   |
-| 2026-01-10 | Updated all directory paths to .claude/.output/     | Claude (Opus 4.5)   |
-| 2026-01-10 | Added CVSS 4.0 scoring to methodology               | Claude (Opus 4.5)   |
-| 2026-01-10 | Split into 6-document suite                         | Claude (Opus 4.5)   |
-| 2024-12-18 | Phase 1 Business Context - orchestrator updated     | Claude (Opus 4.5)   |
-| 2024-12-18 | Created `business-context-discovery` skill          | Claude (Sonnet 4.5) |
-| 2024-12-17 | Created all initial skills and agents               | Claude (mixed)      |
-| Dec 2024   | Initial architecture design                         | Claude (Opus 4.5)   |
+| Date       | Change                                          | Author              |
+| ---------- | ----------------------------------------------- | ------------------- |
+| 2026-01-10 | Aligned documentation to Phase 1-6 numbering    | Claude (Opus 4.5)   |
+| 2026-01-10 | Added Phase 2 (Codebase Sizing) documentation   | Claude (Opus 4.5)   |
+| 2026-01-10 | Updated all directory paths to .claude/.output/ | Claude (Opus 4.5)   |
+| 2026-01-10 | Added CVSS 4.0 scoring to methodology           | Claude (Opus 4.5)   |
+| 2026-01-10 | Split into 6-document suite                     | Claude (Opus 4.5)   |
+| 2024-12-18 | Phase 1 Business Context - orchestrator updated | Claude (Opus 4.5)   |
+| 2024-12-18 | Created `business-context-discovery` skill      | Claude (Sonnet 4.5) |
+| 2024-12-17 | Created all initial skills and agents           | Claude (mixed)      |
+| Dec 2024   | Initial architecture design                     | Claude (Opus 4.5)   |
 
 ---
 

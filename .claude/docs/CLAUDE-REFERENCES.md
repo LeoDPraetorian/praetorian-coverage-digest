@@ -83,4 +83,3 @@ https://www.anthropic.com/news/claude-opus-4-5
 https://www.anthropic.com/news/claude-sonnet-4-5
 https://platform.claude.com/docs/en/about-claude/models/whats-new-claude-4-5
 https://github.com/anthropics/claude-code/blob/main/plugins/claude-opus-4-5-migration/skills/claude-opus-4-5-migration/references/prompt-snippets.md
-

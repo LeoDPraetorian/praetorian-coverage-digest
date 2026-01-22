@@ -37,14 +37,14 @@ The simplest solution that works is the correct solution.
 
 **Always start at the top. Only move down when the simpler option genuinely cannot work.**
 
-| Level | Solution Type | When Appropriate |
-|-------|--------------|------------------|
-| 1 | Inline code (3-5 lines) | One-time operations |
-| 2 | Simple function | Used 2-3 times, no state |
-| 3 | Function with parameters | Variations on same logic |
-| 4 | Struct with methods | State + behavior together |
-| 5 | Interface | Multiple implementations EXIST (not "might exist") |
-| 6 | External dependency | Stdlib genuinely can't do it |
+| Level | Solution Type            | When Appropriate                                   |
+| ----- | ------------------------ | -------------------------------------------------- |
+| 1     | Inline code (3-5 lines)  | One-time operations                                |
+| 2     | Simple function          | Used 2-3 times, no state                           |
+| 3     | Function with parameters | Variations on same logic                           |
+| 4     | Struct with methods      | State + behavior together                          |
+| 5     | Interface                | Multiple implementations EXIST (not "might exist") |
+| 6     | External dependency      | Stdlib genuinely can't do it                       |
 
 **Real Example (from RED phase testing):**
 
@@ -139,6 +139,7 @@ func skipDefaulting(event events.APIGatewayProxyRequest) bool {
 **Rule**: Design functions to accept inputs as parameters. This makes them testable without mocking.
 
 **When DI IS appropriate**: Real service dependencies that represent external systems:
+
 - AWS clients, database connections, HTTP clients
 - Services that make network calls or have side effects
 - Dependencies you genuinely swap in production (e.g., different cloud providers)
@@ -236,15 +237,15 @@ Before writing any code, answer:
 
 ## Common Rationalizations (DO NOT ACCEPT)
 
-| Rationalization | Why It's Wrong | What to Do |
-|-----------------|----------------|------------|
-| "It's more testable" | Testability comes from functions accepting inputs as parameters, not from DI and mocking. | Pass values as parameters. `isBusinessHours(hour int)` is more testable than `Clock` interface. |
-| "We might need to swap it" | YAGNI. You won't. And if you do, refactoring is cheap. | Use concrete types. Refactor when (if) needed. |
-| "It's cleaner" | Abstraction isn't cleaner. Fewer lines is cleaner. | Count the lines. Simple = fewer lines. |
-| "Best practices say..." | Best practices are context-dependent. Internal tooling ≠ library code. | Match complexity to context. |
-| "It's more extensible" | Extension points you don't need are complexity you do have. | Build for today. Extend when needed. |
-| "Senior devs expect this" | They expect working code. They don't expect overengineering. | Ask them. They'll probably say simplify. |
-| "We need a new config for this" | Existing flags often already distinguish the cases you need. | Check existing flags first. `Full` flag already meant daily vs weekly. |
+| Rationalization                 | Why It's Wrong                                                                            | What to Do                                                                                      |
+| ------------------------------- | ----------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- |
+| "It's more testable"            | Testability comes from functions accepting inputs as parameters, not from DI and mocking. | Pass values as parameters. `isBusinessHours(hour int)` is more testable than `Clock` interface. |
+| "We might need to swap it"      | YAGNI. You won't. And if you do, refactoring is cheap.                                    | Use concrete types. Refactor when (if) needed.                                                  |
+| "It's cleaner"                  | Abstraction isn't cleaner. Fewer lines is cleaner.                                        | Count the lines. Simple = fewer lines.                                                          |
+| "Best practices say..."         | Best practices are context-dependent. Internal tooling ≠ library code.                    | Match complexity to context.                                                                    |
+| "It's more extensible"          | Extension points you don't need are complexity you do have.                               | Build for today. Extend when needed.                                                            |
+| "Senior devs expect this"       | They expect working code. They don't expect overengineering.                              | Ask them. They'll probably say simplify.                                                        |
+| "We need a new config for this" | Existing flags often already distinguish the cases you need.                              | Check existing flags first. `Full` flag already meant daily vs weekly.                          |
 
 ## When Complexity IS Appropriate
 
@@ -260,12 +261,12 @@ Before writing any code, answer:
 
 ## Integration with Other Skills
 
-| Skill | Relationship |
-|-------|-------------|
-| `adhering-to-yagni` | YAGNI = don't add FEATURES. KISS = don't add COMPLEXITY. |
-| `adhering-to-dry` | DRY = don't REPEAT. But don't extract prematurely (Rule of Three). |
-| `discovering-reusable-code` | Search for existing code BEFORE writing new code. |
-| `enforcing-evidence-based-analysis` | Verify stdlib capabilities before claiming you need dependencies. |
+| Skill                               | Relationship                                                       |
+| ----------------------------------- | ------------------------------------------------------------------ |
+| `adhering-to-yagni`                 | YAGNI = don't add FEATURES. KISS = don't add COMPLEXITY.           |
+| `adhering-to-dry`                   | DRY = don't REPEAT. But don't extract prematurely (Rule of Three). |
+| `discovering-reusable-code`         | Search for existing code BEFORE writing new code.                  |
+| `enforcing-evidence-based-analysis` | Verify stdlib capabilities before claiming you need dependencies.  |
 
 ## Output Format
 
@@ -275,12 +276,14 @@ When completing a task, note simplicity decisions:
 ## Implementation Notes
 
 **Simplicity decisions:**
+
 - Used stdlib `time.Now()` instead of injected clock
 - Inlined user validation (used once)
 - Hardcoded threshold (only 2 config values)
 - No interface (single implementation)
 
 **Complexity I avoided:**
+
 - Did not create NotificationFilter struct
 - Did not create FailureTracker interface
 - Did not add config package

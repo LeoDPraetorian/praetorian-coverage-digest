@@ -17,6 +17,7 @@ ls $OUTPUT_DIR/discovery/discovery-*.md
 ```
 
 Expected files:
+
 - `discovery-{component-1}.md`
 - `discovery-{component-2}.md`
 - ... (one per agent from Stage 2)
@@ -89,12 +90,13 @@ merged_extensions.sort(key=lambda x: (x["component"], x["name"]))
 
 **Output table**:
 
-| Component | Name             | Location        | Current Purpose         | Extension Point               |
-| --------- | ---------------- | --------------- | ----------------------- | ----------------------------- |
-| Frontend  | MetricsDashboard | Dashboard.tsx   | Display metrics         | Add new chart types           |
-| Backend   | GetMetricsHandler | metrics.go      | Fetch metrics from DB   | Add filtering parameters      |
+| Component | Name              | Location      | Current Purpose       | Extension Point          |
+| --------- | ----------------- | ------------- | --------------------- | ------------------------ |
+| Frontend  | MetricsDashboard  | Dashboard.tsx | Display metrics       | Add new chart types      |
+| Backend   | GetMetricsHandler | metrics.go    | Fetch metrics from DB | Add filtering parameters |
 
 **Same algorithm for**:
+
 - Utilities to Reuse
 - Patterns to Follow
 
@@ -127,17 +129,18 @@ def deduplicate_utilities(utilities):
 **Example deduplication**:
 
 **Before**:
-| Component | Name       | Location        | Use Case           |
+| Component | Name | Location | Use Case |
 | --------- | ---------- | --------------- | ------------------ |
-| Frontend  | formatDate | utils/date.ts   | Format timestamps  |
-| Backend   | formatDate | utils/date.ts   | Format log timestamps |
+| Frontend | formatDate | utils/date.ts | Format timestamps |
+| Backend | formatDate | utils/date.ts | Format log timestamps |
 
 **After**:
-| Name       | Location        | Use Case                          | Found By           |
+| Name | Location | Use Case | Found By |
 | ---------- | --------------- | --------------------------------- | ------------------ |
-| formatDate | utils/date.ts   | Format timestamps; Format log timestamps | Frontend, Backend |
+| formatDate | utils/date.ts | Format timestamps; Format log timestamps | Frontend, Backend |
 
 **Benefits**:
+
 - Clearer reuse percentage calculation
 - Architects see utility is widely applicable
 - Prevents duplicate recommendations
@@ -211,10 +214,12 @@ IF one recommendation is clearly wrong:
 **State Management Approach**:
 
 Option A (Frontend discovery): Use Zustand
+
 - Rationale: Lightweight, minimal boilerplate
 - Found in: 0 existing files (not currently used)
 
 Option B (Backend discovery): Use React Context
+
 - Rationale: Standard React pattern
 - Found in: 12 existing files (established pattern)
 
@@ -237,22 +242,26 @@ Extract "File Placement Guidance" prose from each agent → Synthesize into unif
 ## File Placement Recommendations
 
 ### New React Components
+
 **Location**: `modules/chariot/ui/src/features/metrics/components/`
 **Rationale**: Follows existing feature-based organization. All metrics-related components colocate here.
 **Naming**: PascalCase, descriptive (e.g., `MetricsDashboardChart.tsx`)
 
 ### New Custom Hooks
+
 **Location**: `modules/chariot/ui/src/features/metrics/hooks/`
 **Rationale**: Feature-specific hooks stay in feature directory. Shared hooks go in `src/hooks/`.
 **Naming**: Camel case, prefix with `use` (e.g., `useMetricsData.ts`)
 
 ### New Backend Handlers
+
 **Location**: `modules/chariot/backend/pkg/metrics/handlers/`
 **Rationale**: Handlers grouped by domain. Create new file per endpoint.
 **Naming**: snake_case, suffix with `_handler.go` (e.g., `get_metrics_handler.go`)
 ```
 
 **File placement sources**:
+
 1. Existing directory structure (most authoritative)
 2. Patterns found in similar features
 3. Project conventions (CLAUDE.md, DESIGN-PATTERNS.md)
@@ -306,9 +315,9 @@ Reuse percentage: 140 / 150 * 100 = 93%
 ```markdown
 # Codebase Discovery: {Feature Name}
 
-*Generated: {timestamp}*
-*Components Analyzed: {count}*
-*Reuse Percentage: {XX}%*
+_Generated: {timestamp}_
+_Components Analyzed: {count}_
+_Reuse Percentage: {XX}%_
 
 ---
 
@@ -378,19 +387,19 @@ Quick reference for WHERE to place new code.
 
 ## Frontend
 
-| Code Type       | Location                          | Naming Convention  |
-| --------------- | --------------------------------- | ------------------ |
-| Components      | `features/metrics/components/`    | PascalCase         |
-| Hooks           | `features/metrics/hooks/`         | camelCase, `use*`  |
-| Utilities       | `features/metrics/utils/`         | camelCase          |
+| Code Type  | Location                       | Naming Convention |
+| ---------- | ------------------------------ | ----------------- |
+| Components | `features/metrics/components/` | PascalCase        |
+| Hooks      | `features/metrics/hooks/`      | camelCase, `use*` |
+| Utilities  | `features/metrics/utils/`      | camelCase         |
 
 ## Backend
 
-| Code Type       | Location                          | Naming Convention  |
-| --------------- | --------------------------------- | ------------------ |
-| Handlers        | `pkg/metrics/handlers/`           | snake_case, `*_handler.go` |
-| Models          | `pkg/metrics/models/`             | PascalCase         |
-| Services        | `pkg/metrics/services/`           | snake_case, `*_service.go` |
+| Code Type | Location                | Naming Convention          |
+| --------- | ----------------------- | -------------------------- |
+| Handlers  | `pkg/metrics/handlers/` | snake_case, `*_handler.go` |
+| Models    | `pkg/metrics/models/`   | PascalCase                 |
+| Services  | `pkg/metrics/services/` | snake_case, `*_service.go` |
 ```
 
 **Write to**: `$OUTPUT_DIR/discovery/file-placement.md`
@@ -404,6 +413,7 @@ Quick reference for WHERE to place new code.
 **Purpose**: Consumed by architect/planning phases for programmatic access to findings.
 
 **Key fields**:
+
 - `reuse_percentage` (number)
 - `components_analyzed` (number)
 - `patterns_to_extend` (array of objects)
@@ -433,11 +443,13 @@ Quick reference for WHERE to place new code.
 ## Handoff to Next Phase
 
 **For orchestrating-feature-development**:
+
 - discovery.md → Human-readable summary for architect review
 - discovery-summary.json → Machine-readable for frontend-lead/backend-lead prompts
 - file-placement.md → Quick reference during implementation
 
 **Token budget**:
+
 - discovery-summary.json: < 2000 tokens (for inclusion in lead prompts)
 - discovery.md: < 5000 tokens (for architect review, not included in prompts)
 - file-placement.md: < 500 tokens (for quick reference)
@@ -453,5 +465,6 @@ See [examples/synthesis-output/](../examples/synthesis-output/) for complete exa
 - Large codebase (8 components, 200 files)
 
 Each example includes:
-- Input: scoping-report.json + discovery-*.md files
+
+- Input: scoping-report.json + discovery-\*.md files
 - Output: discovery.md + file-placement.md + discovery-summary.json

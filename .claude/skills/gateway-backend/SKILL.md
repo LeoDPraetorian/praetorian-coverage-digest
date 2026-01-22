@@ -1,6 +1,6 @@
 ---
 name: gateway-backend
-description: Routes backend tasks to library skills. Intent detection + progressive loading.
+description: Use when developing backend - routes to Go, Lambda, DynamoDB, AWS, and infrastructure skills via progressive loading.
 allowed-tools: Read
 ---
 

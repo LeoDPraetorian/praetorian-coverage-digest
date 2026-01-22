@@ -335,13 +335,13 @@ The MCP Wrapper Management system is the lifecycle management system for MCP wra
 
 ### Overview
 
-| Aspect         | Details                                                                                   |
-| -------------- | ----------------------------------------------------------------------------------------- |
+| Aspect         | Details                                                                                                              |
+| -------------- | -------------------------------------------------------------------------------------------------------------------- |
 | **Location**   | `.claude/skills/managing-tool-wrappers/` (lifecycle) + `skill-library/.../orchestrating-mcp-development/` (creation) |
-| **Purpose**    | Create, test, audit, and maintain MCP wrappers                                            |
-| **Philosophy** | TDD-first: tests must exist and fail before implementation                                |
-| **Coverage**   | Minimum 80% unit test coverage required                                                   |
-| **Invocation** | `skill: "managing-tool-wrappers"` (routes to orchestration skills for create)             |
+| **Purpose**    | Create, test, audit, and maintain MCP wrappers                                                                       |
+| **Philosophy** | TDD-first: tests must exist and fail before implementation                                                           |
+| **Coverage**   | Minimum 80% unit test coverage required                                                                              |
+| **Invocation** | `skill: "managing-tool-wrappers"` (routes to orchestration skills for create)                                        |
 
 ### Directory Structure
 

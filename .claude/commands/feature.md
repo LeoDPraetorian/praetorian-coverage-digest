@@ -1,9 +1,9 @@
 ---
 description: Complete feature development - brainstorm, plan, architect, implement, review, test (12 phases with parallel agents)
-allowed-tools: Skill, AskUserQuestion
+allowed-tools: Read, TodoWrite, Task, Bash, Grep, Glob, AskUserQuestion
 argument-hint: <feature-description>
 ---
 
-Invoke the `orchestrating-feature-development` skill and follow it exactly.
+Read and follow `.claude/skill-library/development/orchestrating-feature-development/SKILL.md` exactly as it is written.
 
-**Feature Request:** $ARGUMENTS
+**Context:** $ARGUMENTS

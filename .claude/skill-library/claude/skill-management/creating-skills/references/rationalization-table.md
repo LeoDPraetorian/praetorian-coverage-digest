@@ -1,6 +1,6 @@
 # Skill Creation Rationalization Table
 
-Extends [shared rationalization prevention](../../using-skills/references/rationalization-prevention.md).
+Extends [shared rationalization prevention](.claude/skills/using-skills/references/rationalization-prevention.md).
 
 ## Phase-Specific Rationalizations
 
@@ -22,11 +22,12 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 
 ### Phase 5: Generation
 
-| Rationalization                    | Why It's Wrong                         | Response                                |
-| ---------------------------------- | -------------------------------------- | --------------------------------------- |
-| '500 lines is close enough'        | >500 causes context overflow in agents | DENIED. Extract to references/.         |
-| 'I'll add references later'        | 'Later' has ~5% completion rate        | DENIED. Create reference structure now. |
-| 'Empty placeholder files are fine' | Placeholders become permanent stubs    | DENIED. Only create files with content. |
+| Rationalization                               | Why It's Wrong                                                                                            | Response                                |
+| --------------------------------------------- | --------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| '500 lines is close enough'                   | >500 causes context overflow in agents                                                                    | DENIED. Extract to references/.         |
+| 'I'll add references later'                   | 'Later' has ~5% completion rate                                                                           | DENIED. Create reference structure now. |
+| 'Empty placeholder files are fine'            | Placeholders become permanent stubs                                                                       | DENIED. Only create files with content. |
+| 'I know the pattern, I'll copy another skill' | Template workflow ensures completeness. Copying misses domain-specific details and current anti-patterns. | DENIED. Use template workflow.          |
 
 ### Phase 6: Research
 
@@ -46,10 +47,11 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 
 ### Phase 8: GREEN (Verify Skill Works)
 
-| Rationalization                      | Why It's Wrong                            | Response                          |
-| ------------------------------------ | ----------------------------------------- | --------------------------------- |
-| 'Skill looks complete'               | Looking complete != passing original test | DENIED. Re-test the RED scenario. |
-| 'Skip audit, I followed the process' | Audits catch issues process missed        | DENIED. Run compliance audit.     |
+| Rationalization                      | Why It's Wrong                                                                                                         | Response                          |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------- |
+| 'Skill looks complete'               | Looking complete != passing original test                                                                              | DENIED. Re-test the RED scenario. |
+| 'Skip audit, I followed the process' | Audits catch issues process missed                                                                                     | DENIED. Run compliance audit.     |
+| 'Model testing is overkill'          | Skills behave differently on Haiku vs Sonnet vs Opus. Haiku needs more guidance, Opus finds over-explanation wasteful. | DENIED. Test on target models.    |
 
 ### Phase 9: REFACTOR (Pressure Test)
 
@@ -61,8 +63,11 @@ Extends [shared rationalization prevention](../../using-skills/references/ration
 
 ## Cross-Phase Rationalizations
 
-| Rationalization              | Why It's Wrong                          | Response                             |
-| ---------------------------- | --------------------------------------- | ------------------------------------ |
-| 'TDD is optional for skills' | TDD is mandatory per skill architecture | DENIED. Complete RED-GREEN-REFACTOR. |
-| 'This skill is different'    | All skills follow the same workflow     | DENIED. No exceptions.               |
-| '8/9 phases is close enough' | Phases are all-or-nothing               | DENIED. Complete all 9 phases.       |
+| Rationalization              | Why It's Wrong                                                                 | Response                             |
+| ---------------------------- | ------------------------------------------------------------------------------ | ------------------------------------ |
+| 'TDD is optional for skills' | TDD is mandatory per skill architecture                                        | DENIED. Complete RED-GREEN-REFACTOR. |
+| 'This skill is different'    | All skills follow the same workflow                                            | DENIED. No exceptions.               |
+| '8/9 phases is close enough' | Phases are all-or-nothing                                                      | DENIED. Complete all 9 phases.       |
+| 'I'll come back and fix it'  | 'Later' has ~5% completion rate. Technical debt compounds.                     | DENIED. Fix now or accept forever.   |
+| 'This case is different'     | Everyone thinks their case is special. Rules exist precisely for this thought. | DENIED. No exceptions.               |
+| 'Just this once'             | Every exception becomes precedent. There is no 'just this once.'               | DENIED. Follow the process.          |

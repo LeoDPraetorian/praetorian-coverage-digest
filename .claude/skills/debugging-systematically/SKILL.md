@@ -1,6 +1,6 @@
 ---
 name: debugging-systematically
-description: Use when encountering any bug, test failure, or unexpected behavior, before proposing fixes - four-phase framework (root cause investigation, pattern analysis, hypothesis testing, implementation) that ensures understanding before attempting solutions.
+description: Use when encountering bugs or test failures - four-phase framework (root cause, pattern, hypothesis, fix) ensuring understanding before solutions
 allowed-tools: Read, Bash, Grep, Glob
 ---
 
@@ -16,7 +16,7 @@ Random fixes waste time and create new bugs. Quick patches mask underlying issue
 
 ## The Iron Law
 
-```
+```text
 NO FIXES WITHOUT ROOT CAUSE INVESTIGATION FIRST
 ```
 
@@ -283,18 +283,31 @@ If systematic investigation reveals issue is truly environmental, timing-depende
 
 **But:** 95% of "no root cause" cases are incomplete investigation.
 
-## Integration with Other Skills
+## Integration
 
-**This skill requires using:**
+### Called By
 
-- **tracing-root-causes** - REQUIRED when error is deep in call stack (see Phase 1, Step 5)
-- **developing-with-tdd** - REQUIRED for creating failing test case (see Phase 4, Step 1)
+- User-invoked when encountering bugs, test failures, or unexpected behavior
+- Referenced by debugging guides and troubleshooting workflows
 
-**Complementary skills:**
+### Requires (invoke before starting)
 
-- **defense-in-depth** - Add validation at multiple layers after finding root cause
-- **condition-based-waiting** - Replace arbitrary timeouts identified in Phase 2
-- **verifying-before-completion** - Verify fix worked before claiming success
+None - Entry point skill for debugging methodology
+
+### Calls (during execution)
+
+| Skill                 | Phase/Step | Purpose                                                        |
+| --------------------- | ---------- | -------------------------------------------------------------- |
+| `tracing-root-causes` | Phase 1.5  | REQUIRED for backward tracing when error is deep in call stack |
+| `developing-with-tdd` | Phase 4.1  | REQUIRED for creating failing test case before fixing          |
+
+### Pairs With (conditional)
+
+| Skill                               | Trigger                        | Purpose                                                 |
+| ----------------------------------- | ------------------------------ | ------------------------------------------------------- |
+| `defense-in-depth` (LIBRARY)        | After root cause identified    | Add validation at multiple layers                       |
+| `condition-based-waiting` (LIBRARY) | Timeouts identified in Phase 2 | Replace arbitrary timeouts with condition-based waiting |
+| `verifying-before-completion`       | Before claiming fix complete   | Verify fix worked before success claims                 |
 
 ## Real-World Impact
 

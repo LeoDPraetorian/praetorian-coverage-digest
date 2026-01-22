@@ -1,6 +1,6 @@
 ---
 name: calibrating-time-estimates
-description: Use when estimating task duration, planning timelines, or justifying shortcuts due to "no time" - provides AI vs human time reality with measured data to prevent 10-24x overestimates that enable rationalization.
+description: Use when estimating duration, facing time pressure, or justifying shortcuts - prevents 10-24x AI overestimates via measured data
 allowed-tools: Read, Write, Edit, Bash, Grep
 ---
 
@@ -236,3 +236,27 @@ Start timer and measure actual
 **AI time ≠ human time. Calibrate for your actual capabilities.**
 
 Measure once. Update calibration. Stop overestimating.
+
+## Integration
+
+### Called By
+
+- User invocation - When estimating task duration, planning timelines, or making "no time" decisions
+- Orchestration skills - When planning multi-phase workflows
+- Developer agents - When making time-based decisions about implementation approach
+
+### Requires (invoke before starting)
+
+None - standalone skill
+
+### Calls (during execution)
+
+None - terminal skill (provides guidance, doesn't invoke other skills)
+
+### Pairs With (conditional)
+
+| Skill                               | Trigger                      | Purpose                               |
+| ----------------------------------- | ---------------------------- | ------------------------------------- |
+| `developing-with-tdd` (CORE)        | TDD workflow planning        | Provides time reality for TDD cycles  |
+| `orchestrating-feature-development` | Feature timeline planning    | Calibrates multi-phase estimates      |
+| `writing-plans`                     | Implementation plan creation | Prevents overestimated task durations |

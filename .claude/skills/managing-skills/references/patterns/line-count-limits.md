@@ -1,6 +1,6 @@
 # Line Count Limits
 
-**Single source of truth for SKILL.md line count thresholds.**
+**Single source of truth for SKILL.md and reference file line count thresholds.**
 
 This pattern is referenced by:
 
@@ -24,7 +24,7 @@ This pattern is referenced by:
 
 ---
 
-## Unified Thresholds
+## SKILL.md Thresholds
 
 | Lines   | Status       | Action                                      |
 | ------- | ------------ | ------------------------------------------- |
@@ -35,13 +35,37 @@ This pattern is referenced by:
 
 ---
 
+## Reference File Thresholds
+
+**Reference files should also have size limits to prevent truncation/ignoring by Claude.**
+
+| Lines   | Status       | Action                             |
+| ------- | ------------ | ---------------------------------- |
+| < 300   | ✅ Safe zone | No action needed                   |
+| 300-350 | ℹ️ Info      | Consider splitting for next change |
+| 351-400 | ⚠️ Warning   | Plan split before adding content   |
+| > 400   | ❌ CRITICAL  | MUST split into multiple files     |
+
+**Why 400 lines (not 500)?** Reference files are read on-demand, not always loaded. Lower threshold ensures content is digestible when loaded. Claude truncates files >800-1000 lines, so 400 provides safe margin.
+
+**Split Strategy:** When a reference file exceeds 400 lines:
+
+1. Identify logical sections (by H2 headers)
+2. Create separate files for each major section
+3. Update parent file to link to split files
+4. Ensure each split file has proper parent link
+5. **Update external references** - Search for files linking to the original filename and update them to point to appropriate new files (index or specific sub-file)
+
+---
+
 ## Validation Script
 
 ```bash
 #!/bin/bash
-# Validate SKILL.md line count
+# Validate SKILL.md and optionally reference file line counts
 
 SKILL_PATH="${1:-.}"
+CHECK_REFS="${2:-false}"  # Pass "refs" as second arg to check references/
 SKILL_FILE="$SKILL_PATH/SKILL.md"
 
 if [ ! -f "$SKILL_FILE" ]; then
@@ -49,6 +73,7 @@ if [ ! -f "$SKILL_FILE" ]; then
   exit 1
 fi
 
+# Check SKILL.md
 LINE_COUNT=$(wc -l < "$SKILL_FILE" | tr -d ' ')
 
 if [ "$LINE_COUNT" -gt 500 ]; then
@@ -64,6 +89,34 @@ elif [ "$LINE_COUNT" -gt 350 ]; then
 else
   echo "✅ PASS: Safe zone ($LINE_COUNT/500)"
 fi
+
+# Optionally check reference files
+if [ "$CHECK_REFS" = "refs" ] && [ -d "$SKILL_PATH/references" ]; then
+  echo ""
+  echo "Checking reference files..."
+  find "$SKILL_PATH/references" -name '*.md' | while read ref_file; do
+    ref_count=$(wc -l < "$ref_file" | tr -d ' ')
+    ref_name=$(basename "$ref_file")
+
+    if [ "$ref_count" -gt 400 ]; then
+      echo "❌ CRITICAL: $ref_name is $ref_count lines (limit: 400)"
+    elif [ "$ref_count" -gt 350 ]; then
+      echo "⚠️ WARNING: $ref_name is $ref_count lines (limit: 400)"
+    elif [ "$ref_count" -gt 300 ]; then
+      echo "ℹ️ INFO: $ref_name is $ref_count lines (consider splitting)"
+    fi
+  done
+fi
+```
+
+**Usage:**
+
+```bash
+# Check only SKILL.md
+./validate-line-count.sh .claude/skills/skill-name
+
+# Check SKILL.md + all reference files
+./validate-line-count.sh .claude/skills/skill-name refs
 ```
 
 ---

@@ -61,6 +61,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 ### 1. Postmarket Vulnerability Monitoring & CVD
 
 #### Monitoring Plan Elements
+
 - Continuous monitoring methods (threat intelligence feeds, vulnerability scanners)
 - Triage and risk assessment procedures
 - Severity scoring methodology (CVSS + patient harm)
@@ -68,6 +69,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 - Escalation procedures for critical findings
 
 #### CVD Policy Documentation
+
 - External researcher reporting channels (email, web form, security.txt)
 - Acknowledgment timelines (48-72 hours)
 - Non-retaliation and safe harbor provisions
@@ -75,6 +77,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 - Internal CVD workflow (Intake → Triage → Remediation → Communication)
 
 #### Communication Plans
+
 - Stakeholder notification procedures (healthcare providers, patients, distributors)
 - Notification methods (Field Safety Notices, security bulletins, customer portals)
 - Risk-based timelines:
@@ -85,6 +88,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 ### 2. Software Updates, Patches, and Maintenance
 
 #### Update Capability
+
 - Delivery mechanisms (OTA updates, USB, service tool, cloud-based)
 - Secure update technical controls:
   - Cryptographic signing (code signing certificates)
@@ -95,6 +99,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
   - Update channel encryption (TLS/SSL)
 
 #### Deployment Strategy
+
 - Phased rollout capabilities
 - Pilot/canary deployment support
 - Emergency patch deployment procedures
@@ -102,6 +107,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 - Pre-deployment testing requirements
 
 #### Lifecycle Management
+
 - Support lifecycle definition (5-10 years)
 - End-of-support (EOS) communication plan
 - Legacy device migration strategies
@@ -110,6 +116,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 ### 3. Design Considerations for Cybersecurity
 
 #### Secure-by-Design Principles
+
 - Defense-in-depth layering
 - Least privilege access controls
 - Network segmentation and isolation
@@ -117,6 +124,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 - Zero-trust architecture principles
 
 #### Authentication and Access Control
+
 - Multi-factor authentication (MFA) implementation
 - Role-based access control (RBAC)
 - Password/credential management (complexity, rotation)
@@ -124,6 +132,7 @@ FDA does **NOT** mandate SPDX 2.3+ or CycloneDX 1.4+. However, SBOM must include
 - Privileged access management
 
 #### Data Protection
+
 - Encryption at rest (AES-256, etc.)
 - Encryption in transit (TLS 1.3+)
 - Key management and storage
@@ -141,6 +150,7 @@ FDA requires **reasonable assurance of cybersecurity** but does NOT mandate spec
 ### 1. Threat Modeling
 
 **Accepted methodologies:**
+
 - STRIDE (Spoofing, Tampering, Repudiation, Information Disclosure, Denial of Service, Elevation of Privilege)
 - Attack Trees / Misuse Cases
 - Kill Chain / Attack Lifecycle Models
@@ -149,6 +159,7 @@ FDA requires **reasonable assurance of cybersecurity** but does NOT mandate spec
 **Key requirement:** Comprehensive, documented, traceable to controls and testing
 
 **Deliverables:**
+
 - Threat model report
 - Architecture diagrams
 - Traceability matrix (Threats → Security controls → Verification testing)
@@ -164,6 +175,7 @@ FDA requires **reasonable assurance of cybersecurity** but does NOT mandate spec
 ### 3. Penetration Testing
 
 **Scope:**
+
 - Black-box, gray-box, or white-box testing
 - Authentication and authorization bypass
 - Network protocol exploitation
@@ -173,6 +185,7 @@ FDA requires **reasonable assurance of cybersecurity** but does NOT mandate spec
 - Data exfiltration and tampering
 
 **Deliverables:**
+
 - Penetration test report with findings
 - Proof-of-concept exploits (where applicable)
 - Risk ratings for each finding
@@ -211,17 +224,20 @@ FDA expanded eSTAR template from 2 attachments to **12 attachments and 9 questio
 **15% of submissions receive RTA letters for inadequate cybersecurity documentation.**
 
 ### Documentation Failures
+
 - **Incomplete SBOMs**: Missing versions, dependencies, known vulnerabilities
 - **Fragmented documentation**: Cybersecurity docs not integrated with design controls
 - **Missing traceability**: Threats not linked to controls and tests
 - **Inadequate threat modeling**: 700% increase in deficiency letters since PATCH Act
 
 ### Technical Mistakes
+
 - **Late-stage security additions**: Bolt-on security after design freeze causes redesign
 - **Disconnects between risk assessments and test evidence**
 - **Insufficient testing scope**: Missing penetration testing or vulnerability scanning
 
 ### Process Issues
+
 - **Quality system disconnect**: Cybersecurity not integrated with 21 CFR 820.30 design controls
 - **Missing CVD policy**: No documented external researcher reporting channels
 - **Lack of update capability**: No demonstrated patch delivery mechanism

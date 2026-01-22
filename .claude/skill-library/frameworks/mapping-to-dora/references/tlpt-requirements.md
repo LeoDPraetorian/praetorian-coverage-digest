@@ -7,6 +7,7 @@
 Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** under DORA Article 26, conducted using the **TIBER-EU framework** developed by the European Central Bank.
 
 **Purpose:**
+
 - Test resilience against realistic, intelligence-driven cyber attacks
 - Identify vulnerabilities before malicious actors exploit them
 - Validate detection, response, and recovery capabilities
@@ -19,6 +20,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 ## Mandatory Entities
 
 **TLPT required for:**
+
 - **Significant credit institutions** (systemically important banks)
 - **Large investment firms**
 - **Central securities depositories (CSDs)**
@@ -26,10 +28,12 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 - **Other entities designated by competent authorities** based on risk
 
 **Optional for:**
+
 - Smaller entities (but recommended for critical functions)
 - Entities seeking enhanced assurance
 
 **Pooled TLPT:**
+
 - Multiple smaller entities can pool resources
 - Shared testing infrastructure and costs
 - Regulatory approval required
@@ -40,6 +44,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 ### Phase 1: Preparation (6 months typical)
 
 **1.1 Scope Definition**
+
 - **Critical functions** to be tested (payment systems, trading platforms, customer data)
 - **In-scope systems and networks** (production, not test environments)
 - **Out-of-scope boundaries** (what should NOT be tested)
@@ -47,6 +52,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 - **Testing windows** (dates, times, blackout periods)
 
 **1.2 Threat Intelligence Gathering**
+
 - **Generic threat intelligence**: Applicable to financial sector
 - **Targeted threat intelligence**: Specific to the entity (sector, geography, services)
 - **Threat actor profiling**: Likely adversaries (organized crime, nation-state, hacktivists)
@@ -54,6 +60,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 - **Attack scenarios** based on intelligence (minimum 3 scenarios required)
 
 **1.3 Stakeholder Engagement**
+
 - **White Team**: Project management and coordination (entity's staff)
 - **Red Team**: External penetration testers selected
 - **Blue Team**: Entity's security operations (detection and response)
@@ -61,6 +68,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 - **Competent Authority**: Notification and approval
 
 **1.4 Red Team Selection**
+
 - **External testers required** at least once per 3-year cycle
 - **Internal testing allowed** for 2 of 3 cycles if capabilities exist
 - **Qualification requirements**:
@@ -71,6 +79,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
   - TIBER-EU training certification
 
 **1.5 Legal and Contractual Arrangements**
+
 - **Rules of engagement**: What's allowed, what's prohibited
 - **Liability and indemnification**: Insurance, damage clauses
 - **Confidentiality**: NDA for sensitive information
@@ -78,6 +87,7 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 - **Notification protocols**: When to escalate, emergency stop procedures
 
 **1.6 Regulatory Notification**
+
 - **Competent authority approval** before testing
 - **TLPT testing plan submission** (scope, scenarios, dates)
 - **Cross-border coordination** if multi-jurisdiction entity
@@ -89,16 +99,19 @@ Threat-Led Penetration Testing (TLPT) is **mandatory for significant entities** 
 Scenarios must be based on threat intelligence, not generic testing:
 
 **Example Scenario 1: Financially Motivated Organized Crime**
+
 - **Objective**: Exfiltrate customer financial data for sale on dark web
 - **Attack Vector**: Phishing → credential theft → lateral movement → data exfiltration
 - **TTPs**: Spear phishing, credential stuffing, Mimikatz, data staging
 
 **Example Scenario 2: Nation-State Espionage**
+
 - **Objective**: Long-term persistent access for intelligence gathering
 - **Attack Vector**: Supply chain compromise → backdoor implant → C2 establishment
 - **TTPs**: Watering hole attacks, zero-day exploits, custom malware, steganography
 
 **Example Scenario 3: Hacktivist Disruption**
+
 - **Objective**: Disrupt services to damage reputation and cause financial loss
 - **Attack Vector**: DDoS + web application attacks → defacement + service outage
 - **TTPs**: Botnet DDoS, SQL injection, XSS, public disclosure of vulnerabilities
@@ -106,6 +119,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 **2.2 Attack Execution**
 
 **Reconnaissance (2-4 weeks):**
+
 - **OSINT** (Open Source Intelligence): Public information gathering
 - **Network mapping**: External footprint, DNS, subdomains
 - **Social engineering prep**: Employee profiling via LinkedIn, social media
@@ -113,18 +127,21 @@ Scenarios must be based on threat intelligence, not generic testing:
 - **Identify entry points**: Email, web applications, VPN, partners
 
 **Initial Compromise (1-2 weeks):**
+
 - **Phishing campaigns**: Spear phishing, watering hole attacks
 - **Exploitation**: Known vulnerabilities, zero-day if intelligence supports
 - **Physical access attempts** (if in scope): Tailgating, USB drops
 - **Third-party compromise**: Supplier or partner as entry vector
 
 **Lateral Movement (2-4 weeks):**
+
 - **Privilege escalation**: Local admin → domain admin
 - **Credential harvesting**: Kerberoasting, NTLM relay, password reuse
 - **Network traversal**: Pivot through internal systems
 - **Persistence mechanisms**: Backdoors, scheduled tasks, registry modifications
 
 **Objective Achievement (2-4 weeks):**
+
 - **Data exfiltration**: Customer data, financial records, intellectual property
 - **Service disruption**: Critical function impairment
 - **C2 (Command and Control)** establishment for persistent access
@@ -133,11 +150,13 @@ Scenarios must be based on threat intelligence, not generic testing:
 **2.3 Testing Without Operational Awareness**
 
 **True Red Team Testing:**
+
 - **Blue Team (SOC) NOT informed** of testing dates or methods
 - Tests real-world detection and response capabilities
 - Simulates actual attack where defenders don't expect it
 
 **Controlled Risk:**
+
 - **White Team monitoring** throughout testing
 - **Emergency stop procedures** if critical impact
 - **Pre-defined thresholds** for halting (e.g., production outage risk)
@@ -145,12 +164,14 @@ Scenarios must be based on threat intelligence, not generic testing:
 **2.4 Purple Teaming (Mandatory as of February 2025 TIBER-EU Update)**
 
 **After Red Team completes attack:**
+
 - **Joint debrief**: Red team shows what they did, how they avoided detection
 - **Blue team learns**: Detection gaps, control weaknesses
 - **Collaborative remediation**: Red team helps validate fixes
 - **Re-testing**: Blue team requests re-test of specific scenarios after improvements
 
 **Benefits:**
+
 - Accelerated learning cycle
 - Immediate control enhancement
 - Builds internal capability
@@ -161,6 +182,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 **3.1 Red Team Report Delivery**
 
 **Report Structure:**
+
 - **Executive Summary**: High-level findings for management and board
 - **Technical Findings**: Detailed vulnerability and exploitation documentation
 - **Attack Timeline**: Complete chronology of testing activities
@@ -171,6 +193,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 - **Remediation Recommendations**: Prioritized by risk
 
 **Report Audience:**
+
 - Management body (executive summary)
 - CISO and security teams (technical findings)
 - Competent authority (regulatory submission)
@@ -179,6 +202,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 **3.2 Management Remediation Plan**
 
 **Required within 30-60 days of red team report:**
+
 - **Prioritized remediation roadmap**: Critical → high → medium → low
 - **Assigned owners**: Who's responsible for each fix
 - **Timelines**: When each remediation will be completed
@@ -189,6 +213,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 **3.3 Regulatory Submission**
 
 **Submit to competent authority:**
+
 - Red team report (may be redacted for sensitive details)
 - Management remediation plan
 - Timeline for completion
@@ -196,6 +221,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 - Impact on risk register and controls
 
 **Authority Review:**
+
 - Assess findings severity
 - Evaluate remediation plan adequacy
 - May require enhancements or accelerated timelines
@@ -204,12 +230,14 @@ Scenarios must be based on threat intelligence, not generic testing:
 **3.4 Lessons Learned**
 
 **Organizational Improvements:**
+
 - **Technical controls**: Patch vulnerabilities, enhance monitoring, improve segmentation
 - **Process improvements**: Incident response, change management, access control procedures
 - **People enhancements**: Security awareness training, phishing simulations, SOC analyst skills
 - **Third-party management**: Vendor security requirements, supply chain risk assessment
 
 **Knowledge Sharing:**
+
 - Share anonymized findings with industry peers (Article 45 information sharing)
 - Participate in threat intelligence communities
 - Contribute to sector-wide resilience
@@ -254,13 +282,14 @@ Scenarios must be based on threat intelligence, not generic testing:
 
 **3-Year Cycle Breakdown:**
 
-| Year | Testing Type     | Tester Type | Scope             |
-| ---- | ---------------- | ----------- | ----------------- |
-| 1    | Full TLPT        | External    | All critical functions|
-| 2    | Targeted testing | Internal    | High-risk areas identified in Y1|
-| 3    | Full TLPT prep   | External    | Intelligence gathering, scenario planning|
+| Year | Testing Type     | Tester Type | Scope                                     |
+| ---- | ---------------- | ----------- | ----------------------------------------- |
+| 1    | Full TLPT        | External    | All critical functions                    |
+| 2    | Targeted testing | Internal    | High-risk areas identified in Y1          |
+| 3    | Full TLPT prep   | External    | Intelligence gathering, scenario planning |
 
 **Flexibility:**
+
 - Competent authorities may require more frequent testing for high-risk entities
 - Major incidents or control failures may trigger unscheduled TLPT
 - Significant changes (M&A, new critical services) may reset cycle
@@ -268,12 +297,14 @@ Scenarios must be based on threat intelligence, not generic testing:
 ## Cost Considerations
 
 **Typical TLPT costs:**
+
 - **External red team**: €100,000 - €500,000 (depends on scope, duration)
 - **Threat intelligence**: €20,000 - €100,000
 - **Internal resource costs**: 1-2 FTEs for 6-12 months (white team, coordination)
 - **Remediation**: Variable (can exceed testing costs for major findings)
 
 **Cost Reduction Strategies:**
+
 - **Pooled TLPT**: Share costs with similar entities
 - **Internal testing**: Years 2 and 3 if capabilities exist
 - **Phased approach**: Test critical functions first, expand over time
@@ -294,6 +325,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 ## Tooling and Techniques
 
 **Red Team Toolset (examples):**
+
 - **Reconnaissance**: nmap, Shodan, theHarvester, Maltego
 - **Exploitation**: Metasploit, Cobalt Strike, custom exploits
 - **Credential Harvesting**: Mimikatz, Rubeus, Kerberoasting tools
@@ -302,6 +334,7 @@ Scenarios must be based on threat intelligence, not generic testing:
 - **Evasion**: Obfuscation, in-memory execution, living-off-the-land binaries
 
 **Blue Team Detection (what TLPT validates):**
+
 - **SIEM**: Log correlation and alerting
 - **EDR/XDR**: Endpoint and extended detection
 - **Network Security**: IDS/IPS, NetFlow analysis

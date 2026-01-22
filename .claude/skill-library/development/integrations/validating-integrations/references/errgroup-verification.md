@@ -51,14 +51,15 @@ func (task *Integration) processItems(items []Item) error {
 
 ## SetLimit Values by Use Case
 
-| Value | Use Case | Examples |
-|-------|----------|----------|
-| **10** | Default for API-heavy operations | CrowdStrike, Wiz, Tenable, InsightVM |
-| **25** | API rate limit compliance | GitHub, GitLab |
-| **30** | File I/O operations | Nessus Import, InsightVM Import |
-| **100** | Ultra-lightweight operations | Okta (pagination), PingOne |
+| Value   | Use Case                         | Examples                             |
+| ------- | -------------------------------- | ------------------------------------ |
+| **10**  | Default for API-heavy operations | CrowdStrike, Wiz, Tenable, InsightVM |
+| **25**  | API rate limit compliance        | GitHub, GitLab                       |
+| **30**  | File I/O operations              | Nessus Import, InsightVM Import      |
+| **100** | Ultra-lightweight operations     | Okta (pagination), PingOne           |
 
 **Selection Criteria**:
+
 - API reads: 10-25 (respect external rate limits)
 - File I/O: 30+ (I/O bound, can parallelize more)
 - Lightweight ops: 100+ (list operations, low overhead)
@@ -66,6 +67,7 @@ func (task *Integration) processItems(items []Item) error {
 ## Loop Variable Capture Patterns
 
 ### Correct Pattern 1: Explicit Capture
+
 ```go
 for _, scan := range scans {
     localScan := scan  // Capture BEFORE g.Go()
@@ -76,6 +78,7 @@ for _, scan := range scans {
 ```
 
 ### Correct Pattern 2: Pre-slice Capture
+
 ```go
 for pageNum := range totalPages {
     start := pageNum * pageSize
@@ -93,6 +96,7 @@ for pageNum := range totalPages {
 ```
 
 ### Correct Pattern 3: Loop Index Capture
+
 ```go
 for page := 1; page < totalPages; page++ {
     page := page  // Capture loop index
@@ -106,6 +110,7 @@ for page := 1; page < totalPages; page++ {
 ```
 
 ### WRONG Pattern: No Capture
+
 ```go
 // VIOLATION - Race condition
 for _, item := range items {
@@ -118,6 +123,7 @@ for _, item := range items {
 ## Thread-Safe Patterns with errgroup
 
 ### Atomic Counters
+
 ```go
 counter := atomic.Int32{}
 
@@ -135,6 +141,7 @@ total := int(counter.Load())
 ```
 
 ### Mutex for Shared Maps
+
 ```go
 var mu sync.Mutex
 results := make(map[string]Asset)
@@ -154,6 +161,7 @@ for _, item := range items {
 ## Evidence Format
 
 **PASS Example**:
+
 ```
 ✅ errgroup Safety
 Evidence: crowdstrike.go:179 - g := errgroup.Group{}
@@ -166,6 +174,7 @@ Variable Capture: Correct (batch captured before goroutine)
 ```
 
 **FAIL Example (Missing SetLimit)**:
+
 ```
 ❌ errgroup Safety
 Evidence: vendor.go:100 - g := errgroup.Group{}
@@ -175,6 +184,7 @@ Required: Add g.SetLimit(10) after group creation
 ```
 
 **FAIL Example (Missing Variable Capture)**:
+
 ```
 ❌ errgroup Safety
 Evidence: vendor.go:100 - for _, item := range items {
@@ -197,6 +207,7 @@ Required: Add 'captured := item' before g.Go()
 **SetLimit Compliance**: 100% (18/18 errgroup users)
 
 **SetLimit Distribution**:
+
 - SetLimit(10): 11 integrations
 - SetLimit(25): 2 integrations
 - SetLimit(30): 2 integrations
@@ -209,6 +220,7 @@ Required: Add 'captured := item' before g.Go()
 ## Integration Without errgroup
 
 Not all integrations need errgroup. Sequential processing is acceptable when:
+
 - Single API call with no pagination
 - Low data volume (< 100 items)
 - Order-dependent processing

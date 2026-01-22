@@ -4,13 +4,35 @@
 
 ## Quick Reference Prompts
 
-The prompts below are abbreviated versions for quick reference. For production use, refer to:
+The prompts below are abbreviated versions for quick reference. For production use, refer to the full prompts (split for progressive disclosure):
 
-- [tool-developer-prompt.md](prompts/tool-developer-prompt.md) - ~680 lines with TDD examples
-- [tool-tester-prompt.md](prompts/tool-tester-prompt.md) - ~700 lines with test patterns
-- [tool-lead-prompt.md](prompts/tool-lead-prompt.md) - ~750 lines with decision chains
-- [tool-reviewer-prompt.md](prompts/tool-reviewer-prompt.md) - ~660 lines with verification chains
-- [security-lead-prompt.md](prompts/security-lead-prompt.md) - ~530 lines with threat analysis
+**tool-lead** (architecture design):
+
+- [tool-lead-prompt.md](prompts/tool-lead-prompt.md) - Core template (271 lines)
+- [tool-lead-examples.md](prompts/tool-lead-examples.md) - Decision chain examples (265 lines)
+- [tool-lead-requirements.md](prompts/tool-lead-requirements.md) - Architecture requirements (270 lines)
+
+**tool-developer** (implementation):
+
+- [tool-developer-prompt.md](prompts/tool-developer-prompt.md) - Core template (223 lines)
+- [tool-developer-examples.md](prompts/tool-developer-examples.md) - TDD examples (379 lines)
+- [tool-developer-requirements.md](prompts/tool-developer-requirements.md) - Checklists (144 lines)
+
+**tool-tester** (testing):
+
+- [tool-tester-prompt.md](prompts/tool-tester-prompt.md) - Core template (224 lines)
+- [tool-tester-examples.md](prompts/tool-tester-examples.md) - Test category patterns (339 lines)
+- [tool-tester-requirements.md](prompts/tool-tester-requirements.md) - Self-review checklist (92 lines)
+
+**tool-reviewer** (code review):
+
+- [tool-reviewer-prompt.md](prompts/tool-reviewer-prompt.md) - Core template (291 lines)
+- [tool-reviewer-checklists.md](prompts/tool-reviewer-checklists.md) - Review checklists (147 lines)
+- [tool-reviewer-examples.md](prompts/tool-reviewer-examples.md) - Verification examples (264 lines)
+
+**security-lead** (security assessment):
+
+- [security-lead-prompt.md](prompts/security-lead-prompt.md) - Core template (195 lines)
 
 ---
 

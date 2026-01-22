@@ -197,11 +197,13 @@ finding := &Finding{
 ### ❌ Generic Advice Without D3FEND IDs
 
 **Wrong:**
+
 ```
 Remediation: Use intrusion detection
 ```
 
 **Correct:**
+
 ```
 Remediation: Implement D3-ISVA (Inbound Session Volume Analysis) to detect exploit attempts
 ```
@@ -209,11 +211,13 @@ Remediation: Implement D3-ISVA (Inbound Session Volume Analysis) to detect explo
 ### ❌ Single Defense for Critical Vulnerabilities
 
 **Wrong:**
+
 ```
 Remediation: Enable MFA
 ```
 
 **Correct:**
+
 ```
 Remediation:
 1. Harden: Enable MFA (D3-MFAA) - Priority: Critical
@@ -224,12 +228,14 @@ Remediation:
 ### ❌ Detection Instead of Prevention
 
 **Wrong:**
+
 ```
 Remediation for hardcoded password:
 1. Detect: Scan for secrets (D3-FA)
 ```
 
 **Correct:**
+
 ```
 Remediation for hardcoded password:
 1. Harden: Remove hardcoded password (D3-CH) - Priority: Critical

@@ -47,6 +47,15 @@ digraph when_to_use {
 
 ## The Pattern
 
+**IMPORTANT**: Use TodoWrite to track the multi-agent workflow phases:
+
+```
+1. Identify independent domains
+2. Create focused agent tasks
+3. Dispatch in parallel
+4. Review and integrate
+```
+
 ### 1. Identify Independent Domains
 
 Group failures by what's broken:
@@ -190,3 +199,41 @@ From debugging session (2025-10-03):
 - All investigations completed concurrently
 - All fixes integrated successfully
 - Zero conflicts between agent changes
+
+## Integration
+
+### Called By
+
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` - Phase 10 (when multiple test failures occur)
+- `orchestrating-capability-development` (LIBRARY) - `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")` - Phase 8 (when multiple capability tests fail)
+- `debugging-systematically` (CORE) - When root cause analysis identifies multiple independent bugs
+- Manual invocation - When user faces 3+ unrelated failures
+
+### Requires (invoke before starting)
+
+None - This is a standalone dispatch pattern that can be applied whenever independent failures are identified.
+
+### Calls (during execution)
+
+| Skill/Tool | Phase/Step | Purpose                                                                         |
+| ---------- | ---------- | ------------------------------------------------------------------------------- |
+| Task tool  | Step 3     | Spawn specialized agents (frontend-tester, backend-developer, etc.) in parallel |
+
+### Pairs With (conditional)
+
+| Skill                                           | Trigger                                               | Purpose                                                                                                                      |
+| ----------------------------------------------- | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `iterating-to-completion` (CORE)                | When agents return with errors                        | Loop until all agents complete successfully                                                                                  |
+| `debugging-systematically` (CORE)               | When failures seem independent but root cause unclear | Determine if problems truly independent                                                                                      |
+| `orchestrating-multi-agent-workflows` (LIBRARY) | Need comprehensive orchestration                      | Full multi-phase agent coordination - `Read(".claude/skill-library/prompting/orchestrating-multi-agent-workflows/SKILL.md")` |
+| `persisting-agent-outputs` (LIBRARY)            | Need to collect agent results                         | Agent result collection strategies - `Read(".claude/skill-library/prompting/persisting-agent-outputs/SKILL.md")`             |
+
+## Related Skills
+
+- `iterating-to-completion` (CORE) - Loop until all agents complete successfully
+- `debugging-systematically` (CORE) - Systematic root cause analysis before dispatching
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` - Feature workflow that may invoke this pattern
+- `orchestrating-capability-development` (LIBRARY) - `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")` - Capability workflow that may invoke this pattern
+- `orchestrating-multi-agent-workflows` (LIBRARY) - Comprehensive agent orchestration patterns - `Read(".claude/skill-library/prompting/orchestrating-multi-agent-workflows/SKILL.md")`
+- `persisting-agent-outputs` (LIBRARY) - Agent output collection strategies - `Read(".claude/skill-library/prompting/persisting-agent-outputs/SKILL.md")`
+- `developing-with-subagents` (CORE) - General subagent development patterns

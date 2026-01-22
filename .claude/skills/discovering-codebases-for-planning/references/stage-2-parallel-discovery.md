@@ -13,16 +13,19 @@
 **ALWAYS spawn ALL agents in a SINGLE message with multiple Task tool uses.**
 
 **Correct approach (parallel)**:
+
 - Single message containing N Task tool invocations
 - All agents start simultaneously
 - Results return when all agents complete
 
 **Incorrect approach (sequential)**:
+
 - Send message with Task tool → wait for result → send next Task tool
 - Agents run one at a time
 - Takes N times longer
 
 **Why parallelization matters**:
+
 - 3 agents sequential: 30 minutes total (10 min each)
 - 3 agents parallel: 10 minutes total (all run simultaneously)
 - 10 agents parallel: Still ~15 minutes (most complete around same time)
@@ -38,6 +41,7 @@ cat $OUTPUT_DIR/discovery/scoping-report.json
 ```
 
 Extract:
+
 - `relevant_components` array (list of paths to analyze)
 - `feature_context` (summary to include in prompts)
 - `agent_count` (number of agents to spawn)
@@ -53,11 +57,13 @@ Extract:
 Do NOT use 'quick' or 'medium' modes for this workflow.
 
 **Why**: Discovery is a one-time cost. Missing reusable code leads to:
+
 - Duplicated effort in implementation
 - Inconsistent patterns across codebase
 - Technical debt from not following conventions
 
 **Cost-benefit**:
+
 - Very thorough: +5 minutes discovery time
 - Missed patterns: +2 hours implementation time + ongoing maintenance burden
 
@@ -66,6 +72,7 @@ Do NOT use 'quick' or 'medium' modes for this workflow.
 **Recommend**: Use default model (sonnet) for most agents
 
 **Upgrade to opus**: Only if component is:
+
 - Large (>100 files)
 - Critical infrastructure (authentication, authorization)
 - Highly complex patterns (state management, async flows)
@@ -138,17 +145,20 @@ MANDATORY SKILLS: persisting-agent-outputs (for output location)
 **Mapping strategy**:
 
 If `agent_count == relevant_components.length`:
+
 - 1:1 mapping (ideal case)
 - Agent 1 → Component 1
 - Agent 2 → Component 2
 - etc.
 
 If `agent_count < relevant_components.length` (max 10 agents, >10 components):
+
 - Assign largest N-1 components to dedicated agents
 - Group remaining small components into 1 agent
 - Example: 12 components → 9 dedicated agents + 1 agent analyzing 3 small components
 
 If `agent_count == 1` (single component):
+
 - One agent analyzes that component
 - Still use structured prompt for consistency
 
@@ -183,6 +193,7 @@ spawn_all_agents_parallel(agents_to_spawn)
 Each agent produces: `discovery-{component-name}.md`
 
 **Output location**:
+
 ```
 $OUTPUT_DIR/discovery/discovery-{component-name}.md
 ```
@@ -193,29 +204,35 @@ $OUTPUT_DIR/discovery/discovery-{component-name}.md
 # Discovery: {Component Name}
 
 ## Component Overview
+
 - Path: {path}
 - Files analyzed: {count}
 - Primary purpose: {description}
 
 ## 1. Existing Code to Extend
+
 | Name | Location | Current Purpose | Extension Point |
-|------|----------|----------------|-----------------|
-| ... | ... | ... | ... |
+| ---- | -------- | --------------- | --------------- |
+| ...  | ...      | ...             | ...             |
 
 ## 2. Utilities to Reuse
+
 | Name | Location | Signature | Use Case |
-|------|----------|-----------|----------|
-| ... | ... | ... | ... |
+| ---- | -------- | --------- | -------- |
+| ...  | ...      | ...       | ...      |
 
 ## 3. Patterns to Follow
+
 | Pattern | Description | Example Location |
-|---------|-------------|-----------------|
-| ... | ... | ... |
+| ------- | ----------- | ---------------- |
+| ...     | ...         | ...              |
 
 ## 4. File Placement Guidance
+
 {prose describing where new code should go}
 
 ## 5. Anti-Patterns to Avoid
+
 - {specific anti-pattern with rationale}
 ```
 
@@ -228,6 +245,7 @@ $OUTPUT_DIR/discovery/discovery-{component-name}.md
 **Scenario**: Agent exceeds 30-minute timeout (rare for very thorough mode, but possible for massive components)
 
 **Response**:
+
 1. Check agent output file - may be partially complete
 2. Mark component as "incomplete" in synthesis phase
 3. Document gap in discovery.md: "X component not fully analyzed due to size"
@@ -238,6 +256,7 @@ $OUTPUT_DIR/discovery/discovery-{component-name}.md
 **Scenario**: Agent finds no reusable code (genuine greenfield component)
 
 **Response**:
+
 1. Verify agent actually analyzed the component (check output file exists)
 2. Document "greenfield justification" in synthesis: "X is new feature area, no existing patterns"
 3. Proceed normally - this is valid outcome
@@ -247,6 +266,7 @@ $OUTPUT_DIR/discovery/discovery-{component-name}.md
 **Scenario**: Agent writes prose instead of tables
 
 **Response**:
+
 1. Re-prompt agent: "Please reformat findings as tables per references/agent-output-format.md"
 2. If still fails, extract data manually and restructure in synthesis phase
 3. Note in changelog that agent output needed manual reformatting
@@ -270,12 +290,12 @@ $OUTPUT_DIR/discovery/discovery-{component-name}.md
 
 ## Performance Expectations
 
-| Agent Count | Typical Duration | Factors                              |
-| ----------- | ---------------- | ------------------------------------ |
-| 1 agent     | 8-12 minutes     | Component size, thoroughness mode    |
+| Agent Count | Typical Duration | Factors                                                   |
+| ----------- | ---------------- | --------------------------------------------------------- |
+| 1 agent     | 8-12 minutes     | Component size, thoroughness mode                         |
 | 2-3 agents  | 10-15 minutes    | Parallel execution, largest component determines duration |
-| 4-6 agents  | 12-18 minutes    | Good parallelization, slight coordination overhead |
-| 7-10 agents | 15-20 minutes    | Max parallelization, coordination overhead increases |
+| 4-6 agents  | 12-18 minutes    | Good parallelization, slight coordination overhead        |
+| 7-10 agents | 15-20 minutes    | Max parallelization, coordination overhead increases      |
 
 **Note**: All agents run simultaneously, so total time ≈ slowest agent's time + coordination overhead.
 

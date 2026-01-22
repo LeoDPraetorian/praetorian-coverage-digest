@@ -8,13 +8,13 @@ Synchronized**: 2026-01-10 **Status**: Ready for Implementation
 
 ## Document Metadata
 
-| Property           | Value                                        |
-| ------------------ | -------------------------------------------- |
-| **Document ID**    | 04-PHASE-DETAILS                             |
-| **Token Count**    | ~3,400 tokens                                |
-| **Read Time**      | 20-30 minutes                                |
-| **Prerequisites**  | 01-03 (Overview, Scope, Methodology)         |
-| **Next Documents** | 05-STATE-OUTPUT                              |
+| Property           | Value                                |
+| ------------------ | ------------------------------------ |
+| **Document ID**    | 04-PHASE-DETAILS                     |
+| **Token Count**    | ~3,400 tokens                        |
+| **Read Time**      | 20-30 minutes                        |
+| **Prerequisites**  | 01-03 (Overview, Scope, Methodology) |
+| **Next Documents** | 05-STATE-OUTPUT                      |
 
 ---
 
@@ -127,13 +127,13 @@ focuses on protecting what matters most (risk management)
 
 **How This Drives Subsequent Phases**:
 
-| Phase                           | Uses Business Context For                                                                                                          | Example                                                                                                                         |
-| ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| **Phase 2** (Codebase Sizing)   | **Prioritize**: Components handling crown jewels sized first<br>**Strategy**: Business criticality guides parallelization          | If crown jewels = "payment_card_data", ensure payment components get dedicated agent                                            |
-| **Phase 3** (Codebase Mapping)  | **Focus**: Prioritize components handling crown jewels<br>**Scope**: Map entry points by business criticality                      | If crown jewels = "payment_card_data", focus on payment processor components, not marketing email handlers                      |
-| **Phase 4** (Security Controls) | **Evaluate**: Check for compliance-required controls<br>**Validate**: Encryption for sensitive data types                          | If compliance = PCI-DSS Level 1, validate Requirement 3 (protect stored card data), Requirement 4 (encrypt transmission)        |
-| **Phase 5** (Threat Modeling)   | **Apply**: Relevant threat actor profiles<br>**Score**: Use CVSS 4.0 Environmental scores<br>**Prioritize**: Threats to crown jewels | If threat actors = ransomware groups, focus on ransomware tactics. CVSS Environmental score incorporates Phase 1 context       |
-| **Phase 6** (Test Planning)     | **Prioritize**: Tests by CVSS Environmental score<br>**Include**: Compliance validation tests<br>**Focus**: Crown jewel protection | Tests for payment data protection = Critical priority (CVSS 9.0+). Tests for marketing features = Lower priority               |
+| Phase                           | Uses Business Context For                                                                                                            | Example                                                                                                                  |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Phase 2** (Codebase Sizing)   | **Prioritize**: Components handling crown jewels sized first<br>**Strategy**: Business criticality guides parallelization            | If crown jewels = "payment_card_data", ensure payment components get dedicated agent                                     |
+| **Phase 3** (Codebase Mapping)  | **Focus**: Prioritize components handling crown jewels<br>**Scope**: Map entry points by business criticality                        | If crown jewels = "payment_card_data", focus on payment processor components, not marketing email handlers               |
+| **Phase 4** (Security Controls) | **Evaluate**: Check for compliance-required controls<br>**Validate**: Encryption for sensitive data types                            | If compliance = PCI-DSS Level 1, validate Requirement 3 (protect stored card data), Requirement 4 (encrypt transmission) |
+| **Phase 5** (Threat Modeling)   | **Apply**: Relevant threat actor profiles<br>**Score**: Use CVSS 4.0 Environmental scores<br>**Prioritize**: Threats to crown jewels | If threat actors = ransomware groups, focus on ransomware tactics. CVSS Environmental score incorporates Phase 1 context |
+| **Phase 6** (Test Planning)     | **Prioritize**: Tests by CVSS Environmental score<br>**Include**: Compliance validation tests<br>**Focus**: Crown jewel protection   | Tests for payment data protection = Critical priority (CVSS 9.0+). Tests for marketing features = Lower priority         |
 
 **Checkpoint Template**:
 
@@ -187,6 +187,7 @@ before Phase 2.
 **Why This Phase Exists**:
 
 Phase 2 determines HOW MANY agents to spawn for Phase 3 based on:
+
 - Total file count and component distribution
 - Security-relevant file concentration
 - Component boundaries for parallelization
@@ -203,11 +204,11 @@ Phase 2 determines HOW MANY agents to spawn for Phase 3 based on:
 
 **Strategy Matrix**:
 
-| Total Files   | Tier   | Parallelization      | Analysis Depth |
-|---------------|--------|----------------------|----------------|
-| < 1,000       | small  | Single agent         | Full           |
-| 1,000-10,000  | medium | Per-component agents | Full           |
-| > 10,000      | large  | Per-component agents | Sampling       |
+| Total Files  | Tier   | Parallelization      | Analysis Depth |
+| ------------ | ------ | -------------------- | -------------- |
+| < 1,000      | small  | Single agent         | Full           |
+| 1,000-10,000 | medium | Per-component agents | Full           |
+| > 10,000     | large  | Per-component agents | Sampling       |
 
 **Workflow**:
 
@@ -344,18 +345,21 @@ Task("security-controls-mapper", "Investigate XSS concern")
 Phase 4 uses a two-tier output structure to enable parallel execution:
 
 **Tier 1: Investigation Files** (per-concern):
+
 ```
 phase-4/investigations/{severity}/{concern-id}-{name}.json
 # Example: phase-4/investigations/CRITICAL/c7f2a-auth-bypass-in-login.json
 ```
 
 Each agent produces ONE investigation file with:
+
 - `concern_id` - Links to Phase 1 concern
 - `controls_found` - Array of controls relevant to this concern
 - `control_categories` - Which of the 12 categories this concern touches
 - `gaps_identified` - Control weaknesses for this specific concern
 
 **Tier 2: Category Files** (consolidated by orchestrator):
+
 ```
 phase-4/authentication.json
 phase-4/authorization.json
@@ -364,6 +368,7 @@ phase-4/authorization.json
 
 The **orchestrator** (not individual agents) consolidates Tier 1 investigations
 into Tier 2 category files. This enables:
+
 1. Parallel agent execution (one per concern)
 2. Deduplication across investigations
 3. Standardized Phase 5 inputs
@@ -395,14 +400,17 @@ Batch 4: LOW/INFO concerns (optional, user can skip)
 ## Phase 4 Batch Complete: {severity} Concerns
 
 ### Investigated Concerns:
+
 - {concern_1}: {finding_summary}
 - {concern_2}: {finding_summary}
 
 ### Control Gaps Found:
+
 - {gap_1}: {severity} - {compliance_impact}
 - {gap_2}: {severity} - {compliance_impact}
 
 ### Questions:
+
 - Are these findings accurate?
 - Any additional concerns at this severity level?
 
@@ -410,6 +418,7 @@ Batch 4: LOW/INFO concerns (optional, user can skip)
 ```
 
 **User Options at Each Batch Checkpoint**:
+
 - **Yes**: Proceed to next severity batch
 - **No/Revise**: Provide feedback for re-investigation
 - **Skip remaining**: Jump directly to consolidation (for time constraints)

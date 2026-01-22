@@ -1,4 +1,4 @@
-## 10  WINDOWS AUTHENTICATION
+## 10 WINDOWS AUTHENTICATION
 
 ![Figure](figures/WindowsSecurityInternals_page_329_figure_001.png)
 
@@ -28,7 +28,7 @@ Figure 10-1: A local domain on a stand-alone computer
 
 The users and groups on the computer can access only local resources. A local domain has a local policy that defines the application and security configuration on the computer. The domain is assigned the same name
 
-300    Chapter 10
+300 Chapter 10
 
 ---
 
@@ -44,7 +44,7 @@ Figure 10-2: A single enterprise network domain
 
 Instead of requiring each individual workstation or server to maintain its own users and groups, an enterprise network domain maintains these centrally on a domain controller. It stores the user configuration in a database on the domain controller called, Active Directory. When a user wants to authenticate to the domain, the computer passes the authentication request to the domain controller, which knows how to use the user configuration to verify the request. We'll cover exactly how domain authentication requests are handled in Chapters 12 and 14, when we discuss interactive authentication and Kerberos.
 
-Windows Authentication  301
+Windows Authentication 301
 
 ---
 
@@ -74,7 +74,7 @@ Note that there's no explicit trust relationship between the engineering , miner
 
 The forest also contains a shared global catalog . This catalog is a subset of the information stored in all the Active Directory databases in the forest.
 
-Windows Authentication  303
+Windows Authentication 303
 
 ---
 
@@ -92,7 +92,7 @@ NOTE Managing trust relationships can be complex, especially as the numbers of d
 
 The next few chapters will focus on the configuration of a local domain and a simple forest. If you want to know about more complex domain relationships, the Microsoft technical documentation is a good resource. For now, let's continue by detailing how a local domain stores authentication configurations.
 
-304    Chapter 10
+304 Chapter 10
 
 ---
 
@@ -126,7 +126,7 @@ DefaultAccount  False    S-1-5-21-2318445812-3516008893-216915059-503
 Guest          False    S-1-5-21-2318445812-3516008893-216915059-500
 ```
 
-Windows Authentication  305
+Windows Authentication 305
 
 ---
 
@@ -185,7 +185,7 @@ Now that we've created the user, we can query the SID that the LSA assigned to t
 
 When you read a secure string, you're creating an instance of the .NET System .Security.SecureString class rather than a normal string. A secure string uses encryption to work around a potential security issue with .NET when handling sensitive information such as passwords. When a developer calls a Win32 API that needs a password, the memory containing the password can be allocated once, and when it's no longer needed, it can be zeroed to prevent it from being read by another process or written inadvertently to storage. But in the .NET runtime, the developer doesn't have direct control over memory allocations. The runtime can move object memory allocations around and will free up memory only when the garbage collector executes and finds the memory unreferenced. The runtime provides no guarantees that memory buffer will be zeroed when it gets moved or freed therefore, if you stored the password in a normal string, there would be no way to ensure it wasn't left in memory, where someone could read it. The SecureString class encrypts the string in memory and decrypts it only when it needs to be passed to native code. The decrypted contents are stored in a native memory allocation, which allows the caller to be sure that the value hasn't been copied and can be zeroed before being freed.
 
-Windows Authentication  307
+Windows Authentication 307
 
 ---
 
@@ -231,7 +231,7 @@ Listing 10-5: Displaying local group members for the Awesome Users group
 
 Listing 10-5 shows three columns for each member of the Awesome Users group. The ObjectClass column represents the type of entry (in this case, either User or Group). If a group has been added as an entry, all members of that group will also be members of the enclosing group. Therefore, this output indicates that all members of the INTERACTIVE group are also members of the Awesome Users group.
 
-308    Chapter 10
+308 Chapter 10
 
 ---
 
@@ -313,7 +313,7 @@ SeDemyRemoteInteractiveLogonRight
 
 Listing 10-8: Displaying the logon account rights for the local system
 
-310    Chapter 10
+310 Chapter 10
 
 ---
 
@@ -322,7 +322,6 @@ Reading the names in the first column, you might think they look like privileges
 Table 10-1: Account Logon Rights
 
 <table><tr><td>Allow right</td><td>Deny right</td><td>Description</td></tr><tr><td>SeInteractiveLogonRight</td><td>SeDenyInteractiveLogonRight</td><td>Authenticate for an interactive session.</td></tr><tr><td>SeNetworkLogonRight</td><td>SeDenyNetworkLogonRight</td><td>Authenticate from the network.</td></tr><tr><td>SeBatchLogonRight</td><td>SeDenyBatchLogonRight</td><td>Authenticate to the local system without an interactive console session.</td></tr><tr><td>SeServiceLogonRight</td><td>SeDenyServiceLogonRight</td><td>Authenticate for a service process.</td></tr><tr><td>SeRemoteInteractiveLogonRight</td><td>SeDenyRemoteInteractiveLogonRight</td><td>Authenticate to interact with a remote desktop.</td></tr></table>
-
 
 If a user or group is not assigned a logon right, they won't be granted permission to authenticate in that role. For example, if a user who is not granted SeInteractiveLogonRight attempts to authenticate to the physical console, they'll be denied access. However, if they are granted SeNetworkLogonRight, the user might still be able to connect to the Windows system over the network to access a file share and authenticate successfully. The deny rights are inspected before the allow rights, so you can allow a general group, such as Users, and then deny specific accounts.
 
@@ -357,7 +356,7 @@ The PowerShell commands interact with the local LSA, but the same network protoc
 
 Microsoft documents the service used to access the SAM in the MS-SAMR document, which is available online. Luckily, however, we don't need to reimplement this protocol ourselves. We can make a connection to the SAM
 
-312   Chapter 10
+312 Chapter 10
 
 ---
 
@@ -404,7 +403,7 @@ To connect to the SAM server, the security descriptor must grant the caller the 
 
 The default configuration allows only users who are members of the computer's local Administrator's group to access the SAM remotely. If the caller is not a local administrator, access will be denied, regardless of the security descriptor configuration on the SAM. Windows 10 introduced this additional restriction to make it harder for
 
-Windows Authentication  313
+Windows Authentication 313
 
 ---
 
@@ -443,7 +442,7 @@ ReadPasswordParameters Enables reading password parameters (such as the policy)
 
 WritePasswordParams Enables writing password parameters
 
-314    Chapter 10
+314 Chapter 10
 
 ---
 
@@ -451,17 +450,17 @@ ReadOtherParameters Enables reading general d
 
 WriteOtherParameters Enables writing general domain information
 
-CreateUser   Enables creating a new user
+CreateUser Enables creating a new user
 
-CreateGroup  Enables creating a new group
+CreateGroup Enables creating a new group
 
-CreateAlias  Enables creating a new alias
+CreateAlias Enables creating a new alias
 
-GetAliasMembership   Enables getting the membership of an alias
+GetAliasMembership Enables getting the membership of an alias
 
-ListAccounts  Enables enumerating users, groups, or aliases in the domain
+ListAccounts Enables enumerating users, groups, or aliases in the domain
 
-Lookup   Enables looking up names or IDs of users, groups, or aliases
+Lookup Enables looking up names or IDs of users, groups, or aliases
 
 AdministerServer Enables changing the domain configuration, such as for domain replication
 
@@ -502,14 +501,13 @@ PS> Format-NtSecurityDescriptor $user -Summary
 
 Listing 10-11: Enumerating users in the domain
 
-Windows Authentication   315
+Windows Authentication 315
 
 ---
 
 The list of usernames and SIDs returned here should match the output from Listing 10-1, where we used the Get-localUser command. To get more information about a user, you need to open the user object .
 
 One property you can query on the opened user is the list of User Account Control flags. These flags define various properties of the user.
-
 
 In this case, as we've opened the WDACUUtilityAccount user, we find that it has the AccountDisabled flag set ❸. This matches the output in Listing 10-1, which had the Enabled value set to False for this user account.
 
@@ -527,15 +525,15 @@ Read account: Enables reading the account configuration; for example, the user a
 
 WriteAccount Enables writing the account configuration; for example, the user account control flags
 
-ChangePassword   Enables changing the user's password
+ChangePassword Enables changing the user's password
 
 ForcePasswordChange Enable force-changing a user's password
 
-ListGroups   Enables listing the user's group memberships
+ListGroups Enables listing the user's group memberships
 
 ReadGroupInformation Currently unused
 
-WriteGroupInformation   Currently unused
+WriteGroupInformation Currently unused
 
 Perhaps the most interesting of these access rights are ChangePassword and ForcePasswordChange. The first allows the user's password to be changed using an API like SetChangePassword. For this to succeed, the caller must provide the old password along with the new password to set. If the old password doesn't match the one that's currently set, the server rejects the change request. You can see in Listing 10-11 that the Everyone group ❸ and the WDAGUtilityAccount user are granted the ChangePassword access right.
 
@@ -615,7 +613,7 @@ This concludes our discussion of the SAM remote service. Let's now take a quick 
 
 Microsoft documents the protocol used to access the LSA policy (and thus the SECURITY database) in MS-LSAD. We can make a connection to the LSA policy using the LsaOpenPolicy Win32 API, which returns a handle for
 
-318     Chapter 10
+318 Chapter 10
 
 ---
 
@@ -642,14 +640,13 @@ You can specify one or more of the following access rights for the open policy b
 
 <table><tr><td>ViewLocalInformation</td><td>Enables viewing policy information</td></tr><tr><td>ViewAuditInformation</td><td>Enables viewing audit information</td></tr><tr><td>GetPrivateInformation</td><td>Enables viewing private information</td></tr><tr><td>TrustAdmin</td><td>Enables managing the domain trust configuration</td></tr><tr><td>CreateAccount</td><td>Enables creating a new account object</td></tr><tr><td>CreateSecret</td><td>Enables creating a new secret object</td></tr><tr><td>CreatePrivilege</td><td>Enables creating a new privilege (unsupported)</td></tr><tr><td>SetDefaultQuotaLimits</td><td>Enables setting default quota limits (unsupported)</td></tr><tr><td>SetAuditRequirements</td><td>Enables setting the audit event configuration</td></tr><tr><td>AuditLogAdmin</td><td>Enables managing the audit log</td></tr><tr><td>ServerAdmin</td><td>Enables managing the server configuration</td></tr><tr><td>LookupNames</td><td>Enables looking up SIDs or names of accounts</td></tr><tr><td>Notification</td><td>Enables receiving notifications of policy changes</td></tr></table>
 
-
 With the policy object and the appropriate access rights, you can manage the server's configuration. You can also look up and open the three types of objects in the SECURITY database shown in Figure 10-6: accounts, secrets, and trusted domains. The following sections describe these objects.
 
 ## Account Objects
 
 An account object is not the same as the user objects we accessed via the SAM remote service. An account object doesn't need to be tied to a registered
 
-Windows Authentication  319
+Windows Authentication 319
 
 ---
 
@@ -686,11 +683,11 @@ You can then open an account object by its SID: for example, here we open the bu
 
 View Enables viewing information about the account object, such as privileges and logon rights
 
-AdjustPrivileges   Enables adjusting the assigned privileges
+AdjustPrivileges Enables adjusting the assigned privileges
 
-AdjustQuotas   Enables adjusting user quotas
+AdjustQuotas Enables adjusting user quotas
 
-AdjustSystemAccess   Enables adjusting the assigned logon rights
+AdjustSystemAccess Enables adjusting the assigned logon rights
 
 ---
 
@@ -735,7 +732,7 @@ PS> $policy = Get-IsaPolicy
      {1, 0, 0, 0,...} 3/12/2021 1:46:08 PM {1, 0, 0, 0,...} 11/18 11:42:47 PM
 ```
 
-Windows Authentication  321
+Windows Authentication 321
 
 ---
 
@@ -823,7 +820,7 @@ We start by opening the policy, then use the let-lsa5a secret command to open a 
 
 As the secret is securable, we can check its security descriptor ❸, which can assign the following access rights:
 
-SetValue   Enables setting the value of the secret
+SetValue Enables setting the value of the secret
 
 QueryValue Enables querying the value of the secret
 
@@ -848,10 +845,9 @@ Listing 10-18: Enumerating trust relationships for a domain controller
 
 To inspect and configure trust relationships, you should use Active Directory commands, not the domain policy remote service's commands.
 
-
 Therefore, I won't dwell on these objects any further; we'll come back to the subject of inspecting trust relationships in the next chapter.
 
-322    Chapter 10
+322 Chapter 10
 
 ---
 
@@ -862,7 +858,6 @@ While trusted domains are securable objects, the security descriptors are not co
 ## Name Lookup and Mapping
 
 If you're granted LookupName access, the domain policy remote service will let you translate SIDs to names, and vice versa. For example, as shown in
-
 
 Listing 10-19, you can specify one or more SIDs to receive the corresponding users and domains using the Get-IsaName PowerShell command. You can also specify a name and receive the SID using Get-IsaSid.
 
@@ -885,7 +880,7 @@ Before Windows 10, it was possible for an unauthenticated user to use the lookup
 It's also possible to add mappings from SIDs to names, even if they're not well-known SIDs or registered accounts in the SAM database. The Win32 API LsaManageSdNameMapping controls this. It's used by the SCM (discussed in Chapter 3) to set up service-specific SIDs to control resource access, and you can use it yourself, although you'll encounter the following restrictions:
 
 - • The caller needs SeTcbPrivilege enabled and must be on the same sys-
-tem as the LSA.
+  tem as the LSA.
 
 • The SID to map must be in the NT security authority.
 
@@ -894,10 +889,10 @@ values).
 
 • You must first register a domain SID before you can add a child SID in
 that domain.
+
 ---
 
 You can call the LsaManageSidNameMapping API to add or remove mappings using the Add-NTSidName and Remove-NTSidName PowerShell commands.
-
 
 Listing 10-20 shows how to add SID-to-name mappings to the LSA as an administrator.
 
@@ -934,14 +929,13 @@ You've seen how to access the SAM and SECURITY databases using the remote servic
 
 These registry keys aren't designed to be accessed directly, so the way in which they store the user and policy configurations could change at any time. Keep in mind that the description provided in this section might no longer be accurate at the time you're reading it. Also, because direct access is a common technique used by malicious software, it's very possible that script code in this section that you attempt to run may be blocked by any antivirus product running on your system.
 
-324    Chapter 10
+324 Chapter 10
 
 ---
 
 ## Accessing the SAM Database Through the Registry
 
 Let's start with the SAM database, found in the registry at REGISTRY\
-
 
 MACHINESAM. It's secured so that only the SYSTEM user can read and write to its registry keys. You could run PowerShell as the SYSTEM user with the Start- Win32ch3DProcess command and then access the registry that way, but there is a simpler approach.
 
@@ -980,7 +974,7 @@ s ❸
 credentials Binary {0, 0, 0, 0...}
 ```
 
-Windows Authentication  325
+Windows Authentication 325
 
 ---
 
@@ -1058,7 +1052,7 @@ The key is stored in four separate parts inside the LSA configuration key ❶ . 
 
 We must then permute the boot key's byte values using a fixed ordering to generate the final key ❸. We can run the Get-LSasSystemKey PowerShell command to display the bytes ❹. Note that the value of the key is system specific, so the output you see will almost certainly be different.
 
-Windows Authentication  327
+Windows Authentication 327
 
 ---
 
@@ -1181,7 +1175,7 @@ PS> function Unprotect-PasswordHash([byte[]]&Key, [byte[]]&Data,
     $enc_type = [BitConverter]::ToInt16($Data, 2)
 ```
 
-330    Chapter 10
+330 Chapter 10
 
 ---
 
@@ -1203,9 +1197,7 @@ The hash data stores the type of encryption; as with the PEK, the supported encr
 
 We call the algorithm-specific decryption function to decrypt the hash.
 
-
 Note that only the RC4 decryption function needs us to pass it the RID and
-
 
 type of hash; the AES128 decryption function doesn't require those two values.
 
@@ -1283,7 +1275,7 @@ $ba[0]
         $key2 = ConvertTo-DESK $ba[1], $ba[0], $ba[3], $ba[2], $ba[1], $ba[0],
 ```
 
-332     Chapter 10
+332 Chapter 10
 
 ---
 
@@ -1335,7 +1327,7 @@ PS> Unprotect-PasswordHashDES -Hash 5mt -Dec - RID 500 | Out-HexDump
 51a 1A 3b 26 2C B6 D9 32 0E 9E 8B 43 15 8D 85 22
 ```
 
-Windows Authentication  333
+Windows Authentication 333
 
 ---
 
@@ -1390,7 +1382,7 @@ Listing 10-35: Listing the contents of the SECURITY database registry key
 
 We'll discuss only a few of these registry keys. The Cache key ❶ contains a list of cached domain credentials that can be used to authenticate a user.
 
-334    Chapter 10
+334 Chapter 10
 
 ---
 
@@ -1431,7 +1423,7 @@ Listing 10-36 lists the subkeys of the Secrets key ❶ . The name of each subkey
 
 When we inspect the values of that key ❷ , we find its current and old values and timestamps, as well as the security descriptor for the secret object. The secret's contents are stored as the default value in the key, so we
 
-Windows Authentication  335
+Windows Authentication 335
 
 ---
 
@@ -1477,7 +1469,7 @@ PS> function Get-SidNames {
 
 Listing 10-37: A simple RID cycling implementation
 
-336    Chapter 10
+336 Chapter 10
 
 ---
 
@@ -1514,7 +1506,7 @@ We first define a helper function that opens a user object on a specified server
 
 We then define a function that sets the password. We'll read the password from the console, as it needs to be in the secure string format. The Expired parameter marks the password as needing to be changed the next
 
-Windows Authentication  337
+Windows Authentication 337
 
 ---
 
@@ -1621,4 +1613,3 @@ We finished the chapter with a deep dive into how the authentication configurati
 In the next chapter, we'll take a similar look at how the authentication configuration is stored in an Active Directory configuration, which is sig- nificantly more complex than the local configuration case.
 
 ---
-

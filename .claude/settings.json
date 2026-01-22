@@ -20,7 +20,17 @@
       "Bash(node :*)",
       "Bash(which :*)",
       "Bash(pwd)",
-      "Bash(ls :*)"
+      "Bash(ls :*)",
+      "Bash(npx tsc :*)",
+      "Bash(npx eslint :*)",
+      "Bash(go vet :*)",
+      "Bash(go test :*)",
+      "Bash(go build :*)",
+      "Bash(golangci-lint :*)",
+      "Bash(velociraptor :*)",
+      "Bash(nuclei -validate :*)",
+      "Bash(grep :*)",
+      "Bash(wc :*)"
     ],
     "deny": [
       "Bash(rm -rf /)",
@@ -40,12 +50,114 @@
         "hooks": [
           {
             "type": "command",
-            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/orchestrator-enforcement.sh"
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-reminder.sh"
           }
         ]
       }
     ],
-    "PreToolUse": [],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/agent-first-enforcement.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/compaction-gate-enforcement.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/track-modifications.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "Task",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/capture-agent-result.sh",
+            "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/task-skill-enforcement.sh",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/iteration-limit-stop.sh",
+            "timeout": 5
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/feedback-loop-stop.sh",
+            "timeout": 15
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/quality-gate-stop.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/escalation-advisor.sh",
+            "timeout": 90
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "prompt",
+            "prompt": "You are verifying a subagent completed its assigned task. This is a lightweight check - the main Stop hook handles the full review/test cycle.\n\n## Verify Task Completion\n\nCheck if the subagent accomplished what it was asked to do:\n- Did it make the requested changes?\n- Did it encounter errors that prevent completion?\n- Is the work in a returnable state?\n\n## Decision\n\nIf subagent completed its assigned task (even partially) → return {\"ok\": true}\nLet the main agent's Stop hook enforce review/test requirements.\n\nOnly block if the subagent clearly failed or left work in broken state:\n{\"ok\": false, \"reason\": \"Subagent task incomplete: [specific issue]. Fix before returning.\"}\n\nRespond with ONLY the JSON object.",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
     "SessionStart": [
       {
         "matcher": "startup|resume|clear|compact",
@@ -53,6 +165,18 @@
           {
             "type": "command",
             "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/session-start.sh"
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/precompact-context.sh",
+            "timeout": 10
           }
         ]
       }

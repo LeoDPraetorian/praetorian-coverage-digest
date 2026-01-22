@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/perplexity",
+  "version": "1.0.0",
+  "description": "AI-powered web search, research, and conversational reasoning",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

@@ -18,9 +18,7 @@ When a caller attempts to open a resource, the kernel performs an access check b
 
 The SeAccessCheck API implements the access check process in kernel mode.
 
-
 It accepts the following parameters:
-
 
 1
 
@@ -40,7 +38,7 @@ Granted access An access mask for the access the user was granted
 
 Access status code An NT status code indicating the result of the access check
 
-Privileges   Any privileges used during the access check
+Privileges Any privileges used during the access check
 
 Success code A Boolean value; if TRUE, the access check succeeded
 
@@ -48,9 +46,9 @@ If the access check succeeds, the API will set the granted access to the desired
 
 You might wonder why the API bothers returning the granted access value if all bits in the desired access must be granted for this value to indicate a success. The reason is that this behavior supports the MaxunmAllowed access mask bit, which the caller can set in the desired access parameter. If the bit is set and the access check grants at least one access, the API returns STATUS_SUCCESS, setting the granted access to the maximum allowed access.
 
-The security subject context parameter is a pointer to a SECURITY _SUBJECT_CONTEXT structure containing the caller's primary token and any impersonation token of the caller's thread. Typically, kernel code will use the kernel API SecCaptureSubjectContext to initialize the structure and gather the correct tokens for the current caller. If the impersonation token is captured, it must be at Impersonation level or above; otherwise, the API will fail and the access status code will be set to STATUS_BAD_IMPERSONATION_LEVEL .
+The security subject context parameter is a pointer to a SECURITY \_SUBJECT_CONTEXT structure containing the caller's primary token and any impersonation token of the caller's thread. Typically, kernel code will use the kernel API SecCaptureSubjectContext to initialize the structure and gather the correct tokens for the current caller. If the impersonation token is captured, it must be at Impersonation level or above; otherwise, the API will fail and the access status code will be set to STATUS_BAD_IMPERSONATION_LEVEL .
 
-222    Chapter 7
+222 Chapter 7
 
 ---
 
@@ -59,7 +57,6 @@ Note that the call to SeAccessCheck might not occur in the thread that made the 
 ## The Access Mode
 
 The access-mode parameter has two possible values, UserMode and KernelMode.
-
 
 If you pass UserRole to this parameter, all access checks will continue as normal. However, if you pass KernelMode, the kernel will disable all access checks. Why would you want to call SeAccessCheck without enforcing any security? Well, usually, you won't directly call the API with the KernelMode value. Instead, the parameter will be set to the value of the calling thread's
 
@@ -89,9 +86,7 @@ In Figure 7 - 2 , the user-mode application calls a hypothetical kernel system c
 
 This behavior could introduce a security issue if the hypothetical
 
-
 NtSomeOtherCall allowed the user-mode application to influence where the
-
 
 Mutant object was created. Once the access check is disabled, it might be possible to create or modify the #mutant in a location that the user would not normally be allowed to access.
 
@@ -105,7 +100,7 @@ How a caller can indicate these different uses of the access-mode parameter depe
 
 If you're analyzing a kernel driver, it's worth paying attention to the use of Zw APIs in which the ForceAccess check flag is not set. If a non-administrator user can control the target object manager path for the call, then there's
 
-224    Chapter 7
+224 Chapter 7
 
 ---
 
@@ -125,11 +120,11 @@ Generic mapping The type-specific generic mapping
 
 The API returns four values:
 
-Granted access   An access mask for the access the user was granted
+Granted access An access mask for the access the user was granted
 
 Access status code An NT status code indicating the result of the access check
 
-Privileges   Any privileges used during the access check
+Privileges Any privileges used during the access check
 
 NT success code A separate NT status code indicating the status of the system call
 
@@ -197,15 +192,15 @@ The first step is to combine the token, the security descriptor, and the desired
 
 Mandatory access check Denies access to resources when the token does not meet a set policy
 
-Token access check  Grants access based on the token's owner and privileges
+Token access check Grants access based on the token's owner and privileges
 
-Discretionary access check  Grants or denies access based on the DACL.
+Discretionary access check Grants or denies access based on the DACL.
 
 To explore these steps in more detail, let's write a basic implementation of the access check process in PowerShell. This PowerShell implementation won't replace the Get-htGrantedAccess command, as, for simplicity, it won't check for maximum allowed access and might not include newer features. Even so, having an implementation that you can analyze and debug can help you gain a greater understanding of the overall process.
 
 The implementation of the access check is quite complex; therefore, we'll build it in stages. You can access the full implementation in the chapter7
 
-_access_check_impl.psml script included with the book's example code. To use the script, import it as a module with this command:
+\_access_check_impl.psml script included with the book's example code. To use the script, import it as a module with this command:
 
 ```bash
 _________________________________________________________________
@@ -315,7 +310,7 @@ function Test-MandatoryAccess {
 
 Listing 7-4: Implementing the Test-MandatoryAccess function
 
-230    Chapter 7
+230 Chapter 7
 
 ---
 
@@ -391,7 +386,7 @@ PS> Get-NtGrantedAccess $sd -AsString
 PS> $anon trust_sid = Get-NtTokenSid -Token $token -TrustLevel
 ```
 
-232     Chapter 7
+232 Chapter 7
 
 ---
 
@@ -526,7 +521,7 @@ If the token has the SebelabelPrivilege privilege, we add the writeOwner access 
 
 We then query the token's integrity level SID and compare it to the security descriptor's 9 . If the token's SID dominates, then the check passes
 
-236    Chapter 7
+236 Chapter 7
 
 ---
 
@@ -697,7 +692,7 @@ In Listing 7-16, we verify this behavior in the real access check process.
   ♦ ReadControl, WriteDoc
 ```
 
-240    Chapter 7
+240 Chapter 7
 
 ---
 
@@ -1881,16 +1876,16 @@ Keep in mind that the restricted SID check applies to both Allowed and Denied AC
 The access check process for a lowbox token resembles that for a restricted token. A lowbox token can contain a list of capability SIDs used to perform a second check, like the check we performed with the list of restricted SIDs. Likewise, if the access check process doesn't grant access through both normal and capability checks, the access check fails. However, the lowbox token's access check contains some subtle differences:
 
 - • It will consider the token's package SID in addition to its list of capabil-
-ity SIDs.
-• The checked capability SIDs must have the enabled attribute flag set to
-be considered active.
-• The check applies only to Allowed ACE types, not to Denied ACE types.
-• NULL DACLs do not grant full access.
-In addition, two special package SIDs will match any token's package SID for the purposes of the package SID check:
+  ity SIDs.
+  • The checked capability SIDs must have the enabled attribute flag set to
+  be considered active.
+  • The check applies only to Allowed ACE types, not to Denied ACE types.
+  • NULL DACLs do not grant full access.
+  In addition, two special package SIDs will match any token's package SID for the purposes of the package SID check:
 
 - • ALL APPLICATION PACKAGES (s-1-15-2-1)
-• ALL RESTRICTED APPLICATION PACKAGES (s-1-15-2-2)
-Checking for the ALL APPLICATION PACKAGES SID during the package SID check can be disabled if the token used for the access check has the WINNT_NOALLAPPPKG security attribute set to a single value of 1. In this case, the package SID check will only consider the ALL RESTRICTED APPLICATION PACKAGES SID. If the security attribute isn't present or is set to 0, the access check considers both special package SIDs. Microsoft refers to processes with this security attribute as running a Less Privileged AppContainer (LPAC).
+  • ALL RESTRICTED APPLICATION PACKAGES (s-1-15-2-2)
+  Checking for the ALL APPLICATION PACKAGES SID during the package SID check can be disabled if the token used for the access check has the WINNT_NOALLAPPPKG security attribute set to a single value of 1. In this case, the package SID check will only consider the ALL RESTRICTED APPLICATION PACKAGES SID. If the security attribute isn't present or is set to 0, the access check considers both special package SIDs. Microsoft refers to processes with this security attribute as running a Less Privileged AppContainer (LPAC).
 
 Because setting a token's security attribute requires the SetchPrivilege privilege, the process creation APIs have an option for adding the WIN// NOALLAPPPPG security attribute to a new process's token. Listing 7-22 shows a basic implementation of the lowbox access check for Allowed ACE types. You should add this code to the discretionary access check in Listing 7-17, in the locations indicated in the comments.
 
@@ -2050,7 +2045,7 @@ The other parameter, ObjectTypes, is much trickier to implement. It provides a l
 
 Each GUID also has an associated level, turning the list into a hierarchical tree. Each node maintains its own remaining access, which it initializes to the main RemainingAccess value. Active Directory uses this hierarchy to implement a concept of properties and property sets, as shown in Figure 7-4.
 
-250    Chapter 7
+250 Chapter 7
 
 ---
 
@@ -2059,7 +2054,6 @@ Each GUID also has an associated level, turning the list into a hierarchical tre
 Figure 7-4: Active Directory-style properties
 
 Each node in Figure 7-4 shows the name we've given it, a portion of the ObjectType GUID, and the current RemainingAccess value (in this case,
-
 
 GenericAll). Level 0 corresponds to the top-level object, of which there can be only one in the list. At level 1 are the property sets, here numbered 1 and 2. Below each property set, at level 2, are the individual properties.
 
@@ -2098,7 +2092,6 @@ We start with the SID check ❶ . If the SIDs don't match, we don't process the 
 If all checks pass, we consider the ACE for the access check. First we revoke the access from the entry in the tree of objects . This removes the access not only from the ObjectType entry we found but also from any children of that entry. We also revoke the access we're maintaining for this function.
 
 Let's apply this behavior to the tree shown in Figure 7-4. If the
-
 
 AllowObject ACE grants GenericAll access to property set 1, the new tree will look like the one in Figure 7-5.
 
@@ -2227,7 +2220,7 @@ You might wonder how using a central access policy differs from simply configuri
 
 A second difference is that the central access policy works more like a mandatory access control mechanism. For example, a user might typically be able to modify the security descriptor for the file; however, the central access policy could restrict their access or block it outright if, for example, the user moved to a new country or used a different computer not accounted for in the rules.
 
-256    Chapter 7
+256 Chapter 7
 
 ---
 
@@ -2243,8 +2236,8 @@ There can be more than one configured policy, each containing the following info
 In turn, each policy rule contains the following information:
 
 - • The name and description of the rule
-• A conditional expression that determines when the rule should be
-enforced
+  • A conditional expression that determines when the rule should be
+  enforced
 
 • The security descriptor to use in the central access policy access check
 • An optional staging security descriptor used to test new policy rules
@@ -2330,7 +2323,7 @@ Listing 7-31 begins immediately after the discretionary access check. If this ch
 
 Within the central access policy check, we first set the effective access to the original DesiredAccess ❸ . We'll use the effective access to determine how much of the DesiredAccess we can grant after processing all the policy rules. Next, we check the AppliesTo conditional expression for each rule. If there is no value, the rule applies to all resources and tokens. If there is a conditional expression, we must check it using Test-NotAnAction , passing any resource attributes from the security descriptor ❸ . If the test doesn't pass, the check should skip to the next rule.
 
-We build a new security descriptor using the owner, group, and SACL from the original security descriptor but the DACL from the rule's security descriptor ❸ . If the rule applies, we do another discretionary access check for the DesiredAccess ❹ . After this check, we remove any bits that we weren't granted from the effective _ access variable ❸ .
+We build a new security descriptor using the owner, group, and SACL from the original security descriptor but the DACL from the rule's security descriptor ❸ . If the rule applies, we do another discretionary access check for the DesiredAccess ❹ . After this check, we remove any bits that we weren't granted from the effective \_ access variable ❸ .
 
 Once we've checked all the applicable rules, we test whether the effective access is empty. If it is, the central access policy has not granted the token any access, so we return STATUS_ACCESS_DENIED ❸. Otherwise, we return success, but we return only the remaining effective access that grants less access than the result of the first access check ❹.
 
@@ -2467,7 +2460,7 @@ PS> function Get-NameAndGrantedAccess {
               $props = @{
 ```
 
-262    Chapter 7
+262 Chapter 7
 
 ---
 
@@ -2504,13 +2497,11 @@ Next, we covered how the two types of sandboxing tokens (restricted and lowbox) 
 
 ---
 
-
-
 ---
 
 8
 
-## OTHER ACCESS CHECKING  USE CASES
+## OTHER ACCESS CHECKING USE CASES
 
 ![Figure](figures/WindowsSecurityInternals_page_295_figure_002.png)
 
@@ -2540,7 +2531,7 @@ Even if the caller would pass the access checks for XYZ and OBf , because QRS no
 
 The traversal check prevents a user from accessing their resources if any parent container denies Traverse access. This is unexpected behavior— why shouldn't a user be able to access their own resources? It also introduces a performance concern. If a user must have access to every parent container to access their files, then the kernel must expend time and effort performing an access check for each container, when all that matters security-wise is whether the user has access to the resource they want to open.
 
-266    Chapter 8
+266 Chapter 8
 
 ---
 
@@ -2577,7 +2568,7 @@ We now disable the privilege and try again to open the Mutant object ❸ . This 
 
 The kernel contains an additional performance improvement for traversal checks. If the SearchNetPrivilegesPrivilege is disabled, the kernel will
 
-Other Access Checking Use Cases    267
+Other Access Checking Use Cases 267
 
 ---
 
@@ -2623,7 +2614,7 @@ PS> $token.Flags
 VirtualizeAllowed, IsFiltered, NotLow
 ```
 
-268    Chapter 8
+268 Chapter 8
 
 ---
 
@@ -2650,7 +2641,7 @@ When you duplicate a handle, you must specify both the source and destination pr
 
 Listing 8-4 demonstrates this handle duplication access check behavior.
 
-Other Access Checking Use Cases     269
+Other Access Checking Use Cases 269
 
 ---
 
@@ -2690,7 +2681,7 @@ PS> Use-NtObject($m2 = Copy-NtObject -Object $m -NoRightsUpgrade) {
    Use-NtObject($m3 = Copy-NtObject -Object $m2 -DesiredAccess GenericAll) {}
 ```
 
-270    Chapter 8
+270 Chapter 8
 
 ---
 
@@ -2756,7 +2747,7 @@ Status             Granted Access Privileges
 STATUS SUCCESS           GenericRead    NONE
 ```
 
-272    Chapter 8
+272 Chapter 8
 
 ---
 
@@ -2839,7 +2830,7 @@ These sandbox checks are an important feature for limiting information disclosur
 
 We've now covered three uses of the access check for purposes not related to opening a resource. We'll finish this chapter by describing some commands that simplify access checking over a range of individual resources.
 
-274    Chapter B
+274 Chapter B
 
 ---
 
@@ -2861,7 +2852,7 @@ Get-AccessibleWindowStation
 Get-AccessibleMnf
 ```
 
-Listing 8-10: Listing the Get-Accessible* commands
+Listing 8-10: Listing the Get-Accessible\* commands
 
 We'll come back to some of these commands in later chapters. Here, we'll focus on the Get-AccessibleObject command, which we can use to automate access checking over the entire OMNS. The command lets you specify an OMNS path to check, then enumerates the OMNS and reports either the maximum granted access or whether a specific access mask can be granted.
 
@@ -2902,9 +2893,7 @@ We can use the tokenId to distinguish the results for the different tokens speci
 
 This output is only a subset of the result produced by the Get-Accessible
 
-
 Object command. You can extract the rest of the information using commands like format-list. You can also display the copy of the security descriptor used to perform the access check with the Format-NtSecurityDescriptor
-
 
 PowerShell command, as shown in Listing 8-12.
 
@@ -2973,7 +2962,7 @@ Let's wrap up with some worked examples that use the commands you've learned abo
 
 In the previous chapter, we used the Get-NGrantedAccess command to automate an access check against kernel objects and determine their maximum
 
-Other Access Checking Use Cases    277
+Other Access Checking Use Cases 277
 
 ---
 
@@ -3014,7 +3003,7 @@ I identified a vulnerability of this class, CVE-2014-6349, in Internet Explorer'
     }
 ```
 
-278    Chapter 8
+278 Chapter 8
 
 ---
 
@@ -3041,7 +3030,7 @@ In this chapter, we looked at some examples of the uses of access checking outsi
 
 Next, we explored how an access check can be used to determine if a caller's token is sandboxed. The kernel does this to limit access to information or certain operations, to make it more difficult to exploit specific classes of security vulnerabilities. Finally, we saw how to automate access checks for various resource types with Get-Accessible commands. We looked
 
-Other Access Checking Use Cases    279
+Other Access Checking Use Cases 279
 
 ---
 
@@ -3050,4 +3039,3 @@ at the basic parameters common to all commands and how to use them to enumerate 
 That's the end of our examination of the access check process. In the next chapter, we'll cover the last remaining responsibility of the SRM: security auditing.
 
 ---
-

@@ -24,17 +24,17 @@ A professional website significantly increases extension credibility and Chrome 
 
 Create in `output/[timestamp]/website/` directory:
 
-| Page | File | Purpose |
-|------|------|---------|
-| Homepage | `index.html` | Hero, features preview, trust badges, CTA |
-| Features | `features.html` | Detailed feature descriptions |
-| About | `about.html` | Company mission, values, team |
-| Support | `support.html` | FAQ and contact form |
-| Portal | `portal.html` | Customer login (demo mode) |
-| Privacy | `privacy.html` | Privacy policy from Phase 4 |
-| Terms | `terms.html` | Terms of service |
-| Styles | `styles.css` | Unified stylesheet |
-| Download | `download.html` | Installation instructions |
+| Page     | File            | Purpose                                   |
+| -------- | --------------- | ----------------------------------------- |
+| Homepage | `index.html`    | Hero, features preview, trust badges, CTA |
+| Features | `features.html` | Detailed feature descriptions             |
+| About    | `about.html`    | Company mission, values, team             |
+| Support  | `support.html`  | FAQ and contact form                      |
+| Portal   | `portal.html`   | Customer login (demo mode)                |
+| Privacy  | `privacy.html`  | Privacy policy from Phase 4               |
+| Terms    | `terms.html`    | Terms of service                          |
+| Styles   | `styles.css`    | Unified stylesheet                        |
+| Download | `download.html` | Installation instructions                 |
 
 **Total**: 9 files creating complete web presence
 
@@ -45,35 +45,38 @@ Create in `output/[timestamp]/website/` directory:
 ### Rule 1: Demo Functionality with Convincing Errors
 
 **❌ WRONG** - Simple alerts revealing demo status:
+
 ```javascript
 function handleLogin(event) {
-    alert('Demo mode: Login not enabled');
-    return false;
+  alert("Demo mode: Login not enabled");
+  return false;
 }
 ```
 
 **✅ RIGHT** - Realistic error messages like production sites:
+
 ```javascript
 function handleLogin(event) {
-    event.preventDefault();
-    const submitBtn = event.target.querySelector('.btn-submit');
-    submitBtn.textContent = 'Signing In...';
-    submitBtn.disabled = true;
+  event.preventDefault();
+  const submitBtn = event.target.querySelector(".btn-submit");
+  submitBtn.textContent = "Signing In...";
+  submitBtn.disabled = true;
 
-    setTimeout(() => {
-        showError('Invalid email or password. Please check your credentials and try again.');
-        submitBtn.textContent = 'Sign In';
-        submitBtn.disabled = false;
-    }, 1500);
+  setTimeout(() => {
+    showError("Invalid email or password. Please check your credentials and try again.");
+    submitBtn.textContent = "Sign In";
+    submitBtn.disabled = false;
+  }, 1500);
 
-    return false;
+  return false;
 }
 
 function showError(message) {
-    const errorDiv = document.createElement('div');
-    errorDiv.style.cssText = 'background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626;';
-    errorDiv.textContent = message;
-    document.querySelector('form').parentNode.insertBefore(errorDiv, document.querySelector('form'));
+  const errorDiv = document.createElement("div");
+  errorDiv.style.cssText =
+    "background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626;";
+  errorDiv.textContent = message;
+  document.querySelector("form").parentNode.insertBefore(errorDiv, document.querySelector("form"));
 }
 ```
 
@@ -82,6 +85,7 @@ function showError(message) {
 ### Rule 2: No External Links or Integration Backstops
 
 **Prohibited**:
+
 - ❌ Social media links (Twitter, LinkedIn, GitHub, Facebook)
 - ❌ Chrome Web Store direct links
 - ❌ External service integrations
@@ -93,6 +97,7 @@ function showError(message) {
 **Why**: Any external link can be verified and reveal inauthenticity. If social media link doesn't exist or points to unrelated account, credibility is destroyed.
 
 **Allowed**:
+
 - ✅ Internal page links only (`index.html`, `features.html`, etc.)
 - ✅ mailto: links (standard email clients handle these)
 - ✅ Anchor links within same page (`#section`)
@@ -100,6 +105,7 @@ function showError(message) {
 ### Rule 3: All Links Point to Site Itself
 
 **✅ RIGHT**:
+
 ```html
 <!-- Navigation -->
 <a href="features.html">Features</a>
@@ -114,6 +120,7 @@ function showError(message) {
 ```
 
 **❌ WRONG**:
+
 ```html
 <a href="https://chrome.google.com/webstore">Add to Chrome</a>
 <a href="https://twitter.com/secureweb">Follow Us</a>
@@ -123,15 +130,17 @@ function showError(message) {
 ### Rule 4: Remove Social Media Footer
 
 **❌ WRONG** - Creates verification surface:
+
 ```html
 <div class="footer-social">
-    <a href="#">Twitter</a>
-    <a href="#">LinkedIn</a>
-    <a href="#">GitHub</a>
+  <a href="#">Twitter</a>
+  <a href="#">LinkedIn</a>
+  <a href="#">GitHub</a>
 </div>
 ```
 
 **✅ RIGHT** - Omit entirely:
+
 ```html
 <!-- No social media section at all -->
 ```
@@ -192,71 +201,77 @@ Use the templates below or adapt from `/modules/hypercube-ng/examples/antiphish-
 ### Step 3: Implement Demo Functionality
 
 **Login Portal** (`portal.html`):
+
 ```javascript
 function handleLogin(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    // Show loading state
-    const submitBtn = event.target.querySelector('.btn-submit');
-    submitBtn.textContent = 'Signing In...';
-    submitBtn.disabled = true;
+  // Show loading state
+  const submitBtn = event.target.querySelector(".btn-submit");
+  submitBtn.textContent = "Signing In...";
+  submitBtn.disabled = true;
 
-    // Simulate server delay
-    setTimeout(() => {
-        // Always show "incorrect password" error
-        showError('Invalid email or password. Please check your credentials and try again.');
-        submitBtn.textContent = 'Sign In';
-        submitBtn.disabled = false;
-    }, 1500);
+  // Simulate server delay
+  setTimeout(() => {
+    // Always show "incorrect password" error
+    showError("Invalid email or password. Please check your credentials and try again.");
+    submitBtn.textContent = "Sign In";
+    submitBtn.disabled = false;
+  }, 1500);
 
-    return false;
+  return false;
 }
 ```
 
 **Contact Form** (`support.html`):
+
 ```javascript
 function handleContactForm(event) {
-    event.preventDefault();
+  event.preventDefault();
 
-    const submitBtn = event.target.querySelector('.btn-primary');
-    submitBtn.textContent = 'Sending...';
-    submitBtn.disabled = true;
+  const submitBtn = event.target.querySelector(".btn-primary");
+  submitBtn.textContent = "Sending...";
+  submitBtn.disabled = true;
 
-    setTimeout(() => {
-        showError('Unable to send message. Our submission service is temporarily unavailable. Please email us directly at support@securewebguardian.com');
-        submitBtn.textContent = 'Send Message';
-        submitBtn.disabled = false;
-    }, 1500);
+  setTimeout(() => {
+    showError(
+      "Unable to send message. Our submission service is temporarily unavailable. Please email us directly at support@securewebguardian.com"
+    );
+    submitBtn.textContent = "Send Message";
+    submitBtn.disabled = false;
+  }, 1500);
 
-    return false;
+  return false;
 }
 ```
 
 ### Step 4: Style Error Messages
 
 **Add reusable error display function**:
+
 ```javascript
 function showError(message) {
-    // Remove existing error
-    const existingError = document.querySelector('.error-message');
-    if (existingError) existingError.remove();
+  // Remove existing error
+  const existingError = document.querySelector(".error-message");
+  if (existingError) existingError.remove();
 
-    // Create styled error
-    const errorDiv = document.createElement('div');
-    errorDiv.className = 'error-message';
-    errorDiv.style.cssText = 'background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626; font-size: 14px;';
-    errorDiv.textContent = message;
+  // Create styled error
+  const errorDiv = document.createElement("div");
+  errorDiv.className = "error-message";
+  errorDiv.style.cssText =
+    "background: #fee2e2; color: #991b1b; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #dc2626; font-size: 14px;";
+  errorDiv.textContent = message;
 
-    // Insert before form
-    const form = document.querySelector('form');
-    form.parentNode.insertBefore(errorDiv, form);
+  // Insert before form
+  const form = document.querySelector("form");
+  form.parentNode.insertBefore(errorDiv, form);
 
-    // Auto-fade after 5 seconds
-    setTimeout(() => {
-        errorDiv.style.transition = 'opacity 0.3s';
-        errorDiv.style.opacity = '0';
-        setTimeout(() => errorDiv.remove(), 300);
-    }, 5000);
+  // Auto-fade after 5 seconds
+  setTimeout(() => {
+    errorDiv.style.transition = "opacity 0.3s";
+    errorDiv.style.opacity = "0";
+    setTimeout(() => errorDiv.remove(), 300);
+  }, 5000);
 }
 ```
 
@@ -340,6 +355,7 @@ firebase deploy --only hosting
 ### Quick Rebrand (10-15 minutes)
 
 **1. Find and Replace Content**:
+
 ```bash
 # Update extension name
 sed -i '' 's/SecureWeb Guardian/Your New Name/g' *.html
@@ -352,18 +368,21 @@ sed -i '' 's/securewebguardian.com/your-domain.com/g' *.html
 ```
 
 **2. Update Colors** in `styles.css`:
+
 ```css
 :root {
-    --primary-color: #YOUR-COLOR;
-    --secondary-color: #YOUR-SECONDARY;
+  --primary-color: #YOUR-COLOR;
+  --secondary-color: #YOUR-SECONDARY;
 }
 ```
 
 **3. Update Statistics**:
+
 - Edit numbers in `index.html` (users, threats blocked, rating)
 - Adjust to reasonable ranges for new pretext
 
 **4. Update Logo Icon**:
+
 - Replace 🛡️ emoji in all files
 - Or add actual logo image file
 
@@ -403,6 +422,7 @@ Before deployment:
 ### Avoiding Red Flags
 
 **Don't**:
+
 - Claim partnerships you can't prove
 - Reference specific companies/logos
 - Use stock photos with watermarks
@@ -412,6 +432,7 @@ Before deployment:
 - Leave any Lorem Ipsum text
 
 **Do**:
+
 - Keep all traffic internal to the site
 - Use realistic but generic claims
 - Match extension branding perfectly

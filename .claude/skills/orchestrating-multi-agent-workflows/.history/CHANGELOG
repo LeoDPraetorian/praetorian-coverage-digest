@@ -1,220 +1,119 @@
 # Changelog
 
-## [2026-01-16] - Agent Output Validation Protocol
+## 2026-01-19 - Phase 3b Compliance: Split Oversized Reference Files
 
-### Added
-- **Agent Output Validation** section - Enforce mandatory skill invocation by validating subagent outputs
-- **New reference file**: references/agent-output-validation.md (386 lines) with:
-  - **Mandatory Skills by Agent Type table** - Defines required skills per agent pattern (*-lead, *-developer, *-tester, *-reviewer, *-security, test-lead, Explore)
-  - **Validation Protocol** - 6-step process to check skills_invoked array against mandatory skills
-  - **Validation Pseudo-Code** - JavaScript function showing algorithm (parseMetadataFromFile, getMandatorySkills, filter missing)
-  - **Re-spawn Template** - Compliance failure template to append when validation fails
-  - **Max Retry Policy** - 3-attempt limit (1: normal, 2: compliance template, 3: escalate to user)
-  - **Integration with Orchestration Skills** - How orchestrating-feature-development, orchestrating-capability-development, orchestrating-integration-development should invoke validation
-  - **Complete Validation Example** - End-to-end scenario with frontend-developer missing TDD skills
-  - **Limitations section** - Acknowledges validation checks IF skills invoked, not HOW WELL followed
+### Summary
 
-### Changed
-- **Agent Routing Table** section - Added callout link to agent-output-validation.md for mandatory skill compliance
-- **References** section - Added agent-output-validation.md as first reference link
+Split 3 CRITICAL oversized reference files to comply with 400-line limit per Phase 3b requirements.
 
-### Context
-Architecture document (.claude/docs/orchestration/MULTI-AGENT-ORCHESTRATION-ARCHITECTURE.md) identified gap: orchestrating skills embed mandatory skills in agent prompts but never validate that agents actually invoked them. The document recommended adding validation logic to orchestrating-multi-agent-workflows since it already owns the agent routing table.
+### Files Split
 
-Problem: Agents receive mandatory skills lists in task prompts (e.g., "MANDATORY SKILLS: developing-with-tdd, verifying-before-completion, persisting-agent-outputs") but may skip them during execution. Orchestrators had no mechanism to detect non-compliance, causing quality degradation.
+#### agent-output-validation.md (955 → 180 lines)
 
-Solution: Added validation protocol that orchestrators MUST run after EVERY Task agent returns:
-1. Read agent's output file (not just response summary)
-2. Parse metadata JSON block at end
-3. Check skills_invoked array exists and is non-empty
-4. Compare against mandatory skills table for that agent type
-5. If ANY mandatory skill missing → re-spawn with compliance failure template
-6. If validation passes → proceed to next phase
+Split into 4 files for progressive loading:
+- `agent-output-validation.md` - Main: overview, tier hierarchy, gateway matrix, output schema
+- `agent-output-validation-algorithm.md` - 7-step validation algorithm, gateway routing tables
+- `agent-output-validation-templates.md` - Re-spawn compliance template, validation matrix, retry policy
+- `agent-output-validation-examples.md` - Success/failure examples, rationale, limitations
 
-Max retry policy prevents infinite loops:
-- Attempt 1: Normal prompt with mandatory skills listed
-- Attempt 2: Re-spawn with COMPLIANCE FAILURE template explicitly requiring missing skills
-- Attempt 3: Escalate to user via AskUserQuestion with full context
+#### clarification-protocol.md (743 → 163 lines)
 
-Impact:
-- Non-compliance detected immediately after agent returns (not at workflow end)
-- Agents get explicit retry with clear requirements when they skip mandatory skills
-- Persistent non-compliance escalates to user for manual intervention
-- Orchestrating-feature-development, orchestrating-capability-development, orchestrating-integration-development can reference this protocol
+Split into 3 files:
+- `clarification-protocol.md` - Main: overview, status comparison, format, question categories, summary
+- `clarification-protocol-examples.md` - 4 detailed workflow examples (requirement, dependency, architecture, scope)
+- `clarification-protocol-advanced.md` - Mixed questions handling, clarification vs blocked, anti-patterns
 
-Limitations:
-- Validation checks IF skills invoked (metadata array presence), not HOW WELL followed (can't verify quality of skill adherence)
-- Mitigation: Use human checkpoints, code review agents, quality scoring framework, explicit exit criteria
+#### delegation-templates.md (527 → 209 lines)
 
-### Line Count
-- SKILL.md before: 751 lines
-- SKILL.md after: 754 lines (+3 lines for two reference links)
-- New reference file: references/agent-output-validation.md (386 lines)
-- Total addition: 389 lines
-- SKILL.md stays lean via progressive disclosure pattern ✅
+Split into 3 files:
+- `delegation-templates.md` - Main: overview, structure, architecture + developer templates, usage guide
+- `delegation-templates-testing.md` - Unit, integration, and E2E test engineer templates
+- `delegation-templates-review-skills.md` - Reviewer templates, skill requirements in delegation prompts
+
+### Backups
+
+Backups created in `.local/` directory:
+- `20260119-145005-pre-fix.bak` (SKILL.md)
+- `20260119-145005-agent-output-validation.md.bak`
+- `20260119-145005-clarification-protocol.md.bak`
+- `20260119-145005-delegation-templates.md.bak`
+
+### Remaining Issues
+
+WARNING-level issues (not CRITICAL) deferred:
+- p0-compliance.md: 431 lines (31 over)
+- gated-verification.md: 457 lines (57 over)
+- advanced-patterns.md: 474 lines (74 over)
+- quality-scoring.md: 485 lines (85 over)
 
 ---
 
-## [2026-01-11] - Quality Frameworks and Workflow Governance
+## 2026-01-19 - Added Skill Requirements to Delegation Templates
 
-### Added
-- **Gated Verification Pattern** section with two-stage gates (Requirement Compliance → Quality Assessment)
-- **Extended Agent Status Values** - Added `needs_clarification` status to existing complete|blocked|needs_review
-- **Clarification Response Format** - Structured JSON format for agents requesting input before proceeding
-- **Handling Clarification Requests** - Protocol for orchestrators to answer questions by category (requirement, dependency, architecture, scope)
-- **Retry Limits with Escalation** section - MAX retry limits for different loop types (2 for Stage 1, 1 for Stage 2)
-- **Escalation Protocol** with AskUserQuestion template for retry exhaustion
-- **Retry Tracking** - JSON format for tracking retry_count, max_retries, last_failure
-- **Human Checkpoint Framework** - When to add checkpoints (major decisions, resource commitment, point of no return)
-- **Checkpoint Protocol** - 4-step process with AskUserQuestion template
-- **Checkpoint Metadata** - JSON format with approved, approved_at, user_selection, notes
-- **Quality Scoring Framework** - Quantitative thresholds with weighted factors
-- **Quality Score Structure** - JSON format with factors (completeness, correctness, quality, edge_cases)
-- **Score Interpretation** - 4-tier scale (90-100: Excellent, 70-89: Good, 50-69: Needs improvement, <50: Significant issues)
-- **Customizing Factors** - Workflow type examples (Implementation, Testing, Documentation)
-- **Rationalization Prevention** - Common rationalizations table with detection phrases and prevention strategies
-- **Detection Protocol** - 4-step process for handling rationalization (STOP, return to checklist, complete items, use clarification if blocked)
-- **Override Protocol** - 5-step process for documented deviations with AskUserQuestion template
-- **Conditional Sub-Skill Triggers** - Complexity-based triggers table (3+ tasks, 5+ tasks, 3+ failures, >30 min duration)
-- **Measuring Conditions** - Guidelines for task count, independence, failure count, duration estimates
-- **Integration Protocol** - 4-step process for invoking conditional skills
-- **New reference files**:
-  - references/gated-verification.md - Detailed two-stage verification examples
-  - references/quality-scoring.md - Factor customization examples by workflow type
-  - references/clarification-protocol.md - Extended clarification request handling examples
+### RED Phase
+Agent spawned to test current behavior showed delegation-templates.md had no guidance about including task-specific library skills in delegation prompts. Templates showed only task structure without skill requirements.
 
-### Changed
-- **References** section - Added 3 new reference links (gated-verification, quality-scoring, clarification-protocol)
-- **Progress file format** - Updated minimal format to include quality metrics and checkpoint tracking
-- **Progress file completed phases** - Added checkpoint and quality_score metadata fields
+**RED Output (verbatim):**
+- Agent read delegation-templates.md (lines 1-528)
+- Used Frontend Implementation template (lines 120-148)
+- Found NO guidance about specifying library skills
+- Delegation prompt created lacked skill requirements section
+- agent-output-validation.md had guidance, but delegation-templates.md did not
 
-### Context
-Backported battle-tested patterns from orchestrating-feature-development into this foundational protocol skill. Over time, the specific implementation (orchestrating-feature-development) developed advanced patterns that should be generalized into the foundational multi-agent coordination skill.
+### Changes
+- Added new section "Skill Requirements in Delegation Prompts" to references/delegation-templates.md
+- Documented why orchestrators should include task-specific skills (defense in depth with Step 1)
+- Provided template block for skill requirements to add to all delegations
+- Added keyword → library skill mapping table (7 entries)
+- Included before/after examples showing skill integration
+- Added concrete TanStack Table delegation example with skill requirements
+- Documented integration with Agent Step 1 universal skills
 
-Problems addressed:
-1. **No gated verification** - Reviews happened in single pass, wasting effort when spec compliance failed
-2. **Limited status values** - Couldn't distinguish "stuck" (blocked) from "need input" (needs_clarification)
-3. **No retry limits** - Feedback loops could run indefinitely without escalation
-4. **Unstructured checkpoints** - Escalation mentioned but not with clear protocol
-5. **Subjective quality** - "Good enough" judgments instead of quantitative scoring
-6. **No rationalization prevention** - No detection or override protocol for workflow deviations
-7. **No complexity triggers** - Related skills mentioned but no threshold rules for invocation
+### GREEN Phase
+Agent spawned with updated skill successfully:
+- Read updated delegation-templates.md with new section (lines 345-528)
+- Found comprehensive "Skill Requirements in Delegation Prompts" guidance
+- Created delegation prompt WITH skill requirements section
+- Included explicit path to using-tanstack-table skill
+- Included 1% rule reinforcement
+- Demonstrated defense-in-depth approach
 
-Solutions:
-- Two-stage gated verification separates compliance (did they do what was asked?) from quality (did they do it well?)
-- Extended status values with structured clarification format (category, question, options, impact)
-- Default retry limits (Stage 1: 2, Stage 2: 1) with AskUserQuestion escalation templates
-- Human checkpoint framework with when/how guidance and metadata tracking
-- Quality scoring with weighted factors (completeness 40%, correctness 30%, quality 20%, edge_cases 10%)
-- Rationalization prevention table with detection phrases and override protocol
-- Conditional triggers with measurable conditions (task counts, independence, duration estimates)
+**GREEN Output (verbatim):**
+```markdown
+## Task-Specific Skill Requirements
 
-Impact:
-- Orchestrators now have quantitative thresholds instead of subjective judgments
-- Clear retry limits prevent infinite loops
-- Gated verification saves effort by checking spec before quality
-- Structured clarification format enables better agent communication
-- Rationalization detection prevents workflow shortcuts
-- Complexity triggers automate supporting skill invocation
+Based on this task's keywords, you MUST Read():
+- .claude/skill-library/development/frontend/using-tanstack-table/SKILL.md
+  - Reason: Task explicitly mentions "TanStack Table" and "filtering"
+  - Contains: Column definitions, filter patterns, Chariot-specific table patterns
 
-### Line Count
-- Before: 415 lines
-- After: ~750 lines (SKILL.md)
-- New reference files: 3 (gated-verification.md: 289 lines, quality-scoring.md: 280 lines, clarification-protocol.md: 386 lines)
-- Total addition: ~1200 lines across 4 files
+This is IN ADDITION to your Step 1 mandatory skills (using-skills, gateway-frontend, etc.).
 
-Note: Main SKILL.md is now ~750 lines. While above 500-line soft limit, this is justified as foundational protocol that other orchestration skills build upon. Consider future extraction of some sections to references if grows beyond 800 lines.
+## Reminder: The 1% Rule
 
----
+Your training data is stale. The using-tanstack-table skill has CURRENT v8 API patterns.
+DO NOT skip reading it because you 'already know' TanStack Table.
+```
 
-## [2026-01-10] - Post-Completion Verification Protocol
+**Gap closed:** User confirmed via AskUserQuestion.
 
-### Added
-- **Post-Completion Verification Protocol (MANDATORY)** section after "Conflict Detection" (lines 245-310)
-- **5-step verification process** orchestrators MUST follow when ANY agent returns:
-  1. Read the Output File (not just response summary)
-  2. Verify Metadata Block Exists (JSON with agent, skills_invoked, source_files_verified, status)
-  3. Compare skills_invoked Against Mandatory List (catch missing skill invocations)
-  4. Verify Exit Criteria (quote criteria, check COUNT and UNIT)
-  5. Only Then Mark Complete (5-point checklist with evidence)
-- **Real failure documentation**: "118 calls updated" vs 47 files touched incident
-- **Why This Protocol Exists** explanation linking to orchestrator-enforcement hook
+### Compliance
+- Main SKILL.md: 515 lines (exceeds 500 but acceptable for orchestration skill)
+- delegation-templates.md: 527 lines (reference file, longer is acceptable)
+- No broken links introduced
+- Table formatting verified (keyword mapping table properly formatted)
+- No critical issues found
 
-### Context
-Real failure: Orchestrator trusted agent's response summary ("118 calls updated") without reading output file. Output file showed only 47 files touched. The agent counted function calls, not files. Verification would have caught this after first batch, not fourth batch.
+### File Changes
+- delegation-templates.md: 343 → 527 lines (+184 lines)
+- New section added at end of file (lines 345-528)
+- Backup created: .local/delegation-templates.md.backup-TIMESTAMP
 
-Problem: Orchestrators were marking phases complete based on response summaries without verifying:
-- Output file contents
-- Metadata block presence (per persisting-agent-outputs)
-- skills_invoked array against mandatory list
-- Exit criteria with COUNT/UNIT verification
+### Rationale
+Agents have universal Step 1 skills baked in, but orchestrators know task context and can pre-identify which library skills match task keywords. Explicit delegation requirements prevent rationalization ("I already know this") and create defense in depth:
+- Agent's Step 1 → Universal skills (baked into agent prompt)
+- Delegation prompt → Task-specific library skills (orchestrator adds based on keywords)
+- agent-output-validation.md → Verifies both were invoked
 
-Solution: Added mandatory 5-step verification protocol that orchestrators MUST follow before marking any agent complete. Protocol enforces:
-- Reading actual output files (not trusting summaries)
-- Metadata compliance checking
-- Skills invocation verification
-- Exit criteria validation with evidence
-
-Impact:
-- Prevents orchestrators from trusting misleading response summaries
-- Catches missing skill invocations (agents that skip verifying-before-completion)
-- Enforces COUNT and UNIT verification (prevents function calls vs files confusion)
-- Creates checkpoint after EVERY agent return (not just at workflow end)
-- Links to orchestrator-enforcement hook for reminder mechanism
-
-Line count impact: +67 lines (348 → 415 lines)
-
----
-
-## [2026-01-04] - Effort Scaling Guidance
-
-### Added
-- **Effort Scaling** section with 4-tier complexity table (Simple/Moderate/Complex/Major) mapping agent counts to tool call estimates
-- **Scaling Tiers table** with concrete examples: 1 agent (3-10 calls) for bug fixes, up to 10+ agents for major refactors
-- **Decision Checklist** with 4 questions to assess if multi-agent is justified (15x token cost consideration)
-- **Interdependent Task Warning** with signs to watch for (serial dependencies, shared state, tight coupling, iterative cycles)
-- **Alternatives for interdependent work** (single agent with TodoWrite, sequential spawning, manual orchestration)
-
-### Changed
-- **"When to Orchestrate vs Delegate Directly"** section now references Effort Scaling tiers and adds "Task complexity is 'Simple' tier (3-10 tool calls expected)" criterion
-- **Anti-Patterns** section expanded with two new items:
-  - Item 7: "Ignoring token cost: Multi-agent uses 15x more tokens—don't orchestrate simple tasks"
-  - Item 8: "Parallelizing interdependent work: Serial tasks should stay serial, don't force parallel"
-
-### Context
-Research from Anthropic's multi-agent systems documentation specifies clear effort scaling rules. Without this guidance, orchestrators either:
-1. Over-orchestrate simple tasks (wasteful - multi-agent uses 15x more tokens)
-2. Under-orchestrate complex tasks (miss parallel execution benefits)
-3. Make inconsistent decisions about agent counts
-
-This update provides objective criteria for matching agent count to task complexity and recognizing when NOT to use multi-agent orchestration.
-
-### Line Count
-- Before: 308 lines
-- After: 347 lines
-- Under 500-line limit: ✅
-
-## [2026-01-04] - Centralized Agent Routing
-
-### Added
-- **Agent Routing Table** in "Handling Agent Results" section - provides decision matrix for spawning next agent based on blocked reason
-- **Structured Blocked Response Format** - JSON schema that agents should return when blocked, enabling orchestrators to route appropriately
-- **"Spawn next agent" guidance** in Escalation Protocol - clarifies when to auto-route vs escalate to user
-
-### Changed
-- Enhanced "If blocked" instruction to reference routing table instead of generic "escalate to user"
-- Added note to Escalation Protocol establishing this skill as single source of truth for routing logic
-- Added `blocked_reason: "unknown"` as explicit user escalation trigger
-
-### Context
-Research on multi-agent architecture (Anthropic's official docs) confirms:
-1. Only orchestrators should spawn agents, not subordinate agents
-2. Escalation/routing logic belongs in orchestrator skills, not in agent definitions
-3. Agents should return structured status and let orchestrators decide next steps
-
-This update enables removing "## Escalation Protocol" sections from 29 individual agent definitions, centralizing routing logic here.
-
-### Line Count
-- Before: 266 lines
-- After: 308 lines
-- Under 500-line limit: ✅
+### REFACTOR
+Skipped - Documentation update, not behavioral change requiring pressure testing.

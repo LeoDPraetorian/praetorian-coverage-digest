@@ -11,6 +11,7 @@ allowed-tools: Read
 ## When to Use This Skill
 
 Use this skill when:
+
 - Investigating Windows authentication protocols (Kerberos, NTLM, Negotiate)
 - Analyzing security access tokens and their components
 - Understanding security descriptors, DACLs, SACLs, and access control
@@ -31,6 +32,7 @@ Use this skill when:
 James Forshaw has discovered hundreds of publicly disclosed vulnerabilities in Microsoft platforms over 20+ years. This book represents his deep expertise in Windows security internals, combining theoretical knowledge with practical exploitation and defense perspectives.
 
 **Key Topics**:
+
 - PowerShell security testing environment setup
 - Windows kernel security architecture
 - User-mode application security
@@ -48,20 +50,20 @@ All chapters have been split into individual markdown files with OCR corrections
 
 **Location**: `references/chapters/` (within this skill)
 
-| Chapter | File | Topics Covered |
-|---------|------|----------------|
-| 0 (Front Matter) | `chapter-00.md` | Author info, dedication, about the book |
-| 1 | `chapter-01.md` | Setting up PowerShell testing environment - NtObjectManager module, PowerShell basics, types and variables |
-| 2 | `chapter-02.md` | The Windows kernel - Architecture, drivers, system calls, kernel objects |
-| 3 | `chapter-03.md` | User-mode applications - Process creation, memory layout, PE format, loading |
-| 4 | `chapter-04.md` | Security access tokens - Token structure, user SID, groups, privileges, integrity levels, capabilities |
-| 5 | `chapter-05.md` | Security descriptors - DACL, SACL, owner, group, ACE types, inheritance |
-| 7 | `chapter-07.md` | The access check process - Security Reference Monitor, access checking algorithm, ResultantAccess |
-| 9 | `chapter-09.md` | Security auditing - Audit policies, security event log, object access auditing |
-| 10 | `chapter-10.md` | Windows authentication - Local authentication, SAM database, credential storage, LSA |
-| 11 | `chapter-11.md` | Active Directory - Domain controllers, Kerberos KDC, trust relationships, group policy |
-| 13 | `chapter-13.md` | Network authentication - Negotiate, SPNEGO, credential delegation |
-| 14 | `chapter-14.md` | Kerberos - Ticket structure, TGT, service tickets, delegation types, constrained delegation |
+| Chapter          | File            | Topics Covered                                                                                             |
+| ---------------- | --------------- | ---------------------------------------------------------------------------------------------------------- |
+| 0 (Front Matter) | `chapter-00.md` | Author info, dedication, about the book                                                                    |
+| 1                | `chapter-01.md` | Setting up PowerShell testing environment - NtObjectManager module, PowerShell basics, types and variables |
+| 2                | `chapter-02.md` | The Windows kernel - Architecture, drivers, system calls, kernel objects                                   |
+| 3                | `chapter-03.md` | User-mode applications - Process creation, memory layout, PE format, loading                               |
+| 4                | `chapter-04.md` | Security access tokens - Token structure, user SID, groups, privileges, integrity levels, capabilities     |
+| 5                | `chapter-05.md` | Security descriptors - DACL, SACL, owner, group, ACE types, inheritance                                    |
+| 7                | `chapter-07.md` | The access check process - Security Reference Monitor, access checking algorithm, ResultantAccess          |
+| 9                | `chapter-09.md` | Security auditing - Audit policies, security event log, object access auditing                             |
+| 10               | `chapter-10.md` | Windows authentication - Local authentication, SAM database, credential storage, LSA                       |
+| 11               | `chapter-11.md` | Active Directory - Domain controllers, Kerberos KDC, trust relationships, group policy                     |
+| 13               | `chapter-13.md` | Network authentication - Negotiate, SPNEGO, credential delegation                                          |
+| 14               | `chapter-14.md` | Kerberos - Ticket structure, TGT, service tickets, delegation types, constrained delegation                |
 
 **Note**: Some chapter numbers are missing due to book structure or OCR extraction (chapters 6, 8, 12, 15 not present in current extraction).
 
@@ -76,6 +78,7 @@ Read(".claude/skill-library/security/windows/windows-security-internals/referenc
 ```
 
 **Example queries:**
+
 - "How do security access tokens work?" → Read chapter 4
 - "What's in a security descriptor?" → Read chapter 5
 - "How does the access check process work?" → Read chapter 7
@@ -91,6 +94,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 ```
 
 **Common search terms:**
+
 - Access token, token privileges, integrity level
 - Security descriptor, DACL, SACL, ACE
 - Kerberos, TGT, service ticket, delegation
@@ -101,6 +105,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 ### PowerShell Testing Setup
 
 **Chapter 1 provides complete PowerShell environment setup:**
+
 1. Install NtObjectManager module: `Install-Module NtObjectManager`
 2. Configure execution policy for security testing
 3. Use PowerShell cmdlets to inspect security objects
@@ -108,6 +113,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 ## Key Concepts by Chapter
 
 ### Chapter 1: PowerShell Testing Environment
+
 - PowerShell version selection (5.1 vs open source)
 - Execution policy configuration
 - NtObjectManager module installation and verification
@@ -115,6 +121,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - cmdlet usage and help system
 
 ### Chapter 2: The Windows Kernel
+
 - Kernel architecture and privilege levels
 - System call interface
 - Kernel drivers and device objects
@@ -122,6 +129,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Handle tables and reference counting
 
 ### Chapter 3: User-Mode Applications
+
 - Process creation and initialization
 - Virtual memory layout
 - Portable Executable (PE) format
@@ -129,6 +137,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Application compatibility
 
 ### Chapter 4: Security Access Tokens
+
 - Token structure and components
 - User SID and group SIDs
 - Privilege list and enablement
@@ -138,6 +147,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Impersonation tokens
 
 ### Chapter 5: Security Descriptors
+
 - Security descriptor structure
 - Owner and group SIDs
 - Discretionary Access Control List (DACL)
@@ -147,6 +157,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Security descriptor control flags
 
 ### Chapter 7: The Access Check Process
+
 - Security Reference Monitor (SRM)
 - Access checking algorithm
 - Generic vs specific access rights
@@ -156,6 +167,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Privilege checks
 
 ### Chapter 9: Security Auditing
+
 - Audit policy configuration
 - Security event log structure
 - Object access auditing
@@ -164,6 +176,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Advanced audit policy
 
 ### Chapter 10: Windows Authentication
+
 - Local authentication flow
 - Security Accounts Manager (SAM) database
 - Credential storage (LSA secrets, Credential Manager)
@@ -173,6 +186,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Credential Guard
 
 ### Chapter 11: Active Directory
+
 - Domain controller role
 - Kerberos Key Distribution Center (KDC)
 - Domain trust relationships
@@ -182,6 +196,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Domain functional levels
 
 ### Chapter 13: Network Authentication
+
 - Negotiate protocol (SPNEGO)
 - Credential delegation
 - Mutual authentication
@@ -190,6 +205,7 @@ grep -i "keyword" .claude/skill-library/security/windows/windows-security-intern
 - Network authentication flows
 
 ### Chapter 14: Kerberos
+
 - Kerberos ticket structure
 - Ticket Granting Ticket (TGT)
 - Service tickets
@@ -219,16 +235,17 @@ None - terminal skill (reads chapter files directly)
 
 ### Pairs With (conditional)
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| `windows-internals` | When kernel-level context needed | Complements with OS architecture from Chapter 7 |
-| `evading-edr` | When researching credential access or privilege escalation | Applies authentication concepts to evasion |
+| Skill               | Trigger                                                    | Purpose                                         |
+| ------------------- | ---------------------------------------------------------- | ----------------------------------------------- |
+| `windows-internals` | When kernel-level context needed                           | Complements with OS architecture from Chapter 7 |
+| `evading-edr`       | When researching credential access or privilege escalation | Applies authentication concepts to evasion      |
 
 ## PowerShell Integration
 
 **This book heavily uses PowerShell for security research.** Chapter 1 provides setup for the NtObjectManager module, which exposes Windows security internals through PowerShell cmdlets.
 
 **Key cmdlets covered:**
+
 - `New-NTSecurityDescriptor` - Create and inspect security descriptors
 - `Get-NTAccessToken` - Inspect access tokens
 - `Test-NTAccess` - Simulate access checks
@@ -254,6 +271,7 @@ ISBN: 978-1-7185-0198-0
 ### OCR Quality Notes
 
 Chapters have been OCR-transcribed from PDF with automated error corrections applied:
+
 - Common patterns fixed: `ttObject` → `NtObject`, `ASN-13` → `ISBN-13`
 - PowerShell code blocks preserved
 - Security descriptor diagrams converted to figure references

@@ -1,4 +1,4 @@
-## 2  FUNCTION-HOOKING DLLS
+## 2 FUNCTION-HOOKING DLLS
 
 ![Figure](figures/EvadingEDR_page_043_figure_001.png)
 
@@ -26,7 +26,7 @@ To detect malicious activity, vendors often hook these Windows APIs. For example
 
 In earlier versions of Windows, vendors (and malware authors) often placed their hooks on the System Service Dispatch Table (SSDT), a table in the kernel that holds the pointers to the kernel functions used upon invocation of a syscall. Security products would overwrite these function pointers with pointers to functions in their own kernel module used to log information about the function call and then execute the target function. They would then pass the return values back to the source application.
 
-18    Chapter 2
+18 Chapter 2
 
 ---
 
@@ -35,7 +35,6 @@ With the introduction of Windows XP in 2005, Microsoft made the decision to prev
 Table 2-1: Commonly Hooked Functions in ntdll.dll
 
 <table><tr><td>Function names</td><td>Related attacker techniques</td></tr><tr><td>NtOpenProcess</td><td rowspan="4">Remote process injection</td></tr><tr><td>NtAllocateVirtualMemory</td></tr><tr><td>NtWriteVirtualMemory</td></tr><tr><td>NtCreateThreadEx</td></tr><tr><td>NtSuspendThread</td><td rowspan="3">Shellcode injection via asynchronous procedure call (APC)</td></tr><tr><td>NtResumeThread</td></tr><tr><td>NtQueuedAppThread</td></tr><tr><td>NtCreateSection</td><td rowspan="3">Shellcode injection via mapped memory sections</td></tr><tr><td>NtMapViewOfSection</td></tr><tr><td>NtUnmapViewOfSection</td></tr><tr><td>NtLoadDriver</td><td>Driver loading using a configuration stored in the registry</td></tr></table>
-
 
 By intercepting calls to these APIs, an EDR can observe the parameters passed to the original function, as well as the value returned to the code that called the API. Agents can then examine this data to determine whether the activity was malicious. For example, to detect remote process injection, an agent could monitor whether the region of memory was allocated with readwrite-execute permissions, whether data was written to the new allocation, and whether a thread was created using a pointer to the written data.
 
@@ -77,7 +76,7 @@ This disassembly of the function shows the execution flow that we expect. When t
 
 The function looks substantially different after the injection of a DLL that leverages Detours to hook it, shown in Listing 22:
 
-20    Chapter 2
+20 Chapter 2
 
 ---
 
@@ -160,7 +159,7 @@ The most commonly used technique for injecting a function-hooking DLL into proce
 
 Offensive security practitioners often want to identify whether the functions they plan to use are hooked. Once they identify hooked functions, they can make a list of them and then limit, or entirely avoid, their use. This allows the adversary to bypass inspection by the EDR's function-hooking DLL, as its inspection function will never be invoked. The process of detecting hooked functions is incredibly simple, especially for the native API functions exported by mdtll.dll .
 
-22    Chapter 2
+22 Chapter 2
 
 ---
 
@@ -227,7 +226,7 @@ Thus, to detect hooks placed by an EDR, we can simply examine functions in the c
 Of all the sensor components used in endpoint security software, function hooks are one of the most well researched when it comes to evasion. Attackers can use a myriad of methods to evade function interception, all of which generally boil down to one of the following techniques:
 
 - • Making direct syscalls to execute the instructions of an unmodified
-syscall stub
+  syscall stub
 
 • Remapping ntdll.dll to get unhooked function pointers or overwriting
 the hooked ntdll.dll currently mapped in the process
@@ -322,7 +321,7 @@ NtCreateThreadEx PROC
      jmp  NtCreateThreadEx_Epileque
 ```
 
-26    Chapter 2
+26 Chapter 2
 
 ---
 
@@ -356,17 +355,17 @@ In December 2020, a researcher known by @modexpbug on Twitter published a blog p
 - 1. Get a handle to the current process's mapped ntdll.dll.
 
 2. Enumerate all exported functions that begin with Zw to identify system
-call. Note that functions prefixed with Nt (which is more commonly
-seen) work identically when called from user mode. The decision to use
-the Zw version appears to be arbitrary in this case.
+   call. Note that functions prefixed with Nt (which is more commonly
+   seen) work identically when called from user mode. The decision to use
+   the Zw version appears to be arbitrary in this case.
 
 3. Store the exported function names and their associated relative virtual
-addresses.
+   addresses.
 
 4. Sort the dictionary by relative virtual addresses.
 5. Define the syscall number of the function as its index in the dictionary
-after sorting.
-Using this technique, we can collect syscall numbers at runtime, insert them into the stub at the appropriate location, and then call the target functions as we otherwise would in the statically coded method.
+   after sorting.
+   Using this technique, we can collect syscall numbers at runtime, insert them into the stub at the appropriate location, and then call the target functions as we otherwise would in the statically coded method.
 
 ---
 
@@ -413,7 +412,7 @@ int wmain()
    pTHHeader = (PIMAGE_NT_HEADER564)(ULONG_PTR)lpBaseAddress + pDosHeader->e_lfawn);
 ```
 
-28    Chapter 2
+28 Chapter 2
 
 ---
 
@@ -525,8 +524,6 @@ Function hooking is one of the original mechanisms by which an endpoint security
 
 ---
 
-
-
 ---
 
 ## 3
@@ -570,7 +567,7 @@ To obtain this call stack, use WinDbg to set a breakpoint (bp) on nt!PspCallProc
 ntlPspCallProcessNotifyRoutines:
 ```
 
-34    Chapter 3
+34 Chapter 3
 
 ---
 
@@ -661,7 +658,7 @@ ffffffff80349aec550 00000000 00000000 00000000 00000000
 
 Listing 5-3. An array of EX_FAST_REF structures containing the addresses of processcreation callback routines
 
-36    Chapter 3
+36 Chapter 3
 
 ---
 
@@ -712,7 +709,7 @@ typedef struct _PS_CREATE_NOTIFY_INFO {
 
 Listing 3-5: The definition of the PS_CREATE_NOTIFY_INFO structure
 
-Process- and Thread-Creation Notifications  37
+Process- and Thread-Creation Notifications 37
 
 ---
 
@@ -778,7 +775,7 @@ void ThreadNotifyCallbackRoutine(
 
 Listing 3-6: Registration of a thread-creation notification routine
 
-Process-and Thread-Creation Notifications  39
+Process-and Thread-Creation Notifications 39
 
 ---
 
@@ -830,7 +827,7 @@ Some of the most commonly monitored attributes of process-creation events are th
 
 EDRs can find arguments in the CommandLine member of the structure passed to a process-creation callback routine. When a process is created, its command line arguments are stored in the ProcessParameters field of
 
-Process- and Thread-Creation Notifications     41
+Process- and Thread-Creation Notifications 41
 
 ---
 
@@ -872,7 +869,7 @@ Listing 3-9: Typical child-process creation
 
 This basic implementation spawns a child process of cmd.exe with the arguments "These are my sensitive arguments." When the process is executed, any standard process-monitoring tool should see this child process and its unmodified arguments by reading them from the PEB. For example, in Figure 3-3, we use a tool called Process Hacker to extract command line parameters.
 
-42    Chapter 3
+42 Chapter 3
 
 ---
 
@@ -950,7 +947,6 @@ Thus, in order to hide malicious behavior on the host, attackers often wish to s
 
 To better understand this strategy, let's dig into process creation on Windows. The primary API used for this purpose is the aptly named
 
-
 kernel32!CreateProcess() API. This function is defined in Listing 3-11.
 
 ```bash
@@ -970,7 +966,7 @@ BOOL CreateProcessWk(
 
 Listing 3-11: The kernel32!CreateProcess() API definition
 
-Process- and Thread-Creation Notifications  45
+Process- and Thread-Creation Notifications 45
 
 ---
 
@@ -1099,6 +1095,7 @@ Process- and Thread-Creation Notifications 49
 drivers. As a result, attackers have an opportunity to modify the process's attributes in some way during those early steps. Here is the entire processcreation workflow, with the notification step shown in bold:
 
 - 1. Validate parameters passed to the process-creation API.
+
 2. Open a handle to the target image.
 3. Create a section object from the target image.
 4. Create and initialize a process object.
@@ -1111,8 +1108,7 @@ drivers. As a result, attackers have an opportunity to modify the process's attr
 10. Finalize process initialization.
 11. Start execution at the image entry point.
 12. Return to the caller of the process-creation API.
-The techniques outlined in this section take advantage of step 3, in which the kernel creates a section object from the process image. The memory manager caches this image section once it is created, meaning that the section can deviate from the corresponding target image. Thus, when the driver receives its notification from the kernel process manager, the
-
+    The techniques outlined in this section take advantage of step 3, in which the kernel creates a section object from the process image. The memory manager caches this image section once it is created, meaning that the section can deviate from the corresponding target image. Thus, when the driver receives its notification from the kernel process manager, the
 
 FileObject member of the PS_CREATE_NOTIFY_INFO structure it processes may
 
@@ -1128,7 +1124,7 @@ Figure 3-9: The execution flow of process hallowing
 
 Using this technique, the attacker creates a process in a suspended state, then unmaps its image after locating its base address in the PEB. Once the unmapping is complete, the attacker maps a new image, such as
 
-50    Chapter 3
+50 Chapter 3
 
 ---
 
@@ -1150,7 +1146,7 @@ Figure 3-10: The execution flow of process doppelgänging
 
 In their proof of concept, Liberman and Kogan first create a transaction object and open the target file with kerase321Create11ETransacted(). They then overwrite this transacted file with their malicious code, create an image section that points to the malicious code, and roll back the transaction with kerase321RollbackTransaction(). At this point, the executable has been restored to its original state, but the image section is cached with the malicious code. From here, the authors call ndll19tCreateProcessEx(), passing in the section handle as a parameter, and create the main thread pointing to the entry point of their malicious code. After these objects are created, they resume the main thread, allowing the dopeqqingaced process to execute.
 
-Process- and Thread-Creation Notifications      51
+Process- and Thread-Creation Notifications 51
 
 ---
 
@@ -1164,13 +1160,13 @@ Figure 3-11: The execution flow of process herpaderping
 
 To perform heradepending, an attacker first writes the malicious code to be executed to disk and creates the section object, leaving the handle to the dropped executable open. They then call the legacy process-creation API, with the section handle as a parameter, to create the process object. Before initializing the process, they obscure the original executable dropped to disk using the open file handle and kerere3219Write() or a similar API. Finally, they create the main thread object and perform the remaining process spin-up tasks.
 
-At this point, the driver's callback receives a notification, and it can scan the file's contents using the fileObject member of the structure passed to the driver on process creation. However, because the file's contents have been modified, the scanning function will retrieve bogus data. Additionally, closing the file handle will send an IRP _ M_CLEANUP 1/O control code to any filesystem minifilters that have been registered. If the minifilter wishes to scan the contents of the file, it will meet the same fate as the driver, potentially resulting in a false-negative scan result.
+At this point, the driver's callback receives a notification, and it can scan the file's contents using the fileObject member of the structure passed to the driver on process creation. However, because the file's contents have been modified, the scanning function will retrieve bogus data. Additionally, closing the file handle will send an IRP \_ M_CLEANUP 1/O control code to any filesystem minifilters that have been registered. If the minifilter wishes to scan the contents of the file, it will meet the same fate as the driver, potentially resulting in a false-negative scan result.
 
 ## Ghosting
 
 One of the newest variations on process-image modification is process ghosting, released in June 2021 by Gabriel Landau. Process ghosting relies on the fact that Windows only prevents the deletion of files after they're mapped into an image section and doesn't check whether an associated section actually exists during the deletion process. If a user attempts to open the mapped executable to modify or delete it, Windows will return an error. If the developer marks the file for deletion and then creates the image section from the executable, the file will be deleted when the file handle is closed, but the section object will persist. This technique's execution flow is shown in Figure 3 - 12 .
 
-52    Chapter 3
+52 Chapter 3
 
 ---
 
@@ -1184,7 +1180,7 @@ To implement this technique in practice, malware might create an empty file on d
 
 While process-image modification has a seemingly endless number of variations, we can detect all of these using the same basic methods due to the technique's reliance on two things: the creation of an image section that differs from the reported executable, whether it is modified or missing, and the use of the legacy process-creation API to create a new, non-minimal process from the image section.
 
-Unfortunately, most of the detections for this tactic are reactive, occurring only as part of an investigation, or they leverage proprietary tooling. Still, by focusing on the basics of the technique, we can imagine multiple potential ways to detect it. To demonstrate these methods, Aleksandra Doniec (@hasherezade) created a public proof of concept for process ghosting that we can analyze in a controlled environment. You can find this file, proc _ ghostify6.exe , at https://github.com/hasherezade/ process _ ghosting _ releases . Yes that SHA-256 hash matches the following: 8a74a522e9ea27770803c0b95df8bea4c4c17f4aa487c64a489188bfdf6855 .
+Unfortunately, most of the detections for this tactic are reactive, occurring only as part of an investigation, or they leverage proprietary tooling. Still, by focusing on the basics of the technique, we can imagine multiple potential ways to detect it. To demonstrate these methods, Aleksandra Doniec (@hasherezade) created a public proof of concept for process ghosting that we can analyze in a controlled environment. You can find this file, proc _ ghostify6.exe , at https://github.com/hasherezade/ process _ ghosting \_ releases . Yes that SHA-256 hash matches the following: 8a74a522e9ea27770803c0b95df8bea4c4c17f4aa487c64a489188bfdf6855 .
 
 First, in kernel mode, the driver could search for information related to the process's image either in the PEB or in the corresponding PROCESS structure, the structure that represents a process object in the kernel. Because the user can control the PEB, the process structure is a better
 
@@ -1195,7 +1191,6 @@ source. It contains process-image information in a number of locations, describe
 Table 3-1: Process-Image Information Contained in the EPROCESS Structure
 
 <table><tr><td>Location</td><td>Process-image information</td></tr><tr><td>ImageFileName</td><td>Contains only the filename</td></tr><tr><td>ImageFilePointer.FileName</td><td>Contains the rooted Win32 filepath</td></tr><tr><td>SeAuditProcessCreationInfo .ImageFileName</td><td>Contains the full NT path but may not always be populated</td></tr><tr><td>ImagePathHash</td><td>Contains the hashed NT, or canonicalized, path via nt!P!CalculateProcessHash()</td></tr></table>
-
 
 Drivers may query these paths by using APIs such as nt!SloateProcess ImageName() or nt!QueryInformationProcess() to retrieve the true image path, at which point they still need a way to determine whether the process has been tampered with. Despite being unreliable, the PEB provides a point of comparison. Let's walk through this comparison using WinDbg. First, we attempt to pull the image's filepath from one of the process structure's fields (Listing 3-15).
 
@@ -1295,7 +1290,7 @@ Listing 3-21: The Minimal and PicoCreated members set to false
 
 Another place to look for anomalies is the virtual address descriptor (VAD) tree used for tracking a process's contiguous virtual memory allocations. The VAD tree can provide very useful information about loaded modules and the permissions of memory allocations. The root of this tree is stored in the VadRoot member of the process structure, which we can't directly retrieve through a Microsoft-supplied API, but you can find a reference implementation in Blackbone, a popular driver used for manipulating memory.
 
-To detect process-image modifications, you'll probably want to look at the mapped allocation types, which include READONLY file mappings, such as the COM+ catalog files (for example, C:\Windows\Registration\RXXXXxx\ ebb), and EXECUTE_WRITECOPY* executable files. In the VAD tree, you'll commonly see the Win32-rooted path for the process image (in other words, the executable file that backs the process as the first mapped executable). Listing 3-22 shows the truncated output of WinDbg's tvaD command.
+To detect process-image modifications, you'll probably want to look at the mapped allocation types, which include READONLY file mappings, such as the COM+ catalog files (for example, C:\Windows\Registration\RXXXXxx\ ebb), and EXECUTE_WRITECOPY\* executable files. In the VAD tree, you'll commonly see the Win32-rooted path for the process image (in other words, the executable file that backs the process as the first mapped executable). Listing 3-22 shows the truncated output of WinDbg's tvaD command.
 
 ```bash
 0: kd\lvad
@@ -1309,9 +1304,7 @@ Listing 3-22: The output of the !vad command in WinDbg for a normal process
 
 The output of this tool shows mapped allocations for an unmodified
 
-
 nptuple.exe process. Now let's see how they look in a ghosted process
-
 
 (Listing 3-23).
 
@@ -1327,11 +1320,11 @@ Listing 3-23: The output of the !vad command for a ghosted process
 
 This mapped allocation shows the path to the .tmp file instead of the path to ./notepad.exe.
 
-56    Chapter 3
+56 Chapter 3
 
 ---
 
-Now that we know the path to the image of interest, we can investigate it further. One way to do this is to use the mdtllNTQueryInformationFile() API with the fileStandardInformation class, which will return a FILE_STANDARD_ INFORMATION structure. This structure contains the DeletePending field, which is a Boolean indicating whether the file has been marked for deletion.
+Now that we know the path to the image of interest, we can investigate it further. One way to do this is to use the mdtllNTQueryInformationFile() API with the fileStandardInformation class, which will return a FILE*STANDARD* INFORMATION structure. This structure contains the DeletePending field, which is a Boolean indicating whether the file has been marked for deletion.
 
 Under normal circumstances, you could also pull this information from the DeletePending member of the FILE_OBJECT structure. Inside the EPDOCSS structure for the relevant process, this is pointed to by the ImageFilePointer member. In the case of the ghosted process, this pointer will be null, so the EDR can't use it. Listing 3-24 shows what a normal process's image file pointer and deletion status should look like.
 
@@ -1349,8 +1342,8 @@ This listing is from a notepad.exe process executed under normal conditions. In 
 After observing the difference between a normal instance of nopad.exe and one that has been ghosted, we've identified a few indicators:
 
 - • There will be a mismatch between the paths in the ImagePathName inside
-the ProcessParameters member of the process's PEB and the ImageFileName
-in its EPROCESS structure.
+  the ProcessParameters member of the process's PEB and the ImageFileName
+  in its EPROCESS structure.
 
 • The process structure's image file pointer will be null and its Minimal
 and PicoCreated fields will be false .
@@ -1401,7 +1394,7 @@ Fork & run works by spawning a sacrificial process into which the primary agent 
 
 The architecture also streamlines the agent's design. By providing a host process and a means of injecting its post-exploitation capabilities, the developer makes it easier to integrate new features into the agent. Additionally, by keeping post-exploitation tasking contained in another
 
-58    Chapter 3
+58 Chapter 3
 
 ---
 
@@ -1421,13 +1414,12 @@ If attackers remove the artifacts from fork&run, EDR vendors must rely on other 
 
 Monitoring the creation of new processes and threads is an immensely important capability for any EDR. It facilitates the mapping of parent–child relationships, the investigation of suspect processes prior to their execution, and the identification of remote thread creation. Although Windows
 
-Process- and Thread-Creation Notifications  59
+Process- and Thread-Creation Notifications 59
 
 ---
 
 provides other ways to obtain this information, process- and thread-creation callback routines inside the EDR's driver are by far the most common. In addition to having a great deal of visibility into activity on the system, these callbacks are challenging to evade, relying on gaps in coverage and blind spots rather than fundamental flaws in the underlying technology.
 
-60    Chapter 3
+60 Chapter 3
 
 ---
-

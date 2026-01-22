@@ -23,30 +23,32 @@ Use this skill when:
 
 **NOT for:**
 
-- Renaming skills (use `renaming-skills` skill)
+- Renaming skills (use `renaming-skills` (LIBRARY) skill)
 - Temporarily disabling skills (comment out gateway reference)
-- Migrating skills (use `migrating-skills` skill)
+- Migrating skills (use `migrating-skills` (LIBRARY) skill)
 
 ---
 
 ## Quick Reference
 
-| Phase           | Purpose                       | Time  | Checkpoint            |
-| --------------- | ----------------------------- | ----- | --------------------- |
-| **1. Validate** | Verify skill exists           | 1 min | Skill found           |
-| **2. Discover** | Find all references           | 3 min | References documented |
-| **3. Analyze**  | Show impact to user           | 2 min | Impact clear          |
-| **4. Confirm**  | User approval before deletion | 1 min | Confirmed             |
-| **5. Remove**   | Delete skill directory        | 1 min | Directory removed     |
-| **6. Gateway**  | Sync gateway routing tables   | 3 min | Gateways synced       |
-| **7. Cleanup**  | Remove non-gateway references | 5 min | References cleaned    |
-| **8. Verify**   | Ensure no orphaned references | 2 min | Clean verified        |
+| Phase           | Purpose                               | Time  | Checkpoint            |
+| --------------- | ------------------------------------- | ----- | --------------------- |
+| **1. Validate** | Navigate to root, verify skill exists | 1 min | Skill found           |
+| **2. Discover** | Find all references                   | 3 min | References documented |
+| **3. Analyze**  | Show impact to user                   | 2 min | Impact clear          |
+| **4. Confirm**  | User approval before deletion         | 1 min | Confirmed             |
+| **5. Remove**   | Delete skill directory                | 1 min | Directory removed     |
+| **6. Gateway**  | Sync gateway routing tables           | 3 min | Gateways synced       |
+| **7. Cleanup**  | Remove non-gateway references         | 5 min | References cleaned    |
+| **8. Verify**   | Ensure no orphaned references         | 2 min | Clean verified        |
 
 **Total**: 18 minutes
 
 ---
 
-## Step 0: Navigate to Repository Root (MANDATORY)
+## Phase 1: Navigate to Repository Root and Validate Skill Existence
+
+### 1.0 Navigate to Repository Root (MANDATORY)
 
 **Execute BEFORE any delete operation:**
 
@@ -54,15 +56,11 @@ Use this skill when:
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT"
 ```
 
-**See:** [Repository Root Navigation](../../../../skills/managing-skills/references/patterns/repo-root-detection.md)
+**See:** [Repository Root Navigation](.claude/skills/managing-skills/references/patterns/repo-root-detection.md)
 
 **⚠️ If skill file not found:** You are in the wrong directory. Navigate to repo root first. The file exists, you're just looking in the wrong place.
 
 **Cannot proceed without navigating to repo root** ✅
-
----
-
-## Phase 1: Validate Skill Existence
 
 ### 1.1 Find the Skill
 
@@ -273,40 +271,40 @@ ls {skill-path} 2>&1
 
 ## Phase 6: Gateway Sync
 
-**Automatically detect and remove broken gateway paths using syncing-gateways skill.**
+**Automatically detect and remove broken gateway paths using `syncing-gateways` (LIBRARY) skill.**
 
-This phase mirrors the pattern from `migrating-skills` Step 4: after directory deletion, automatically sync gateway routing tables to remove broken references.
+This phase mirrors the pattern from `migrating-skills` (LIBRARY) Step 4: after directory deletion, automatically sync gateway routing tables to remove broken references.
 
 ### 6.1 Read syncing-gateways Skill
 
 ```bash
-# Read the syncing-gateways skill to understand the workflow
+# Read the syncing-gateways (LIBRARY) skill to understand the workflow
 # Located at: .claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md
 ```
 
-Use Read tool to load the `syncing-gateways` skill.
+Use Read tool to load the `syncing-gateways` (LIBRARY) skill.
 
 ### 6.2 Execute Gateway Sync
 
-Follow the `syncing-gateways` workflow to:
+Follow the `syncing-gateways` (LIBRARY) workflow to:
 
 1. **Detect** - Scan all gateway skills for references to deleted skill
 2. **Validate** - Check if referenced skills exist in core or library
 3. **Report** - Show which gateways have broken references
 4. **Fix** - Remove broken routing entries from gateway skills
 
-**Why automatic?** Gateways follow predictable routing table patterns. The `syncing-gateways` skill can detect and fix broken references automatically.
+**Why automatic?** Gateways follow predictable routing table patterns. The `syncing-gateways` (LIBRARY) skill can detect and fix broken references automatically.
 
 ### 6.3 Verify Gateway Cleanup
 
-After running `syncing-gateways`, verify no gateway references remain:
+After running `syncing-gateways` (LIBRARY), verify no gateway references remain:
 
 ```bash
 grep -r "{skill-name}" .claude/skills/gateway-*/SKILL.md
 # Should return no results
 ```
 
-**If references found:** The `syncing-gateways` skill should have removed them. If not, investigate and clean manually.
+**If references found:** The `syncing-gateways` (LIBRARY) skill should have removed them. If not, investigate and clean manually.
 
 ---
 
@@ -458,23 +456,30 @@ Deletion complete when:
 
 ---
 
-## Integration with Other Skills
+## Integration
 
-**Before deleting:**
+### Called By
 
-- Check if skill should be **renamed** instead (`renaming-skills`)
-- Check if skill should be **migrated** instead (`migrating-skills`)
+- `/skill-manager` command - Routes delete operations to this skill
+- `managing-skills` (CORE) - Main skill management router
 
-**After deleting:**
+### Requires (invoke before starting)
 
-- Run `npm run audit -- <gateway-name>` on updated gateway files
-- Verify no broken links with `npm run audit` (audits all skills)
+None - standalone skill
 
-**Related:**
+### Calls (during execution)
 
-- `renaming-skills` - Rename instead of delete
-- `migrating-skills` - Move location instead of delete
-- `auditing-skills` - Verify cleanup success
+| Skill                        | Phase/Step | Purpose                                                                                                                                  |
+| ---------------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------------------------------- |
+| `syncing-gateways` (LIBRARY) | Phase 6    | Automatically detect and remove broken gateway paths - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")` |
+
+### Pairs With (conditional)
+
+| Skill                        | Trigger                                              | Purpose                                                                                                                              |
+| ---------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| `renaming-skills` (LIBRARY)  | When skill needs new name instead of deletion        | Consider renaming instead of deleting - `Read(".claude/skill-library/claude/skill-management/renaming-skills/SKILL.md")`             |
+| `migrating-skills` (LIBRARY) | When skill needs location change instead of deletion | Consider migrating instead of deleting - `Read(".claude/skill-library/claude/skill-management/migrating-skills/SKILL.md")`           |
+| `auditing-skills` (LIBRARY)  | After deletion                                       | Verify cleanup success and no orphaned references - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")` |
 
 ---
 

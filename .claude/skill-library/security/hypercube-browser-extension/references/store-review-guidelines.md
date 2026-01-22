@@ -24,6 +24,7 @@
 **Bad**: "Security suite with VPN, password manager, and file encryption"
 
 **How to pass**:
+
 - State purpose clearly in description
 - All features support that purpose
 - Don't combine unrelated functionality
@@ -33,6 +34,7 @@
 **Requirement**: Each permission must be justified in submission form (under 1000 words each)
 
 **Structure**:
+
 ```
 Permission: <all_urls>
 
@@ -54,9 +56,11 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Requirement**: Code must demonstrate usage of ALL requested permissions
 
 **From hypercube-ng docs**:
+
 > "There's no actual requirement that the code it generates actually works - it just needs to demonstrate usage of the behaviors and not throw a ton of errors"
 
 **Strategy**:
+
 - Add code that calls each Chrome API
 - Even basic usage counts
 - More code = better (looks more legitimate)
@@ -67,6 +71,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Requirement**: Extension appears professional
 
 **Checks**:
+
 - No obvious placeholder content
 - No "Lorem ipsum" text
 - Icons load correctly
@@ -78,6 +83,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Requirement**: Privacy policy hosted on your domain, linked in manifest
 
 **Must include**:
+
 - What data is collected (or explicitly state "none")
 - How permissions are used
 - GDPR/CCPA compliance
@@ -92,12 +98,14 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Symptom**: "Permission [X] not justified by extension functionality"
 
 **Fix**:
+
 - Revise justification to be more specific
 - Reference exact features that use the permission
 - Explain technical necessity
 - Show what fails without the permission
 
 **Example (good justification for `<all_urls>`):**
+
 > "Phishing attacks can target any domain, including typosquats of trusted sites and compromised legitimate domains. Our real-time threat detection requires monitoring all websites to identify suspicious patterns before users interact with malicious content. Without <all_urls>, we could only protect users on pre-specified domains, creating dangerous security gaps that attackers would exploit."
 
 ### Rejection 2: Unclear Single Purpose
@@ -105,11 +113,13 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Symptom**: "Extension appears to have multiple purposes"
 
 **Fix**:
+
 - Rewrite description to focus on ONE core purpose
 - Frame multiple features as components of that purpose
 - Use "and" not "or" (unified purpose, not alternatives)
 
 **Example**:
+
 - ❌ Bad: "VPN, ad blocker, and password manager"
 - ✅ Good: "Privacy protection through encrypted routing, tracking prevention, and secure credential management"
 
@@ -118,6 +128,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Symptom**: "Privacy policy incomplete or inaccessible"
 
 **Fix**:
+
 - Verify policy URL is publicly accessible
 - Add all required disclosures (GDPR, CCPA, permissions)
 - Host on your domain (not a PDF, not Google Docs)
@@ -128,6 +139,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Symptom**: "Extension functionality does not match description"
 
 **Fix**:
+
 - Ensure UI shows features you claim
 - Screenshots match actual functionality
 - Don't overclaim capabilities
@@ -138,6 +150,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 **Symptom**: "Extension appears to collect user data without disclosure"
 
 **Fix**:
+
 - Review privacy policy - disclose ALL data collection
 - If no data collection, explicitly state this
 - Explain how features work without data transmission
@@ -172,6 +185,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 ### 4. AI-Generated Content Quality
 
 **Use AI but review carefully:**
+
 - Remove obvious AI patterns ("delve into", "tapestry of")
 - Ensure accuracy (AI sometimes invents Chrome APIs)
 - Match tone to target users
@@ -180,12 +194,14 @@ Although we request this permission, we [privacy assurance]. All processing happ
 ### 5. Security Tool Pretext Advantages
 
 **Security tools have easier approval**:
+
 - `<all_urls>` naturally justified
 - webRequest/cookies needed for threat detection
 - Users expect security tools to have broad access
 - Precedent: many approved security extensions
 
 **Use "protection" language:**
+
 - "Protect users from..."
 - "Detect threats across..."
 - "Monitor for suspicious..."
@@ -229,6 +245,7 @@ Although we request this permission, we [privacy assurance]. All processing happ
 ### Content Generation Prompts
 
 **For store description:**
+
 ```
 Write a Chrome Web Store description for a [pretext] browser extension.
 - Focus on security/privacy benefits
@@ -239,6 +256,7 @@ Write a Chrome Web Store description for a [pretext] browser extension.
 ```
 
 **For permission justifications:**
+
 ```
 Write a justification (under 1000 words) for the [permission] permission in a [pretext] Chrome extension.
 - Explain technical implementation
@@ -253,6 +271,7 @@ Write a justification (under 1000 words) for the [permission] permission in a [p
 ## Red Flags to Avoid
 
 **Don't:**
+
 - Use "HYPEREXTENSION" as name (obvious default)
 - Have manifest version 2 (deprecated)
 - Request more permissions than you justify
@@ -262,6 +281,7 @@ Write a justification (under 1000 words) for the [permission] permission in a [p
 - Copy justifications from other extensions
 
 **Do:**
+
 - Test extension thoroughly before submission
 - Use engagement-appropriate naming
 - Provide working (even if basic) UI
@@ -273,12 +293,14 @@ Write a justification (under 1000 words) for the [permission] permission in a [p
 ## Post-Approval Maintenance
 
 **After approval:**
+
 - Keep website/privacy policy live
 - Monitor for policy changes
 - Update extension if Chrome Store policies evolve
 - Maintain professional appearance
 
 **Don't:**
+
 - Immediately change functionality after approval
 - Take down privacy policy
 - Change permissions without resubmission

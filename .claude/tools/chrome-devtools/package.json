@@ -1,18 +1,11 @@
 {
   "name": "@claude-tools/chrome-devtools",
   "version": "1.0.0",
-  "description": "TypeScript wrappers for chrome-devtools MCP tools with progressive loading",
+  "description": "Browser automation, DOM inspection, network monitoring, and debugging",
   "type": "module",
   "main": "index.ts",
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts"
-  },
-  "dependencies": {
-    "zod": "^3.22.4",
-    "@modelcontextprotocol/sdk": "^1.22.0"
-  },
-  "devDependencies": {
-    "@claude/testing": "*"
   }
 }

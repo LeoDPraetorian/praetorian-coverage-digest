@@ -1,6 +1,6 @@
 ---
 name: searching-skills
-description: Use when finding skills by keyword - searches both core (.claude/skills/) and library (.claude/skill-library/) locations with fuzzy matching, scoring algorithm (exact > substring > fuzzy), and optional CLI (npm run search)
+description: Use when finding skills by keyword - searches core and library with fuzzy matching, scored results (exact > substring)
 allowed-tools: Bash, Grep, Read, TodoWrite, Glob
 ---
 
@@ -8,7 +8,27 @@ allowed-tools: Bash, Grep, Read, TodoWrite, Glob
 
 **Keyword-based skill discovery across core and library locations.**
 
-> **You MUST use TodoWrite** before starting to track all search workflow steps.
+<EXTREMELY-IMPORTANT>
+**TodoWrite is MANDATORY before any search operation.**
+
+You MUST create a TodoWrite todo list with these items BEFORE proceeding:
+
+1. Navigate to repository root
+2. Get search query from user
+3. Search core skills by name and description
+4. Search library skills by name and description
+5. Score and sort results by relevance
+6. Format and present search results
+
+**This is NOT optional. This is NOT negotiable.**
+
+- ❌ "This is just a quick search" → Use TodoWrite anyway
+- ❌ "I already know the workflow" → TodoWrite makes progress visible to user
+- ❌ "It's only 6 steps" → TodoWrite is mandatory for ANY multi-step workflow
+- ❌ "The user wants fast results" → TodoWrite IS fast and provides transparency
+
+**If you skip TodoWrite, you are violating this skill's requirements.**
+</EXTREMELY-IMPORTANT>
 
 ---
 
@@ -62,7 +82,7 @@ Grep {
 
 ---
 
-## Step 0: Navigate to Repository Root (MANDATORY)
+## Step 1: Navigate to Repository Root (MANDATORY)
 
 **Execute BEFORE any search operation:**
 
@@ -80,7 +100,7 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 Follow these steps to search for skills by keyword with scoring and result formatting:
 
-### Step 1: Get Search Query
+### Step 2: Get Search Query
 
 If user provided query, use it. Otherwise, ask:
 
@@ -93,7 +113,7 @@ Options:
   - Domain (e.g., "frontend", "backend")
 ```
 
-### Step 2: Search Core Skills
+### Step 3: Search Core Skills
 
 **Search core skill names:**
 
@@ -113,7 +133,7 @@ Grep {
 }
 ```
 
-### Step 3: Search Library Skills
+### Step 4: Search Library Skills
 
 **Search library skill names:**
 
@@ -136,7 +156,7 @@ Grep {
 }
 ```
 
-### Step 4: Score and Sort Results
+### Step 5: Score and Sort Results
 
 For each match:
 
@@ -145,7 +165,7 @@ For each match:
 - Calculate score
 - Sort by score descending
 
-### Step 5: Format Output
+### Step 6: Format Output
 
 ```text
 Search Results for "{keyword}":
@@ -173,10 +193,10 @@ Found {count} matches
 [LIB] creating-skills (Score: 30)
   Description mentions React in examples
 
-[LIB] frontend-tanstack-query (Score: 50)
+[LIB] using-tanstack-query (Score: 50)
   Category contains React patterns
 
-[LIB] frontend-react-patterns (Score: 100)
+[LIB] using-modern-react-patterns (Score: 100)
   Name exact match
 ```
 
@@ -190,17 +210,37 @@ Found {count} matches
 
 ---
 
+## Integration
+
+### Called By
+
+- `managing-skills` skill (search operation routing)
+- `/skill-manager search <query>` command
+- Gateway skills (when user asks "find skills about X")
+- Users discovering available skills before creating duplicates
+
+### Requires (invoke before starting)
+
+None - standalone search skill
+
+### Calls (during execution)
+
+None - terminal skill (doesn't invoke other skills)
+
+### Pairs With (conditional)
+
+| Skill                       | Trigger                          | Purpose                                                                                             |
+| --------------------------- | -------------------------------- | --------------------------------------------------------------------------------------------------- |
+| `listing-skills` (LIBRARY)  | When complete enumeration needed | List all skills - `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")`   |
+| `creating-skills` (LIBRARY) | After search finds no match      | Create new skill - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` |
+| `auditing-skills` (LIBRARY) | After finding skill to validate  | Validate skill - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`   |
+
+---
+
 ## Related Skills
 
-- `listing-skills` - List all skills
-- `creating-skills` - Create new skills
-- `auditing-skills` - Owns the search CLI
-
-## CLI Alternative
-
-The search command is owned by `auditing-skills`:
-
-```bash
-# From anywhere in the repo
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && cd "$ROOT/.claude" && npm run search -- "<query>"
-```
+| Skill                       | Purpose                                                                                              |
+| --------------------------- | ---------------------------------------------------------------------------------------------------- |
+| `listing-skills` (LIBRARY)  | List all skills - `Read(".claude/skill-library/claude/skill-management/listing-skills/SKILL.md")`    |
+| `creating-skills` (LIBRARY) | Create new skills - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` |
+| `auditing-skills` (LIBRARY) | Validate skills - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`   |

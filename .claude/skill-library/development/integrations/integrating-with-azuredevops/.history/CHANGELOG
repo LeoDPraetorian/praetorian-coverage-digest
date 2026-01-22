@@ -1,70 +1,34 @@
 # Changelog - integrating-with-azuredevops
 
-## 2026-01-06 - Initial Creation
+## 2026-01-19
 
-**Type:** New Skill
-**Category:** development/integrations
-**Skill Type:** Integration
-**Author:** Claude Code (Sonnet 4.5)
+### Added
+- CheckAffiliation (Ownership Verification) section to asset-mapping.md
+  - Pattern A (Direct Ownership Query) recommended for Azure DevOps
+  - API endpoints documented for repository, pipeline, and work item verification
+  - Complete Go code examples for CheckAffiliation implementation
+  - Error handling rules table for different API responses
+  - Helper function for detecting "not found" errors
+- vmfilter-patterns.md reference file
+  - Extracted complete VMFilter workflow examples from asset-mapping.md
+  - Repository, pipeline, and work item discovery patterns
+  - Security implications and multi-tenancy attack scenarios
 
-### RED Phase Documentation
+### Changed
+- asset-mapping.md: Condensed VMFilter section (removed 62 lines)
+  - Replaced verbose examples with concise usage pattern
+  - Added link to vmfilter-patterns.md for complete workflows
+- asset-mapping.md: Updated Related Resources section
+  - Added link to vmfilter-patterns.md
+  - Added link to checkaffiliation-patterns.md
 
-**Gap Identified:** No dedicated skill for Azure DevOps integration, while similar skills exist for GitHub, BitBucket, and GitLab.
+### Metrics
+- asset-mapping.md: 305 → 365 lines (net +60 lines after extraction)
+- vmfilter-patterns.md: new file, 132 lines
+- Total reference files: 13 files, 3855 lines
 
-**Test Scenario:** Developer asks "help me integrate Azure DevOps repositories with Chariot"
-
-**Failure Without Skill:**
-- Would rely on generic REST API integration knowledge
-- Would search scattered Azure DevOps code examples in codebase
-- Might miss Azure DevOps-specific patterns (PAT scopes, API versioning, WIQL queries)
-- No structured reference for webhooks, PR automation, or pipeline integration
-- No guidance on work item tracking integration
-
-**Expected With Skill:**
-- Immediate access to Azure DevOps-specific patterns and authentication methods
-- Structured guidance on repos, pipelines, work items, and webhooks
-- Reference documentation for common integration scenarios
-- Error handling and rate limiting strategies specific to Azure DevOps
-
-### Initial Implementation
-
-**Structure:**
-- SKILL.md: 490 lines (within 450-500 warning threshold)
-- Location: `.claude/skill-library/development/integrations/`
-- Progressive disclosure: Main patterns in SKILL.md, detailed content in references/
-
-**Coverage:**
-- Authentication (PAT, OAuth, Service Principal)
-- Repository discovery and asset mapping
-- Pull request automation
-- Pipeline integration and security monitoring
-- Work item tracking with WIQL queries
-- Webhook configuration for git, build, and work item events
-- Error handling and rate limiting
-- Integration patterns and testing guidance
-
-**References to Create:**
-- api-reference.md
-- authentication.md
-- client-implementation.md
-- pagination-patterns.md
-- pr-automation.md
-- pipeline-integration.md
-- work-item-integration.md
-- webhook-events.md
-- asset-mapping.md
-- error-handling.md
-- integration-patterns.md
-- testing-guide.md
-
-### Status
-
-- ✅ Phase 1 (RED): Gap documented and test scenario defined
-- ✅ Phase 2 (Validation): Name validated, no conflicts
-- ✅ Phase 3 (Location): Library skill, category `development/integrations`
-- ✅ Phase 4 (Type): Integration skill
-- ✅ Phase 5 (Structure): Directory created, SKILL.md generated (490 lines)
-- ⏳ Phase 6 (Research): Pending
-- ⏳ Phase 7 (Gateway): Pending gateway update
-- ⏳ Phase 8 (GREEN): Pending verification
-- ⏳ Phase 9 (REFACTOR): Pending pressure tests
+### Compliance
+- ✅ SKILL.md: 493 lines (under 500-line limit)
+- ✅ asset-mapping.md: 365 lines (under 400-line limit)
+- ✅ vmfilter-patterns.md: 132 lines (under 400-line limit)
+- ⚠️ Pre-existing issue: client-implementation.md at 627 lines (exceeds 400-line limit)

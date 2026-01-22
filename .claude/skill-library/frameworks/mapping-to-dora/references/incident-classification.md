@@ -6,12 +6,12 @@
 
 **Any ONE of these triggers major incident classification:**
 
-| Threshold Type  | Value                      | Measurement                                  |
-| --------------- | -------------------------- | -------------------------------------------- |
-| Financial Impact| >€500,000                  | Direct/indirect losses, recovery costs       |
-| Client Impact   | >5% of client base         | Number of clients with affected services     |
-| Downtime        | >2 hours                   | Duration critical/important function unavailable |
-| Data Breach     | >50,000 records compromised| Personal, financial, or sensitive data       |
+| Threshold Type   | Value                       | Measurement                                      |
+| ---------------- | --------------------------- | ------------------------------------------------ |
+| Financial Impact | >€500,000                   | Direct/indirect losses, recovery costs           |
+| Client Impact    | >5% of client base          | Number of clients with affected services         |
+| Downtime         | >2 hours                    | Duration critical/important function unavailable |
+| Data Breach      | >50,000 records compromised | Personal, financial, or sensitive data           |
 
 ## Qualitative Assessment Criteria
 
@@ -71,10 +71,12 @@
 ### Initial Notification (4 hours / 24 hours)
 
 **Timeline:**
+
 - **4 hours** after incident classified as major
 - No later than **24 hours** after incident detected (if classification takes time)
 
 **Required Content:**
+
 - Incident description and type
 - Classification rationale (which threshold(s) triggered)
 - Time of occurrence and detection
@@ -85,6 +87,7 @@
 - Contact information for incident lead
 
 **Submission:**
+
 - Via competent authority's incident reporting portal
 - 24/7 availability required
 - Immediate acknowledgment from authority
@@ -92,9 +95,11 @@
 ### Intermediate Report (72 hours)
 
 **Timeline:**
+
 - **72 hours** after incident classification
 
 **Required Content (expanding initial report):**
+
 - Detailed impact analysis (clients, systems, data)
 - Root cause investigation progress
 - Complete timeline of events
@@ -105,6 +110,7 @@
 - Changes in classification (if warranted)
 
 **Analysis Depth:**
+
 - Technical root cause analysis
 - Control failures identified
 - Detection mechanism effectiveness
@@ -113,9 +119,11 @@
 ### Final Report (1 month)
 
 **Timeline:**
+
 - **1 month** (30 days) after incident classification
 
 **Required Content (comprehensive post-incident report):**
+
 - Complete root cause analysis (technical and procedural)
 - Full incident timeline with evidence
 - Impact assessment (financial, operational, reputational)
@@ -128,6 +136,7 @@
 - Regulatory coordination (if cross-border)
 
 **Post-Incident Review:**
+
 - Management review and sign-off required
 - Board notification (for significant incidents)
 - Update to risk register
@@ -137,17 +146,20 @@
 ## Client Notification Requirements
 
 **Mandatory notification when:**
+
 - Incident affects client financial interests
 - Client data compromised
 - Service availability impacts client operations
 - Regulatory requirement (GDPR for personal data)
 
 **Notification Timeline:**
+
 - **Without undue delay** after classification
 - Coordinate with competent authority
 - May be delayed if law enforcement investigation
 
 **Notification Content:**
+
 - Nature of incident and affected services
 - Impact on client (specific where possible)
 - Actions taken to mitigate
@@ -160,11 +172,13 @@
 ### NIS2 Directive Alignment
 
 DORA incident timelines harmonized with NIS2 (Network and Information Security Directive):
+
 - Initial notification: 24 hours (DORA allows 4h if classification fast)
 - Incident update: 72 hours
 - Final report: 1 month
 
 **Coordination:**
+
 - Same reporting channels for entities under both regimes
 - Avoid duplicate reporting burden
 - Cross-reference to NIS2 reports
@@ -173,12 +187,13 @@ DORA incident timelines harmonized with NIS2 (Network and Information Security D
 
 **Personal data breaches require parallel reporting:**
 
-| Regulation | Authority         | Timeline    | Trigger                     |
-| ---------- | ----------------- | ----------- | --------------------------- |
-| DORA       | Financial regulator| 4h/24h/72h/1m| Major ICT incident        |
-| GDPR       | Data protection   | 72 hours    | Personal data breach        |
+| Regulation | Authority           | Timeline      | Trigger              |
+| ---------- | ------------------- | ------------- | -------------------- |
+| DORA       | Financial regulator | 4h/24h/72h/1m | Major ICT incident   |
+| GDPR       | Data protection     | 72 hours      | Personal data breach |
 
 **Best Practice:**
+
 - Use DORA initial report for GDPR 72-hour notification
 - Coordinate with both authorities
 - Ensure consistent information
@@ -203,12 +218,14 @@ DORA incident timelines harmonized with NIS2 (Network and Information Security D
 ## Enforcement and Penalties
 
 **Non-compliance sanctions:**
+
 - Fines up to **2% of annual worldwide turnover**
 - Public warnings and disclosure
 - Remediation mandates
 - Enhanced supervision
 
 **Aggravating Factors:**
+
 - Delayed reporting (beyond timelines)
 - Incomplete or inaccurate information
 - Failure to implement remediation
@@ -253,6 +270,7 @@ DORA incident timelines harmonized with NIS2 (Network and Information Security D
 ### Tool Requirements
 
 **Incident Management Platform should support:**
+
 - Automated classification decision trees
 - Threshold monitoring (financial impact, clients, downtime, data)
 - Countdown timers (4h, 72h, 30 days)
@@ -264,13 +282,13 @@ DORA incident timelines harmonized with NIS2 (Network and Information Security D
 
 ## Common Classification Mistakes
 
-| Mistake                        | Consequence                          | Prevention                              |
-| ------------------------------ | ------------------------------------ | --------------------------------------- |
-| Delaying classification        | Missed 4-hour window                 | Pre-classify when in doubt, can reclassify later|
-| Underestimating client impact  | Non-compliance, penalties            | Conservative assessment, err on side of reporting|
-| Ignoring qualitative factors   | Missing systemic risk incidents      | Use qualitative criteria even if thresholds not met|
-| Incomplete initial reports     | Regulatory scrutiny, follow-up demands| Use template, submit what's known, update at 72h|
-| Not updating classification    | Inaccurate risk assessment           | Re-evaluate as investigation progresses |
+| Mistake                       | Consequence                            | Prevention                                          |
+| ----------------------------- | -------------------------------------- | --------------------------------------------------- |
+| Delaying classification       | Missed 4-hour window                   | Pre-classify when in doubt, can reclassify later    |
+| Underestimating client impact | Non-compliance, penalties              | Conservative assessment, err on side of reporting   |
+| Ignoring qualitative factors  | Missing systemic risk incidents        | Use qualitative criteria even if thresholds not met |
+| Incomplete initial reports    | Regulatory scrutiny, follow-up demands | Use template, submit what's known, update at 72h    |
+| Not updating classification   | Inaccurate risk assessment             | Re-evaluate as investigation progresses             |
 
 ## References
 

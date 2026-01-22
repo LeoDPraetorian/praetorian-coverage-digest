@@ -463,10 +463,10 @@ When parent skill provides `OUTPUT_DIR`:
 
 ## Integration with Research Orchestration
 
-This skill is invoked during research orchestration by `orchestrating-research` (CORE skill):
+This skill is invoked during research orchestration by `orchestrating-research` (LIBRARY):
 
 ```
-skill: "orchestrating-research"
+Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
 ```
 
 Research orchestration delegates to:
@@ -500,15 +500,15 @@ Research orchestration delegates to:
 
 ## Related Skills
 
-| Skill                      | Access Method                                                                              | Purpose                                |
-| -------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------- |
-| **orchestrating-research** | `skill: "orchestrating-research"` (CORE)                                                   | Orchestrator for all research types    |
-| **researching-codebase**   | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)           | Local codebase pattern discovery       |
-| **researching-context7**   | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)           | npm/library documentation via Context7 |
-| **researching-arxiv**      | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)              | Academic papers and research           |
-| **researching-web**        | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)                | General web research (fallback)        |
-| **creating-skills**        | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY) | Skill creation workflow                |
-| **updating-skills**        | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY) | Skill update workflow                  |
+| Skill                              | Access Method                                                                              | Purpose                                |
+| ---------------------------------- | ------------------------------------------------------------------------------------------ | -------------------------------------- |
+| `orchestrating-research` (LIBRARY) | `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`                   | Orchestrator for all research types    |
+| **researching-codebase**           | `Read(".claude/skill-library/research/researching-codebase/SKILL.md")` (LIBRARY)           | Local codebase pattern discovery       |
+| **researching-context7**           | `Read(".claude/skill-library/research/researching-context7/SKILL.md")` (LIBRARY)           | npm/library documentation via Context7 |
+| **researching-arxiv**              | `Read(".claude/skill-library/research/researching-arxiv/SKILL.md")` (LIBRARY)              | Academic papers and research           |
+| **researching-web**                | `Read(".claude/skill-library/research/researching-web/SKILL.md")` (LIBRARY)                | General web research (fallback)        |
+| **creating-skills**                | `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")` (LIBRARY) | Skill creation workflow                |
+| **updating-skills**                | `Read(".claude/skill-library/claude/skill-management/updating-skills/SKILL.md")` (LIBRARY) | Skill update workflow                  |
 
 ---
 

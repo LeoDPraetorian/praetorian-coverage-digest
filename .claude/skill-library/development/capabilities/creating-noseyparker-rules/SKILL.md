@@ -8,6 +8,7 @@ description: Use when creating new credential detection rules for NoseyParker se
 ## When to Use
 
 Use this skill when:
+
 - User requests a new credential detection rule for NoseyParker
 - User provides a credential type that needs detection (e.g., "create rule for Stripe API keys")
 - User wants to add scanning capability for a specific secret format
@@ -17,37 +18,41 @@ Use this skill when:
 **8-Phase Semi-Automated Workflow** (~75% automated)
 
 Human interaction points:
+
 1. **Phase 4**: GitHub validation (5 minutes - structured feedback)
 2. **Phase 10**: Final approval before integration
 
 ## Phase 1: Intake & Validation
 
 ### Input
+
 User provides credential type name (e.g., "AWS Access Key", "Stripe API Key", "GitHub Token")
 
 ### Actions
+
 ```yaml
 1. Validate input:
-   - Confirm credential type is specific enough
-   - Clarify if ambiguous (use AskUserQuestion)
+  - Confirm credential type is specific enough
+  - Clarify if ambiguous (use AskUserQuestion)
 
 2. Check for existing rules:
-   - Search NoseyParker's 87 built-in rules
-   - Location: modules/noseyparker/crates/noseyparker/data/default/builtin/rules/
-   - If exists: Inform user, ask if updating or creating variant
+  - Search NoseyParker's 87 built-in rules
+  - Location: modules/noseyparker/crates/noseyparker/data/default/builtin/rules/
+  - If exists: Inform user, ask if updating or creating variant
 
 3. Initialize TodoWrite with 8 phases:
-   - Format research
-   - Regex generation
-   - GitHub validation (human-in-loop)
-   - Example preparation
-   - Documentation generation
-   - Rule file creation
-   - Validation testing
-   - Final approval
+  - Format research
+  - Regex generation
+  - GitHub validation (human-in-loop)
+  - Example preparation
+  - Documentation generation
+  - Rule file creation
+  - Validation testing
+  - Final approval
 ```
 
 ### Output
+
 Confirmed credential type + project plan
 
 ---
@@ -55,28 +60,30 @@ Confirmed credential type + project plan
 ## Phase 2: Format Research
 
 ### Actions
+
 ```yaml
 1. Use orchestrating-research skill:
-   Query: "[Credential Type] format specification structure prefixes length character-set"
-   Sources: Web search primary, Context7 if available
+  Query: "[Credential Type] format specification structure prefixes length character-set"
+  Sources: Web search primary, Context7 if available
 
 2. Extract from research:
-   - Distinctive prefixes (e.g., AKIA, ghp_, sk-)
-   - Fixed length requirements
-   - Character set restrictions (alphanumeric, base64, hex)
-   - Checksum algorithms if any
-   - Official documentation URLs
+  - Distinctive prefixes (e.g., AKIA, ghp_, sk-)
+  - Fixed length requirements
+  - Character set restrictions (alphanumeric, base64, hex)
+  - Checksum algorithms if any
+  - Official documentation URLs
 
 3. Document findings:
-   Format Specification:
-   - Prefix: [value or "none"]
-   - Length: [exact or range]
-   - Character set: [allowed characters]
-   - Structure: [description]
-   - References: [URLs]
+  Format Specification:
+    - Prefix: [value or "none"]
+    - Length: [exact or range]
+    - Character set: [allowed characters]
+    - Structure: [description]
+    - References: [URLs]
 ```
 
 ### Output
+
 Format specification document saved to research output
 
 ---
@@ -84,9 +91,11 @@ Format specification document saved to research output
 ## Phase 3: Regex Pattern Generation
 
 ### Input
+
 Format specification from Phase 2
 
 ### Actions
+
 ```yaml
 1. Generate initial regex pattern:
 
@@ -114,6 +123,7 @@ Format specification from Phase 2
 ```
 
 ### Example Output
+
 ```yaml
 pattern: |
   (?x)
@@ -127,9 +137,11 @@ pattern: |
 ## Phase 4: GitHub Validation (Human-in-the-Loop)
 
 ### Input
+
 Initial regex pattern from Phase 3
 
 ### Actions
+
 ```yaml
 1. Generate GitHub search query:
    - Format: /{regex}/ language:python
@@ -236,6 +248,7 @@ Initial regex pattern from Phase 3
 ```
 
 ### Output
+
 - Validated regex (or flagged for refinement)
 - Real-world examples (3-5 strings)
 - False positive patterns identified
@@ -246,12 +259,15 @@ Initial regex pattern from Phase 3
 ## Phase 5: Pattern Refinement (Conditional)
 
 ### Trigger
+
 Only if Phase 4 quality gates failed (match_count < 20 OR real_cred_pct < 60%)
 
 ### Input
+
 Human feedback from Phase 4
 
 ### Actions
+
 ```yaml
 1. Analyze failure mode:
 
@@ -297,6 +313,7 @@ Human feedback from Phase 4
 ```
 
 ### Output
+
 Refined regex pattern + iteration notes
 
 ---
@@ -304,9 +321,11 @@ Refined regex pattern + iteration notes
 ## Phase 6: Example Preparation
 
 ### Input
+
 Examples from Phase 4 human feedback
 
 ### Actions
+
 ```yaml
 1. Validate examples from human:
    for each example in examples:
@@ -353,6 +372,7 @@ Examples from Phase 4 human feedback
 ```
 
 ### Example Output
+
 ```yaml
 examples:
   - "AKIAIOSFODNN7EXAMPLE"
@@ -365,13 +385,15 @@ examples:
 ## Phase 7: Documentation & Rule Generation
 
 ### Input
+
 - Validated regex pattern
 - Safe test examples
 - Format specification
 - False positive patterns
 
 ### Actions
-```yaml
+
+````yaml
 1. Generate rule metadata:
 
    id: Generate unique ID
@@ -439,11 +461,12 @@ rules:
 
     categories:
       {applicable_categories}
-```
+````
 
 4. Save rule file:
    Path: .claude/.output/noseyparker-rules/{timestamp}-{credential-type}/rule.yml
-```
+
+````
 
 ### Output
 Complete YAML rule file
@@ -497,9 +520,10 @@ Complete rule file from Phase 7
 
    Status: {PASS/FAIL}
    {error_details if FAIL}"
-```
+````
 
 ### Output
+
 Validation pass/fail + error details if failed
 
 ---
@@ -507,9 +531,11 @@ Validation pass/fail + error details if failed
 ## Phase 9: Negative Example Generation
 
 ### Input
+
 False positive patterns from Phase 4
 
 ### Actions
+
 ```yaml
 1. Generate negative examples from FP patterns:
 
@@ -535,6 +561,7 @@ False positive patterns from Phase 4
 ```
 
 ### Output
+
 Rule with false positive prevention
 
 ---
@@ -542,72 +569,67 @@ Rule with false positive prevention
 ## Phase 10: Final Human Approval
 
 ### Input
+
 Complete validated rule + all metrics
 
 ### Actions
+
 ```yaml
-1. Present comprehensive summary:
+1. Present comprehensive summary: "NoseyParker Rule Creation Complete!
 
-   "NoseyParker Rule Creation Complete!
+  📋 Rule Summary:
+  - ID: {id}
+  - Name: {name}
+  - Pattern: {regex}
 
-   📋 Rule Summary:
-   - ID: {id}
-   - Name: {name}
-   - Pattern: {regex}
+  ✅ Quality Metrics:
+  - noseyparker rules check: PASSED
+  - GitHub validation: {match_count} matches, {real_cred_pct}% real credentials
+  - Examples: {count} validated
+  - Negative examples: {count} patterns excluded
+  - False positive rate: {fp_rate}%
 
-   ✅ Quality Metrics:
-   - noseyparker rules check: PASSED
-   - GitHub validation: {match_count} matches, {real_cred_pct}% real credentials
-   - Examples: {count} validated
-   - Negative examples: {count} patterns excluded
-   - False positive rate: {fp_rate}%
+  📝 Examples:
+  {display_examples}
 
-   📝 Examples:
-   {display_examples}
+  🚫 Negative Examples:
+  {display_negative_examples}
 
-   🚫 Negative Examples:
-   {display_negative_examples}
+  📚 References:
+  {display_references}
 
-   📚 References:
-   {display_references}
-
-   📁 Rule file saved to:
-   {file_path}"
+  📁 Rule file saved to:
+  {file_path}"
 
 2. Request final approval using AskUserQuestion:
-
-   question: "Ready to integrate this rule into NoseyParker?"
-   header: "Final approval"
-   options:
-     - label: "Approve - integrate rule"
-       description: "Rule meets quality standards, proceed with integration"
-     - label: "Refine - iterate on pattern"
-       description: "Return to Phase 5 for pattern refinement"
-     - label: "Reject - start over"
-       description: "Restart from Phase 2 with different approach"
-     - label: "Save for later - manual review"
-       description: "Save rule file but don't integrate yet"
+  question: "Ready to integrate this rule into NoseyParker?"
+  header: "Final approval"
+  options:
+    - label: "Approve - integrate rule"
+      description: "Rule meets quality standards, proceed with integration"
+    - label: "Refine - iterate on pattern"
+      description: "Return to Phase 5 for pattern refinement"
+    - label: "Reject - start over"
+      description: "Restart from Phase 2 with different approach"
+    - label: "Save for later - manual review"
+      description: "Save rule file but don't integrate yet"
 
 3. Handle user response:
+  If "Approve": → Proceed to Phase 11 (Integration)
 
-   If "Approve":
-     → Proceed to Phase 11 (Integration)
+  If "Refine": → Return to Phase 5
+    → Increment iteration counter
 
-   If "Refine":
-     → Return to Phase 5
-     → Increment iteration counter
+  If "Reject": → Document rejection reason
+    → Return to Phase 2
 
-   If "Reject":
-     → Document rejection reason
-     → Return to Phase 2
-
-   If "Save for later":
-     → Save to manual review directory
-     → Document current state
-     → Provide file path for future work
+  If "Save for later": → Save to manual review directory
+    → Document current state
+    → Provide file path for future work
 ```
 
 ### Output
+
 User decision + next action
 
 ---
@@ -615,9 +637,11 @@ User decision + next action
 ## Phase 11: Integration
 
 ### Input
+
 Approved rule from Phase 10
 
 ### Actions
+
 ```yaml
 1. Determine target location:
 
@@ -679,6 +703,7 @@ Approved rule from Phase 10
 ```
 
 ### Output
+
 Integrated rule + next steps
 
 ---
@@ -688,28 +713,33 @@ Integrated rule + next steps
 ### Common Issues
 
 **1. Format research returns no results**
+
 - Fallback to manual format specification entry
 - Ask user to provide format details
 - Use generic high-entropy pattern as baseline
 
 **2. GitHub validation finds 0 matches**
+
 - Pattern may be too specific
 - Check if credential type is rare or theoretical
 - Consider if detection is needed at all
 
 **3. GitHub validation finds >90% false positives**
+
 - Format specification may be incorrect
 - Credential type may be too generic
 - Consider if regex-based detection is appropriate
 - May need entropy + context analysis instead
 
 **4. Validation fails repeatedly (>3 iterations)**
+
 - Flag for manual expert review
 - Save all iteration history
 - Document where automated approach failed
 - Provide recommendations for manual completion
 
 **5. Human provides insufficient feedback**
+
 - Re-prompt with clearer instructions
 - Offer to show example GitHub search screenshots
 - Provide template for feedback format
@@ -735,6 +765,7 @@ Rule creation is complete when:
 ## Time Estimates
 
 Per rule:
+
 - Phase 1 (Intake): 2 minutes
 - Phase 2 (Research): 5-10 minutes (automated)
 - Phase 3 (Regex Gen): 2 minutes (automated)
@@ -755,7 +786,7 @@ Per rule:
 
 ## Related Skills
 
-- `orchestrating-research`: Used in Phase 2 for format research
+- `orchestrating-research` (LIBRARY): Used in Phase 2 for format research - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`
 - `using-todowrite`: Track progress across 8 phases
 - `persisting-agent-outputs`: Save intermediate results
 - `verifying-before-completion`: Phase 8 validation checks
@@ -766,3 +797,4 @@ Per rule:
 
 ```
 User: "Create a NoseyParker rule for Stripe API keys"
+```

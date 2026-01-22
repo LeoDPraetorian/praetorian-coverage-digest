@@ -11,10 +11,12 @@
 ### Terminology Evolution
 
 **Historical (deprecated)**:
+
 - "Scored" = Recommendations that affected the compliance score
 - "Not Scored" = Recommendations excluded from scoring
 
 **Current (CIS Controls v8+)**:
+
 - "Automated" = System state can be automatically evaluated
 - "Manual" = Requires human verification and judgment
 
@@ -38,6 +40,7 @@ Recommendations where **system state can be automatically evaluated** against th
 ### Examples
 
 **AWS**:
+
 ```
 [CloudTrail.1] - CloudTrail enabled in all regions
     ↳ Automated: Query AWS API → TRUE/FALSE
@@ -47,6 +50,7 @@ Recommendations where **system state can be automatically evaluated** against th
 ```
 
 **Azure**:
+
 ```
 3.15 - Storage minimum TLS version 1.2
     ↳ Automated: Query storage account → TLS_1_2 or lower
@@ -56,6 +60,7 @@ Recommendations where **system state can be automatically evaluated** against th
 ```
 
 **Linux**:
+
 ```
 5.2.1 - Ensure SSH Protocol is set to 2
     ↳ Automated: grep /etc/ssh/sshd_config → Protocol 2
@@ -91,6 +96,7 @@ Recommendations requiring **manual steps** to determine whether the system's con
 ### Examples
 
 **Organizational Policies**:
+
 ```
 Security awareness training completion
     ↳ Manual: Review training records, completion rates
@@ -102,6 +108,7 @@ Incident response plan adequacy
 ```
 
 **Physical Security**:
+
 ```
 Physical access controls to data center
     ↳ Manual: Site inspection, badge reader logs review
@@ -113,6 +120,7 @@ Proper disposal of sensitive media
 ```
 
 **Business Context**:
+
 ```
 Third-party risk assessment reviews
     ↳ Manual: Evaluate vendor security questionnaires
@@ -138,6 +146,7 @@ Data classification policy enforcement
 **Definition**: The recommendation was correctly applied and verified.
 
 **Requirements**:
+
 - Configuration matches CIS recommendation
 - Verification confirms correct implementation
 - No deviations from benchmark guidance
@@ -149,6 +158,7 @@ Data classification policy enforcement
 **Definition**: The recommendation was not applied or incorrectly configured.
 
 **Requirements**:
+
 - Configuration does not match CIS recommendation
 - Missing control or insecure setting detected
 
@@ -159,12 +169,14 @@ Data classification policy enforcement
 **Definition**: The recommendation relates to requirements that aren't relevant to the specific environment.
 
 **Valid Reasons for N/A**:
+
 - **Technology not in use**: Recommendation for Docker Swarm, but environment uses Kubernetes
 - **Service not enabled**: Recommendation for Amazon RDS, but organization uses Aurora Serverless
 - **Platform difference**: Recommendation for Windows, but system is Linux
 - **Architecture decision**: Recommendation for on-premise, but organization is cloud-only
 
 **Example**:
+
 ```
 Kubernetes Recommendation 5.2.7: Ensure admission of containers with added capabilities
     ↓
@@ -195,6 +207,7 @@ Compliance Score = (Passed Automated Checks / Total Automated Checks - N/A) × 1
 **Environment**: AWS with CIS Foundations Benchmark v3.0.0 (43 controls)
 
 **Assessment Results**:
+
 - Total recommendations: 43
 - Automated recommendations: 38
 - Manual recommendations: 5
@@ -203,6 +216,7 @@ Compliance Score = (Passed Automated Checks / Total Automated Checks - N/A) × 1
 - Automated N/A: 2 (organization doesn't use specific AWS services)
 
 **Score Calculation**:
+
 ```
 Compliance Score = (30 / (38 - 2)) × 100
                  = (30 / 36) × 100
@@ -213,13 +227,13 @@ Compliance Score = (30 / (38 - 2)) × 100
 
 ### Score Ranges
 
-| Score Range | Interpretation                | Recommended Action                  |
-| ----------- | ----------------------------- | ----------------------------------- |
-| 95-100%     | Excellent compliance          | Maintain continuous monitoring      |
-| 85-94%      | Strong compliance             | Address remaining gaps              |
-| 70-84%      | Moderate compliance           | Prioritize failed checks            |
-| 50-69%      | Weak compliance               | Significant remediation required    |
-| <50%        | Non-compliant                 | Urgent security improvements needed |
+| Score Range | Interpretation       | Recommended Action                  |
+| ----------- | -------------------- | ----------------------------------- |
+| 95-100%     | Excellent compliance | Maintain continuous monitoring      |
+| 85-94%      | Strong compliance    | Address remaining gaps              |
+| 70-84%      | Moderate compliance  | Prioritize failed checks            |
+| 50-69%      | Weak compliance      | Significant remediation required    |
+| <50%        | Non-compliant        | Urgent security improvements needed |
 
 **Note**: Organizations set their own thresholds. Common targets: 80%, 90%, 95%.
 
@@ -230,6 +244,7 @@ Compliance Score = (30 / (38 - 2)) × 100
 ### CIS-CAT Pro Assessor
 
 **Capabilities**:
+
 - Automated scanning of system configurations
 - XCCDF/OVAL-based assessments
 - HTML reports with pass/fail details
@@ -237,6 +252,7 @@ Compliance Score = (30 / (38 - 2)) × 100
 - Historical trend analysis
 
 **Scoring Output**:
+
 ```
 Benchmark: CIS Microsoft Windows Server 2022 v1.0.0
 Profile: Level 1
@@ -252,6 +268,7 @@ Compliance Score: 85.2%
 ### Cloud-Native Tools
 
 **AWS Security Hub**:
+
 - CIS AWS Foundations Benchmark v3.0.0 certified
 - Continuous compliance monitoring
 - Pass/Fail/Not Available statuses
@@ -259,6 +276,7 @@ Compliance Score: 85.2%
 - Integration with AWS Config Rules
 
 **Azure Policy**:
+
 - 200+ built-in CIS controls
 - Compliance percentage per policy initiative
 - Real-time compliance dashboard
@@ -266,6 +284,7 @@ Compliance Score: 85.2%
 - Policy-as-Code deployment
 
 **GCP Security Command Center**:
+
 - CIS GCP Foundations Benchmark certified (multiple versions)
 - Daily compliance calculation
 - Active + muted findings model
@@ -274,12 +293,14 @@ Compliance Score: 85.2%
 ### Manual Assessment
 
 **When Required**:
+
 - Manual recommendations (cannot be automated)
 - Initial benchmark familiarization
 - Verification of automated tool accuracy
 - Compliance audit preparation
 
 **Process**:
+
 1. Review benchmark PDF for manual recommendations
 2. Collect evidence (policies, logs, screenshots)
 3. Document compliance status with justification
@@ -292,12 +313,14 @@ Compliance Score: 85.2%
 ### Scheduling
 
 **Automated Scans**:
+
 - **Critical systems**: Daily
 - **Production systems**: Weekly
 - **Development systems**: Monthly
 - **Per CIS Control 7.1**: Quarterly minimum (authenticated scans)
 
 **Manual Assessments**:
+
 - **Organizational policies**: Quarterly
 - **Physical security**: Semi-annually
 - **Compliance audits**: Annually
@@ -305,6 +328,7 @@ Compliance Score: 85.2%
 ### Configuration Drift Detection
 
 **Problem**: Systems drift from compliant state over time due to:
+
 - Manual configuration changes
 - Software updates
 - New deployments
@@ -313,6 +337,7 @@ Compliance Score: 85.2%
 **Solution**: Continuous monitoring
 
 **Implementation**:
+
 ```
 SIEM Integration
     ↓
@@ -328,6 +353,7 @@ Automated Remediation (if possible)
 ### Trending and Reporting
 
 **Metrics to Track**:
+
 1. **Overall compliance score** (trend over time)
 2. **New failures introduced** (since last scan)
 3. **Time to remediation** (from failure detection to resolution)
@@ -335,6 +361,7 @@ Automated Remediation (if possible)
 5. **N/A justifications** (review periodically for validity)
 
 **Reporting Frequency**:
+
 - **Executive dashboard**: Monthly summary
 - **Security team**: Weekly detailed reports
 - **Compliance auditors**: Quarterly comprehensive reports
@@ -348,6 +375,7 @@ Automated Remediation (if possible)
 **Problem**: Marking controls as N/A to artificially inflate score
 
 **Example**:
+
 ```
 AWS [CloudTrail.1] - CloudTrail enabled in all regions
 Status: N/A
@@ -357,6 +385,7 @@ Justification: "We don't use CloudTrail"
 **Why it's wrong**: CloudTrail is a foundational logging service; choosing not to use it doesn't make the control N/A.
 
 **Correct approach**:
+
 ```
 Status: FAIL
 Remediation plan: Enable CloudTrail by Q2
@@ -369,6 +398,7 @@ Remediation plan: Enable CloudTrail by Q2
 **Problem**: Focusing solely on automated checks because they affect the score
 
 **Why it's dangerous**: Manual recommendations often cover critical organizational controls:
+
 - Security awareness training
 - Incident response plans
 - Physical security
@@ -381,12 +411,14 @@ Remediation plan: Enable CloudTrail by Q2
 **Problem**: Automated tools may lag behind latest benchmark versions
 
 **Example**:
+
 - **Latest CIS Docker Benchmark**: v1.7.0 (July 2024)
 - **docker-bench-security**: v1.6.0 (6-12 months behind)
 
 **Impact**: Compliance score may not reflect latest security guidance
 
 **Mitigation**:
+
 1. Note benchmark version used in reports
 2. Supplement with manual checks for new recommendations
 3. Plan for tool updates when available
@@ -396,6 +428,7 @@ Remediation plan: Enable CloudTrail by Q2
 **Problem**: Different platforms have different control counts and automation levels
 
 **Example**:
+
 - AWS CIS Benchmark v3.0.0: 43 controls (95% automated)
 - Azure CIS Benchmark v2.0.0: 100+ controls (85% automated)
 - Linux CIS Benchmark: Distribution-specific (80-90% automated)
@@ -411,6 +444,7 @@ Remediation plan: Enable CloudTrail by Q2
 ### What to Include in Reports
 
 **Essential Elements**:
+
 1. **Benchmark name and version** (e.g., CIS AWS Foundations v3.0.0)
 2. **Profile level assessed** (Level 1, Level 2, STIG)
 3. **Total recommendations** (all controls in benchmark)
@@ -422,6 +456,7 @@ Remediation plan: Enable CloudTrail by Q2
 9. **Manual assessment status** (tracked separately)
 
 **Example Report Header**:
+
 ```
 CIS Benchmark Compliance Report
 

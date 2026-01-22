@@ -4,7 +4,112 @@
 
 ---
 
-## 1. VMFilter (REQUIRED)
+## Critical Integration Patterns
+
+These 6 patterns are REQUIRED for integrations to work at runtime. Without them, integrations compile successfully but fail during execution:
+
+### 1. BaseCapability Embedding
+
+Every integration struct MUST embed `base.BaseCapability`:
+
+```go
+type IntegrationTask struct {
+    Job    model.Job
+    Asset  model.Integration  // NOTE: model.Integration, NOT model.Asset
+    Filter model.Filter
+    base.BaseCapability       // REQUIRED - provides GetClient(), AWS, Collectors
+}
+```
+
+**Why Required**: BaseCapability provides HTTP client, AWS clients, and collector registry. Without embedding, integration has no access to these critical capabilities.
+
+### 2. init() Registration
+
+Every integration file MUST include init() function that registers the capability:
+
+```go
+func init() {
+    registries.RegisterChariotCapability(&VendorName{}, NewVendorName)
+}
+```
+
+**Why Required**: Without init() registration, the capability registry never discovers the integration. It compiles but is never executed.
+
+**Common Error**: `capability not found for class 'vendorname'`
+
+### 3. Integration() Method
+
+Every integration MUST implement `Integration()` returning `true`:
+
+```go
+func (t *VendorName) Integration() bool { return true }
+```
+
+**Why Required**: Distinguishes integrations from regular capabilities. System behavior differs for integrations (credential storage, UI display, scheduling).
+
+### 4. Match() Method
+
+Every integration MUST implement `Match()` to validate asset class:
+
+```go
+func (t *VendorName) Match() error {
+    if !t.Asset.IsClass("vendorname") {
+        return fmt.Errorf("expected class 'vendorname', got '%s'", t.Asset.Class)
+    }
+    return nil
+}
+```
+
+**Why Required**: Prevents integration from running on wrong asset types. Without Match(), integration may execute on incompatible assets causing runtime errors.
+
+### 5. Constructor Pattern
+
+Constructor MUST accept `*model.Integration` pointer and use `base.NewBaseCapability`:
+
+```go
+func NewVendorName(job model.Job, asset *model.Integration, opts ...base.Option) model.Capability {
+    opts = append(opts, base.WithStatic())  // For static IP compliance
+    baseCapability := base.NewBaseCapability(job, opts...)
+    return &VendorName{
+        Job:            job,
+        Asset:          *asset,  // NOTE: Dereference pointer
+        Filter:         filter.NewVMFilter(baseCapability.AWS, baseCapability.Collectors),
+        BaseCapability: baseCapability,
+    }
+}
+```
+
+**Why Required**: Proper initialization of base capability and functional options. Static IP compliance requires `base.WithStatic()` option.
+
+### 6. Type Distinction: model.Integration vs model.Asset
+
+Critical type distinction:
+
+- Constructor parameter: `*model.Integration` (pointer)
+- Struct field: `model.Integration` (value, dereferenced in constructor)
+
+```go
+// Constructor signature
+func NewVendorName(job model.Job, asset *model.Integration, ...) model.Capability
+
+// Struct field
+type VendorName struct {
+    Asset model.Integration  // NOT model.Asset, NOT *model.Integration
+}
+
+// Constructor body
+return &VendorName{
+    Asset: *asset,  // Dereference the pointer
+}
+```
+
+**Why Required**: `model.Integration` extends `model.Asset` with integration-specific fields (credentials, configuration). Using `model.Asset` causes compilation errors or missing credential access.
+
+**See [Integration Skeleton](integration-skeleton.md) for complete working template with all 6 patterns.**
+
+---
+
+## 7. VMFilter (REQUIRED)
 
 **Purpose**: Filter assets and risks by username to enforce multi-tenancy boundaries.
 

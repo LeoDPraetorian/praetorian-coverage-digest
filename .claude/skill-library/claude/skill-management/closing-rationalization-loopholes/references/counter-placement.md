@@ -172,10 +172,10 @@ Conclusion: Universal memory confidence pattern
 
 **Placement options:**
 
-| Scope           | Location                                       | When                     |
-| --------------- | ---------------------------------------------- | ------------------------ |
-| Skill-specific  | The skill that was skipped, ## Red Flags section | Only this skill gets skipped |
-| Universal       | using-skills anti-rationalization table        | Pattern spans multiple skills |
+| Scope          | Location                                         | When                          |
+| -------------- | ------------------------------------------------ | ----------------------------- |
+| Skill-specific | The skill that was skipped, ## Red Flags section | Only this skill gets skipped  |
+| Universal      | using-skills anti-rationalization table          | Pattern spans multiple skills |
 
 **Example:**
 

@@ -1,6 +1,6 @@
 # Research Integration Workflow
 
-**When to use:** After Phase 6.2 (researching-skills) completes and user selected "Yes" to research.
+**When to use:** After Sub-Phase 6.2 (orchestrating-research) completes and user selected "Yes" to research.
 
 ## Output Location
 
@@ -138,119 +138,14 @@ Use this table to route research output content to the correct reference files:
 
 ### 4. Example: Complete Reference File from Research
 
-**Scenario:** Creating `advanced-patterns.md` for a TanStack Query skill after research
+For a complete worked example of creating a reference file from research findings, see [examples/tanstack-query-research-example.md](../examples/tanstack-query-research-example.md).
 
-**Source files available:**
+This example demonstrates:
 
-- `SYNTHESIS.md` - Cross-interpretation patterns section
-- `github-tanstack-examples.md` - Open-source implementations
-- `codebase-chariot-hooks.md` - Local usage patterns
-
-**Resulting advanced-patterns.md (78 lines):**
-
-```markdown
-# Advanced TanStack Query Patterns
-
-**Source:** Research conducted 2026-01-12
-
-## Optimistic Updates with Rollback
-
-**Pattern from github-tanstack-examples.md:**
-
-\`\`\`typescript
-const mutation = useMutation({
-mutationFn: updateUser,
-onMutate: async (newUser) => {
-// Cancel outgoing refetches
-await queryClient.cancelQueries({ queryKey: ['users'] })
-
-    // Snapshot previous value
-    const previousUsers = queryClient.getQueryData(['users'])
-
-    // Optimistically update
-    queryClient.setQueryData(['users'], (old) => [...old, newUser])
-
-    return { previousUsers }
-
-},
-onError: (err, newUser, context) => {
-// Rollback on error
-queryClient.setQueryData(['users'], context.previousUsers)
-},
-})
-\`\`\`
-
-**Used in codebase:** `modules/chariot/ui/src/mutations/useUpdateAsset.ts:45-67`
-
-## Dependent Queries
-
-**Pattern from SYNTHESIS.md Cross-Interpretation Patterns:**
-
-\`\`\`typescript
-const { data: user } = useQuery({
-queryKey: ['user', userId],
-queryFn: () => fetchUser(userId),
-})
-
-const { data: projects } = useQuery({
-queryKey: ['projects', user?.id],
-queryFn: () => fetchProjects(user.id),
-enabled: !!user?.id, // Only run when user exists
-})
-\`\`\`
-
-**Best practice (from web research):** Always use `enabled` option to prevent unnecessary requests.
-
-## Infinite Queries for Pagination
-
-**Pattern from github-tanstack-examples.md:**
-
-\`\`\`typescript
-const {
-data,
-fetchNextPage,
-hasNextPage,
-isFetchingNextPage,
-} = useInfiniteQuery({
-queryKey: ['projects'],
-queryFn: ({ pageParam = 0 }) => fetchProjects(pageParam),
-getNextPageParam: (lastPage, pages) => lastPage.nextCursor,
-})
-\`\`\`
-
-**Performance note (from SYNTHESIS.md):** Use `maxPages` option to limit memory usage for very long lists.
-
-## Prefetching Strategies
-
-**Pattern from codebase-chariot-hooks.md:**
-
-\`\`\`typescript
-// Prefetch on hover (modules/chariot/ui/src/components/AssetCard.tsx)
-<Card
-onMouseEnter={() => {
-queryClient.prefetchQuery({
-queryKey: ['asset', asset.id],
-queryFn: () => fetchAssetDetails(asset.id),
-})
-}}
-/>
-\`\`\`
-
-**When to use (from web research):** Prefetch for likely next actions, but avoid prefetching everything (wastes bandwidth).
-
-## Related Patterns
-
-- [TanStack Query Official Docs](https://tanstack.com/query/v5/docs) - Latest API
-- [Codebase hooks](../../modules/chariot/ui/src/hooks/) - Local implementations
-```
-
-**Key characteristics of this example:**
-
-- 78 lines (well over 50-line minimum)
-- Cites specific research sources ("from github-tanstack-examples.md")
-- References actual codebase files with locations
-- Includes real code examples (not placeholders)
-- Provides context for when to use each pattern
+- How to synthesize multiple research sources (SYNTHESIS.md, GitHub examples, codebase patterns)
+- Proper citation format for research sources
+- Real code examples with file locations
+- Context for when to use each pattern
 
 ### 5. Replace Template Placeholders
 
@@ -304,6 +199,21 @@ Include source attribution:
 - [TanStack Query Best Practices (2025)](https://example.com/article) - Optimization guide
 ```
 
+## Handling Large Research Outputs
+
+**🚨 CRITICAL: Each reference file MUST be <400 lines.**
+
+When research returns large documents (API docs, advanced patterns, etc.), split them logically by category/module/phase.
+
+**See:** [Splitting Large Outputs](splitting-large-outputs.md) for:
+
+- Splitting strategy (by module, concern, phase)
+- File naming conventions
+- Common split patterns (API, Patterns, Workflow)
+- Verification scripts
+
+---
+
 ## Verification Checklist
 
 **Before proceeding to Phase 7, ALL items must pass:**
@@ -312,6 +222,7 @@ Include source attribution:
 - [ ] SKILL.md updated with patterns from SYNTHESIS.md
 - [ ] All required reference files for skill type exist (see mapping table)
 - [ ] Each reference file has >50 lines of content (not placeholder)
+- [ ] Each reference file has <400 lines (split if exceeded)
 - [ ] Reference files cite research sources (not training data)
 - [ ] All examples are real (not hypothetical)
 - [ ] Examples use current syntax (not outdated from training data)
@@ -321,16 +232,44 @@ Include source attribution:
 **Bash verification:**
 
 ```bash
-# Verify reference files exist and have content
-for file in workflow.md advanced-patterns.md; do
-  if [ ! -f "references/$file" ] || [ $(wc -l < "references/$file") -lt 50 ]; then
-    echo "FAIL: references/$file missing or too short"
+# Verify reference files exist with proper size (50-400 lines)
+for file in references/*.md; do
+  [ ! -f "$file" ] && continue
+  lines=$(wc -l < "$file")
+  if [ "$lines" -lt 50 ]; then
+    echo "FAIL: $file too short ($lines lines, min: 50)"
+    exit 1
+  elif [ "$lines" -gt 400 ]; then
+    echo "FAIL: $file too long ($lines lines, max: 400) - MUST SPLIT"
     exit 1
   fi
 done
+echo "All reference files within 50-400 line range"
 ```
 
 **Cannot proceed to Phase 7 until verification passes** ✅
+
+## Table of Contents Requirement
+
+For reference files over 100 lines, include a table of contents at the top:
+
+```markdown
+# API Reference
+
+## Contents
+
+- Authentication and setup
+- Core methods (create, read, update, delete)
+- Advanced features
+- Error handling
+- Code examples
+
+## Authentication and setup
+
+...
+```
+
+This ensures Claude can see the full scope of available content even when previewing files with partial reads (`head -100`).
 
 ## Anti-Patterns
 
@@ -350,7 +289,7 @@ done
 **"Research is optional, I'll skip integration"**
 
 - WRONG: Research was conducted, must be used
-- If research wasn't needed, should have selected "No" in Phase 6.1
+- If research wasn't needed, should have selected "No" in Sub-Phase 6.1
 
 **"I'll integrate later after GREEN phase"**
 

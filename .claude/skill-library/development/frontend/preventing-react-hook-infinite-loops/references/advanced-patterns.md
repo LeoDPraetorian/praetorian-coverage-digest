@@ -9,6 +9,7 @@
 ### When to Use
 
 Use deep comparison only when:
+
 - Object has nested structure that can't be flattened
 - Object comes from third-party library (can't control structure)
 - Restructuring component is infeasible
@@ -47,12 +48,14 @@ function Component({ complexObject }) {
 ### Performance Considerations
 
 **Cost Analysis**:
+
 - Small objects (< 10 properties): 0.1-0.5ms overhead
 - Medium objects (10-50 properties): 0.5-2ms overhead
 - Large objects (50-100 properties): 2-10ms overhead
 - Very large objects (100+ properties): 10-50ms overhead
 
 **When Deep Comparison Hurts Performance**:
+
 ```typescript
 // ❌ BAD: Object updated frequently, deep comparison expensive
 function Component({ largeConfig }) {
@@ -77,6 +80,7 @@ function Component({ configId, configLastModified }) {
 ### When to Use
 
 Use multi-level serialization for:
+
 - Arrays of objects with stable IDs
 - Nested structures with identifiable items
 - When order doesn't matter
@@ -85,20 +89,21 @@ Use multi-level serialization for:
 
 ```typescript
 // Serialize nested structure with multiple levels
-function useSerializedDeps<T extends { id: string; items?: any[] }>(
-  data: T[]
-): string {
+function useSerializedDeps<T extends { id: string; items?: any[] }>(data: T[]): string {
   return useMemo(() => {
     return data
-      .map(item => {
+      .map((item) => {
         const baseKey = item.id;
         const itemsKey = item.items
-          ? item.items.map(i => i.id).sort().join(',')
-          : '';
+          ? item.items
+              .map((i) => i.id)
+              .sort()
+              .join(",")
+          : "";
         return `${baseKey}:${itemsKey}`;
       })
       .sort()
-      .join('|');
+      .join("|");
   }, [data]);
 }
 
@@ -128,14 +133,12 @@ interface GraphQLConnection<T> {
   };
 }
 
-function useConnectionKey<T extends { id: string }>(
-  connection: GraphQLConnection<T>
-): string {
+function useConnectionKey<T extends { id: string }>(connection: GraphQLConnection<T>): string {
   return useMemo(() => {
     const nodeIds = connection.edges
-      .map(edge => edge.node.id)
+      .map((edge) => edge.node.id)
       .sort()
-      .join(',');
+      .join(",");
     return `${nodeIds}:${connection.pageInfo.endCursor}`;
   }, [connection]);
 }
@@ -145,7 +148,7 @@ function Component({ usersConnection }) {
   const usersKey = useConnectionKey(usersConnection);
 
   useEffect(() => {
-    renderUsers(usersConnection.edges.map(e => e.node));
+    renderUsers(usersConnection.edges.map((e) => e.node));
   }, [usersKey]);
 }
 ```
@@ -190,13 +193,13 @@ function Component({ onUpdate }) {
 
 ### Comparison: useCallback vs useEvent
 
-| Aspect | useCallback | useEvent |
-|--------|-------------|----------|
-| Recreates when deps change | Yes | No (never) |
-| Access to latest values | Via deps | Always latest |
-| Stable reference | Only when deps stable | Always stable |
-| Use in dependency arrays | Yes | Yes |
-| Memory usage | Medium | Low |
+| Aspect                     | useCallback           | useEvent      |
+| -------------------------- | --------------------- | ------------- |
+| Recreates when deps change | Yes                   | No (never)    |
+| Access to latest values    | Via deps              | Always latest |
+| Stable reference           | Only when deps stable | Always stable |
+| Use in dependency arrays   | Yes                   | Yes           |
+| Memory usage               | Medium                | Low           |
 
 ---
 
@@ -205,6 +208,7 @@ function Component({ onUpdate }) {
 ### When to Use
 
 Use lazy resolution when:
+
 - Dependency computation is expensive
 - Dependency doesn't change often
 - You can derive stable key from dependency
@@ -212,10 +216,7 @@ Use lazy resolution when:
 ### Implementation
 
 ```typescript
-function useLazyDependency<T>(
-  value: T,
-  keyExtractor: (val: T) => string
-): T {
+function useLazyDependency<T>(value: T, keyExtractor: (val: T) => string): T {
   const keyRef = useRef<string>();
   const valueRef = useRef<T>(value);
 
@@ -232,10 +233,7 @@ function useLazyDependency<T>(
 // Usage
 function Component({ config }) {
   // Only update stable config when id changes, not when other properties change
-  const stableConfig = useLazyDependency(
-    config,
-    cfg => cfg.id
-  );
+  const stableConfig = useLazyDependency(config, (cfg) => cfg.id);
 
   useEffect(() => {
     applyConfig(stableConfig);
@@ -253,7 +251,7 @@ function Component({ config }) {
 // ❌ BAD: Both dependencies always tracked
 function Component({ mode, userConfig, adminConfig }) {
   useEffect(() => {
-    if (mode === 'user') {
+    if (mode === "user") {
       apply(userConfig);
     } else {
       apply(adminConfig);
@@ -268,13 +266,13 @@ function Component({ mode, userConfig, adminConfig }) {
 // ✅ GOOD: Each effect only tracks relevant dependencies
 function Component({ mode, userConfig, adminConfig }) {
   useEffect(() => {
-    if (mode === 'user') {
+    if (mode === "user") {
       apply(userConfig);
     }
   }, [mode, userConfig]); // Only user dependencies
 
   useEffect(() => {
-    if (mode === 'admin') {
+    if (mode === "admin") {
       apply(adminConfig);
     }
   }, [mode, adminConfig]); // Only admin dependencies
@@ -292,11 +290,7 @@ Batch updates to reduce effect executions when multiple related dependencies cha
 ### Implementation
 
 ```typescript
-function useBatchedEffect(
-  callback: () => void,
-  dependencies: any[],
-  delayMs = 100
-) {
+function useBatchedEffect(callback: () => void, dependencies: any[], delayMs = 100) {
   const timeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
@@ -320,9 +314,13 @@ function useBatchedEffect(
 
 // Usage: API calls batched when filters change rapidly
 function Component({ filters }) {
-  useBatchedEffect(() => {
-    fetchData(filters);
-  }, [filters], 300); // Wait 300ms after last filter change
+  useBatchedEffect(
+    () => {
+      fetchData(filters);
+    },
+    [filters],
+    300
+  ); // Wait 300ms after last filter change
 }
 ```
 
@@ -335,7 +333,7 @@ function Component({ filters }) {
 ```typescript
 // ❌ BAD: selectedItems recomputed and new array every render
 function Component({ items, selectedIds }) {
-  const selectedItems = items.filter(item => selectedIds.includes(item.id));
+  const selectedItems = items.filter((item) => selectedIds.includes(item.id));
 
   useEffect(() => {
     processSelected(selectedItems);
@@ -349,7 +347,7 @@ function Component({ items, selectedIds }) {
 // ✅ GOOD: Memoized selector
 function Component({ items, selectedIds }) {
   const selectedItems = useMemo(
-    () => items.filter(item => selectedIds.includes(item.id)),
+    () => items.filter((item) => selectedIds.includes(item.id)),
     [items, selectedIds]
   );
 
@@ -445,14 +443,14 @@ interface Filters {
 function useFiltersKey(filters: Filters): string {
   return useMemo(() => {
     const parts = [
-      filters.search || '',
-      filters.category || '',
-      filters.tags?.sort().join(',') || '',
-      filters.dateRange ?
-        `${filters.dateRange.start.toISOString()}:${filters.dateRange.end.toISOString()}` :
-        ''
+      filters.search || "",
+      filters.category || "",
+      filters.tags?.sort().join(",") || "",
+      filters.dateRange
+        ? `${filters.dateRange.start.toISOString()}:${filters.dateRange.end.toISOString()}`
+        : "",
     ];
-    return parts.join('|');
+    return parts.join("|");
   }, [filters]);
 }
 

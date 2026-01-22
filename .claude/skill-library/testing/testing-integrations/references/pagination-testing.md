@@ -33,6 +33,7 @@ func (task *Integration) Discover() error {
 ```
 
 **Testing**:
+
 ```go
 func TestIntegration_Pagination(t *testing.T) {
     page1Called := false
@@ -154,7 +155,7 @@ func TestIntegration_MaxPagesLimit(t *testing.T) {
 
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         requestCount++
-        
+
         // Always return next page (simulating infinite pagination)
         w.WriteHeader(http.StatusOK)
         json.NewEncoder(w).Encode(Response{
@@ -164,7 +165,7 @@ func TestIntegration_MaxPagesLimit(t *testing.T) {
     }))
     defer server.Close()
 
-    task := NewIntegration(job, &integration, 
+    task := NewIntegration(job, &integration,
         base.WithHTTPBaseURL(server.URL),
         base.WithMaxPages(5),  // Limit to 5 pages
     )

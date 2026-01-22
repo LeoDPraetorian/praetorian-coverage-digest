@@ -1,5 +1,67 @@
 # Changelog - deleting-skills
 
+## [Date: 2026-01-19] - Phase 28 & 30 Compliance Fixes
+
+### Changed
+- **Phase 28**: Restructured "Integration with Other Skills" section to new Integration format:
+  - Added "Called By" subsection (skill-manager command, managing-skills router)
+  - Added "Requires" subsection (none - standalone skill)
+  - Added "Calls" subsection with syncing-gateways (Phase 6) in table format
+  - Added "Pairs With" subsection with renaming-skills, migrating-skills, auditing-skills in table format
+  - All library skill references include (LIBRARY) annotation AND full Read() paths in table Purpose columns
+
+- **Phase 30**: Added (LIBRARY) annotations to all library skill references throughout SKILL.md:
+  - `renaming-skills` (LIBRARY) - 2 occurrences
+  - `migrating-skills` (LIBRARY) - 2 occurrences
+  - `syncing-gateways` (LIBRARY) - 8 occurrences
+  - `auditing-skills` (LIBRARY) - 1 occurrence in Integration section
+
+### Fix Method
+- **Phase 28 Category**: Claude-Automated (analyzed skill content to generate Integration structure)
+- **Phase 30 Category**: Hybrid (Claude reasoning + file lookup to verify core vs library)
+- **Severity**: CRITICAL (both phases)
+
+### Rationale
+- Phase 28: New Integration section makes skill composition explicit and traceable
+- Phase 30: Proper annotations prevent token waste and invocation failures
+- All referenced skills verified to exist in library locations via find command
+
+---
+
+## [Date: 2026-01-19] - Integrate Navigation into Phase 1
+
+### Changed
+- Removed "Step 0: Navigate to Repository Root" as standalone section
+- Integrated navigation as Phase 1.0 within Phase 1 workflow
+- Updated Phase 1 header to "Navigate to Repository Root and Validate Skill Existence"
+- Maintains consistency with Phase 1-8 structure throughout skill
+
+### Rationale
+- Eliminates numbering inconsistency between "Step 0" and "Phase 1-8"
+- Navigation is part of validation workflow, not a separate prerequisite
+- Improves workflow clarity and consistency
+
+---
+
+## [Date: 2026-01-19] - Phase 27 Fix: Convert Deep Relative Path
+
+### Changed
+- Line 57: Converted deep relative path (4 levels of `../`) to repo-root path
+- Before: `../../../../skills/managing-skills/references/patterns/repo-root-detection.md`
+- After: `.claude/skills/managing-skills/references/patterns/repo-root-detection.md`
+
+### Fix Method
+- **Category**: Hybrid (automated path calculation, Claude verification)
+- **Severity**: WARNING
+- **Auto-fixable**: Yes
+
+### Rationale
+- Deep relative paths (3+ levels of `../`) are fragile and break when files reorganize
+- Repo-root paths (`.claude/...`) are robust and maintainable
+- Phase 27 compliance requirement for PASSED status
+
+---
+
 ## [Date: 2025-12-27] - Add Automated Gateway Sync Phase
 
 ### Changed

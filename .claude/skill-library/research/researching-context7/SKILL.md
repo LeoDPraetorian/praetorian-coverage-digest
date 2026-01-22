@@ -373,14 +373,14 @@ When parent skill provides `OUTPUT_DIR`:
 
 ## Related Skills
 
-| Skill                    | Purpose                                       |
-| ------------------------ | --------------------------------------------- |
-| `orchestrating-research` | Orchestrates all research types (CORE skill)  |
-| `researching-protocols`  | Research network protocols and specifications |
-| `researching-arxiv`      | Research academic papers and ML techniques    |
-| `mcp-tools-context7`     | Raw MCP tool catalog for Context7 service     |
-| `creating-skills`        | Skill creation workflow (uses this skill)     |
-| `updating-skills`        | Skill update workflow (uses this skill)       |
+| Skill                              | Purpose                                                                                                    |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------- |
+| `orchestrating-research` (LIBRARY) | Orchestrates all research types - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `researching-protocols`            | Research network protocols and specifications                                                              |
+| `researching-arxiv`                | Research academic papers and ML techniques                                                                 |
+| `mcp-tools-context7`               | Raw MCP tool catalog for Context7 service                                                                  |
+| `creating-skills`                  | Skill creation workflow (uses this skill)                                                                  |
+| `updating-skills`                  | Skill update workflow (uses this skill)                                                                    |
 
 ---
 

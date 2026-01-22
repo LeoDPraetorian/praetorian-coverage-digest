@@ -57,3 +57,10 @@ docs/plans/
 
 # Serena warmup logs
 .serena-warmup.log
+
+# Hook state files (runtime, not for version control)
+# Matches both legacy (e.g., feedback-loop-state.json) and
+# session-specific (e.g., feedback-loop-state-abc123.json) patterns
+.claude/hooks/*-state*.json
+.claude/hooks/escalation-context*.json
+.worktrees/

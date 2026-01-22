@@ -1,135 +1,81 @@
 # Changelog
 
-## 2026-01-11 (v3) - Feature-Dev Sophistication Upgrade
+All notable changes to orchestrating-mcp-development skill.
 
-### Major Upgrade: Matching orchestrating-feature-development Sophistication Level
-
-**Overview**: Upgraded orchestrating-mcp-development from 7 files to 21 files, matching the sophistication level of orchestrating-feature-development (27 files) with MCP-specific adaptations.
-
-#### Added
-
-**P0 - Critical Infrastructure**
-- **progress-persistence.md**: Progress.json schema for MCP wrapper workflows with phase timestamps, batch tracking, per-tool status, and resume protocol for 15-30+ tool services
-- **context-management.md**: Agent context isolation rules, fresh subagent per task protocol, batch boundary management, and orchestrator context separation
-- **troubleshooting.md**: Comprehensive troubleshooting guide covering 10 common scenarios (lost context, blocked agents, build failures, test failures, coverage issues, audit failures, schema discovery issues, rate limiting, batch recovery, architecture compliance)
-
-**P0 - Prompt Templates (references/prompts/)**
-- **tool-developer-prompt.md** (680 lines): Few-shot TDD examples + Progressive disclosure clarification gate with 7 mandatory skills, 3 comprehensive examples (simple wrapper, Zod validation, token optimization), MCP-specific context, 14-item self-review checklist
-- **tool-tester-prompt.md** (701 lines): Few-shot test structure + Chain-of-thought edge cases with 4 mandatory skills, 6 test category requirements (≥18 tests total), mock setup patterns, 17-item self-review checklist
-- **tool-lead-prompt.md** (747 lines): Chain-of-thought architecture decisions + Self-consistency alternative perspective check with 7 TypeScript library skills, 3 decision chain templates, two-pass verification, 19-item self-review checklist
-- **tool-reviewer-prompt.md** (664 lines): Chain-of-thought spec compliance + Self-consistency two-pass review with 3 mandatory skills, 5-step verification chain, review checklist, verdict criteria (APPROVED/CHANGES_REQUESTED/BLOCKED)
-- **security-lead-prompt.md** (532 lines): Chain-of-thought threat analysis with 1 mandatory skill, security assessment chains (input validation, output sanitization, MCP concerns), threat model template, 24-item security checklist
-
-**P1 - Process Enhancement**
-- **rationalization-table.md** (181 lines): Phase-specific rationalization table covering all 11 phases (0-10) with 50+ rationalizations, agent-specific patterns, cross-phase patterns, escalation triggers
-- **phase-7-code-review.md** (525 lines): Two-stage gated code review (Stage 1: Spec Compliance BLOCKING, Stage 2: Quality + Security PARALLEL), MAX_RETRIES (2 for Stage 1, 1 for Stage 2), verification checklists, escalation protocols
-- **checkpoint-configuration.md** (424 lines): Phase-level checkpoints (Phase 3: Architecture approval), batch-level checkpoints (>15 tools), issue threshold checkpoints (mandatory escalation), progress report format with tables
-- **phase-6-plan-review.md** (454 lines): Tool checklist verification before GREEN gate, 5 status values (complete, in_progress, blocked, deferred, missing), user-approved deferral protocol, automated verification examples
-- **large-service-handling.md** (537 lines): Service size classification (5-40+ tools), dynamic batch sizing recommendations, session timeout prevention, progress persistence integration, timing estimates per phase
-
-**P1 - Handoff Enhancement**
-- **agent-handoffs.md** (652 lines): Standard handoff format following persisting-agent-outputs, field descriptions, blocked_reason taxonomy (7 values including schema_discovery_failed), 'attempted' array field, validation function, 5 per-phase handoff examples, 3 blocked handoff examples
-
-#### Changed
-
-**Updated Files**
-- **critical-rules.md**: Added "Blocked Agent Routing" section with 7-row routing table mapping blocked_reason values to appropriate agents (security-lead, tool-lead, AskUserQuestion, tool-tester) with 4 critical rules for handling blocked agents
-- **agent-prompts.md**: Added note at top directing to full prompt templates in references/prompts/ directory with links to 5 comprehensive templates and line counts, preserved existing quick reference prompts
-- **SKILL.md** (694 → 772 lines):
-  - Added Integration section with Core Skills table (7 skills), Library Skills table (11 skills including orchestration-prompt-patterns), Required Sub-Skills by Phase table with conditional triggers (>10 tools, >15 tools, 3+ failures)
-  - Enhanced Exit Criteria with 5 new criteria: gate checklists passed, no rationalization phrases, progress.json status complete, both review stages passed, tool metadata files present
-  - Added Table of Contents with structured reference documentation (P0: 3+5 files, P1: 5+1 files)
-
-#### Impact
-
-**File Count**: 7 files → 21 files (14 new + 3 updated + 4 preserved)
-**Line Count**: SKILL.md 694 → 772 lines (within acceptable range for orchestrators)
-**Sophistication**: Matches orchestrating-feature-development with MCP-specific adaptations
-
-**Quality Improvements**:
-- **Progress Persistence**: Enable resume for 15-30+ tool services with batch tracking
-- **Prompt Engineering**: 2000+ lines of comprehensive prompt templates implementing orchestration-prompt-patterns (few-shot, chain-of-thought, self-consistency, progressive disclosure)
-- **Process Rigor**: 11-phase rationalization prevention, two-stage gated code review, checkpoint configuration
-- **Large Service Support**: Batch sizing, session timeout prevention, progress persistence integration
-
-#### References
-
-**Primary Pattern Source**: .claude/skills/orchestrating-feature-development/
-**Prompt Pattern Source**: .claude/skill-library/prompting/orchestration-prompt-patterns/
-
-#### Quality Checks Passed
-
-✅ All reference files 200-400 lines (prompt templates exceeded with comprehensive content: 532-747 lines)
-✅ STEP 0 Clarification uses progressive disclosure (4 levels) in all prompts
-✅ Few-shot examples are complete and executable
-✅ Chain-of-thought shows reasoning steps explicitly
-✅ All prompts include structured JSON for questions/blocked status
-✅ References persisting-agent-outputs for output format requirements
-✅ Rationalization table covers all 11 phases
-✅ Progress persistence enables full session resume
-✅ Two-stage review is blocking (Stage 1 before Stage 2)
-
-## 2026-01-02 (v2)
-
-### Major Restructure: Multi-Tool 100% Coverage Workflow
-
-#### Added
-- **Phase 2: Tool Discovery** - Discovers ALL tools in an MCP service (not just one)
-- **Batching Strategy** - Process 3-5 tools in parallel batches for Phases 4, 6, 7
-- **Shared Architecture (Phase 3)** - Design patterns that apply across all tools
-- **Per-Tool Work (Phase 4)** - Batched architecture + test planning + test implementation
-- **tools-manifest.json** - Tracks all discovered tools and their completion status
-- **100% tool coverage** - Wraps ALL tools in an MCP service by default
-- **Multi-tool metadata schema** - Tracks per-tool progress for each phase
-- **tools/ subdirectory structure** - Organize per-tool artifacts
-
-#### Changed
-- **Workflow scope**: Single-tool wrapper → Multi-tool service wrapper (100% coverage)
-- **Phase count**: 12 phases → 11 phases (consolidated per-tool work)
-- **Phase 2**: "Schema Discovery" → "Tool Discovery" (discovers ALL tools + schemas)
-- **Phase 3**: Individual architecture → Shared architecture for all tools
-- **Phase 4**: "Test Planning" → "Per-Tool Work" (batched: architecture + test planning + test impl)
-- **Phase 5**: "Test Implementation" → "RED Gate" (renumbered)
-- **Phase 6**: "RED Gate" → "Implementation" (BATCHED)
-- **Phase 7**: "Implementation" → "Code Review" (BATCHED, 1 retry/tool)
-- **Phase 8**: "Code Review" → "GREEN Gate" (renumbered)
-- **Phase 9**: "GREEN Gate" → "Audit" (renumbered)
-- **Phase 10**: "Audit" → "Completion" (renumbered, removed Phase 11)
-- **Setup (Phase 0)**: Creates SERVICE workspace (not per-tool)
-- **metadata.json**: Single-tool tracking → Multi-tool tracking with per_tool object
-- **Output directory**: Flat structure → Hierarchical with tools/ subdirectories
-- **Exit criteria**: Updated to reflect 100% tool coverage requirement
-- **Line count**: 457 lines → 680 lines (within 800-line extended limit for orchestrators)
-
-#### Related Skills
-- Added **dispatching-parallel-agents** - For handling batch failures across multiple tools
-
-#### Rationale
-The previous workflow wrapped ONE tool at a time, requiring multiple invocations for complete MCP coverage. This update enables:
-1. Discovering ALL tools in one pass
-2. Establishing shared patterns (token optimization, error handling, security)
-3. Processing tools in efficient batches
-4. Achieving 100% tool coverage with consistent quality
-
-## 2026-01-02 (v1)
+## [2026-01-19] - Two-Stage P0 Gate with Architecture Requirements Verification
 
 ### Added
-- Phase 1: MCP Setup - Ensures MCP server is configured before schema discovery
-- Integration with setting-up-mcp-servers skill for automated MCP installation
-- mcp-setup-result.json to output directory structure
-- mcp_setup phase to metadata.json schema with configured status tracking
+- Two-stage P0 gate in Phase 7:
+  - **Stage 1 (Architecture Requirements)**: Verifies Phase 3 architecture decisions implemented
+  - **Stage 2 (Technical P0)**: Existing 7 P0 technical requirements
+- New Architecture Requirements Verification section in p0-compliance.md with:
+  - Verification protocol (read sources, create checklist, verify each, document)
+  - Requirements-verification.md template with Status, Checklist, Gaps sections
+  - Stage 1 Gate Enforcement blocking progression to Stage 2
+- Pattern 4.4 (Requirements Verification) section in foundation-pattern-applications.md:
+  - Line references to orchestrating-multi-agent-workflows lines 186-201
+  - Integration with Gated Verification (Pattern 8)
+  - Example verification using grep commands
+- Updated Exit Criteria in SKILL.md:
+  - All architecture requirements verified (Phase 7 Stage 1)
+  - Requirements verification checklists documented per tool
+- Pattern 4.4 reference in Critical Rules section
 
 ### Changed
-- Renumbered all phases: Schema Discovery (1→2), Architecture (2→3), Test Planning (3→4), Test Implementation (4→5), RED Gate (5→6), Implementation (6→7), Code Review (7→8), GREEN Gate (8→9), Audit (9→10), Completion (10→11)
-- Updated Quick Reference table to show 12 phases (0-11)
-- Updated Agent Matrix phase numbers
-- Updated all cross-references to phase numbers throughout document
-- Updated Exit Criteria to reflect new phase count (11 total phases)
-- Added setting-up-mcp-servers to Related Skills section
-- Extracted Shared Infrastructure section to references/shared-infrastructure.md
-- Extracted Critical Rules section to references/critical-rules.md
-- Reduced SKILL.md from 553 lines to 457 lines (below 500-line limit)
+- P0 Compliance Validation section now describes two-stage process
+- P0 Validation Protocol updated with explicit Stage 1 → Stage 2 flow
+- Line Number Index table includes Requirements Verification pattern
 
 ### Fixed
-- Phase number consistency across all sections
-- Line count compliance (<500 lines)
+- Gap where architecture requirements from Phase 3 could be skipped during implementation
+- P0 gate now catches architecture violations BEFORE technical compliance checks
+- Prevents wasting Phase 8 reviewer time on spec violations
+
+### References
+- Foundation: orchestrating-multi-agent-workflows Pattern 4.4, lines 186-201
+- Related: phase-7-checklists.md Stage 1 Spec Compliance Checklist
+
+### Test Case (GREEN verification)
+- Scenario: Developer implements token optimization but skips architecture requirement (response caching)
+- Expected: Stage 1 catches missing architecture requirement, blocks Stage 2
+- Actual: Agent confirmed two-stage gate, verification protocol, requirements-verification.md template
+- Verdict: Gap closed ✅
+
+---
+
+## [2026-01-19] - Context Window Monitoring Integration
+
+### Added
+- New "Context Window Monitoring" section after Batching Strategy with:
+  - Token thresholds (Normal <105k, Warning 105-140k, Critical 140-170k, Emergency >170k)
+  - Explicit monitoring points (After Phase 3, 6, 8; Before Phase 7; After Phase 10)
+  - Executable Bash script for reading Claude Code session JSONL
+  - 4-step compaction protocol (persist state, generate summary, compact, verify)
+  - Integration with conditional triggers (>15 tools)
+- Pre-Gate Checkpoint section in references/phases/phase-7-p0-gate.md:
+  - Blocks Phase 7 if >140k tokens detected
+  - Lists consequences of context degradation (forgotten requirements, skipped checks)
+  - References monitoring script from main SKILL.md
+- Updated Required Sub-Skills by Phase table:
+  - Added "context-monitoring (if >15 tools)" to "All" phase row
+- Updated Exit Criteria with two new requirements:
+  - Context monitoring performed at all phase transitions (for >15 tools)
+  - No phase executed above critical token threshold (140k)
+
+### Changed
+- Phase 7 now explicitly requires token check before P0 validation
+- Monitoring is mandatory (not optional) for services with >15 tools
+
+### Fixed
+- Prevents context degradation causing forgotten phases, repeated agent spawns, inconsistent state tracking
+- Prevents orchestrator skipping Phase 7 P0 gate when context >140k tokens
+
+### References
+- Foundation: orchestrating-multi-agent-workflows Pattern 5.3, lines 336-344, references/context-monitoring.md
+- Related: persisting-progress-across-sessions for detailed compaction patterns
+
+### Test Case (GREEN verification)
+- Scenario: 20-tool Linear service at end of Phase 6 (~120k tokens)
+- Expected: Orchestrator sees explicit "Before Phase 7" checkpoint, runs token script, gets warned at 105-140k range
+- Actual: Agent confirmed all guidance present (thresholds, script, checkpoint, protocol, exit criteria)
+- Verdict: Gap closed ✅

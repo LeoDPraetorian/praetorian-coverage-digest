@@ -278,11 +278,11 @@ func buildCPE(version string) string {
 
 **When your plugin returns `plugins.TCPTLS`, the connection is ALREADY TLS-wrapped by fingerprintx.**
 
-| What Fingerprintx Does                     | Your Plugin's Responsibility                                          |
-| ------------------------------------------ | --------------------------------------------------------------------- |
-| Establishes TLS connection to target       | Use the connection as-is (already encrypted)                          |
-| Passes `*tls.Conn` to your `Run()` method | Do NOT create another TLS layer                                       |
-| Handles certificate verification           | For HTTP-based detection, use `http://` scheme (NOT `https://`)       |
+| What Fingerprintx Does                    | Your Plugin's Responsibility                                    |
+| ----------------------------------------- | --------------------------------------------------------------- |
+| Establishes TLS connection to target      | Use the connection as-is (already encrypted)                    |
+| Passes `*tls.Conn` to your `Run()` method | Do NOT create another TLS layer                                 |
+| Handles certificate verification          | For HTTP-based detection, use `http://` scheme (NOT `https://`) |
 
 ### The TLS Double-Wrapping Bug
 
@@ -341,6 +341,7 @@ func (p *MyPlugin) Run(conn net.Conn, timeout time.Duration, target plugins.Targ
 ### Real-World Example: Kubernetes Plugin
 
 The kubernetes plugin (PR #61) shipped with this bug:
+
 - Plugin type: `plugins.TCPTLS`
 - Detection: HTTP GET to `/version` endpoint
 - Bug: Used `https://` on already-TLS-wrapped connection
@@ -386,13 +387,13 @@ Each plugin should include:
 
 ## Common Pitfalls
 
-| Pitfall                                    | Solution                                              |
-| ------------------------------------------ | ----------------------------------------------------- |
-| Forgetting to register in `plugin_list.go` | Plugin won't be discovered                            |
-| Wrong priority (HTTP blocks detection)     | Use -1 for DB protocols on HTTP ports                 |
-| Not handling auth-required                 | Detection should succeed, enrichment can fail         |
-| Hardcoded timeouts                         | Always use the `timeout` parameter                    |
-| Missing error types                        | Use `utils.InvalidResponseErrorInfo`                  |
+| Pitfall                                    | Solution                                             |
+| ------------------------------------------ | ---------------------------------------------------- |
+| Forgetting to register in `plugin_list.go` | Plugin won't be discovered                           |
+| Wrong priority (HTTP blocks detection)     | Use -1 for DB protocols on HTTP ports                |
+| Not handling auth-required                 | Detection should succeed, enrichment can fail        |
+| Hardcoded timeouts                         | Always use the `timeout` parameter                   |
+| Missing error types                        | Use `utils.InvalidResponseErrorInfo`                 |
 | TLS double-wrapping                        | Check if conn is `*tls.Conn` before adding TLS layer |
 
 ## Common Rationalizations (DO NOT USE)

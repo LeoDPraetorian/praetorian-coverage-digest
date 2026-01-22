@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file:line, verify with reads                                      |
-| `gateway-security`                  | Routes to mapping-security-controls library skill (methodology)                                      |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST                 |
-| `using-todowrite`                   | Track workflow progress (per-concern or 10-step)                                                     |
-| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                                                  |
+| Skill                               | Why Always Invoke                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------ |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure.     |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing          |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                   |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - cite file:line, verify with reads                      |
+| `gateway-security`                  | Routes to mapping-security-controls library skill (methodology)                      |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, session management, MANIFEST |
+| `using-todowrite`                   | Track workflow progress (per-concern or 10-step)                                     |
+| `verifying-before-completion`       | Ensures all artifacts produced before claiming done                                  |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -122,13 +122,13 @@ You map security controls for threat modeling **Phase 4**. You produce structure
 
 ## Controls Mapping Workflow
 
-For the complete methodology (mode detection, per-concern investigation steps, full mapping 10 categories, gap analysis, STRIDE alignment), use `gateway-security` to load the `mapping-security-controls` skill:
+For the complete methodology (mode detection, per-concern investigation steps, full mapping 10 categories, gap analysis, STRIDE alignment), use `gateway-security` to load the `security-controls-mapping` skill:
 
 ```
-Read(".claude/skill-library/security/mapping-security-controls/SKILL.md")
+Read(".claude/skill-library/security/threat-model/security-controls-mapping/SKILL.md")
 ```
 
-The `mapping-security-controls` skill provides:
+The `security-controls-mapping` skill provides:
 
 - **Mode detection**: Per-concern vs full mapping triggers
 - **Per-Concern Investigation**: 5-step workflow for targeted control analysis

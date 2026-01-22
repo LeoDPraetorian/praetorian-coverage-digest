@@ -1,28 +1,40 @@
-# Changelog
+# Changelog - dispatching-parallel-agents
 
-## 2026-01-07 - Update Task() Examples to Show subagent_type Parameter
+## 2026-01-19 - Compliance Remediation
 
-**Problem (RED):**
-- Examples showed generic Task() calls without the required subagent_type parameter
-- Users reading the skill would see: `Task("Fix agent-tool-abort.test.ts failures");`
-- This pattern would fail in practice since Task tool requires explicit subagent_type
+**Context**: Audit identified 6 structural issues (3 CRITICAL, 3 WARNING) and 3 semantic issues.
 
-**Changes:**
-1. Section "### 3. Dispatch in Parallel" (lines 71-77):
-   - Updated from: `Task("Fix agent-tool-abort.test.ts failures");`
-   - Updated to: `Task({ subagent_type: 'frontend-tester', description: 'Fix abort tests', prompt: '...' });`
-   - Shows proper Task tool invocation with all required parameters
+**Fixes Applied**:
 
-2. Section "## Real Example from Session" under "Dispatch:" (lines 150-156):
-   - Updated from: `Agent 1 → Fix agent-tool-abort.test.ts`
-   - Updated to: `Agent 1 (frontend-tester) → Fix agent-tool-abort.test.ts`
-   - Clarifies which agent type is being dispatched
+### Deterministic Fixes:
+- **Phase 5**: Created `references/` directory for progressive disclosure (WARNING)
 
-**Verification (GREEN):**
-- Examples now accurately reflect Task tool API requirements
-- Users can copy-paste examples and they will work correctly
-- Agent type is explicit in both code examples and real-world scenario
+### Claude-Automated Fixes:
+- **Phase 13**: Added TodoWrite mandate to workflow section for multi-step tracking (WARNING)
+- **Phase 28**: Generated complete Integration section with Called By, Requires, Calls, Pairs With subsections (CRITICAL)
+- **Phase 30**: Added Related Skills section with proper (CORE)/(LIBRARY) annotations (WARNING)
 
-**Compliance:**
-- Line count: 192 lines (within 500-line limit)
-- All other content unchanged
+**Results**:
+- Skill line count increased from 193 to 239 lines (+46 lines)
+- 4 of 6 structural issues resolved
+- Integration section now documents skill dependencies and relationships
+- TodoWrite mandate ensures workflow tracking
+
+**Remaining Issues**:
+- **Phase 3 (CRITICAL)**: Content density still below optimal for reasoning skill (239 lines vs 350+ recommended)
+- **Phase 26 (CRITICAL)**: `references/` directory created but not yet populated with content
+
+**Recommendation**: Populate references/ directory with:
+- `agent-prompts.md` - Agent task specification templates
+- `coordination-patterns.md` - Multi-agent synchronization strategies
+- `failure-modes.md` - Common issues and debugging
+- `integration-examples.md` - Real-world orchestration patterns
+
+**Method**: Claude-Automated via orchestrating-research skill for verified content
+
+**Changes**:
+- Added references/ directory structure
+- Added Integration section (30 lines)
+- Added Related Skills section (7 entries)
+- Added TodoWrite mandate to workflow
+- Created .local/ backup: 2026-01-19-05-54-08-pre-fix.bak

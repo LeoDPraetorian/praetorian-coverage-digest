@@ -135,22 +135,22 @@ function fixReferences(content: string): string {
 
 ## Consumers
 
-| Skill                           | How It Uses Registry                  |
-| ------------------------------- | ------------------------------------- |
-| `claude-skill-audit-references` | Detects deprecated skill/command refs |
-| `claude-skill-fix-references`   | Fixes deprecated skill/command refs   |
-| `claude-agent-audit-references` | Detects deprecated refs in agents     |
-| `claude-agent-fix-references`   | Fixes deprecated refs in agents       |
-| `claude-skill-rename`           | Adds entries when renaming            |
-| `claude-agent-rename`           | Adds entries when renaming            |
+| Skill             | How It Uses Registry                  |
+| ----------------- | ------------------------------------- |
+| `auditing-skills` | Detects deprecated skill/command refs |
+| `fixing-skills`   | Fixes deprecated skill/command refs   |
+| `auditing-agents` | Detects deprecated refs in agents     |
+| `fixing-agents`   | Fixes deprecated refs in agents       |
+| `renaming-skills` | Adds entries when renaming            |
+| `renaming-agents` | Adds entries when renaming            |
 
 ## Maintainers
 
-| Skill                   | Role                             |
-| ----------------------- | -------------------------------- |
-| `claude-skill-rename`   | Adds skill deprecation entries   |
-| `claude-agent-rename`   | Adds agent deprecation entries   |
-| `claude-command-rename` | Adds command deprecation entries |
+| Skill               | Role                             |
+| ------------------- | -------------------------------- |
+| `renaming-skills`   | Adds skill deprecation entries   |
+| `renaming-agents`   | Adds agent deprecation entries   |
+| `managing-commands` | Adds command deprecation entries |
 
 ## Validation
 

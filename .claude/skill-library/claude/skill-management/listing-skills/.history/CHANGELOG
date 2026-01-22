@@ -1,0 +1,31 @@
+# Changelog - listing-skills
+
+## 2026-01-19 - Add (LIBRARY) Annotations to Library Skill References
+
+**Changes:**
+- Added (LIBRARY) annotation to `searching-skills` references (lines 34, 242, 249)
+- Added (LIBRARY) annotation to `auditing-skills` references (lines 35, 243, 250)
+- Updated table formatting in "Pairs With" section to accommodate longer skill names with annotations
+
+**Rationale:**
+- Phase 30 compliance requirement: All library skill references must be annotated with (LIBRARY)
+- Distinguishes library skills from core skills for proper skill invocation
+- `managing-skills` is a core skill and does not require annotation
+
+**Impact:** Documentation clarity improvement, no functional changes
+
+## 2026-01-19 - Step Numbering Normalization
+
+**Changes:**
+- Renamed "Step 0: Navigate to Repository Root" to "Step 1: Navigate to Repository Root"
+- Incremented all subsequent step numbers by 1:
+  - Step 1 → Step 2 (List Core Skills)
+  - Step 2 → Step 3 (List Library Skills)
+  - Step 3 → Step 4 (Check Status)
+  - Step 4 → Step 5 (Format Output)
+
+**Rationale:**
+- Aligns with standard 1-indexed step numbering convention used across other skills
+- Improves consistency and reduces confusion for agents following workflow
+
+**Impact:** None functional, purely documentation consistency improvement

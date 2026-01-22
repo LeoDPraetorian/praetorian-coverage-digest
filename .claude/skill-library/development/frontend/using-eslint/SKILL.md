@@ -4,7 +4,7 @@ description: Use when linting TypeScript/JavaScript code after making changes, b
 allowed-tools: "Read, Write, Edit, Bash, Grep"
 ---
 
-# smart-eslint
+# using-eslint
 
 This skill runs ESLint only on modified files instead of the entire codebase to prevent hanging, slow performance, and wasted CPU. It detects changed files via git diff and lints them in seconds rather than minutes.
 

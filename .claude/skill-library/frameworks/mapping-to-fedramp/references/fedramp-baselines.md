@@ -6,11 +6,11 @@
 
 ## Baseline Overview
 
-| Baseline | Control Count | Impact Level | Primary Use Cases |
-|---|---|---|---|
-| **Low** | 156 controls | Low-impact | Non-sensitive data, low-risk SaaS, public information systems |
-| **Moderate** | 325 controls | Moderate-impact | CUI, PII, most federal agencies (default baseline) |
-| **High** | 421 controls | High-impact | National security, law enforcement, critical infrastructure |
+| Baseline     | Control Count | Impact Level    | Primary Use Cases                                             |
+| ------------ | ------------- | --------------- | ------------------------------------------------------------- |
+| **Low**      | 156 controls  | Low-impact      | Non-sensitive data, low-risk SaaS, public information systems |
+| **Moderate** | 325 controls  | Moderate-impact | CUI, PII, most federal agencies (default baseline)            |
+| **High**     | 421 controls  | High-impact     | National security, law enforcement, critical infrastructure   |
 
 **Note**: Minor count variances (±2-8 controls) exist between sources due to Rev 5 transition and control enhancement counting. Always reference the official FedRAMP Security Controls Baseline spreadsheet for authoritative counts.
 
@@ -25,6 +25,7 @@
 **Format**: Excel (.xlsx)
 
 **Contains**:
+
 - All three baselines (Low/Moderate/High)
 - Control enhancements by baseline
 - P0/P1/P2 priority designations
@@ -37,6 +38,7 @@
 **Main Page**: https://www.fedramp.gov/rev5-transition/
 
 **Key Documents**:
+
 1. **Transition Guide** (PDF): FedRAMP_Baselines_Rev5_Transition_Guide.pdf
    - Rev 4 to Rev 5 migration guidance
    - Control mapping changes
@@ -55,6 +57,7 @@
 **URL**: https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final
 
 **Available Formats**:
+
 - Full control catalog in spreadsheet format
 - Control baselines of SP 800-53B
 - Machine-readable formats (JSON, XML)
@@ -66,6 +69,7 @@
 ### When to Use Low Baseline (156 controls)
 
 **Appropriate For**:
+
 - Low-impact cloud services
 - Public information systems
 - No CUI or PII handling
@@ -73,11 +77,13 @@
 - Low-risk SaaS applications
 
 **Examples**:
+
 - Public-facing informational websites
 - Non-sensitive data processing
 - Low-risk collaboration tools
 
 **Key Characteristics**:
+
 - Minimal security impact if breached
 - No classified or sensitive data
 - Limited authorization scope
@@ -85,6 +91,7 @@
 ### When to Use Moderate Baseline (325 controls)
 
 **Appropriate For**:
+
 - **Most federal agency systems (default choice)**
 - Systems handling CUI (Controlled Unclassified Information)
 - Sensitive PII processing
@@ -93,12 +100,14 @@
 - Moderate-risk cloud services
 
 **Examples**:
+
 - Federal employee management systems
 - Grant management platforms
 - Healthcare data platforms (not life-critical)
 - Financial reporting systems
 
 **Key Characteristics**:
+
 - Default for federal agencies
 - CUI or PII handling
 - Moderate impact if breached
@@ -107,6 +116,7 @@
 ### When to Use High Baseline (421 controls)
 
 **Appropriate For**:
+
 - National security systems (unclassified)
 - Law enforcement data systems
 - Critical infrastructure protection
@@ -114,12 +124,14 @@
 - Mission-critical federal operations
 
 **Examples**:
+
 - Law enforcement databases
 - Critical infrastructure control systems
 - National security-related (unclassified) systems
 - Emergency response systems
 
 **Key Characteristics**:
+
 - Severe or catastrophic impact if breached
 - National security implications
 - Life, safety, or critical mission impact
@@ -134,14 +146,17 @@ Controls build upon each other across baselines:
 ### Example: SI-2 (Flaw Remediation)
 
 **Low Baseline**:
+
 - SI-2 (base control): Identify, report, correct flaws
 
 **Moderate Baseline** (adds enhancements):
+
 - SI-2 (base control)
 - SI-2(1): Central Management
 - SI-2(2): Automated Flaw Remediation
 
 **High Baseline** (adds more enhancements):
+
 - SI-2 (base control)
 - SI-2(1): Central Management
 - SI-2(2): Automated Flaw Remediation
@@ -184,6 +199,7 @@ Controls build upon each other across baselines:
 ### Low Baseline (156 controls)
 
 Focus areas:
+
 - AC (Access Control): Core access controls
 - AU (Audit): Basic logging
 - IA (Identification/Authentication): Authentication fundamentals
@@ -193,6 +209,7 @@ Focus areas:
 ### Moderate Baseline (325 controls)
 
 Adds to Low:
+
 - CM (Configuration Management): Enhanced configuration control
 - IR (Incident Response): Comprehensive incident handling
 - RA (Risk Assessment): Regular risk assessments
@@ -202,6 +219,7 @@ Adds to Low:
 ### High Baseline (421 controls)
 
 Adds to Moderate:
+
 - PE (Physical/Environmental): Enhanced physical security
 - MP (Media Protection): Advanced data protection
 - PS (Personnel Security): Enhanced background checks
@@ -219,6 +237,7 @@ Adds to Moderate:
 ### Q: How long does authorization take?
 
 **A**:
+
 - Low: 3-6 months (LI-SaaS: 3 months)
 - Moderate: 6-12 months
 - High: 12-18+ months
@@ -230,6 +249,7 @@ Adds to Moderate:
 ### Q: How often must I reassess?
 
 **A**:
+
 - Annual 3PAO assessment (all baselines)
 - Continuous monitoring (monthly scans, quarterly reviews)
 - Significant change reassessments

@@ -47,13 +47,13 @@ If the user didn't explicitly ask for it → ASK before doing it
 
 ### Go-Specific Violations (See [go-anti-patterns.md](references/go-anti-patterns.md))
 
-| Violation                      | Example                                           | What to Do Instead                              |
-| ------------------------------ | ------------------------------------------------- | ----------------------------------------------- |
-| **Interface compliance vars**  | `var _ Interface = (*Type)(nil)`                  | Return interface from constructor instead       |
-| **Version package**            | Creating `version/version.go` for simple CLI      | Don't add unless explicitly requested           |
-| **Useless comments**           | `// NewFoo creates a new Foo`                     | Only comment non-obvious behavior               |
-| **Premature interfaces**       | Interface with single implementation              | Just use struct until polymorphism needed       |
-| **Giant config structs**       | 20-field Config struct before knowing needs       | Start simple, add options when requested        |
+| Violation                     | Example                                      | What to Do Instead                        |
+| ----------------------------- | -------------------------------------------- | ----------------------------------------- |
+| **Interface compliance vars** | `var _ Interface = (*Type)(nil)`             | Return interface from constructor instead |
+| **Version package**           | Creating `version/version.go` for simple CLI | Don't add unless explicitly requested     |
+| **Useless comments**          | `// NewFoo creates a new Foo`                | Only comment non-obvious behavior         |
+| **Premature interfaces**      | Interface with single implementation         | Just use struct until polymorphism needed |
+| **Giant config structs**      | 20-field Config struct before knowing needs  | Start simple, add options when requested  |
 
 ## Table of Contents
 
@@ -276,6 +276,36 @@ See [The "While I'm Here" Fallacy](references/while-im-here.md) for detailed ana
 **Why it's wrong**: "Obvious" is subjective. Changes have costs (time, bugs, maintenance).
 
 **What to do**: State the improvement, ask if it should be included.
+
+## Integration
+
+### Called By
+
+This skill can be invoked at any point during development work to enforce scope discipline:
+
+- Any development task requiring code changes
+- Before implementing features, bug fixes, or refactoring
+- When tempted to add "improvements" beyond user request
+
+### Requires (invoke before starting)
+
+| Skill                   | When | Purpose                                  |
+| ----------------------- | ---- | ---------------------------------------- |
+| None - standalone skill | -    | Can be invoked independently at any time |
+
+### Calls (during execution)
+
+| Skill                  | Phase/Step | Purpose                                           |
+| ---------------------- | ---------- | ------------------------------------------------- |
+| `AskUserQuestion` tool | Step 3     | Question out-of-scope changes before implementing |
+
+### Pairs With (conditional)
+
+| Skill                         | Trigger                    | Purpose                                                     |
+| ----------------------------- | -------------------------- | ----------------------------------------------------------- |
+| `developing-with-tdd`         | During TDD cycles          | Prevent over-engineering in test/implementation phases      |
+| `debugging-systematically`    | Bug fix requests           | Stay focused on requested bug, avoid fixing adjacent issues |
+| `verifying-before-completion` | Before claiming completion | Ensure deliverables match original request exactly          |
 
 ## Related Skills
 

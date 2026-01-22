@@ -1,18 +1,11 @@
 {
   "name": "@claude-tools/praetorian-cli",
   "version": "1.0.0",
-  "description": "TypeScript wrappers for praetorian-cli MCP tools with progressive loading",
+  "description": "Chariot platform assets, risks, jobs, and seeds management",
   "type": "module",
   "main": "index.ts",
   "exports": {
     ".": "./index.ts",
     "./*": "./*.ts"
-  },
-  "dependencies": {
-    "zod": "^3.23.8",
-    "@modelcontextprotocol/sdk": "^1.0.4"
-  },
-  "devDependencies": {
-    "@claude/testing": "*"
   }
 }

@@ -51,6 +51,7 @@ async def admin_endpoint(current_user):
 ```
 
 **Architecture:**
+
 - Python FastAPI backend
 - JWT for session management
 - HS256 symmetric signing
@@ -304,19 +305,19 @@ groups = {
 
 ### Confidence Scoring
 
-| Vulnerability          | Models Agreeing | Confidence  |
-| ---------------------- | --------------- | ----------- |
-| Hardcoded secret       | 3/4             | HIGH        |
-| No expiration          | 2/4             | MEDIUM-HIGH |
-| Algorithm confusion    | 2/4             | MEDIUM-HIGH |
-| Refresh token (arch)   | 1/4             | MEDIUM      |
-| Exception handling     | 1/4             | MEDIUM      |
-| Role check bug         | 1/4             | MEDIUM      |
-| Security headers       | 1/4             | MEDIUM      |
-| Rate limiting          | 1/4             | MEDIUM      |
-| Token binding          | 1/4             | MEDIUM      |
-| Input validation       | 1/4             | MEDIUM      |
-| Weak entropy           | 1/4             | MEDIUM      |
+| Vulnerability        | Models Agreeing | Confidence  |
+| -------------------- | --------------- | ----------- |
+| Hardcoded secret     | 3/4             | HIGH        |
+| No expiration        | 2/4             | MEDIUM-HIGH |
+| Algorithm confusion  | 2/4             | MEDIUM-HIGH |
+| Refresh token (arch) | 1/4             | MEDIUM      |
+| Exception handling   | 1/4             | MEDIUM      |
+| Role check bug       | 1/4             | MEDIUM      |
+| Security headers     | 1/4             | MEDIUM      |
+| Rate limiting        | 1/4             | MEDIUM      |
+| Token binding        | 1/4             | MEDIUM      |
+| Input validation     | 1/4             | MEDIUM      |
+| Weak entropy         | 1/4             | MEDIUM      |
 
 ### Severity Resolution
 
@@ -349,13 +350,14 @@ Found **11 unique vulnerabilities** across 4 security domains.
 
 ### High-Confidence Findings (2+ models agree)
 
-| Vulnerability | Severity | Found By | Confidence | Priority |
-|---------------|----------|----------|------------|----------|
-| Hardcoded secret key | CRITICAL | Claude, GPT-4, Gemini | 3/4 - HIGH | P0 |
-| No token expiration | CRITICAL | Claude, GPT-4 | 2/4 - MEDIUM-HIGH | P0 |
-| Algorithm confusion (CVE-2015-9235) | CRITICAL | Claude, GPT-4 | 2/4 - MEDIUM-HIGH | P0 |
+| Vulnerability                       | Severity | Found By              | Confidence        | Priority |
+| ----------------------------------- | -------- | --------------------- | ----------------- | -------- |
+| Hardcoded secret key                | CRITICAL | Claude, GPT-4, Gemini | 3/4 - HIGH        | P0       |
+| No token expiration                 | CRITICAL | Claude, GPT-4         | 2/4 - MEDIUM-HIGH | P0       |
+| Algorithm confusion (CVE-2015-9235) | CRITICAL | Claude, GPT-4         | 2/4 - MEDIUM-HIGH | P0       |
 
 **Immediate Actions:**
+
 1. Move SECRET_KEY to environment variable
 2. Add 'exp' claim with 1-hour expiration
 3. Whitelist only HS256 algorithm in decode
@@ -364,16 +366,16 @@ Found **11 unique vulnerabilities** across 4 security domains.
 
 ### Model-Unique Findings (investigate by specialty)
 
-| Vulnerability | Severity | Found By | Model Specialty | Recommendation |
-|---------------|----------|----------|-----------------|----------------|
-| No refresh token pattern | HIGH | Gemini only | Architecture | Review token lifecycle design |
-| Insecure exception handling | MEDIUM | DeepSeek only | Code-level bugs | Code review exception handling |
-| String comparison role check | LOW | DeepSeek only | Implementation | Add type validation |
-| Missing security headers | MEDIUM | Claude only | Auth edge cases | Review token storage method |
-| No rate limiting | MEDIUM | GPT-4 only | Known patterns | Add rate limiting to /api/login |
-| Missing token binding | MEDIUM | Gemini only | Architecture | Consider adding context claims |
-| No token input validation | MEDIUM | DeepSeek only | Code-level | Validate token format before decode |
-| Weak entropy | HIGH | DeepSeek only | Code-level | Use secrets.token_urlsafe(32) |
+| Vulnerability                | Severity | Found By      | Model Specialty | Recommendation                      |
+| ---------------------------- | -------- | ------------- | --------------- | ----------------------------------- |
+| No refresh token pattern     | HIGH     | Gemini only   | Architecture    | Review token lifecycle design       |
+| Insecure exception handling  | MEDIUM   | DeepSeek only | Code-level bugs | Code review exception handling      |
+| String comparison role check | LOW      | DeepSeek only | Implementation  | Add type validation                 |
+| Missing security headers     | MEDIUM   | Claude only   | Auth edge cases | Review token storage method         |
+| No rate limiting             | MEDIUM   | GPT-4 only    | Known patterns  | Add rate limiting to /api/login     |
+| Missing token binding        | MEDIUM   | Gemini only   | Architecture    | Consider adding context claims      |
+| No token input validation    | MEDIUM   | DeepSeek only | Code-level      | Validate token format before decode |
+| Weak entropy                 | HIGH     | DeepSeek only | Code-level      | Use secrets.token_urlsafe(32)       |
 
 ---
 
@@ -393,12 +395,14 @@ Found **11 unique vulnerabilities** across 4 security domains.
 ### Why Parallel Analysis Worked
 
 **Without parallel models:**
+
 - Using Claude alone: Would miss GPT-4's CVE-2015-9235 reference
 - Using GPT-4 alone: Would miss DeepSeek's exception handling bug
 - Using Gemini alone: Would miss Claude's algorithm confusion attack
 - Using DeepSeek alone: Would miss Gemini's refresh token architecture issue
 
 **With parallel models:**
+
 - 3x consensus on critical secret management issue (HIGH confidence)
 - 2x consensus on expiration and algorithm issues (MEDIUM-HIGH confidence)
 - 8x unique findings from model specialties (breadth of coverage)

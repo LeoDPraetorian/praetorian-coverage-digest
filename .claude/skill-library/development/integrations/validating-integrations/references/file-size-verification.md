@@ -37,6 +37,7 @@ done | sort -rn
 ## File Organization Pattern
 
 ### Under 400 Lines (Single File)
+
 ```
 vendor/
 ├── vendor.go          # All code in one file
@@ -45,6 +46,7 @@ vendor/
 ```
 
 ### Over 400 Lines (Split Required)
+
 ```
 vendor/
 ├── vendor.go          # ~250 lines - Main struct, Invoke(), CheckAffiliation()
@@ -58,6 +60,7 @@ vendor/
 ## Split File Contents
 
 ### vendor.go (Main File)
+
 ```go
 // Package documentation
 package vendor
@@ -83,6 +86,7 @@ func (v *Vendor) ValidateCredentials() error
 ```
 
 ### vendor_types.go (API Types)
+
 ```go
 package vendor
 
@@ -103,6 +107,7 @@ type VendorMetadata struct { ... }
 ```
 
 ### vendor_client.go (HTTP Client)
+
 ```go
 package vendor
 
@@ -120,6 +125,7 @@ func (v *Vendor) listVulnerabilities(assetID string) ([]VendorVulnerability, err
 ```
 
 ### vendor_transform.go (Transformations)
+
 ```go
 package vendor
 
@@ -137,6 +143,7 @@ func extractDNS(hostnames []string) string
 ## Evidence Format
 
 **PASS Example**:
+
 ```
 ✅ File Size
 Evidence: vendor.go - 285 lines
@@ -144,6 +151,7 @@ Status: Under 400 line limit
 ```
 
 **PASS Example (Split Files)**:
+
 ```
 ✅ File Size
 Evidence: vendor.go - 250 lines
@@ -153,6 +161,7 @@ Status: All files under 400 lines, properly split
 ```
 
 **FAIL Example**:
+
 ```
 ❌ File Size
 Evidence: vendor.go - 914 lines (228% over limit)
@@ -164,42 +173,45 @@ Recommendation: Extract GraphQL client methods to vendor_client.go (~200 lines)
 
 ## Known Violations (from codebase research)
 
-| Rank | Integration | Lines | Over Limit | Severity |
-|------|-------------|-------|-----------|----------|
-| 1 | wiz.go | 914 | +228% | CRITICAL |
-| 2 | bitbucket.go | 610 | +153% | CRITICAL |
-| 3 | crowdstrike.go | 569 | +142% | CRITICAL |
-| 4 | xpanse.go | 509 | +127% | CRITICAL |
-| 5 | pingone.go | 508 | +127% | CRITICAL |
-| 6 | tenable_vm.go | 486 | +122% | WARNING |
-| 7 | amazon.go | 481 | +120% | WARNING |
-| 8 | qualys.go | 474 | +119% | WARNING |
-| 9 | okta.go | 460 | +115% | WARNING |
-| 10 | microsoft_defender.go | 442 | +111% | WARNING |
+| Rank | Integration           | Lines | Over Limit | Severity |
+| ---- | --------------------- | ----- | ---------- | -------- |
+| 1    | wiz.go                | 914   | +228%      | CRITICAL |
+| 2    | bitbucket.go          | 610   | +153%      | CRITICAL |
+| 3    | crowdstrike.go        | 569   | +142%      | CRITICAL |
+| 4    | xpanse.go             | 509   | +127%      | CRITICAL |
+| 5    | pingone.go            | 508   | +127%      | CRITICAL |
+| 6    | tenable_vm.go         | 486   | +122%      | WARNING  |
+| 7    | amazon.go             | 481   | +120%      | WARNING  |
+| 8    | qualys.go             | 474   | +119%      | WARNING  |
+| 9    | okta.go               | 460   | +115%      | WARNING  |
+| 10   | microsoft_defender.go | 442   | +111%      | WARNING  |
 
 **Statistics**:
+
 - Compliant (<400): 34/44 (77%)
 - Violations (≥400): 10/44 (23%)
 - Split files used: 0/44 (0%)
 
 ## Split Strategy by File Size
 
-| Lines | Status | Action |
-|-------|--------|--------|
-| <350 | Safe | No action needed |
-| 350-400 | Caution | Consider splitting |
-| 400-500 | Warning | Should split |
-| 500+ | Critical | Must split immediately |
+| Lines   | Status   | Action                 |
+| ------- | -------- | ---------------------- |
+| <350    | Safe     | No action needed       |
+| 350-400 | Caution  | Consider splitting     |
+| 400-500 | Warning  | Should split           |
+| 500+    | Critical | Must split immediately |
 
 ## Wiz.go Split Example
 
 **Current (914 lines)**:
+
 - Wiz struct (lines 27-32)
 - 13+ API response types (WizOAuth, WizQuery, WizVulnerability, etc.)
 - GraphQL query methods
 - CheckAffiliation, ValidateCredentials, Invoke
 
 **Recommended Split**:
+
 - **wiz.go** (~250 lines): Main struct, Invoke, CheckAffiliation, ValidateCredentials
 - **wiz_types.go** (~250 lines): All API response structs
 - **wiz_client.go** (~150 lines): GraphQL client, OAuth, query methods

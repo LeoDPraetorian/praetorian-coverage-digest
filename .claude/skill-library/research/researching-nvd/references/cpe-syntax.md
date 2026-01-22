@@ -9,6 +9,7 @@
 **Current Version:** CPE 2.3 (2011-present)
 
 **Purpose:**
+
 - Identify affected products/versions in CVEs
 - Enable automated vulnerability scanning
 - Provide precise product matching
@@ -21,20 +22,20 @@ cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw
 
 ### Components Breakdown
 
-| Position | Field        | Description                    | Example        |
-| -------- | ------------ | ------------------------------ | -------------- |
-| 1        | (prefix)     | Always `cpe:2.3`               | `cpe:2.3`      |
-| 2        | part         | a=app, o=OS, h=hardware        | `a`            |
-| 3        | vendor       | Vendor name                    | `apache`       |
-| 4        | product      | Product name                   | `tomcat`       |
-| 5        | version      | Version number                 | `9.0.50`       |
-| 6        | update       | Update/patch level             | `*` or `-`     |
-| 7        | edition      | Edition (enterprise/standard)  | `*` or `-`     |
-| 8        | language     | Language (en/fr/de)            | `*` or `-`     |
-| 9        | sw_edition   | Software edition               | `*` or `-`     |
-| 10       | target_sw    | Target software platform       | `*` or `-`     |
-| 11       | target_hw    | Target hardware platform       | `*` or `-`     |
-| 12       | other        | Other                          | `*` or `-`     |
+| Position | Field      | Description                   | Example    |
+| -------- | ---------- | ----------------------------- | ---------- |
+| 1        | (prefix)   | Always `cpe:2.3`              | `cpe:2.3`  |
+| 2        | part       | a=app, o=OS, h=hardware       | `a`        |
+| 3        | vendor     | Vendor name                   | `apache`   |
+| 4        | product    | Product name                  | `tomcat`   |
+| 5        | version    | Version number                | `9.0.50`   |
+| 6        | update     | Update/patch level            | `*` or `-` |
+| 7        | edition    | Edition (enterprise/standard) | `*` or `-` |
+| 8        | language   | Language (en/fr/de)           | `*` or `-` |
+| 9        | sw_edition | Software edition              | `*` or `-` |
+| 10       | target_sw  | Target software platform      | `*` or `-` |
+| 11       | target_hw  | Target hardware platform      | `*` or `-` |
+| 12       | other      | Other                         | `*` or `-` |
 
 ### Wildcards
 
@@ -42,16 +43,17 @@ cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw
 - `-` = Not Applicable (N/A, logically undefined)
 
 **Usage:**
+
 - `*` when field could have various values
 - `-` when field is not relevant for this product
 
 ## Part Values
 
-| Value | Meaning     | Use For                               |
-| ----- | ----------- | ------------------------------------- |
+| Value | Meaning     | Use For                                 |
+| ----- | ----------- | --------------------------------------- |
 | `a`   | Application | Software applications, libraries, tools |
-| `o`   | OS          | Operating systems                     |
-| `h`   | Hardware    | Physical devices, firmware            |
+| `o`   | OS          | Operating systems                       |
+| `h`   | Hardware    | Physical devices, firmware              |
 
 ## Common Examples
 
@@ -62,6 +64,7 @@ cpe:2.3:a:apache:tomcat:9.0.50:*:*:*:*:*:*:*
 ```
 
 **Breakdown:**
+
 - `a` = Application
 - `apache` = Vendor
 - `tomcat` = Product
@@ -75,6 +78,7 @@ cpe:2.3:o:microsoft:windows_10:*:*:*:*:*:*:*:*
 ```
 
 **Breakdown:**
+
 - `o` = Operating System
 - `microsoft` = Vendor
 - `windows_10` = Product
@@ -87,6 +91,7 @@ cpe:2.3:o:cisco:ios:15.2\(4\):*:*:*:*:*:*:*
 ```
 
 **Breakdown:**
+
 - Special characters `()` escaped with `\`
 - Version includes minor/patch in parentheses
 
@@ -97,6 +102,7 @@ cpe:2.3:a:python:python:3.9.7:*:*:*:*:*:*:*
 ```
 
 **Breakdown:**
+
 - `a` = Application (interpreter/runtime)
 - `python` = Vendor (Python Software Foundation)
 - `python` = Product
@@ -109,6 +115,7 @@ cpe:2.3:o:canonical:ubuntu_linux:20.04:*:*:*:lts:*:*:*
 ```
 
 **Breakdown:**
+
 - Edition field = `lts` (Long Term Support)
 - Shows optional field usage
 
@@ -203,6 +210,7 @@ https://services.nvd.nist.gov/rest/json/cves/2.0?cpeName=cpe:2.3:a:apache:tomcat
 ```
 
 **Fields:**
+
 - `vulnerable: true` = This CPE is affected
 - `versionStartIncluding` = Range start (inclusive)
 - `versionEndExcluding` = Range end (exclusive)
@@ -237,14 +245,15 @@ https://services.nvd.nist.gov/rest/json/cves/2.0?cpeName=cpe:2.3:a:apache:tomcat
 
 ### Escaping
 
-| Character | Escaped | Example Context       |
-| --------- | ------- | --------------------- |
-| `(`       | `\(`    | Version 15.2(4)       |
-| `)`       | `\)`    | Version 15.2(4)       |
-| `.`       | `.`     | Version numbers (OK)  |
-| `_`       | `_`     | Product names (OK)    |
+| Character | Escaped | Example Context      |
+| --------- | ------- | -------------------- |
+| `(`       | `\(`    | Version 15.2(4)      |
+| `)`       | `\)`    | Version 15.2(4)      |
+| `.`       | `.`     | Version numbers (OK) |
+| `_`       | `_`     | Product names (OK)   |
 
 **Example:**
+
 ```
 cpe:2.3:o:cisco:ios:15.2\(4\):*:*:*:*:*:*:*
 ```
@@ -254,11 +263,13 @@ cpe:2.3:o:cisco:ios:15.2\(4\):*:*:*:*:*:*:*
 **Official CPE Dictionary:** https://nvd.nist.gov/products/cpe
 
 **Purpose:**
+
 - Browse all CPE names
 - Find correct vendor/product names
 - Verify CPE format
 
 **Example Lookup:**
+
 1. Search for "Apache Tomcat"
 2. Find official CPE: `cpe:2.3:a:apache:tomcat:...`
 3. Use in NVD API queries

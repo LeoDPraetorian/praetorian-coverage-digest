@@ -65,6 +65,7 @@ owasp_10    # OWASP Top 10 #10
 ```
 
 **Mapping examples** (Web Application):
+
 - `owasp_1` → A01:2021 - Broken Access Control
 - `owasp_2` → A02:2021 - Cryptographic Failures
 - `owasp_3` → A03:2021 - Injection
@@ -89,6 +90,7 @@ effective_control
 **Use when**: The finding describes a security control that is working correctly (positive finding).
 
 **Example use cases**:
+
 - Strong MFA implementation
 - Effective network segmentation
 - Well-configured WAF rules
@@ -97,11 +99,13 @@ effective_control
 **Requires**: Both `phase_*` tag AND `effective_control` tag
 
 **Example**:
+
 ```
 Tags: phase_web, effective_control
 ```
 
 This will place the finding in:
+
 1. Web Application Assessment → Summary of Weaknesses (if severity > Info)
 2. Web Application Assessment → Summary of Effective Controls
 
@@ -118,6 +122,7 @@ This will place the finding in:
 These narrative sections appear in the Executive Summary portion of the report, before the technical phase sections.
 
 **Common ES narrative sections:**
+
 ```
 Title: Business Impact
 Tag: es
@@ -145,6 +150,7 @@ Tag: es
 **Use when**: Report includes threat modeling deliverables
 
 **Common threat model sections:**
+
 ```
 Title: System Diagram
 Tag: threat_model
@@ -175,6 +181,7 @@ Tag: threat_model
 **Use when**: Describing reconnaissance, initial access, lateral movement, etc.
 
 **Common attack narrative sections:**
+
 ```
 Title: Reconnaissance
 Tag: attack_narrative
@@ -199,6 +206,7 @@ Tag: attack_narrative
 **Use when**: Report documents purple team exercises
 
 **Common purple team sections:**
+
 ```
 Title: Purple Team Overview
 Tag: purple_team
@@ -217,6 +225,7 @@ Tag: purple_team
 **Use when**: Adding custom content to appendices (beyond standard scope, team, contact sections)
 
 **Common appendix sections:**
+
 ```
 Title: Scope
 Tag: appendix
@@ -238,12 +247,14 @@ Tag: appendix
 Before exporting report, verify:
 
 **Findings:**
+
 - [ ] Every finding has at least one `phase_` tag
 - [ ] Phase tags match Report Details → Tags configuration
 - [ ] ProdSec findings have appropriate `owasp_` tags
 - [ ] Effective controls have both `phase_*` and `effective_control` tags
 
 **Narratives:**
+
 - [ ] Executive Summary sections have `es` tag
 - [ ] Threat model sections have `threat_model` tag (if applicable)
 - [ ] Attack narratives have `attack_narrative` tag (if applicable)

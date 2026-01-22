@@ -244,15 +244,15 @@ Before proceeding with large artifact processing:
 
 ### Pairs With (conditional)
 
-| Skill                         | Trigger          | Purpose                     |
-| ----------------------------- | ---------------- | --------------------------- |
-| `orchestrating-research`      | After split      | Populate split sections     |
-| `verifying-before-completion` | Before synthesis | Validate agent completeness |
+| Skill                              | Trigger          | Purpose                                                                                            |
+| ---------------------------------- | ---------------- | -------------------------------------------------------------------------------------------------- |
+| `orchestrating-research` (LIBRARY) | After split      | Populate split sections - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `verifying-before-completion`      | Before synthesis | Validate agent completeness                                                                        |
 
 ## Related Skills
 
 - `orchestrating-multi-agent-workflows` - Agent coordination patterns
-- `orchestrating-research` - Parallel research for content population
+- `orchestrating-research` (LIBRARY) - Parallel research for content population - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")`
 - `persisting-agent-outputs` - Output directory structure
 - `calibrating-time-estimates` - Prevent rationalization (processing seems faster than actually is)
 

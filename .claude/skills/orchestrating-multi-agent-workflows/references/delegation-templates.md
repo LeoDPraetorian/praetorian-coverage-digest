@@ -2,6 +2,20 @@
 
 Pre-built prompt templates for delegating to specialized agents.
 
+---
+
+## Navigation
+
+This document is split for progressive loading. Load sections as needed:
+
+| Section          | File                                                                           | Content                                                              |
+| ---------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------------- |
+| Main (this file) | delegation-templates.md                                                        | Overview, structure, architecture + developer templates, usage guide |
+| Testing          | [delegation-templates-testing.md](delegation-templates-testing.md)             | Unit, integration, and E2E test engineer templates                   |
+| Review + Skills  | [delegation-templates-review-skills.md](delegation-templates-review-skills.md) | Reviewer templates, skill requirements in delegation                 |
+
+---
+
 ## Template Structure
 
 Every delegation prompt should include:
@@ -23,6 +37,8 @@ Expected output:
 - [File locations for artifacts]
 - [Output format for results]
 ```
+
+---
 
 ## Architecture Agent Templates
 
@@ -84,6 +100,8 @@ Expected output:
 - Data fetching strategy
 - Return as structured JSON with tier classification
 ```
+
+---
 
 ## Developer Agent Templates
 
@@ -147,166 +165,7 @@ Expected output:
 - Return structured JSON with files created and test results
 ```
 
-## Test Engineer Templates
-
-### Unit Test Engineer
-
-```markdown
-Task: Create comprehensive unit tests for [component/handler]
-
-Context from implementation:
-
-- File location: [path to file]
-- Key functionality: [list main functions]
-- Dependencies: [what's mocked vs real]
-
-Test requirements:
-
-1. Cover happy path for each public function
-2. Cover error scenarios and edge cases
-3. Use table-driven tests for multiple scenarios
-4. Mock external dependencies (APIs, database)
-
-Scope: Unit tests ONLY. Do NOT create integration or E2E tests.
-
-Expected output:
-
-- Test file at [path]
-- Minimum 80% coverage for the file
-- Return structured JSON with:
-  - Test count
-  - Coverage percentage
-  - Any gaps identified
-```
-
-### Integration Test Engineer
-
-```markdown
-Task: Create integration tests for [API/service]
-
-Context from implementation:
-
-- API endpoints: [list endpoints]
-- External dependencies: [AWS services, third-party APIs]
-- Expected behavior: [describe flows]
-
-Test requirements:
-
-1. Test API contract compliance
-2. Use MSW for HTTP mocking / localstack for AWS
-3. Cover success and error response codes
-4. Validate response shapes
-
-Scope: Integration tests ONLY. Do NOT create E2E or unit tests.
-
-Expected output:
-
-- Test file at [path]
-- MSW handlers if HTTP mocking needed
-- Return structured JSON with test results
-```
-
-### E2E Test Engineer
-
-```markdown
-Task: Create E2E tests for [user workflow]
-
-Context from implementation:
-
-- Page location: [route/URL]
-- User flow: [step by step]
-- Key interactions: [buttons, forms, etc.]
-
-Test requirements:
-
-1. Use Playwright page object model
-2. Cover complete user journey
-3. Include assertions for each step
-4. Handle loading states with waitFor
-
-Scope: E2E tests ONLY. Do NOT create unit or integration tests.
-
-Expected output:
-
-- Test file at e2e/tests/[path]
-- Page object if new page being tested
-- Return structured JSON with:
-  - Scenarios covered
-  - Test results
-  - Screenshots if failures
-```
-
-## Reviewer Agent Templates
-
-### Code Quality Review
-
-```markdown
-Task: Review implementation for code quality
-
-Files to review:
-
-- [path 1]
-- [path 2]
-
-Context:
-
-- Requirements: [original requirements]
-- Architecture decisions: [key decisions]
-
-Review criteria:
-
-1. Does implementation match requirements?
-2. Are patterns consistent with codebase?
-3. Is error handling comprehensive?
-4. Is code maintainable and readable?
-
-Scope: Review ONLY. Do NOT fix issues yourself.
-
-Expected output:
-Return structured JSON with:
-
-- assessment: "approved" | "changes_required"
-- strengths: [list]
-- issues: [
-  { severity: "critical|important|minor", description, file, line }
-  ]
-- suggestions: [optional improvements]
-```
-
-### Security Review
-
-```markdown
-Task: Review implementation for security vulnerabilities
-
-Files to review:
-
-- [path 1]
-- [path 2]
-
-Context:
-
-- Feature handles: [auth/user input/secrets/etc.]
-- Attack surface: [describe exposure]
-
-Review criteria:
-
-1. Input validation (injection prevention)
-2. Authentication/authorization checks
-3. Sensitive data handling
-4. Error messages (no information leakage)
-5. OWASP Top 10 compliance
-
-Scope: Security review ONLY. Do NOT fix issues yourself.
-
-Expected output:
-Return structured JSON with:
-
-- risk_level: "low" | "medium" | "high" | "critical"
-- vulnerabilities: [
-  { severity, type, description, file, line, remediation }
-  ]
-- recommendations: [security improvements]
-```
+---
 
 ## Using Templates
 
@@ -341,3 +200,49 @@ Ensure you request:
 - Specific deliverables
 - Structured JSON for easy parsing
 - Files created/modified list
+
+---
+
+## Context Awareness in Delegations
+
+### Token Thresholds
+
+Before spawning agents, check current token usage:
+
+| Threshold         | Layer       | Action                                            |
+| ----------------- | ----------- | ------------------------------------------------- |
+| <75% (150k)       | —           | Proceed normally                                  |
+| 75-80% (150-160k) | Guidance    | SHOULD compact - proactive compaction recommended |
+| 80-85% (160-170k) | Guidance    | MUST compact - compact NOW before spawning        |
+| >85% (170k)       | Enforcement | Hook BLOCKS agent spawning until /compact         |
+
+**See:** [context-monitoring.md](context-monitoring.md) for token measurement scripts.
+
+### Agent Prompt Context Size
+
+Keep agent prompts focused to avoid context pollution:
+
+| Agent Type   | Max Context | Include                                  | Exclude                           |
+| ------------ | ----------- | ---------------------------------------- | --------------------------------- |
+| Architecture | 2000 tokens | Requirements, constraints, patterns      | Full discovery output             |
+| Developer    | 3000 tokens | Architecture summary, file paths, skills | Other domain details              |
+| Reviewer     | 2000 tokens | Plan, implementation files               | Discovery, architecture rationale |
+| Tester       | 2000 tokens | Test plan, file locations                | Implementation logs               |
+
+### Fresh Agent Principle
+
+Each `Task()` spawns a NEW agent instance:
+
+- No context pollution from previous agents
+- Include ALL necessary context in the prompt
+- Reference files instead of inlining content
+- Never ask agent to "continue" previous work
+
+**See:** [compaction-gates.md](compaction-gates.md) for compaction protocol at phase transitions.
+
+---
+
+## Next Steps
+
+- **For test templates**: See [delegation-templates-testing.md](delegation-templates-testing.md)
+- **For review templates + skill requirements**: See [delegation-templates-review-skills.md](delegation-templates-review-skills.md)

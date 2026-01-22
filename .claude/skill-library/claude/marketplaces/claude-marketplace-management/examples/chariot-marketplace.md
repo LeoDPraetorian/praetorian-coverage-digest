@@ -101,7 +101,7 @@ Actual `.claude/settings.json` in Chariot repository:
 - developing-with-tdd
 - verifying-before-completion
 - using-superpowers
-- claude-skill-write
+- creating-skills
 - writing-plans
 - executing-plans
 - (and 12 more)

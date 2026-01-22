@@ -342,14 +342,14 @@ None - this skill provides reference data and mapping logic
 
 ### Pairs With (conditional)
 
-| Skill                          | Trigger                                    | Purpose                                |
-| ------------------------------ | ------------------------------------------ | -------------------------------------- |
-| `mapping-to-iso-27001`         | When dual FedRAMP + ISO 27001 compliance   | Cross-map NIST 800-53 ↔ ISO Annex A    |
-| `mapping-to-mitre-attack`      | When threat intelligence context needed    | ATT&CK technique → control mapping     |
-| `mapping-to-cwe`               | When vulnerability classification needed   | CWE → control mapping                  |
-| `scoring-cvss-threats`                 | When severity scoring needed               | CVSS score influences POA&M priority   |
-| `security-controls-mapping`    | When general control mapping needed        | Broader security control framework     |
-| `threat-modeling-orchestrator` | When architecting security controls        | Threat model → control recommendations |
+| Skill                          | Trigger                                  | Purpose                                |
+| ------------------------------ | ---------------------------------------- | -------------------------------------- |
+| `mapping-to-iso-27001`         | When dual FedRAMP + ISO 27001 compliance | Cross-map NIST 800-53 ↔ ISO Annex A    |
+| `mapping-to-mitre-attack`      | When threat intelligence context needed  | ATT&CK technique → control mapping     |
+| `mapping-to-cwe`               | When vulnerability classification needed | CWE → control mapping                  |
+| `scoring-cvss-threats`         | When severity scoring needed             | CVSS score influences POA&M priority   |
+| `security-controls-mapping`    | When general control mapping needed      | Broader security control framework     |
+| `threat-modeling-orchestrator` | When architecting security controls      | Threat model → control recommendations |
 
 ---
 
@@ -387,13 +387,13 @@ Detailed documentation in `references/`:
 
 ## Related Skills
 
-| Skill                          | Purpose                                        |
-| ------------------------------ | ---------------------------------------------- |
+| Skill                          | Purpose                                                                                       |
+| ------------------------------ | --------------------------------------------------------------------------------------------- |
 | `mapping-to-iso-27001`         | Map findings to ISO 27001/27002 Annex A controls (common for orgs needing both FedRAMP + ISO) |
-| `mapping-to-mitre-attack`      | Map findings to ATT&CK techniques/tactics      |
-| `mapping-to-mitre-d3fend`      | Map defensive techniques to D3FEND framework   |
-| `mapping-to-cwe`               | Map vulnerabilities to CWE categories          |
-| `mapping-to-sans-top-25`       | Map findings to SANS Top 25 vulnerabilities    |
-| `scoring-cvss-threats`                 | Calculate CVSS scores for findings             |
-| `security-controls-mapping`    | General security control framework mapping     |
-| `threat-modeling-orchestrator` | Architect security controls from threat models |
+| `mapping-to-mitre-attack`      | Map findings to ATT&CK techniques/tactics                                                     |
+| `mapping-to-mitre-d3fend`      | Map defensive techniques to D3FEND framework                                                  |
+| `mapping-to-cwe`               | Map vulnerabilities to CWE categories                                                         |
+| `mapping-to-sans-top-25`       | Map findings to SANS Top 25 vulnerabilities                                                   |
+| `scoring-cvss-threats`         | Calculate CVSS scores for findings                                                            |
+| `security-controls-mapping`    | General security control framework mapping                                                    |
+| `threat-modeling-orchestrator` | Architect security controls from threat models                                                |

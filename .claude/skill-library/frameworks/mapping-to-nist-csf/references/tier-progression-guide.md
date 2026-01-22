@@ -8,12 +8,12 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
 
 ## The 4 Tiers
 
-| Tier                        | Risk Management Process          | Integrated Risk Mgmt Program  | External Participation        | Example Characteristics |
-| --------------------------- | -------------------------------- | ----------------------------- | ----------------------------- | ---------------------- |
-| **Tier 1 (Partial)**        | Ad hoc, reactive                 | Isolated by department        | Limited awareness             | Manual processes, no automation |
-| **Tier 2 (Risk Informed)**  | Risk-aware, no org-wide policy   | Risk-informed but not org-wide| Aware but no formal sharing   | Basic automation, scheduled activities |
-| **Tier 3 (Repeatable)**     | Formal policy, regularly updated | Org-wide approach             | Formal collaboration          | Automated continuous processes, centralized |
-| **Tier 4 (Adaptive)**       | Adaptive, lessons learned        | Real-time risk-based          | Proactive, real-time intel    | ML-based, predictive, automated response |
+| Tier                       | Risk Management Process          | Integrated Risk Mgmt Program   | External Participation      | Example Characteristics                     |
+| -------------------------- | -------------------------------- | ------------------------------ | --------------------------- | ------------------------------------------- |
+| **Tier 1 (Partial)**       | Ad hoc, reactive                 | Isolated by department         | Limited awareness           | Manual processes, no automation             |
+| **Tier 2 (Risk Informed)** | Risk-aware, no org-wide policy   | Risk-informed but not org-wide | Aware but no formal sharing | Basic automation, scheduled activities      |
+| **Tier 3 (Repeatable)**    | Formal policy, regularly updated | Org-wide approach              | Formal collaboration        | Automated continuous processes, centralized |
+| **Tier 4 (Adaptive)**      | Adaptive, lessons learned        | Real-time risk-based           | Proactive, real-time intel  | ML-based, predictive, automated response    |
 
 ## Industry Distribution (2024-2025)
 
@@ -27,6 +27,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
 ### Tier 1 → Tier 2: From Ad-Hoc to Risk-Aware
 
 **Core Requirements:**
+
 1. **Governance (GV):**
    - Establish GV.RM-02: Document risk appetite statement
    - Implement GV.PO-01: Formal cybersecurity policies created
@@ -48,6 +49,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
    - Document RS.MA-01: Written incident response plan
 
 **Success Indicators:**
+
 - Risk discussions at management level (not just IT)
 - Documented policies and procedures
 - Basic tools deployed (vulnerability scanner, SIEM)
@@ -56,6 +58,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
 ### Tier 2 → Tier 3: From Risk-Informed to Repeatable
 
 **Core Requirements:**
+
 1. **Governance (GV):**
    - Implement GV.RM-03: Cybersecurity integrated into enterprise risk management (board-level reporting)
    - Establish GV.OV-01: Quarterly board cybersecurity reviews
@@ -86,6 +89,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
    - Implement PR.DS-11: Automated backup testing
 
 **Success Indicators:**
+
 - Board-level cybersecurity reporting (quarterly)
 - Centralized security operations
 - Automated asset discovery and vulnerability management
@@ -95,6 +99,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
 ### Tier 3 → Tier 4: From Repeatable to Adaptive
 
 **Core Requirements:**
+
 1. **Governance (GV):**
    - Implement GV.RM-04: Risk-adaptive strategy (adjust based on real-time threat intel)
    - Implement GV.OV-03: Real-time KPI dashboards for leadership
@@ -125,6 +130,7 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
    - Chaos engineering / resilience testing
 
 **Success Indicators:**
+
 - Real-time risk-adaptive security controls
 - 80%+ of incidents handled with automated response
 - ML/AI-based predictive analytics operational
@@ -136,36 +142,43 @@ NIST CSF 2.0 maintains four implementation tiers that measure cybersecurity risk
 For each question, score: 0 (No), 1 (Partial), 2 (Yes)
 
 **Governance (GV):**
+
 - Do you have documented risk appetite and tolerance? (GV.RM-02)
 - Does the board receive regular cybersecurity briefings? (GV.OV-01)
 - Do you have formal supplier risk assessment processes? (GV.SC-06/07)
 
 **Identify (ID):**
+
 - Is asset discovery automated? (ID.AM-01/02)
 - Do you conduct continuous vulnerability scanning? (ID.RA-01)
 - Do you integrate threat intelligence feeds? (ID.RA-02)
 
 **Protect (PR):**
+
 - Is MFA enforced for privileged accounts? (PR.AA-03)
 - Can you patch Critical CVEs within 7 days? (PR.PS-02)
 - Do you enforce configuration baselines? (PR.PS-01)
 
 **Detect (DE):**
+
 - Do you have 24/7 security monitoring? (DE.CM-01)
 - Do you have automated event correlation? (DE.AE-02)
 - Do you conduct proactive threat hunting? (DE.CM advanced)
 
 **Respond (RS):**
+
 - Do you have documented incident response plans? (RS.MA-01)
 - Do you conduct regular IR drills/tabletops? (RS.CO)
 - Do you have automated incident response? (RS.MI-01 with SOAR)
 
 **Recover (RC):**
+
 - Do you test backup restoration? (PR.DS-11, RC.RP-01)
 - Can you meet recovery time objectives? (RC.RP-02)
 - Do you update recovery plans post-incident? (RC.RP-03)
 
 **Scoring:**
+
 - **0-12 points:** Tier 1 (Partial)
 - **13-24 points:** Tier 2 (Risk Informed)
 - **25-30 points:** Tier 3 (Repeatable)
@@ -173,14 +186,14 @@ For each question, score: 0 (No), 1 (Partial), 2 (Yes)
 
 ## Chariot Platform Tier Mapping
 
-| Chariot Capability | Tier 1 | Tier 2 | Tier 3 | Tier 4 |
-| ------------------ | ------ | ------ | ------ | ------ |
-| Asset Discovery | Manual | Scheduled scans | Automated continuous | Real-time with ML classification |
-| Vulnerability Scanning | On-demand | Daily/weekly scheduled | Continuous with prioritization | Predictive + automated remediation |
-| Compliance Dashboards | None | Basic reports | Centralized real-time | Executive + ML-based gap prediction |
-| Incident Response | Manual | Documented playbooks | Automated playbooks | SOAR with ML triage |
-| Threat Intelligence | None | Basic feeds | Integrated feeds | Real-time enrichment + hunting |
-| Supply Chain Risk | Ad-hoc | Vendor lists | Risk assessments | Continuous monitoring + alerts |
+| Chariot Capability     | Tier 1    | Tier 2                 | Tier 3                         | Tier 4                              |
+| ---------------------- | --------- | ---------------------- | ------------------------------ | ----------------------------------- |
+| Asset Discovery        | Manual    | Scheduled scans        | Automated continuous           | Real-time with ML classification    |
+| Vulnerability Scanning | On-demand | Daily/weekly scheduled | Continuous with prioritization | Predictive + automated remediation  |
+| Compliance Dashboards  | None      | Basic reports          | Centralized real-time          | Executive + ML-based gap prediction |
+| Incident Response      | Manual    | Documented playbooks   | Automated playbooks            | SOAR with ML triage                 |
+| Threat Intelligence    | None      | Basic feeds            | Integrated feeds               | Real-time enrichment + hunting      |
+| Supply Chain Risk      | Ad-hoc    | Vendor lists           | Risk assessments               | Continuous monitoring + alerts      |
 
 ## Official Sources
 

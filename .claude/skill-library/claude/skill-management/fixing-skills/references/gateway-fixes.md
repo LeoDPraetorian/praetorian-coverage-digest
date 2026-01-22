@@ -93,24 +93,24 @@
 
 **How to fix:**
 
-This requires cross-gateway coordination. Use the `syncing-gateways` skill:
+This requires cross-gateway coordination. Load and follow the `syncing-gateways` skill workflow:
 
-```bash
-skill-manager sync-gateways --full-sync
+```typescript
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md");
 ```
 
-**Manual workflow:**
+The syncing-gateways workflow will guide you through:
 
-1. List all library skills: `find .claude/skill-library -name SKILL.md`
-2. Check each gateway routing table
-3. Add missing skills to appropriate gateways
-4. Use category mapping:
+1. **Discovery**: Find all library skills via `find .claude/skill-library -name SKILL.md`
+2. **Mapping**: Determine gateway using path patterns:
    - `development/frontend/*` → `gateway-frontend`
    - `development/backend/*` → `gateway-backend`
    - `testing/*` → `gateway-testing`
    - `security/*` → `gateway-security`
    - `claude/mcp-tools/*` → `gateway-mcp-tools`
    - `development/integrations/*` → `gateway-integrations`
+3. **Comparison**: Identify skills missing from gateway routing tables
+4. **Application**: Add missing skills using Edit tool
 
 **Why defer to syncing-gateways:** Phase 20 requires checking ALL gateways and ALL library skills - beyond the scope of single-skill fixing.
 

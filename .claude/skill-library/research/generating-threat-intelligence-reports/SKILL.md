@@ -24,13 +24,13 @@ Use this skill when:
 
 ## Quick Reference
 
-| Phase | Purpose | Output |
-|-------|---------|--------|
-| 1. KEV Research | Get top actively exploited CVEs | Top CVEs from CISA catalog |
-| 2. Attribution Research | Enrich with threat actor intelligence | APT/ransomware attribution |
-| 3. Nuclei Correlation | Search templates for detection | Detection coverage status |
-| 4. Prioritization | Rank by threat + coverage | Priority matrix |
-| 5. Report Generation | Format for customer delivery | Key Takeaways + Patching Table |
+| Phase                   | Purpose                               | Output                         |
+| ----------------------- | ------------------------------------- | ------------------------------ |
+| 1. KEV Research         | Get top actively exploited CVEs       | Top CVEs from CISA catalog     |
+| 2. Attribution Research | Enrich with threat actor intelligence | APT/ransomware attribution     |
+| 3. Nuclei Correlation   | Search templates for detection        | Detection coverage status      |
+| 4. Prioritization       | Rank by threat + coverage             | Priority matrix                |
+| 5. Report Generation    | Format for customer delivery          | Key Takeaways + Patching Table |
 
 ## Progress Tracking (MANDATORY)
 
@@ -52,22 +52,22 @@ Use this skill when:
 
 Ask user via AskUserQuestion if not provided:
 
-| Parameter | Default | Purpose |
-|-----------|---------|---------|
-| **Timeframe** | 45 days | KEV catalog date range |
-| **Top N CVEs** | 5 | Number of vulnerabilities to report |
-| **Industry Vertical** | All | Healthcare, Financial, Government, Manufacturing, Energy, Technology, or All |
-| **Output Format** | Markdown | Table/Presentation format |
+| Parameter             | Default  | Purpose                                                                      |
+| --------------------- | -------- | ---------------------------------------------------------------------------- |
+| **Timeframe**         | 45 days  | KEV catalog date range                                                       |
+| **Top N CVEs**        | 5        | Number of vulnerabilities to report                                          |
+| **Industry Vertical** | All      | Healthcare, Financial, Government, Manufacturing, Energy, Technology, or All |
+| **Output Format**     | Markdown | Table/Presentation format                                                    |
 
 ### Output Artifacts
 
-| Artifact | Location | Purpose |
-|----------|----------|---------|
-| **Key Takeaways** | REPORT.md | 5 executive bullets |
-| **Priority Table** | REPORT.md | CVE + Threat Actor + Detection Status |
-| **Attribution Evidence** | REPORT.md | Source citations for threat actors |
-| **Detection Gap Analysis** | REPORT.md | CVEs without nuclei templates |
-| **Research Artifacts** | OUTPUT_DIR/ | Raw KEV data + attribution sources |
+| Artifact                   | Location    | Purpose                               |
+| -------------------------- | ----------- | ------------------------------------- |
+| **Key Takeaways**          | REPORT.md   | 5 executive bullets                   |
+| **Priority Table**         | REPORT.md   | CVE + Threat Actor + Detection Status |
+| **Attribution Evidence**   | REPORT.md   | Source citations for threat actors    |
+| **Detection Gap Analysis** | REPORT.md   | CVEs without nuclei templates         |
+| **Research Artifacts**     | OUTPUT_DIR/ | Raw KEV data + attribution sources    |
 
 ---
 
@@ -84,6 +84,7 @@ Read(".claude/skill-library/research/researching-cisa-kev/SKILL.md")
 ```
 
 **Parameters to pass:**
+
 - Timeframe: {days} (default: 45)
 - Focus: All vulnerability classes OR specific (RCE, auth bypass, etc.)
 - Output mode: Standalone (creates its own OUTPUT_DIR)
@@ -93,6 +94,7 @@ Read(".claude/skill-library/research/researching-cisa-kev/SKILL.md")
 From the SYNTHESIS.md produced by `researching-cisa-kev`:
 
 **Extract for each CVE:**
+
 - CVE ID
 - Vulnerability Name
 - Vendor/Product
@@ -107,6 +109,7 @@ From the SYNTHESIS.md produced by `researching-cisa-kev`:
 ### 1.3 Select Top N Candidates
 
 Based on KEV criteria:
+
 - Recent addition (within timeframe)
 - Federal deadline proximity
 - CVSS severity
@@ -127,6 +130,7 @@ Based on KEV criteria:
 For each CVE from Phase 1, run targeted searches:
 
 **Query patterns:**
+
 1. `"{CVE-ID} threat actor attribution"` - Direct attribution
 2. `"{CVE-ID} APT ransomware campaign"` - Campaign context
 3. `"{Product} {CVE-ID} exploitation {year}"` - Recent exploitation
@@ -136,6 +140,7 @@ For each CVE from Phase 1, run targeted searches:
 ### 2.2 Extract Attribution Data
 
 For each CVE, document:
+
 - **Primary Actor** (APT28, LockBit, etc.)
 - **Actor Type** (Nation-state/Ransomware/Opportunistic)
 - **Country** (if nation-state)
@@ -145,12 +150,12 @@ For each CVE, document:
 
 ### 2.3 Assign Confidence Levels
 
-| Confidence | Criteria | Use |
-|------------|----------|-----|
-| **HIGH** | Multiple Tier 1/2 sources | Full priority weight |
-| **MEDIUM** | Single Tier 2 or multiple Tier 3 | Partial weight (0.7x) |
-| **LOW** | Tier 3 only or speculation | Minimal weight (0.3x) |
-| **UNKNOWN** | No attribution found | Flag for investigation |
+| Confidence  | Criteria                         | Use                    |
+| ----------- | -------------------------------- | ---------------------- |
+| **HIGH**    | Multiple Tier 1/2 sources        | Full priority weight   |
+| **MEDIUM**  | Single Tier 2 or multiple Tier 3 | Partial weight (0.7x)  |
+| **LOW**     | Tier 3 only or speculation       | Minimal weight (0.3x)  |
+| **UNKNOWN** | No attribution found             | Flag for investigation |
 
 **Alternative:** If WebSearch insufficient, use `researching-perplexity` for synthesized intelligence.
 
@@ -163,6 +168,7 @@ For each CVE, document:
 Filter CVEs based on "Target Sectors" extracted in Phase 2.2:
 
 **Matching logic:**
+
 - **Healthcare:** CVEs targeting Healthcare, Medical, Hospitals, Pharmaceutical sectors
 - **Financial:** CVEs targeting Financial Services, Banking, Fintech, Insurance sectors
 - **Government:** CVEs targeting Government, Defense, Federal, State agencies
@@ -187,6 +193,7 @@ Result: ✅ INCLUDE (All sectors accepted)
 ```
 
 **Filtering behavior:**
+
 - Apply filter AFTER Phase 2 attribution research completes
 - If fewer than Top N CVEs match vertical, report all matching CVEs
 - **If ZERO CVEs match vertical:** Generate summary report with recommendation to expand search
@@ -195,6 +202,7 @@ Result: ✅ INCLUDE (All sectors accepted)
 **Priority boost:** CVEs targeting specified vertical receive +15% priority weight in Phase 4 scoring.
 
 **Zero-match handling:**
+
 ```markdown
 # Threat Intelligence Report
 
@@ -204,6 +212,7 @@ Result: ✅ INCLUDE (All sectors accepted)
 No CVEs targeting the Healthcare sector were identified in the {days}-day KEV window.
 
 **Recommendation:**
+
 - Expand search: Use --vertical All to see all threats
 - Extend timeframe: Use --days 90 for broader coverage
 ```
@@ -236,6 +245,7 @@ grep -r "CVE-YYYY-NNNNN" /tmp/nuclei-templates --include="*.yaml" --include="*.y
 ```
 
 **Record:**
+
 - Template exists: YES/NO
 - Template path(s) if found
 - Multiple templates if available (e.g., praetorian/ vs http/cves/)
@@ -245,16 +255,18 @@ grep -r "CVE-YYYY-NNNNN" /tmp/nuclei-templates --include="*.yaml" --include="*.y
 
 **Initial status assignment (tentative - refined in Phase 2):**
 
-| Detection Status | Symbol | Meaning |
-|-----------------|--------|---------|
-| **COVERED** | ✅ | Template exists in nuclei (refined by customer exposure in Phase 2) |
-| **GAP** | ❌ | No template found (refined by remediation in Phase 3) |
+| Detection Status | Symbol | Meaning                                                             |
+| ---------------- | ------ | ------------------------------------------------------------------- |
+| **COVERED**      | ✅     | Template exists in nuclei (refined by customer exposure in Phase 2) |
+| **GAP**          | ❌     | No template found (refined by remediation in Phase 3)               |
 
 **Note:** This is a tentative status. The progressive detection status system refines this based on:
+
 - **Phase 2:** Customer asset exposure (COVERED → COVERED-EXPOSED if customer has vulnerable assets)
 - **Phase 3:** Remediation status (GAP → IN DEVELOPMENT when CVE research triggered)
 
 **For templates found:** Read first 50 lines to extract:
+
 - Template severity
 - Detection method (HTTP/network/file-based)
 - Verified status (metadata.verified: true/false)
@@ -271,12 +283,12 @@ grep -r "CVE-YYYY-NNNNN" /tmp/nuclei-templates --include="*.yaml" --include="*.y
 
 Rank CVEs using combined scoring:
 
-| Factor | Weight | Scoring |
-|--------|--------|---------|
-| **Threat Actor Attribution** | 35% | Nation-state HIGH conf (10) > Ransomware HIGH (8) > Nation-state MEDIUM (6) > Opportunistic (3) > Unknown (1) |
-| **Federal Deadline Proximity** | 30% | Days until due date (urgent = 10, >90 days = 1) |
-| **CVSS Severity** | 20% | Critical (10) > High (7) > Medium (4) > Low (1) |
-| **Detection Coverage** | 15% | Gap (10) > Partial (5) > Covered (1) |
+| Factor                         | Weight | Scoring                                                                                                       |
+| ------------------------------ | ------ | ------------------------------------------------------------------------------------------------------------- |
+| **Threat Actor Attribution**   | 35%    | Nation-state HIGH conf (10) > Ransomware HIGH (8) > Nation-state MEDIUM (6) > Opportunistic (3) > Unknown (1) |
+| **Federal Deadline Proximity** | 30%    | Days until due date (urgent = 10, >90 days = 1)                                                               |
+| **CVSS Severity**              | 20%    | Critical (10) > High (7) > Medium (4) > Low (1)                                                               |
+| **Detection Coverage**         | 15%    | Gap (10) > Partial (5) > Covered (1)                                                                          |
 
 **Why attribution gets higher weight:** Nation-state actors are persistent and sophisticated; ransomware groups are financially motivated and widespread. Attribution confidence affects urgency.
 
@@ -416,21 +428,21 @@ Before marking workflow complete:
 
 ## Common Rationalizations (DO NOT SKIP)
 
-| Rationalization | Why It's Wrong |
-|----------------|----------------|
-| "I'll just manually search KEV" | researching-cisa-kev already automates this with initial attribution |
-| "Attribution takes too long" | WebSearch queries take <30 seconds per CVE, critical for prioritization |
-| "KEV Notes field has attribution" | Often missing or incomplete; Phase 2 enriches with Tier 2 sources |
-| "Nuclei search takes too long" | grep across 12K files takes <5 seconds |
-| "Customer doesn't need detection status" | Transparency on gaps builds trust and drives capability development |
-| "5 bullets is arbitrary" | Standardized format enables comparison across reports |
-| "I'll skip confidence levels" | Attribution without confidence misleads customers on urgency |
-| "I'll skip prioritization, just list CVEs" | Random order wastes customer time reviewing irrelevant threats |
-| "Stakeholder requested N items instead of 5" | Report parameters are standardized for comparison across time; customize presentation, not research workflow |
-| "I already manually gathered KEV/attribution data" | Sunk cost fallacy; automated workflow ensures consistency and prevents missed datapoints |
-| "No time for TodoWrite tracking" | TodoWrite takes 30 seconds, prevents hours of rework from skipped phases |
-| "I remember which templates exist, can skip search" | Memory is unreliable; templates change; verification is mandatory even when "known" |
-| "Customize weights for this customer's context" | Weights are fixed; if factor doesn't apply (no federal deadline), it scores low naturally |
+| Rationalization                                     | Why It's Wrong                                                                                               |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ |
+| "I'll just manually search KEV"                     | researching-cisa-kev already automates this with initial attribution                                         |
+| "Attribution takes too long"                        | WebSearch queries take <30 seconds per CVE, critical for prioritization                                      |
+| "KEV Notes field has attribution"                   | Often missing or incomplete; Phase 2 enriches with Tier 2 sources                                            |
+| "Nuclei search takes too long"                      | grep across 12K files takes <5 seconds                                                                       |
+| "Customer doesn't need detection status"            | Transparency on gaps builds trust and drives capability development                                          |
+| "5 bullets is arbitrary"                            | Standardized format enables comparison across reports                                                        |
+| "I'll skip confidence levels"                       | Attribution without confidence misleads customers on urgency                                                 |
+| "I'll skip prioritization, just list CVEs"          | Random order wastes customer time reviewing irrelevant threats                                               |
+| "Stakeholder requested N items instead of 5"        | Report parameters are standardized for comparison across time; customize presentation, not research workflow |
+| "I already manually gathered KEV/attribution data"  | Sunk cost fallacy; automated workflow ensures consistency and prevents missed datapoints                     |
+| "No time for TodoWrite tracking"                    | TodoWrite takes 30 seconds, prevents hours of rework from skipped phases                                     |
+| "I remember which templates exist, can skip search" | Memory is unreliable; templates change; verification is mandatory even when "known"                          |
+| "Customize weights for this customer's context"     | Weights are fixed; if factor doesn't apply (no federal deadline), it scores low naturally                    |
 
 ---
 
@@ -444,24 +456,24 @@ Before marking workflow complete:
 
 ### Requires (invoke before starting)
 
-| Skill | When | Purpose |
-|-------|------|---------|
+| Skill                  | When    | Purpose                                                      |
+| ---------------------- | ------- | ------------------------------------------------------------ |
 | `researching-cisa-kev` | Phase 1 | Retrieve KEV vulnerabilities with initial exploitation notes |
 
 ### Calls (during execution)
 
-| Skill | Phase | Purpose |
-|-------|-------|---------|
-| `researching-cisa-kev` | Phase 1 | Automate KEV catalog research and initial threat context |
+| Skill                    | Phase              | Purpose                                                     |
+| ------------------------ | ------------------ | ----------------------------------------------------------- |
+| `researching-cisa-kev`   | Phase 1            | Automate KEV catalog research and initial threat context    |
 | `researching-perplexity` | Phase 2 (optional) | Synthesized threat intelligence when WebSearch insufficient |
 
 ### Pairs With (conditional)
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| `writing-nuclei-templates` | When detection gaps found | Create templates for missing CVEs |
-| `orchestrating-capability-development` | When multiple gaps | Batch capability development |
-| `orchestrating-research` | Complex attribution | Full multi-source research orchestration |
+| Skill                                  | Trigger                   | Purpose                                                                                                             |
+| -------------------------------------- | ------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `writing-nuclei-templates`             | When detection gaps found | Create templates for missing CVEs                                                                                   |
+| `orchestrating-capability-development` | When multiple gaps        | Batch capability development                                                                                        |
+| `orchestrating-research` (LIBRARY)     | Complex attribution       | Full multi-source research orchestration - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
 
 ---
 
@@ -476,13 +488,13 @@ Before marking workflow complete:
 
 ## Related Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `researching-cisa-kev` | Core KEV research this skill delegates to |
-| `researching-perplexity` | Synthesized threat intelligence for attribution |
-| `orchestrating-research` | Multi-source research orchestration |
-| `writing-nuclei-templates` | Create detection capabilities for gaps |
-| `orchestrating-capability-development` | Full capability development workflow |
+| Skill                                  | Purpose                                                                                                        |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `researching-cisa-kev`                 | Core KEV research this skill delegates to                                                                      |
+| `researching-perplexity`               | Synthesized threat intelligence for attribution                                                                |
+| `orchestrating-research` (LIBRARY)     | Multi-source research orchestration - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `writing-nuclei-templates`             | Create detection capabilities for gaps                                                                         |
+| `orchestrating-capability-development` | Full capability development workflow                                                                           |
 
 ---
 

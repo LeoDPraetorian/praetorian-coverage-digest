@@ -14,14 +14,14 @@ This document provides machine-readable specifications for generating all requir
 
 All prompts use these variables that must be replaced based on pretext:
 
-| Variable | Example (SecureWeb Guardian) | Example (DevAPI Tester) |
-|----------|------------------------------|-------------------------|
-| `{EXTENSION_NAME}` | SecureWeb Guardian | DevAPI Tester Pro |
-| `{PRIMARY_COLOR}` | #667eea (purple-blue) | #2563eb (blue) |
-| `{SECONDARY_COLOR}` | #764ba2 (purple) | #1e40af (dark blue) |
-| `{ICON_SYMBOL}` | shield | code brackets |
-| `{THEME}` | security/protection | developer/technical |
-| `{PRIMARY_METAPHOR}` | shield, lock, guard | code, API, terminal |
+| Variable             | Example (SecureWeb Guardian) | Example (DevAPI Tester) |
+| -------------------- | ---------------------------- | ----------------------- |
+| `{EXTENSION_NAME}`   | SecureWeb Guardian           | DevAPI Tester Pro       |
+| `{PRIMARY_COLOR}`    | #667eea (purple-blue)        | #2563eb (blue)          |
+| `{SECONDARY_COLOR}`  | #764ba2 (purple)             | #1e40af (dark blue)     |
+| `{ICON_SYMBOL}`      | shield                       | code brackets           |
+| `{THEME}`            | security/protection          | developer/technical     |
+| `{PRIMARY_METAPHOR}` | shield, lock, guard          | code, API, terminal     |
 
 ---
 
@@ -33,9 +33,9 @@ All prompts use these variables that must be replaced based on pretext:
 {
   "asset_type": "extension_icons",
   "required_sizes": [
-    {"width": 16, "height": 16, "filename": "icon16.png", "usage": "Browser toolbar"},
-    {"width": 48, "height": 48, "filename": "icon48.png", "usage": "Extensions management page"},
-    {"width": 128, "height": 128, "filename": "icon128.png", "usage": "Chrome Web Store listing"}
+    { "width": 16, "height": 16, "filename": "icon16.png", "usage": "Browser toolbar" },
+    { "width": 48, "height": 48, "filename": "icon48.png", "usage": "Extensions management page" },
+    { "width": 128, "height": 128, "filename": "icon128.png", "usage": "Chrome Web Store listing" }
   ],
   "format": "PNG",
   "transparency": "optional but recommended",
@@ -62,6 +62,7 @@ All prompts use these variables that must be replaced based on pretext:
 ### Image Prompts
 
 **16x16 Icon**:
+
 ```
 Create a 16x16 pixel browser extension icon for {EXTENSION_NAME}.
 
@@ -77,6 +78,7 @@ Keep extremely simple - at 16px, only basic shapes are visible. Focus on clear s
 ```
 
 **48x48 Icon**:
+
 ```
 Create a 48x48 pixel browser extension icon for {EXTENSION_NAME}.
 
@@ -93,6 +95,7 @@ Add subtle shadow or gradient to symbol for depth while maintaining flat design 
 ```
 
 **128x128 Icon**:
+
 ```
 Create a 128x128 pixel browser extension icon for {EXTENSION_NAME}.
 
@@ -177,6 +180,7 @@ Example layout:
 ### Screenshots (1280x800)
 
 **Screenshot 1 - Extension Popup**:
+
 ```
 Create a 1280x800 screenshot showing the {EXTENSION_NAME} browser extension popup interface.
 
@@ -197,6 +201,7 @@ Make it look like actual browser screenshot showing extension in action.
 ```
 
 **Screenshot 2 - Features Overview**:
+
 ```
 Create a 1280x800 promotional image highlighting {EXTENSION_NAME} key features.
 
@@ -216,6 +221,7 @@ Clean, modern design that could be used in marketing materials.
 ```
 
 **Screenshot 3 - Protection in Action** (Optional):
+
 ```
 Create a 1280x800 screenshot showing {EXTENSION_NAME} blocking a threat.
 
@@ -407,6 +413,7 @@ These replace emoji icons currently used (🔍, 🍪, 🚫, 🔒, ⚡, 🔄).
 4. **Pretext-specific additions** (security vs developer vs privacy theme)
 
 **Example workflow**:
+
 ```
 1. User chooses pretext: "Anti-Phishing Security Tool"
 2. Hypercube skill extracts variables:
@@ -428,11 +435,13 @@ These replace emoji icons currently used (🔍, 🍪, 🚫, 🔒, ⚡, 🔄).
 **When to generate**: After pretext design approved, before customizing extension
 
 **Assets needed**:
+
 - `icon16.png`
 - `icon48.png`
 - `icon128.png`
 
 **Integration**:
+
 ```markdown
 #### 3.3 Generate Icons (Required)
 
@@ -441,12 +450,12 @@ These replace emoji icons currently used (🔍, 🍪, 🚫, 🔒, ⚡, 🔄).
 Option A: Manual design (Figma, icon.kitchen)
 Option B: Generate via image skill:
 
-  Skill({
-    skill: "image-generation",
-    assets: ["extension_icons"],
-    pretext_variables: { /* extracted from Phase 1 */ },
-    specifications: "references/image-specifications.md"
-  })
+Skill({
+skill: "image-generation",
+assets: ["extension_icons"],
+pretext*variables: { /* extracted from Phase 1 \_/ },
+specifications: "references/image-specifications.md"
+})
 ```
 
 ### Phase 4: Chrome Store Materials
@@ -454,11 +463,13 @@ Option B: Generate via image skill:
 **When to generate**: After extension customized, before testing
 
 **Assets needed**:
+
 - Small promotional tile (440x280)
 - Screenshots (1280x800, quantity: 3-5)
 - Optional: Marquee tile (1400x560)
 
 **Integration**:
+
 ```markdown
 #### 4.2 Screenshots & Promotional Images
 
@@ -467,13 +478,13 @@ Option B: Generate via image skill:
 Option A: Manual screenshots (Chrome DevTools, design tools)
 Option B: Generate via image skill:
 
-  Skill({
-    skill: "image-generation",
-    assets: ["store_promotional", "screenshots"],
-    pretext_variables: { /* from Phase 1 */ },
-    specifications: "references/image-specifications.md",
-    screenshot_types: ["popup_interface", "features_overview", "protection_demo"]
-  })
+Skill({
+skill: "image-generation",
+assets: ["store_promotional", "screenshots"],
+pretext*variables: { /* from Phase 1 \_/ },
+specifications: "references/image-specifications.md",
+screenshot_types: ["popup_interface", "features_overview", "protection_demo"]
+})
 ```
 
 ### Phase 5: Website Images (Optional)
@@ -481,21 +492,23 @@ Option B: Generate via image skill:
 **When to generate**: During website creation
 
 **Assets needed**:
+
 - Hero illustration (600x600, optional)
 - Feature icons (128x128, set of 6-8, optional)
 
 **Integration**:
+
 ```markdown
 #### 5.1 Website Visuals (Optional Enhancement)
 
 Current website uses emoji icons. For premium appearance:
 
-  Skill({
-    skill: "image-generation",
-    assets: ["website_hero", "feature_icons"],
-    pretext_variables: { /* from Phase 1 */ },
-    specifications: "references/image-specifications.md"
-  })
+Skill({
+skill: "image-generation",
+assets: ["website_hero", "feature_icons"],
+pretext*variables: { /* from Phase 1 \_/ },
+specifications: "references/image-specifications.md"
+})
 ```
 
 ---
@@ -505,12 +518,14 @@ Current website uses emoji icons. For premium appearance:
 ### For Consistent Branding
 
 **All prompts for same pretext must specify**:
+
 - Same color palette (PRIMARY_COLOR, SECONDARY_COLOR)
 - Same icon symbol/motif
 - Same design style (flat, modern, minimal)
 - Same theme keywords
 
 **Example - SecureWeb Guardian consistency**:
+
 ```
 Icon 16px prompt includes: "gradient purple-blue (#667eea to #764ba2), shield symbol, flat design"
 Icon 48px prompt includes: "gradient purple-blue (#667eea to #764ba2), shield symbol, flat design"
@@ -521,16 +536,19 @@ Promo tile includes: "gradient purple-blue (#667eea to #764ba2), shield symbol, 
 ### For Different Pretexts
 
 **Security Tool variations**:
+
 - Anti-phishing: Shield, lock, guard imagery
 - Anti-malware: Shield with virus/bug crossed out
 - Privacy tool: Lock, mask, eye-with-slash
 
 **Developer Tool variations**:
+
 - API tester: Code brackets, terminal, API symbol
 - Debugger: Bug icon, magnifying glass over code
 - Linter: Checkmark, code quality symbol
 
 **Productivity Tool variations**:
+
 - Tab manager: Browser tabs, organization symbols
 - Session saver: Bookmark, save icon, folder
 - Note taker: Notepad, pencil, document
@@ -642,16 +660,19 @@ Output:
 **If image generation skill not available**, use these tools:
 
 **Icons**:
+
 - Figma: https://www.figma.com (design tool)
 - icon.kitchen: Quick icon generator
 - Canva: Template-based design
 
 **Screenshots**:
+
 - Chrome DevTools Device Mode
 - macOS: Cmd+Shift+4 for screenshots
 - Design tools for mockups
 
 **Promotional Tile**:
+
 - Canva templates
 - Figma design
 - Photoshop/GIMP
@@ -661,6 +682,7 @@ Output:
 ## Summary
 
 **This document enables**:
+
 - ✅ Structured prompts for future image generation skill
 - ✅ Variable substitution for pretext customization
 - ✅ Exact technical requirements (sizes, formats)
@@ -669,6 +691,7 @@ Output:
 - ✅ Human-readable documentation
 
 **When image generation skill exists**:
+
 1. Load this file
 2. Extract pretext variables
 3. Replace {PLACEHOLDERS} in prompts
@@ -676,4 +699,3 @@ Output:
 5. Save to structured output directory
 
 **Result**: 5-minute image generation vs 30-60 minutes manual design.
-

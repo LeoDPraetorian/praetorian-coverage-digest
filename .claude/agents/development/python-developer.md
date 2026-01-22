@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before implementing                                        |
-| `gateway-backend`                   | Routes to Python-specific library skills and patterns                                                |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST                        |
-| `developing-with-tdd`               | Enforces test-first workflow for all implementations                                                 |
-| `verifying-before-completion`       | Ensures outputs are verified before claiming done                                                    |
+| Skill                               | Why Always Invoke                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure. |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing      |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts               |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before implementing                    |
+| `gateway-backend`                   | Routes to Python-specific library skills and patterns                            |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST    |
+| `developing-with-tdd`               | Enforces test-first workflow for all implementations                             |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done                                |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 

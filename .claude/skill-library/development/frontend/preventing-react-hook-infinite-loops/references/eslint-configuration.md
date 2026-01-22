@@ -16,18 +16,18 @@ npm install --save-dev eslint eslint-plugin-react-hooks
 
 ```javascript
 // eslint.config.js
-import reactHooks from 'eslint-plugin-react-hooks';
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
   {
     plugins: {
-      'react-hooks': reactHooks
+      "react-hooks": reactHooks,
     },
     rules: {
-      'react-hooks/rules-of-hooks': 'error',
-      'react-hooks/exhaustive-deps': 'warn' // or 'error' for strict
-    }
-  }
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn", // or 'error' for strict
+    },
+  },
 ];
 ```
 
@@ -52,11 +52,13 @@ export default [
 ### rules-of-hooks
 
 Enforces Rules of Hooks:
+
 - Only call hooks at top level
 - Only call hooks from React functions
 - Don't call hooks in loops, conditions, or nested functions
 
 **Example violations**:
+
 ```typescript
 // ❌ Hook in condition
 function Component({ show }) {
@@ -67,7 +69,7 @@ function Component({ show }) {
 
 // ❌ Hook in loop
 function Component({ items }) {
-  items.forEach(item => {
+  items.forEach((item) => {
     useState(item); // Error!
   });
 }
@@ -78,11 +80,13 @@ function Component({ items }) {
 ### exhaustive-deps
 
 Validates dependency arrays:
+
 - Warns about missing dependencies
 - Warns about unnecessary dependencies
 - Suggests fixes (with autofix capability)
 
 **Example violations**:
+
 ```typescript
 // ❌ Missing dependency
 function Component({ userId }) {
@@ -93,7 +97,7 @@ function Component({ userId }) {
 
 // ❌ Object/function without memoization
 function Component() {
-  const config = { api: '/endpoint' };
+  const config = { api: "/endpoint" };
   useEffect(() => {}, [config]); // Warning: new reference every render
 }
 ```
@@ -108,16 +112,16 @@ Tell ESLint about custom hooks:
 // eslint.config.js
 export default [
   {
-    plugins: { 'react-hooks': reactHooks },
+    plugins: { "react-hooks": reactHooks },
     rules: {
-      'react-hooks/exhaustive-deps': [
-        'warn',
+      "react-hooks/exhaustive-deps": [
+        "warn",
         {
-          'additionalHooks': '(useMyCustomHook|useAnotherHook)'
-        }
-      ]
-    }
-  }
+          additionalHooks: "(useMyCustomHook|useAnotherHook)",
+        },
+      ],
+    },
+  },
 ];
 ```
 

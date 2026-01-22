@@ -77,6 +77,7 @@ Independent of plan, check standard quality:
 **Execute all verification commands and capture output:**
 
 **Type checking (required):**
+
 ```bash
 cd modules/chariot/ui && npx tsc --noEmit
 ```
@@ -84,6 +85,7 @@ cd modules/chariot/ui && npx tsc --noEmit
 **Linting (required):**
 
 Use the `using-eslint` skill instead of inline commands. It provides:
+
 - Checks both modified and staged files
 - Auto-fix with `--fix` flag
 - Deduplicates file lists
@@ -96,6 +98,7 @@ Read(".claude/skill-library/development/frontend/using-eslint/SKILL.md")
 Then follow the skill's instructions to run ESLint on modified files.
 
 **Tests:**
+
 ```bash
 npm test -- --passWithNoTests
 ```

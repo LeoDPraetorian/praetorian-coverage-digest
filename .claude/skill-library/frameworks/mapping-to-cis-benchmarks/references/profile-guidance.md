@@ -36,6 +36,7 @@ CIS Benchmarks organize controls into **three profile levels** with cumulative r
 ### Target Environments
 
 ✅ **Use Level 1 for**:
+
 - All organizations as baseline minimum
 - Development and test environments
 - Non-mission-critical systems
@@ -46,24 +47,28 @@ CIS Benchmarks organize controls into **three profile levels** with cumulative r
 ### Example Controls
 
 **AWS**:
+
 - Root user MFA enabled
 - S3 block public access enabled
 - CloudTrail enabled in all regions
 - IAM password policy minimum 14 characters
 
 **Azure**:
+
 - Secure transfer required for storage accounts
 - SQL TDE encryption enabled
 - NSG Flow Logs captured
 - RDP/SSH access from internet restricted
 
 **Linux**:
+
 - Basic password policies
 - Firewall enabled and configured
 - Unnecessary services disabled
 - System logging configured
 
 **Kubernetes**:
+
 - No privileged containers
 - No containers running as root
 - No hostNetwork usage
@@ -72,6 +77,7 @@ CIS Benchmarks organize controls into **three profile levels** with cumulative r
 ### Compliance Alignment
 
 Level 1 satisfies baseline requirements for:
+
 - PCI DSS (basic requirements)
 - HIPAA (baseline security)
 - General industry best practices
@@ -80,6 +86,7 @@ Level 1 satisfies baseline requirements for:
 ### When Level 1 Is Sufficient
 
 ✅ **Proceed with Level 1 only when**:
+
 1. Risk assessment shows low to moderate risk
 2. No sensitive data processed or stored
 3. No regulatory requirements for defense-in-depth
@@ -113,6 +120,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 ### Target Environments
 
 ✅ **Use Level 2 for**:
+
 - High-security environments
 - Sensitive data processing (PII, PHI, financial data)
 - Regulated industries (healthcare, finance, government)
@@ -123,6 +131,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 ### Example Controls (Level 2-Specific)
 
 **AWS**:
+
 - Hardware MFA for root user (not just virtual MFA)
 - S3 MFA delete enabled
 - CloudTrail S3 bucket access logging
@@ -130,6 +139,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 - CloudTrail encryption at-rest
 
 **Azure**:
+
 - Storage encrypted with customer-managed keys (CMK)
 - SQL TDE protector encrypted with CMK
 - PostgreSQL infrastructure double encryption
@@ -137,6 +147,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 - VM unattached disks encrypted with CMK
 
 **Linux**:
+
 - Advanced audit logging (auditd)
 - Mandatory access controls (AppArmor/SELinux enforcing)
 - Encrypted filesystems (LUKS)
@@ -144,6 +155,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 - NTP with authentication
 
 **Kubernetes**:
+
 - PSP/PSS restrictive policies enforced
 - Secrets encryption at rest
 - Network policies enforced
@@ -153,6 +165,7 @@ Organizations must implement Level 1 before adding Level 2 controls.
 ### Compliance Alignment
 
 Level 2 addresses requirements for:
+
 - **NIST Cybersecurity Framework (CSF)** - Comprehensive protection
 - **FedRAMP** - Federal cloud security
 - **ISO 27001** - Information security management
@@ -163,16 +176,19 @@ Level 2 addresses requirements for:
 ### Potential Impacts (Plan for These)
 
 ⚠️ **Performance**:
+
 - Increased authentication time (MFA, hardware tokens)
 - Storage overhead (extensive logging, encryption)
 - Network latency (VPC flow logs, NSG flow logs)
 
 ⚠️ **Usability**:
+
 - Additional authentication steps may delay workflows
 - Stricter access controls may require approval processes
 - Encrypted storage may complicate key management
 
 ⚠️ **Operational**:
+
 - Increased monitoring and log analysis workload
 - More complex disaster recovery (encrypted backups)
 - Higher training requirements for staff
@@ -180,6 +196,7 @@ Level 2 addresses requirements for:
 ### When Level 2 Is Required
 
 ✅ **Level 2 is necessary when**:
+
 1. Processing sensitive data (PII, PHI, PCI, financial)
 2. Subject to regulatory compliance (NIST, FedRAMP, ISO 27001)
 3. High-value target (e.g., financial services, healthcare)
@@ -213,6 +230,7 @@ Organizations must implement both Level 1 and Level 2 before adding STIG-specifi
 ### Target Environments
 
 ✅ **Use STIG Profile for**:
+
 - Department of Defense (DoD) systems
 - Federal information systems
 - DoD contractors connecting to DoD networks
@@ -222,25 +240,26 @@ Organizations must implement both Level 1 and Level 2 before adding STIG-specifi
 
 ### STIG vs CIS Comparison
 
-| Aspect                 | CIS Benchmarks                | DISA STIGs                       |
-| ---------------------- | ----------------------------- | -------------------------------- |
-| **Origin**             | Consensus-based, industry-driven | DoD/military-focused             |
-| **Categorization**     | Level 1 / Level 2 (impact-based) | CAT I / CAT II / CAT III (severity) |
-| **Flexibility**        | Adaptable to various industries | Strict compliance requirements   |
-| **Applicability**      | Cross-industry, broad functionality | Government/defense sector        |
-| **Legal Requirement**  | Voluntary best practice       | Legally required for DoDIN       |
+| Aspect                | CIS Benchmarks                      | DISA STIGs                          |
+| --------------------- | ----------------------------------- | ----------------------------------- |
+| **Origin**            | Consensus-based, industry-driven    | DoD/military-focused                |
+| **Categorization**    | Level 1 / Level 2 (impact-based)    | CAT I / CAT II / CAT III (severity) |
+| **Flexibility**       | Adaptable to various industries     | Strict compliance requirements      |
+| **Applicability**     | Cross-industry, broad functionality | Government/defense sector           |
+| **Legal Requirement** | Voluntary best practice             | Legally required for DoDIN          |
 
 ### STIG Severity Categories
 
-| Category | Severity      | Risk Level                                  |
-| -------- | ------------- | ------------------------------------------- |
-| CAT I    | High          | Immediate exploitation risk, data loss      |
-| CAT II   | Medium        | Exploitable but lower immediate risk        |
-| CAT III  | Low           | Vulnerabilities without immediate failure   |
+| Category | Severity | Risk Level                                |
+| -------- | -------- | ----------------------------------------- |
+| CAT I    | High     | Immediate exploitation risk, data loss    |
+| CAT II   | Medium   | Exploitable but lower immediate risk      |
+| CAT III  | Low      | Vulnerabilities without immediate failure |
 
 ### When STIG Profile Is Required
 
 ✅ **STIG Profile is mandatory when**:
+
 1. Part of DoD Information Networks (DoDIN)
 2. Federal entity subject to FISMA requirements
 3. DoD contractor connecting to DoD systems
@@ -251,10 +270,12 @@ Organizations must implement both Level 1 and Level 2 before adding STIG-specifi
 ### Hybrid Approach: CIS + STIG
 
 Many organizations "blend both" frameworks:
+
 - **CIS**: Broad cloud and application security (AWS, Azure, GCP, Kubernetes)
 - **STIG**: Specific endpoint hardening (Windows, Linux baseline configurations)
 
 **Example Architecture**:
+
 ```
 Cloud Infrastructure (AWS/Azure/GCP)
     ↓
@@ -320,6 +341,7 @@ What are your security resources?
 ### Phase 1: Level 1 Baseline (Weeks 1-4)
 
 **Activities**:
+
 1. Test environment deployment
 2. Automated scan with CIS-CAT Pro / cloud-native tools
 3. Prioritize failed checks
@@ -331,6 +353,7 @@ What are your security resources?
 ### Phase 2: Level 1 Production Rollout (Weeks 5-8)
 
 **Activities**:
+
 1. Pilot with non-critical systems
 2. Monitor for operational impact
 3. Refine implementation based on feedback
@@ -342,6 +365,7 @@ What are your security resources?
 ### Phase 3: Level 2 Assessment (if applicable)
 
 **Activities**:
+
 1. Risk assessment to determine Level 2 necessity
 2. Impact analysis for Level 2 controls
 3. Business case and stakeholder approval
@@ -352,6 +376,7 @@ What are your security resources?
 ### Phase 4: Level 2 Implementation (if proceeding)
 
 **Activities**:
+
 1. Test environment deployment
 2. Performance and usability impact testing
 3. User training for new controls (MFA, encryption)
@@ -363,6 +388,7 @@ What are your security resources?
 ### Phase 5: STIG Alignment (if required)
 
 **Activities**:
+
 1. STIG-specific control mapping
 2. CAT I controls prioritized first
 3. Automated SCAP scanning
@@ -422,6 +448,7 @@ What are your security resources?
 ### Example 1: Small SaaS Startup
 
 **Context**:
+
 - 50 employees
 - Processes customer data (email, names)
 - Hosted on AWS
@@ -431,6 +458,7 @@ What are your security resources?
 **Profile Selection**: **Level 1**
 
 **Rationale**:
+
 - Risk assessment shows moderate risk
 - No PII, PHI, or financial data
 - No compliance requirements beyond general best practices
@@ -444,6 +472,7 @@ What are your security resources?
 ### Example 2: Healthcare Provider
 
 **Context**:
+
 - 500 employees
 - Processes Protected Health Information (PHI)
 - Multi-cloud (AWS + Azure)
@@ -453,6 +482,7 @@ What are your security resources?
 **Profile Selection**: **Level 2**
 
 **Rationale**:
+
 - PHI processing requires defense-in-depth
 - HIPAA requires strict security controls
 - Budget supports advanced controls
@@ -465,6 +495,7 @@ What are your security resources?
 ### Example 3: Defense Contractor
 
 **Context**:
+
 - 200 employees
 - Processes Controlled Unclassified Information (CUI)
 - Connects to DoD networks
@@ -474,6 +505,7 @@ What are your security resources?
 **Profile Selection**: **STIG Profile**
 
 **Rationale**:
+
 - Legal requirement for DoD contractors
 - CUI processing mandates STIG compliance
 - NIST 800-171 aligns with STIG requirements

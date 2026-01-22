@@ -67,20 +67,21 @@ func (task *Integration) Invoke() error {
 
 ## Lightweight API Endpoints by Integration Type
 
-| Integration Type | Recommended Endpoint | Purpose |
-|-----------------|---------------------|---------|
-| **GitHub** | `GET /orgs/{org}` | Org metadata |
-| **GitLab** | `GET /user`, `GET /namespaces/{id}` | Current user + namespace |
-| **Okta** | `GET /api/v2/apps?limit=1` | List 1 app |
-| **Fastly** | `GET /tokens/self` | Token metadata/scope |
-| **Wiz** | `POST /graphql` (issues first:1) | Minimal GraphQL query |
-| **Tenable** | `GET /scans?limit=1` | List 1 scan |
-| **SentinelOne** | `GET /web/api/v2.1/accounts?limit=1` | List 1 account |
-| **Invicti** | `GET /scans/list?page=1&pageSize=1` | List 1 scan |
-| **Extrahop** | `GET /api/v1/extrahop` | Health/info endpoint |
-| **Cloudflare** | `GET /zones`, `GET /zones/{id}/dns_records` | List zones |
+| Integration Type | Recommended Endpoint                        | Purpose                  |
+| ---------------- | ------------------------------------------- | ------------------------ |
+| **GitHub**       | `GET /orgs/{org}`                           | Org metadata             |
+| **GitLab**       | `GET /user`, `GET /namespaces/{id}`         | Current user + namespace |
+| **Okta**         | `GET /api/v2/apps?limit=1`                  | List 1 app               |
+| **Fastly**       | `GET /tokens/self`                          | Token metadata/scope     |
+| **Wiz**          | `POST /graphql` (issues first:1)            | Minimal GraphQL query    |
+| **Tenable**      | `GET /scans?limit=1`                        | List 1 scan              |
+| **SentinelOne**  | `GET /web/api/v2.1/accounts?limit=1`        | List 1 account           |
+| **Invicti**      | `GET /scans/list?page=1&pageSize=1`         | List 1 scan              |
+| **Extrahop**     | `GET /api/v1/extrahop`                      | Health/info endpoint     |
+| **Cloudflare**   | `GET /zones`, `GET /zones/{id}/dns_records` | List zones               |
 
 **Common Characteristics of Lightweight Endpoints**:
+
 1. Single record fetch with `limit=1` or `first=1`
 2. Metadata-only endpoints (e.g., `/tokens/self`, `/user`)
 3. No data enumeration - just authentication check
@@ -90,6 +91,7 @@ func (task *Integration) Invoke() error {
 ## Validation Patterns by Credential Type
 
 ### Token-based (Simple API Key)
+
 ```go
 func (task *Integration) ValidateCredentials() error {
     token := task.Job.Secret["token"]
@@ -110,6 +112,7 @@ func (task *Integration) ValidateCredentials() error {
 ```
 
 ### OAuth2 Service Account
+
 ```go
 func (task *Integration) ValidateCredentials() error {
     clientID := task.Job.Secret["client_id"]
@@ -129,6 +132,7 @@ func (task *Integration) ValidateCredentials() error {
 ```
 
 ### API Key + Secret
+
 ```go
 func (task *Integration) ValidateCredentials() error {
     apiKey := task.Job.Secret["api_key"]
@@ -149,6 +153,7 @@ func (task *Integration) ValidateCredentials() error {
 ## Evidence Format
 
 **PASS Example**:
+
 ```
 ✅ ValidateCredentials
 Evidence: github.go:73-107 - func (task *Github) ValidateCredentials() error
@@ -158,6 +163,7 @@ Placement: First statement in Invoke()
 ```
 
 **FAIL Example (Missing)**:
+
 ```
 ❌ ValidateCredentials
 Evidence: vendor.go - No ValidateCredentials() method found
@@ -167,6 +173,7 @@ Required: Implement ValidateCredentials() and call first in Invoke()
 ```
 
 **FAIL Example (Wrong Placement)**:
+
 ```
 ❌ ValidateCredentials
 Evidence: vendor.go:100 - func ValidateCredentials() exists
@@ -177,22 +184,24 @@ Required: Move ValidateCredentials() call to first statement in Invoke()
 
 ## Applicability
 
-| Integration Type | ValidateCredentials Required? | Notes |
-|-----------------|------------------------------|-------|
-| API-based integrations | YES | All SaaS integrations with credentials |
-| Cloud providers | YES | AWS, Azure, GCP - validate CLI auth |
-| File imports | NO | No API credentials to validate |
-| OAuth integrations | YES | Token exchange validates credentials |
+| Integration Type       | ValidateCredentials Required? | Notes                                  |
+| ---------------------- | ----------------------------- | -------------------------------------- |
+| API-based integrations | YES                           | All SaaS integrations with credentials |
+| Cloud providers        | YES                           | AWS, Azure, GCP - validate CLI auth    |
+| File imports           | NO                            | No API credentials to validate         |
+| OAuth integrations     | YES                           | Token exchange validates credentials   |
 
 ## Known Violations (from codebase research)
 
 **Missing Implementation (20 integrations)**:
+
 - DigitalOcean, AWS, Azure, GCP
 - Axonius, Burp, CrowdStrike, Imperva
 - InsightVM, NS1, Nessus, Qualys
 - File import integrations (acceptable)
 
 **Correct Implementation (24 integrations)**:
+
 - GitHub, GitLab, Okta, Wiz, Fastly
 - Cloudflare, Tenable, SentinelOne, Invicti
 - 100% correct placement when implemented

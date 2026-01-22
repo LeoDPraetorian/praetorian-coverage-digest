@@ -16,12 +16,12 @@ Azure DevOps uses a **TSTU (Time-Shared Throughput Units)** model for rate limit
 
 Azure DevOps returns rate limit information in response headers:
 
-| Header | Description | Example |
-|--------|-------------|---------|
-| `X-RateLimit-Limit` | Total TSTU quota | `200` |
-| `X-RateLimit-Remaining` | TSTUs remaining in current window | `150` |
-| `X-RateLimit-Reset` | Unix timestamp when quota resets | `1704585600` |
-| `Retry-After` | Seconds to wait before retry (429 only) | `60` |
+| Header                  | Description                             | Example      |
+| ----------------------- | --------------------------------------- | ------------ |
+| `X-RateLimit-Limit`     | Total TSTU quota                        | `200`        |
+| `X-RateLimit-Remaining` | TSTUs remaining in current window       | `150`        |
+| `X-RateLimit-Reset`     | Unix timestamp when quota resets        | `1704585600` |
+| `Retry-After`           | Seconds to wait before retry (429 only) | `60`         |
 
 ---
 
@@ -244,21 +244,23 @@ changes, err := gitClient.GetChanges(ctx, git.GetChangesArgs{
 
 Different API operations consume different amounts of TSTUs. While Microsoft doesn't publish exact costs, community observations suggest:
 
-| Operation Type | Estimated TSTU Cost | Example |
-|----------------|---------------------|---------|
-| Simple GET (single resource) | 1 | Get single work item |
-| List GET (paginated) | 2-3 | List repositories |
-| Batch GET | 3-5 | Get 200 work items |
-| POST/PATCH (create/update) | 3-5 | Create work item |
-| Complex queries (WIQL) | 5-10 | Work item query with joins |
-| Build logs | 10-20 | Download large build logs |
+| Operation Type               | Estimated TSTU Cost | Example                    |
+| ---------------------------- | ------------------- | -------------------------- |
+| Simple GET (single resource) | 1                   | Get single work item       |
+| List GET (paginated)         | 2-3                 | List repositories          |
+| Batch GET                    | 3-5                 | Get 200 work items         |
+| POST/PATCH (create/update)   | 3-5                 | Create work item           |
+| Complex queries (WIQL)       | 5-10                | Work item query with joins |
+| Build logs                   | 10-20               | Download large build logs  |
 
 **Formula (approximate):**
+
 - Simple operations: ~1-2 TSTUs
 - Complex operations: ~5-10 TSTUs
 - Data-heavy operations: ~10-20 TSTUs
 
 **200 TSTU limit supports:**
+
 - ~100-200 simple operations per 5 minutes
 - ~20-40 complex operations per 5 minutes
 - ~10-20 data-heavy operations per 5 minutes

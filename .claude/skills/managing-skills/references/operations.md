@@ -94,11 +94,11 @@ Safely removes skills with comprehensive reference cleanup using Claude's native
 Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")
 ```
 
-Validates skills against the Skill Compliance Contract. Follows instruction-based workflow with 29 compliance phases.
+Validates skills against the Skill Compliance Contract. Follows instruction-based workflow with 30 compliance phases.
 
-For phase details, see [auditing-skills](.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md).
+For phase details, see [auditing-skills](../../../skill-library/claude/skill-management/auditing-skills/SKILL.md).
 
-For fix categories (deterministic vs hybrid vs human-required), see [phase-details.md](.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md).
+For fix categories (deterministic vs hybrid vs human-required), see [phase-details.md](../../../skill-library/claude/skill-management/auditing-skills/references/phase-details.md).
 
 ---
 
@@ -129,7 +129,7 @@ For current phase-to-category mapping, see `.claude/skill-library/claude/skill-m
 | `phase11-command` | 11 | Fix cd command portability |
 | `phase13-todowrite` | 13 | Add TodoWrite mandate |
 
-**See:** [fixing-skills](.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md)
+**See:** [fixing-skills](../../../skill-library/claude/skill-management/fixing-skills/SKILL.md)
 
 ---
 
@@ -193,7 +193,7 @@ Find skills by keyword in BOTH core and library using Grep and Glob patterns.
 
 **Output:** Scored results with location indicators
 
-**See:** [searching-skills](.claude/skill-library/claude/skill-management/searching-skills/SKILL.md)
+**See:** [searching-skills](../../../skill-library/claude/skill-management/searching-skills/SKILL.md)
 
 ---
 
@@ -208,10 +208,30 @@ Display all skills using Claude's native tools (Glob, Read).
 | Skill Name        | Location | Path                   |
 | ----------------- | -------- | ---------------------- |
 | frontend-patterns | CORE     | ./.claude/skills/...   |
-| tool-manager       | CORE     | ./.claude/skills/...   |
+| tool-manager      | CORE     | ./.claude/skills/...   |
 | tanstack-query    | LIBRARY  | ./.claude/skill-lib... |
 
-**See:** [listing-skills](.claude/skill-library/claude/skill-management/listing-skills/SKILL.md)
+**See:** [listing-skills](../../../skill-library/claude/skill-management/listing-skills/SKILL.md)
+
+---
+
+## Compare (Skill Comparison)
+
+**Use the processing-large-skills library skill:**
+
+```
+Read(".claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md")
+```
+
+Compares two skills side-by-side using parallel agent analysis. Useful for:
+
+- Analyzing symmetry between orchestration skills
+- Understanding when to use one skill vs another
+- Identifying overlapping vs unique capabilities
+
+**Output:** Comparison matrix, overlapping capabilities, unique features, decision guide
+
+**See:** `.claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md`
 
 ---
 

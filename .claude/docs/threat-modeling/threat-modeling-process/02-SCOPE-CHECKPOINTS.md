@@ -8,13 +8,13 @@ workflows **Last Synchronized**: 2026-01-10 **Status**: Ready for Implementation
 
 ## Document Metadata
 
-| Property           | Value                                            |
-| ------------------ | ------------------------------------------------ |
-| **Document ID**    | 02-SCOPE-CHECKPOINTS                             |
-| **Token Count**    | ~1,600 tokens                                    |
-| **Read Time**      | 8-12 minutes                                     |
-| **Prerequisites**  | 01-OVERVIEW-ARCHITECTURE                         |
-| **Next Documents** | 03-METHODOLOGY, 04-PHASE-DETAILS                 |
+| Property           | Value                            |
+| ------------------ | -------------------------------- |
+| **Document ID**    | 02-SCOPE-CHECKPOINTS             |
+| **Token Count**    | ~1,600 tokens                    |
+| **Read Time**      | 8-12 minutes                     |
+| **Prerequisites**  | 01-OVERVIEW-ARCHITECTURE         |
+| **Next Documents** | 03-METHODOLOGY, 04-PHASE-DETAILS |
 
 ---
 
@@ -129,9 +129,9 @@ interface MethodologySelection {
 
   // Custom allows selecting specific techniques
   custom?: {
-    useDFD: boolean;        // Data Flow Diagrams
-    useSTRIDE: boolean;     // STRIDE threat categories
-    usePASTA: boolean;      // PASTA attack simulation
+    useDFD: boolean; // Data Flow Diagrams
+    useSTRIDE: boolean; // STRIDE threat categories
+    usePASTA: boolean; // PASTA attack simulation
     useAttackTrees: boolean; // Attack tree generation
   };
 }
@@ -270,7 +270,7 @@ interface PhaseCheckpoint {
 
 ### What I Found:
 
-- [X] components identified
+- [x] components identified
 - [Y] entry points (attack surface)
 - [Z] data flows mapped
 
@@ -361,7 +361,7 @@ interface PhaseCheckpoint {
 
 ### Recommended Testing (CVSS-prioritized):
 
-- [X] files for priority code review
+- [x] files for priority code review
 - [Y] SAST rules to apply
 - [Z] manual test cases
 

@@ -158,6 +158,7 @@ The authentication system follows a three-layer architecture:
 6. Tokens returned to client
 
 Protected routes:
+
 1. Request hits middleware chain (CORS → Rate Limit → Auth → Session)
 2. AuthMiddleware extracts JWT from Authorization header
 3. TokenService.Verify() validates signature and expiry
@@ -169,22 +170,26 @@ Protected routes:
 ## Key Components
 
 ### Handlers (handlers/)
+
 - **LoginHandler** - Authenticates user, issues JWT + refresh token
 - **LogoutHandler** - Invalidates tokens
 - **RefreshTokenHandler** - Rotates refresh token, issues new JWT
 
 ### Middleware (middleware/)
+
 - **AuthMiddleware** - JWT validation on protected routes
 - **RateLimiter** - Distributed rate limiting via Redis (10 req/min per IP)
 - **CORS** - Configured for api.example.com
 - **Session** - Manages user context in request lifecycle
 
 ### Models (models/)
+
 - **User** - Core entity with bcrypt password hashing
 - **TokenService** - JWT creation, validation, rotation
 - **RefreshToken** - Tracks token lifecycle
 
 ### Utils (utils/)
+
 - **Validator** - Email format, password strength checks
 - **Redis** - Shared Redis client for rate limiting
 
@@ -193,6 +198,7 @@ Protected routes:
 ## Security Considerations
 
 ✅ **Strengths:**
+
 - Bcrypt password hashing with appropriate cost factor
 - JWT validation on all protected routes
 - Token rotation for refresh tokens
@@ -200,6 +206,7 @@ Protected routes:
 - CORS configured for specific origin
 
 ⚠️ **Recommendations:**
+
 - Consider adding token revocation list for immediate logout
 - Implement MFA for sensitive operations
 - Add audit logging for authentication events
@@ -217,12 +224,12 @@ Protected routes:
 
 ## File Reference
 
-| Component    | Files                                    | Lines |
-| ------------ | ---------------------------------------- | ----- |
-| Handlers     | handlers/login.go, logout.go, refresh.go | 4,200 |
-| Middleware   | middleware/auth.go, cors.go, rate.go     | 3,800 |
-| Models       | models/user.go, token.go, refresh.go     | 2,500 |
-| Utils        | utils/validator.go, redis.go             | 1,500 |
+| Component  | Files                                    | Lines |
+| ---------- | ---------------------------------------- | ----- |
+| Handlers   | handlers/login.go, logout.go, refresh.go | 4,200 |
+| Middleware | middleware/auth.go, cors.go, rate.go     | 3,800 |
+| Models     | models/user.go, token.go, refresh.go     | 2,500 |
+| Utils      | utils/validator.go, redis.go             | 1,500 |
 ```
 
 ---
@@ -337,16 +344,19 @@ grep -n "^# " ARCHITECTURE.md
 ## Quick Reference
 
 ### Backend
+
 - REST API endpoints: [02-BACKEND.md](02-BACKEND.md#api-endpoints)
 - GraphQL schema: [02-BACKEND.md](02-BACKEND.md#graphql)
 - Lambda functions: [02-BACKEND.md](02-BACKEND.md#serverless)
 
 ### Frontend
+
 - Component hierarchy: [03-FRONTEND.md](03-FRONTEND.md#components)
 - Routing: [03-FRONTEND.md](03-FRONTEND.md#routing)
 - State management: [03-FRONTEND.md](03-FRONTEND.md#state)
 
 ### Security
+
 - Authentication flow: [05-SECURITY.md](05-SECURITY.md#auth-flow)
 - Authorization rules: [05-SECURITY.md](05-SECURITY.md#authz)
 - Threat model: [05-SECURITY.md](05-SECURITY.md#threats)
@@ -391,9 +401,7 @@ Strategy: 5 agents, one per split file
   "items_checked": 52,
   "found": 51,
   "missing_from_original": [],
-  "gaps_in_split": [
-    "ASCII diagram (lines 234-256) not preserved"
-  ],
+  "gaps_in_split": ["ASCII diagram (lines 234-256) not preserved"],
   "coverage_percent": 98,
   "status": "minor gaps",
   "notes": "All headings, text, code blocks present. ASCII art diagram lost during split."
@@ -452,13 +460,13 @@ Strategy: 5 agents, one per split file
 
 ## Overall Coverage
 
-| Section | File              | Lines      | Coverage | Status      |
-| ------- | ----------------- | ---------- | -------- | ----------- |
-| 1       | 01-ARCHITECTURE   | 1-1385     | 98%      | Minor gaps  |
-| 2       | 02-SCM-FLOW       | 1386-2770  | 100%     | Complete    |
-| 3       | 03-COMPONENTS     | 2771-4155  | 95%      | Minor gaps  |
-| 4       | 04-SECURITY       | 4156-5540  | 100%     | Complete    |
-| 5       | 05-DEPLOYMENT     | 5541-6925  | 97%      | Minor gaps  |
+| Section | File            | Lines     | Coverage | Status     |
+| ------- | --------------- | --------- | -------- | ---------- |
+| 1       | 01-ARCHITECTURE | 1-1385    | 98%      | Minor gaps |
+| 2       | 02-SCM-FLOW     | 1386-2770 | 100%     | Complete   |
+| 3       | 03-COMPONENTS   | 2771-4155 | 95%      | Minor gaps |
+| 4       | 04-SECURITY     | 4156-5540 | 100%     | Complete   |
+| 5       | 05-DEPLOYMENT   | 5541-6925 | 97%      | Minor gaps |
 
 **Total Coverage:** 98.0%
 
@@ -467,11 +475,13 @@ Strategy: 5 agents, one per split file
 ## Gaps Identified
 
 ### Section 1: 01-ARCHITECTURE.md
+
 **Gap:** ASCII diagram (lines 234-256)
 **Impact:** Visual representation of trust boundaries lost
 **Recommendation:** Manually recreate as Mermaid diagram
 
 ### Section 3: 03-COMPONENTS.md
+
 **Gap 1:** Component diagram references (lines 3120-3125)
 **Impact:** Broken links to external diagrams
 **Recommendation:** Update links to use absolute paths or embed diagrams
@@ -481,6 +491,7 @@ Strategy: 5 agents, one per split file
 **Recommendation:** Reformat table in Markdown or convert to list
 
 ### Section 5: 05-DEPLOYMENT.md
+
 **Gap:** Environment variables table (lines 6200-6245)
 **Impact:** Partial truncation of env var descriptions
 **Recommendation:** Verify all 42 env vars documented
@@ -499,15 +510,18 @@ Strategy: 5 agents, one per split file
 ## Recommendations
 
 ### High Priority
+
 1. Recreate ASCII diagrams in sections 1, 3 as Mermaid diagrams
 2. Fix table formatting in section 3
 3. Verify environment variables table completeness in section 5
 
 ### Medium Priority
+
 4. Update diagram references to absolute paths
 5. Add navigation hints to 00-INDEX.md
 
 ### Low Priority
+
 6. Consider adding search index for quick reference
 7. Generate PDF from split files for distribution
 
@@ -516,6 +530,7 @@ Strategy: 5 agents, one per split file
 ## Verification Methodology
 
 For each split file:
+
 1. Extracted all H2/H3 headings
 2. Identified all code blocks (first line matching)
 3. Selected 10 unique technical terms

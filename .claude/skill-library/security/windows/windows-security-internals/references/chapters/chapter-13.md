@@ -1,4 +1,4 @@
-## 13  NETWORK AUTHENTICATION
+## 13 NETWORK AUTHENTICATION
 
 ![Figure](figures/WindowsSecurityInternals_page_451_figure_001.png)
 
@@ -77,7 +77,6 @@ Table 13-1: Select NTLM Flags
 
 <table><tr><td>Flag name</td><td>Description</td></tr><tr><td>Unicode</td><td>The client supports Unicode strings.</td></tr><tr><td>Oem</td><td>The client supports byte character strings (for example, ASCII).</td></tr><tr><td>RequestTarget</td><td>The client requires the server to send a target name in the response.</td></tr><tr><td>NTLM</td><td>The client requests to use the NTLM hash.</td></tr><tr><td>AlwaysSign</td><td>The client requests that the authentication be signed to ensure integrity.</td></tr><tr><td>ExtendedSessionSecurity</td><td>The client requests NTLMv2 Session security.</td></tr><tr><td>Version</td><td>The client has sent the operating system and NTLM protocol version.</td></tr><tr><td>Key128Bit</td><td>The client requests a 128-bit signing key.</td></tr><tr><td>Key56Bit</td><td>The client requests a 56-bit signing key.</td></tr></table>
 
-
 You might wonder why the ExtendedSessionSecurity flag is set. This flag changes NTLMv1 to NTLMv2 Session security, but I mentioned earlier that NTLMv1 is disabled by default. The LSA sets the flag anyway, just in case the server responds with a request for NTLMv1. Except for Version, these flags all indicate the features the client requires. The Version flag indicates major, minor, and build values of the operating system version, as well as the NTLM protocol version, which has been fixed at 15 since Windows Server 2003.
 
 To ensure the integrity of the authentication protocol, NTLM generates an encryption key based on the values in the exchange, then uses it to apply a message integrity code (MIC) to the entire exchange. A MIC is a cryptographic hash of the authentication tokens sent and received in the current exchange. It's used to detect whether the authentication tokens have been tampered with over the network.
@@ -90,7 +89,7 @@ PS> Format-LsaAuthToken -Token $client.Token -AsBytes
 -----------------------------
 ```
 
-Network Authentication   425
+Network Authentication 425
 
 ---
 
@@ -135,7 +134,7 @@ Listing 13-3: Initializing the server for NTLM authentication and formatting the
 
 We start by creating the inbound credentials handle. You don't need to provide any credentials to do this; in fact, NTLM would ignore the
 
-426    Chapter 13
+426 Chapter 13
 
 ---
 
@@ -216,7 +215,7 @@ __________________________________________________________________________
 
 You can also differentiate between NTLMv1 and NTLMv2 Session by looking at the flags and LM hash. If the ftendedSessionSecurity flag is set,
 
-Network Authentication  429
+Network Authentication 429
 
 ---
 
@@ -253,7 +252,7 @@ ADMINISTRATORS
 
 As a result of a network authentication exchange, the LSA generates a Token object using the groups and privileges of the local or domain policy. A quirk occurs if the authenticating user is both a local user and a member of the local Administrators group and UAC is enabled. In that case, the LSA generates the UAC filtered token for the authentication rather than the full administrator token. This limits a local administrator's ability to access remote services using a local
 
-430    Chapter 13
+430 Chapter 13
 
 ---
 
@@ -290,7 +289,7 @@ PS> function Get-Md5Hmac {
 
 Listing 13-6: Defining the Get-Md5Hmac function
 
-Network Authentication   431
+Network Authentication 431
 
 ---
 
@@ -384,7 +383,7 @@ At this point, problems arise. The server doesn't have the user's NT hash, so it
 
 Note that the domain controller doesn't verify the MIC, as this requires all three authentication tokens. Instead, the server calculates the session
 
-434     Chapter 13
+434 Chapter 13
 
 ---
 
@@ -457,7 +456,7 @@ Why does the LSA implement local loopback authentication? One reason is that net
 
 We've seen how to use PowerShell commands to authenticate as the calling user. This is normally the behavior you'll want to implement, as the current user typically aims to access some network resource as themselves. However,
 
-436    Chapter 13
+436 Chapter 13
 
 ---
 
@@ -534,7 +533,7 @@ One thing you might notice about NTLM is that, while the LSA performs the authen
 
 Figure 13-3 shows the basic setup of an NTLM relay attack.
 
-438    Chapter 13
+438 Chapter 13
 
 ---
 
@@ -550,7 +549,7 @@ The attacker accepts the client's HTTP connection and starts the NTLM authentica
 
 The SMB server will respond with a CHALLENGE token, and the attacker can forward this to the client to continue the authentication process . The client should respond with an AUTHENTICATE token to the attacker's web server,
 
-Network Authentication   439
+Network Authentication 439
 
 ---
 
@@ -579,7 +578,7 @@ Integer
 
 Listing 13-14 shows the client's AUTHENTICATE token if we specify the Integrity request attribute flag when creating the client and server contexts.
 
-440    Chapter 13
+440 Chapter 13
 
 ---
 
@@ -623,7 +622,7 @@ PS> Update-LsaServerContext $server $client
 PS> $msg = $(0, 1, 2, 3)
 ```
 
-Network Authentication   441
+Network Authentication 441
 
 ---
 
@@ -730,7 +729,7 @@ PS> function Get-BindingHash {
     $writer.Write(0) # dwInitiatorAddrType
 ```
 
-444    Chapter 13
+444 Chapter 13
 
 ---
 
@@ -775,7 +774,7 @@ We can then send messages back and forth between the client and the server . We'
 
 ## The Code Module
 
-The client and server will perform many of the same tasks, such as sending and receiving messages, so it makes sense to put that code into a separate module that both sides can easily reference. Create a directory for the example code and copy Listing 13-19 into its own file with the name network _protocol_common.psml, as both the server and client implementations will need to access it.
+The client and server will perform many of the same tasks, such as sending and receiving messages, so it makes sense to put that code into a separate module that both sides can easily reference. Create a directory for the example code and copy Listing 13-19 into its own file with the name network \_protocol_common.psml, as both the server and client implementations will need to access it.
 
 ---
 
@@ -961,7 +960,7 @@ NOTE
 
 It's a common practice to bind to only the loopback address when testing server code. This ensures that other computers on the network can't connect to your server and potentially abuse its functionality. Only bind to all network interfaces when you're confident that any code you've written is secure, or when on a network with no other participants.
 
-450    Chapter 13
+450 Chapter 13
 
 ---
 
@@ -979,8 +978,7 @@ If we receive an empty message, we treat this as the signal to close down the se
 
 For the most part, the client implements the reverse operations of the server. Listing 13-21 shows its code. Copy this into its own script file in the same directory as the module file from Listing 13-19, with the name network
 
-
-_proton_client.ps1.
+\_proton_client.ps1.
 
 ```bash
 ❶ param{
@@ -1119,7 +1117,7 @@ This chapter described the NTLM authentication protocol and provided scripts to 
 
 I also showed you how to derive some of the cryptographic values generated by the NTLM protocol using PowerShell. This included the final NT response value, which proves the knowledge of the user's password, and the
 
-454   Chapter 13
+454 Chapter 13
 
 ---
 
@@ -1131,7 +1129,4 @@ Now that you better understand network authentication and the APIs used to gener
 
 ---
 
-
-
 ---
-

@@ -112,24 +112,23 @@ function Component() {
 **Example**:
 
 ````markdown
-Run the command:
+Load the auditing skill:
 
-```bash
-npm run audit
+```typescript
+Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md");
 ```
 
-Output:
+Follow the workflow. Sample output:
 
 ```
-Auditing 50 skills...
+Auditing skill...
 ✓ Phase 1: passed
 ✓ Phase 2: passed
 ⚠ Phase 15: 3 code blocks need review
-Done in 2.3s
 ```
 ````
 
-**Verdict**: ✅ IGNORE - This is console output showing results, not code to execute.
+**Verdict**: ✅ IGNORE - This is sample output showing results, not code to execute.
 
 ---
 
@@ -287,15 +286,15 @@ Response:
 
 **Example**:
 
-````markdown
+```markdown
 # Code Block Best Practices
 
 Always tag your code blocks with language:
+```
 
-````
 ```typescript
 function example() {}
-````
+```
 
 ```
 
@@ -310,7 +309,8 @@ function example() {}
 ```
 
 ```
-````
+
+`````
 
 **Verdict**: ✅ IGNORE - This discusses code block syntax as the subject matter.
 
@@ -368,7 +368,7 @@ For each INFO-level candidate (missing/mismatched tag), ask:
 ```typescript
 // TODO: Implement actual API call
 ```
-````
+`````
 
 - **Context**: In a file named "template"
 - **Classification**: Template Placeholder

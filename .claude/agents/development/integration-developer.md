@@ -16,18 +16,18 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `discovering-reusable-code`         | Before implement any change exhaustively search for reusable patterns                                |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read existing integrations before building                             |
-| `gateway-integrations`              | Routes to Chariot integration patterns, auth flows, API testing                                      |
-| `gateway-backend`                   | Routes to Go patterns (AWS, error handling, concurrency)                                             |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST                        |
-| `developing-with-tdd`               | Write test first, watch it fail, then implement                                                      |
-| `verifying-before-completion`       | Ensures tests pass before claiming done                                                              |
+| Skill                               | Why Always Invoke                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure. |
+| `discovering-reusable-code`         | Before implement any change exhaustively search for reusable patterns            |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing      |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts               |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read existing integrations before building         |
+| `gateway-integrations`              | Routes to Chariot integration patterns, auth flows, API testing                  |
+| `gateway-backend`                   | Routes to Go patterns (AWS, error handling, concurrency)                         |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST    |
+| `developing-with-tdd`               | Write test first, watch it fail, then implement                                  |
+| `verifying-before-completion`       | Ensures tests pass before claiming done                                          |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 

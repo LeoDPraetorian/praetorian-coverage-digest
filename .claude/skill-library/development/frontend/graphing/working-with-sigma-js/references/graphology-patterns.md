@@ -10,16 +10,16 @@ Advanced graph data structure operations for Sigma.js.
 
 ```typescript
 // ❌ Slow: Multiple renders
-graph.setNodeAttribute('node1', 'color', '#ff0000');
-graph.setNodeAttribute('node1', 'size', 20);
-graph.setNodeAttribute('node1', 'label', 'Updated');
+graph.setNodeAttribute("node1", "color", "#ff0000");
+graph.setNodeAttribute("node1", "size", 20);
+graph.setNodeAttribute("node1", "label", "Updated");
 
 // ✅ Fast: Single render
-graph.updateNodeAttributes('node1', (attrs) => ({
+graph.updateNodeAttributes("node1", (attrs) => ({
   ...attrs,
-  color: '#ff0000',
+  color: "#ff0000",
   size: 20,
-  label: 'Updated',
+  label: "Updated",
 }));
 ```
 
@@ -49,14 +49,14 @@ for (const [node, attrs] of graph.nodeEntries()) {
 
 ```typescript
 // ❌ Expensive: Remove and re-add nodes
-const filteredNodes = graph.filterNodes((node, attrs) => attrs.type === 'active');
+const filteredNodes = graph.filterNodes((node, attrs) => attrs.type === "active");
 graph.clear();
 filteredNodes.forEach((node) => graph.addNode(node));
 
 // ✅ Fast: Toggle visibility
 graph.forEachNode((node, attrs) => {
-  const shouldShow = attrs.type === 'active';
-  graph.setNodeAttribute(node, 'hidden', !shouldShow);
+  const shouldShow = attrs.type === "active";
+  graph.setNodeAttribute(node, "hidden", !shouldShow);
 });
 sigma.refresh();
 ```
@@ -69,16 +69,16 @@ sigma.refresh();
 
 ```typescript
 // Store layout instance
-graph.setAttribute('layout', layoutInstance);
+graph.setAttribute("layout", layoutInstance);
 
 // Store camera state
-graph.setAttribute('initialCameraState', sigma.getCamera().getState());
+graph.setAttribute("initialCameraState", sigma.getCamera().getState());
 
 // Store UI state
-graph.setAttribute('selectedNodes', new Set(['node1', 'node2']));
+graph.setAttribute("selectedNodes", new Set(["node1", "node2"]));
 
 // Access from any hook
-const layout = graph.getAttribute('layout');
+const layout = graph.getAttribute("layout");
 if (layout?.isRunning()) {
   layout.stop();
 }
@@ -92,25 +92,25 @@ Edges support the same attribute patterns as nodes:
 
 ```typescript
 // Add edge with attributes
-graph.addEdge('node1', 'node2', {
+graph.addEdge("node1", "node2", {
   weight: 5,
-  color: '#cccccc',
+  color: "#cccccc",
   size: 2,
   hidden: false,
-  type: 'arrow', // or 'line', 'curve'
+  type: "arrow", // or 'line', 'curve'
 });
 
 // Update edge attributes
-graph.updateEdgeAttributes('edge-id', (attrs) => ({
+graph.updateEdgeAttributes("edge-id", (attrs) => ({
   ...attrs,
-  color: '#ff0000',
+  color: "#ff0000",
   size: 3,
 }));
 
 // Bulk edge updates
 graph.forEachEdge((edge, attrs, source, target) => {
   if (attrs.weight > 10) {
-    graph.setEdgeAttribute(edge, 'size', 5);
+    graph.setEdgeAttribute(edge, "size", 5);
   }
 });
 ```
@@ -120,18 +120,18 @@ graph.forEachEdge((edge, attrs, source, target) => {
 Sigma.js supports multiple graphs in same component:
 
 ```typescript
-import MultiDirectedGraph from 'graphology';
+import MultiDirectedGraph from "graphology";
 
 const graph = new MultiDirectedGraph();
 
 // Multiple edges between same nodes
-graph.addEdge('node1', 'node2', { type: 'follows' });
-graph.addEdge('node1', 'node2', { type: 'blocks' });
+graph.addEdge("node1", "node2", { type: "follows" });
+graph.addEdge("node1", "node2", { type: "blocks" });
 
 // Query specific edge
-const followsEdge = graph.edges('node1', 'node2').find((edge) =>
-  graph.getEdgeAttribute(edge, 'type') === 'follows'
-);
+const followsEdge = graph
+  .edges("node1", "node2")
+  .find((edge) => graph.getEdgeAttribute(edge, "type") === "follows");
 ```
 
 ## Node Neighbors
@@ -140,16 +140,16 @@ Efficient neighbor queries:
 
 ```typescript
 // Get all neighbors (inbound + outbound)
-const neighbors = graph.neighbors('node1');
+const neighbors = graph.neighbors("node1");
 
 // Get only inbound neighbors
-const inNeighbors = graph.inNeighbors('node1');
+const inNeighbors = graph.inNeighbors("node1");
 
 // Get only outbound neighbors
-const outNeighbors = graph.outNeighbors('node1');
+const outNeighbors = graph.outNeighbors("node1");
 
 // Iterate neighbor edges
-graph.forEachEdge('node1', (edge, attrs, source, target) => {
+graph.forEachEdge("node1", (edge, attrs, source, target) => {
   console.log(`Edge to ${target}:`, attrs);
 });
 ```
@@ -161,10 +161,10 @@ Serialize graph for persistence:
 ```typescript
 // Export to JSON
 const serialized = graph.export();
-localStorage.setItem('graph-state', JSON.stringify(serialized));
+localStorage.setItem("graph-state", JSON.stringify(serialized));
 
 // Import from JSON
-const data = JSON.parse(localStorage.getItem('graph-state'));
+const data = JSON.parse(localStorage.getItem("graph-state"));
 const graph = Graph.from(data);
 ```
 

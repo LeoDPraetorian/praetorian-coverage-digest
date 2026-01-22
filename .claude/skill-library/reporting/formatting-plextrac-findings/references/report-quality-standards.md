@@ -12,11 +12,11 @@
 
 ### Example Transformations
 
-| ❌ Verbatim Quote | ✅ Professional Paraphrase |
-|-------------------|---------------------------|
-| `stating "this seems really bad"` | `acknowledged this as a significant security concern` |
-| `"This is definitely a weak point..."` | `Security team identified this configuration as a vulnerability requiring remediation` |
-| `"We've tried and failed many times..."` | `Security team reported that despite multiple attempts, the functionality proved unreliable` |
+| ❌ Verbatim Quote                                                                                                      | ✅ Professional Paraphrase                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `stating "this seems really bad"`                                                                                      | `acknowledged this as a significant security concern`                                                                                                       |
+| `"This is definitely a weak point..."`                                                                                 | `Security team identified this configuration as a vulnerability requiring remediation`                                                                      |
+| `"We've tried and failed many times..."`                                                                               | `Security team reported that despite multiple attempts, the functionality proved unreliable`                                                                |
 | `"Both stronger from the certificate perspective, but weaker from the authentication user authentication perspective"` | `Acknowledged the security tradeoff, noting the configuration maintains hardware-backed certificate strength while accepting weaker authentication factors` |
 
 ### Application
@@ -55,6 +55,7 @@ Internal references are meaningless to clients and unprofessional in deliverable
 ### Verification Step
 
 Before finalizing findings, search for:
+
 - `.claude`
 - `.local`
 - `.history`
@@ -111,32 +112,39 @@ Use business-appropriate, realistic timelines:
 ### Real Example Correction
 
 ❌ **WRONG:**
+
 ```markdown
 ### Remediation
 
 **Immediate (P0 - Within 7 Days):**
+
 1. Disable user-agent string bypass policy
 2. Enable MFA enforcement
 
 **Short-Term (P1 - Within 30 Days):**
+
 1. Deploy hardware-backed authentication to Windows devices
 
 Priority: P1
 ```
 
 ✅ **RIGHT:**
+
 ```markdown
 ### Recommendations
 
 **Immediate (Within 14-30 Days):**
+
 1. Monitor authentication patterns for user-agent bypass attempts
 2. Begin hardware-backed authentication deployment planning
 
 **Short-Term (Within 60-90 Days):**
+
 1. Pilot hardware-backed authentication deployment to 10% of Windows fleet
 2. Implement bifurcated Microsoft SSO configuration
 
 **Long-Term (Within 90-180 Days):**
+
 1. Complete hardware-backed authentication rollout to all Windows devices
 2. Remove user-agent string exception policy
 ```
@@ -150,6 +158,7 @@ Priority: P1
 ### Why This Matters
 
 Final reports may:
+
 - Reorder findings by severity or category
 - Remove findings that were later determined invalid
 - Deliver subsets of findings to different audiences
@@ -159,17 +168,18 @@ Internal notation like "F01" or "Finding 9" breaks in all these scenarios.
 
 ### Example Transformations
 
-| ❌ Internal Notation | ✅ Descriptive Reference |
-|---------------------|-------------------------|
-| `documented in Finding 9` | `documented in finding "Remote Access Tool Users Permitted Weak Authentication"` |
-| `See Finding 6` | `See finding "VDI User Accounts with Authentication Policy Gaps"` |
-| `(Finding 1, Finding 3, Finding 4)` | `(authentication bypass, service account weak controls, enrollment security bypass)` |
-| `Similar to Finding 2` | `Similar to the authentication delegation bypass finding` |
-| `Finding 6 scored higher than Finding 9` | `VDI finding scored higher than remote access finding` |
+| ❌ Internal Notation                     | ✅ Descriptive Reference                                                             |
+| ---------------------------------------- | ------------------------------------------------------------------------------------ |
+| `documented in Finding 9`                | `documented in finding "Remote Access Tool Users Permitted Weak Authentication"`     |
+| `See Finding 6`                          | `See finding "VDI User Accounts with Authentication Policy Gaps"`                    |
+| `(Finding 1, Finding 3, Finding 4)`      | `(authentication bypass, service account weak controls, enrollment security bypass)` |
+| `Similar to Finding 2`                   | `Similar to the authentication delegation bypass finding`                            |
+| `Finding 6 scored higher than Finding 9` | `VDI finding scored higher than remote access finding`                               |
 
 ### Implementation Guide
 
 When referencing another finding:
+
 1. Use the full finding title (Title Case)
 2. If title is long, use a shortened descriptive phrase
 3. Make the reference specific enough to be unique
@@ -190,6 +200,7 @@ device enrollment.
 ```
 
 Not just:
+
 ```markdown
 The authentication bypass fix will resolve this.
 ```
@@ -211,25 +222,26 @@ The authentication bypass fix will resolve this.
 
 ### Examples
 
-| ❌ Sentence case | ✅ Title Case |
-|-----------------|--------------|
+| ❌ Sentence case                                                              | ✅ Title Case                                                                 |
+| ----------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
 | `User agent string bypass enables password-only access to Microsoft services` | `User Agent String Bypass Enables Password-Only Access to Microsoft Services` |
-| `Single active signing key with no rotation evidence` | `Single Active Signing Key with No Rotation Evidence` |
-| `Linux NoMachine users permitted fishable MFA` | `Linux NoMachine Users Permitted Fishable MFA` |
-| `VDI user accounts permitted password-only authentication` | `VDI User Accounts Permitted Password-Only Authentication` |
-| `On-premises MFA dependency introduces availability risk` | `On-Premises MFA Dependency Introduces Availability Risk` |
+| `Single active signing key with no rotation evidence`                         | `Single Active Signing Key with No Rotation Evidence`                         |
+| `Linux NoMachine users permitted fishable MFA`                                | `Linux NoMachine Users Permitted Fishable MFA`                                |
+| `VDI user accounts permitted password-only authentication`                    | `VDI User Accounts Permitted Password-Only Authentication`                    |
+| `On-premises MFA dependency introduces availability risk`                     | `On-Premises MFA Dependency Introduces Availability Risk`                     |
 
 ### Common Mistakes
 
-| Incorrect | Reason | Correct |
-|-----------|--------|---------|
-| `User Agent String Bypass Enables Password-Only Access To Microsoft Services` | "To" capitalized (short preposition) | `User Agent String Bypass Enables Password-Only Access to Microsoft Services` |
-| `Single Active Signing Key With No Rotation Evidence` | "With" capitalized (short preposition) | `Single Active Signing Key with No Rotation Evidence` |
-| `On-premises mfa Dependency` | "mfa" lowercase (acronym), "premises" lowercase after hyphen | `On-Premises MFA Dependency` |
+| Incorrect                                                                     | Reason                                                       | Correct                                                                       |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| `User Agent String Bypass Enables Password-Only Access To Microsoft Services` | "To" capitalized (short preposition)                         | `User Agent String Bypass Enables Password-Only Access to Microsoft Services` |
+| `Single Active Signing Key With No Rotation Evidence`                         | "With" capitalized (short preposition)                       | `Single Active Signing Key with No Rotation Evidence`                         |
+| `On-premises mfa Dependency`                                                  | "mfa" lowercase (acronym), "premises" lowercase after hyphen | `On-Premises MFA Dependency`                                                  |
 
 ### Why Title Case
 
 Professional report formatting standards require Title Case for:
+
 - Report titles
 - Section headings
 - Finding titles
@@ -245,21 +257,23 @@ Consistency across findings improves professionalism and readability.
 
 ### Common Client Preferences
 
-| Preferred Term | Instead Of | Rationale |
-|---------------|-----------|-----------|
-| **"Recommendations"** | "Remediation" | More consultative tone; implies improvement opportunity vs. "broken/failed" connotation |
-| **"Verification and Attack Information"** | "Evidence" or "Proof of Concept" | PlexTrac VKB layout field name; emphasizes both verification AND attack scenarios |
-| **"Impact"** | (often missing) | Required for business risk communication to non-technical stakeholders |
-| **"Systems Impacted"** | "Affected Systems" | PlexTrac VKB layout field name |
+| Preferred Term                            | Instead Of                       | Rationale                                                                               |
+| ----------------------------------------- | -------------------------------- | --------------------------------------------------------------------------------------- |
+| **"Recommendations"**                     | "Remediation"                    | More consultative tone; implies improvement opportunity vs. "broken/failed" connotation |
+| **"Verification and Attack Information"** | "Evidence" or "Proof of Concept" | PlexTrac VKB layout field name; emphasizes both verification AND attack scenarios       |
+| **"Impact"**                              | (often missing)                  | Required for business risk communication to non-technical stakeholders                  |
+| **"Systems Impacted"**                    | "Affected Systems"               | PlexTrac VKB layout field name                                                          |
 
 ### Why "Recommendations" vs "Remediation"
 
 **Remediation** implies:
+
 - Something is broken or failed
 - Client made a mistake
 - Prescriptive fix required
 
 **Recommendations** implies:
+
 - Opportunities for improvement
 - Collaborative problem-solving
 - Consultative guidance
@@ -285,11 +299,11 @@ Walkthrough calls are informal technical discussions. Including raw quotes or ti
 
 ### Transform Walkthrough Notes Into Professional Narrative
 
-| ❌ Raw Walkthrough Notes | ✅ Professional Integration |
-|--------------------------|----------------------------|
+| ❌ Raw Walkthrough Notes                                                                                                                                                 | ✅ Professional Integration                                                                                                                                                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `Walkthrough call (timestamp 00:40:33): Person X said "We've tried and failed many times to pass the hardware key through to the remote device and it just is so flaky"` | `Administrators explained the technical constraints during the security architecture review. Despite multiple attempts, USB passthrough functionality for hardware security keys proved unreliable in the remote access environment, leading to the current password+push configuration.` |
-| `Meeting transcript line 18: "this seems really bad"` | `Security team acknowledged this as a significant security concern requiring remediation.` |
-| `Person Y (timestamp 01:15:22): "This legacy temp token thing is basically 2FA, but it's delegating this factor to a legacy IDP..."` | `Administrators identified the legacy authenticator when discussing available MFA factors. They explained it represents a legacy on-premises identity provider that remains available for backward compatibility with a specific user population.` |
+| `Meeting transcript line 18: "this seems really bad"`                                                                                                                    | `Security team acknowledged this as a significant security concern requiring remediation.`                                                                                                                                                                                                |
+| `Person Y (timestamp 01:15:22): "This legacy temp token thing is basically 2FA, but it's delegating this factor to a legacy IDP..."`                                     | `Administrators identified the legacy authenticator when discussing available MFA factors. They explained it represents a legacy on-premises identity provider that remains available for backward compatibility with a specific user population.`                                        |
 
 ### Professional Integration Guidelines
 

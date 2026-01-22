@@ -659,13 +659,7 @@ interface Workspace {
   workspace_id: string;
   cloud_provider: CloudProvider;
   region: string;
-  status:
-    | "queued"
-    | "provisioning"
-    | "initializing"
-    | "ready"
-    | "active"
-    | "failed";
+  status: "queued" | "provisioning" | "initializing" | "ready" | "active" | "failed";
   status_message?: string;
   ssh_config?: SSHConfig;
   cursor_link?: string;
@@ -733,10 +727,7 @@ export function useLaunchWorkspace(engagementId: string) {
       estimated_loc?: number;
       ssh_public_key: string; // Client-generated ephemeral key (P1-6)
     }) => {
-      const response = await axios.post(
-        `/engagements/${engagementId}/threat-model/launch`,
-        params
-      );
+      const response = await axios.post(`/engagements/${engagementId}/threat-model/launch`, params);
       return response.data;
     },
     onSuccess: (data) => {
@@ -780,9 +771,7 @@ export function useWorkspaces(engagementId: string) {
   return useQuery({
     queryKey: ["workspaces", engagementId],
     queryFn: async () => {
-      const response = await axios.get(
-        `/engagements/${engagementId}/threat-model/workspaces`
-      );
+      const response = await axios.get(`/engagements/${engagementId}/threat-model/workspaces`);
       return response.data as Workspace[];
     },
   });

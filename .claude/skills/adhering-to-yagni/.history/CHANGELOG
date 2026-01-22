@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-01-18 - Compliance Fix (Phase 28)
+
+**Method:** Claude-Automated
+
+**Changes:**
+- Added Integration section with all required subsections:
+  - Called By: Documents when skill is invoked (any development work)
+  - Requires: None (standalone skill)
+  - Calls: AskUserQuestion tool for scope validation
+  - Pairs With: developing-with-tdd, debugging-systematically, verifying-before-completion
+
+**Result:** Phase 28 now passes. Skill dependencies are now explicit and traceable.
+
+**Remaining Issues:**
+- Phase 4 & 26: 7 broken links to missing reference/example files (CRITICAL)
+  - references/bug-fix-scenarios.md
+  - references/feature-implementation.md
+  - references/code-review.md
+  - references/while-im-here.md
+  - references/workflow.md
+  - examples/feature-implied-requirements.md
+  - examples/refactoring-boundaries.md
+- Phase 1: Description at length limit (119/120 chars) (WARNING)
+
+**Next Steps:** Create missing reference/example files or remove broken links from SKILL.md
+
 ## 2026-01-13 - Add Go-Specific Anti-Patterns
 
 **Changes:**

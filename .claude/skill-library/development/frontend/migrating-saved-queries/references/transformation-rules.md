@@ -8,7 +8,7 @@ Complete transformation rules for migrating old saved queries to new format.
 
 ```typescript
 interface Setting {
-  name: string;      // Format: "saved_query#<uuid>"
+  name: string; // Format: "saved_query#<uuid>"
   value: SavedQuery; // The complete SavedQuery object
 }
 ```
@@ -30,6 +30,7 @@ interface Setting {
 ```
 
 **Requirements:**
+
 1. `Setting.name` must follow pattern: `"saved_query#" + queryId`
 2. The UUID in `Setting.name` must match `Setting.value.id`
 3. The entire SavedQuery object goes in `Setting.value`
@@ -352,18 +353,18 @@ If `adObjectTypesNegated: true`:
 
 **Setting wrapper:**
 
-| New Field       | Source                      | Generation Rule                      |
-| --------------- | --------------------------- | ------------------------------------ |
-| `Setting.name`  | Generated from query ID     | `"saved_query#" + queryId`           |
-| `Setting.value` | Complete SavedQuery object  | Entire migrated query                |
+| New Field       | Source                     | Generation Rule            |
+| --------------- | -------------------------- | -------------------------- |
+| `Setting.name`  | Generated from query ID    | `"saved_query#" + queryId` |
+| `Setting.value` | Complete SavedQuery object | Entire migrated query      |
 
 **SavedQuery fields:**
 
-| New Field  | Source                | Generation Rule                    |
-| ---------- | --------------------- | ---------------------------------- |
-| `id`       | Generated             | New UUID (do NOT reuse old IDs)    |
-| `type`     | Default or inferred   | `'graph'` (default) or `'table'`   |
-| `folderId` | Default or user input | `'custom-queries'` (default)       |
+| New Field  | Source                | Generation Rule                  |
+| ---------- | --------------------- | -------------------------------- |
+| `id`       | Generated             | New UUID (do NOT reuse old IDs)  |
+| `type`     | Default or inferred   | `'graph'` (default) or `'table'` |
+| `folderId` | Default or user input | `'custom-queries'` (default)     |
 
 ### Fields That Are Dropped
 

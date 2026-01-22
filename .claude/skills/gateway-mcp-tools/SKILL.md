@@ -1,6 +1,6 @@
 ---
 name: gateway-mcp-tools
-description: Routes MCP tool tasks to service skills. Intent detection + progressive loading.
+description: Use when working with MCP tools - routes to wrapper development, Linear, Perplexity, Context7, and CLI integration skills.
 allowed-tools: Read
 ---
 
@@ -60,8 +60,12 @@ This gateway implements 3-tier loading:
 | "semantic code" / "Serena" / "LSP"            | → `mcp-tools-serena`                       |
 | "Shodan" / "host search" / "recon"            | → `mcp-tools-shodan-api`                   |
 | "tool discovery" / "MCP registry"             | → `mcp-tools-registry`                     |
+| "list tools" / "what MCP tools" / "available" | → `listing-tools`                          |
 | "wrapper architecture" / "token optimization" | → `designing-progressive-loading-wrappers` |
 | "review wrapper" / "validate implementation"  | → `reviewing-mcp-wrappers`                 |
+| "audit wrapper" / "validate compliance"       | → `auditing-tool-wrappers`                 |
+| "fix wrapper" / "remediate compliance"        | → `fixing-tool-wrappers`                   |
+| "update wrapper" / "modify wrapper"           | → `updating-tool-wrappers`                 |
 | "MCP setup" / "server config"                 | → `setting-up-mcp-servers`                 |
 | "create wrapper" / "new MCP tool"             | → `orchestrating-mcp-development`          |
 | "orchestrate MCP" / "complete wrapper flow"   | → `orchestrating-mcp-development`          |
@@ -143,19 +147,23 @@ This gateway implements 3-tier loading:
 
 ### Infrastructure
 
-| Skill        | Path                                                                          | Triggers       |
-| ------------ | ----------------------------------------------------------------------------- | -------------- |
-| MCP Registry | `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`          | tool discovery |
-| MCP Setup    | `.claude/skill-library/claude/mcp-management/setting-up-mcp-servers/SKILL.md` | server config  |
+| Skill         | Path                                                                          | Triggers              |
+| ------------- | ----------------------------------------------------------------------------- | --------------------- |
+| MCP Registry  | `.claude/skill-library/claude/mcp-tools/mcp-tools-registry/SKILL.md`          | tool discovery        |
+| MCP Setup     | `.claude/skill-library/claude/mcp-management/setting-up-mcp-servers/SKILL.md` | server config         |
+| Listing Tools | `.claude/skill-library/claude/mcp-management/listing-tools/SKILL.md`          | list tools, available |
 
 ### Development
 
-| Skill                | Path                                                                                          | Triggers                      |
-| -------------------- | --------------------------------------------------------------------------------------------- | ----------------------------- |
+| Skill                | Path                                                                                          | Triggers                        |
+| -------------------- | --------------------------------------------------------------------------------------------- | ------------------------------- |
 | Orchestrating MCP    | `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`          | new wrapper, TDD, orchestration |
-| Orchestrating API    | `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`     | REST API, HTTP wrappers       |
-| Wrapper Architecture | `.claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md` | token optimization            |
-| Reviewing Wrappers   | `.claude/skill-library/claude/mcp-management/reviewing-mcp-wrappers/SKILL.md`                 | review, validate, code review |
+| Orchestrating API    | `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`     | REST API, HTTP wrappers         |
+| Wrapper Architecture | `.claude/skill-library/claude/mcp-management/designing-progressive-loading-wrappers/SKILL.md` | token optimization              |
+| Reviewing Wrappers   | `.claude/skill-library/claude/mcp-management/reviewing-mcp-wrappers/SKILL.md`                 | review, validate, code review   |
+| Auditing Wrappers    | `.claude/skill-library/claude/mcp-management/auditing-tool-wrappers/SKILL.md`                 | audit, compliance, 12-phase     |
+| Fixing Wrappers      | `.claude/skill-library/claude/mcp-management/fixing-tool-wrappers/SKILL.md`                   | fix, remediate, auto-fix        |
+| Updating Wrappers    | `.claude/skill-library/claude/mcp-management/updating-tool-wrappers/SKILL.md`                 | update, modify, change          |
 
 ## Cross-Gateway Routing
 

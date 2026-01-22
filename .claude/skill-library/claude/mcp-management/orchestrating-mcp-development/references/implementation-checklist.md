@@ -1,8 +1,8 @@
 # Implementation Checklist
 
-## Phase 6: Wrapper Implementation
+## Phase 8: Wrapper Implementation
 
-Follow this checklist when implementing the wrapper in Phase 6:
+Follow this checklist when implementing the wrapper in Phase 8:
 
 ### 1. Input Schema (Zod)
 

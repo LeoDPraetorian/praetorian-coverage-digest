@@ -95,14 +95,13 @@ Duration: 1.8 seconds
 **Scenario:** Just created 3 new frontend skills
 
 ```bash
-# 1. Preview changes
-Use syncing-gateways with --gateway gateway-frontend --dry-run
+# 1. Load syncing-gateways workflow
+Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")
 
-# 2. Apply changes
-Use syncing-gateways with --gateway gateway-frontend
+# 2. Follow Phase 1-3 for gateway-frontend only
 
-# 3. Verify
-npm run audit -- gateway-frontend
+# 3. Verify all paths exist
+grep "\.claude/skill-library" .claude/skills/gateway-frontend/SKILL.md | grep -oE '`[^`]+`' | tr -d '`' | while read path; do test -f "$path" || echo "✗ BROKEN: $path"; done
 ```
 
 ## Notes

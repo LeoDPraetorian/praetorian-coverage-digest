@@ -1,6 +1,6 @@
 ---
 name: semantic-code-operations
-description: Use when ANY code task (reading, analyzing, reviewing, debugging, editing, explaining) - routes to Serena MCP for semantic search, symbol editing, project memory (core code tool)
+description: Use when ANY code task (reading, analyzing, reviewing, debugging, editing, explaining) - LSP-based semantic code operations via Serena MCP for token-efficient symbol search, definition editing, and cross-session project memory (core code tool)
 allowed-tools: Read, Bash
 ---
 
@@ -247,13 +247,40 @@ When a Serena call executes, you will see `[Serena]` log messages:
 - **Official integration**: Uses custom adapter pattern (validated by Serena maintainers)
 - **Progressive loading**: Gateways for other MCPs, core skill for Serena
 
-## Related Skills and Tools
+## Integration
 
-| Resource                       | Access Method                                                              | Purpose                                |
-| ------------------------------ | -------------------------------------------------------------------------- | -------------------------------------- |
-| **mcp-tools-serena** (LIBRARY) | `Read('.claude/skill-library/claude/mcp-tools/mcp-tools-serena/SKILL.md')` | Complete wrapper catalog (23 tools)    |
-| **gateway-mcp-tools** (CORE)   | `skill: "gateway-mcp-tools"`                                               | Other external APIs (Linear, Context7) |
-| **MCP Architecture**           | Read `docs/mcps/MCP-TOOLS-ARCHITECTURE.md`                                 | System design and patterns             |
+### Called By
+
+- Developer agents in "first actions" protocol:
+  - `frontend-developer` agent
+  - `backend-developer` agent
+  - `capability-developer` agent
+  - `python-developer` agent
+- Any workflow involving code analysis, editing, or semantic search
+- User direct invocation when working with code files
+
+### Requires (invoke before starting)
+
+None - This is an entry point router skill that delegates to library skill
+
+### Calls (during execution)
+
+| Skill                        | Phase/Step  | Purpose                                                                                                                 |
+| ---------------------------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `mcp-tools-serena` (LIBRARY) | Immediately | Complete Serena wrapper catalog (23 tools) - `Read('.claude/skill-library/claude/mcp-tools/mcp-tools-serena/SKILL.md')` |
+
+### Pairs With (conditional)
+
+| Skill                      | Trigger                    | Purpose                                 |
+| -------------------------- | -------------------------- | --------------------------------------- |
+| `gateway-mcp-tools`        | Need other external APIs   | Other external APIs (Linear, Context7)  |
+| `debugging-systematically` | Complex code investigation | Root cause analysis with semantic tools |
+
+## Related Documentation
+
+| Resource             | Location                              | Purpose                    |
+| -------------------- | ------------------------------------- | -------------------------- |
+| **MCP Architecture** | `docs/mcps/MCP-TOOLS-ARCHITECTURE.md` | System design and patterns |
 
 ## Summary
 

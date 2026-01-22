@@ -16,19 +16,19 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `discovering-reusable-code`         | Before proposing a plan, a fix, or any change exhaustively search for reusable patterns              |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this                            |
-| `gateway-capabilities`              | Routes to capability-specific library skills and patterns                                            |
-| `gateway-backend`                   | Routes to Go backend patterns for scanner integrations                                               |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST                        |
-| `brainstorming`                     | Enforces exploring alternatives rather than jumping to first solution                                |
-| `writing-plans`                     | Document every decision. Architecture work = planning work.                                          |
-| `verifying-before-completion`       | Ensures outputs are verified before claiming done                                                    |
+| Skill                               | Why Always Invoke                                                                       |
+| ----------------------------------- | --------------------------------------------------------------------------------------- |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure.        |
+| `discovering-reusable-code`         | Before proposing a plan, a fix, or any change exhaustively search for reusable patterns |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing             |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                      |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - you WILL fail catastrophically without this               |
+| `gateway-capabilities`              | Routes to capability-specific library skills and patterns                               |
+| `gateway-backend`                   | Routes to Go backend patterns for scanner integrations                                  |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST           |
+| `brainstorming`                     | Enforces exploring alternatives rather than jumping to first solution                   |
+| `writing-plans`                     | Document every decision. Architecture work = planning work.                             |
+| `verifying-before-completion`       | Ensures outputs are verified before claiming done                                       |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -36,12 +36,12 @@ DO THIS NOW. BEFORE ANYTHING ELSE.
 
 Your `skills` frontmatter makes these core skills available. **Invoke based on semantic relevance to your task**:
 
-| Trigger                    | Skill                       | When to Invoke                                                           |
-| -------------------------- | --------------------------- | ------------------------------------------------------------------------ |
-| Code duplication concerns  | `adhering-to-dry`           | Reviewing for patterns, architecting plans, eliminating duplication      |
-| Scope creep risk           | `adhering-to-yagni`         | Adding features that were not requested, ask questions for clarification |
-| Investigating issues       | `debugging-systematically`  | Root cause analysis during review                                        |
-| Multi-step task (≥2 steps) | `using-todowrite`           | Anything requiring > 1 task to perform                                   |
+| Trigger                    | Skill                      | When to Invoke                                                           |
+| -------------------------- | -------------------------- | ------------------------------------------------------------------------ |
+| Code duplication concerns  | `adhering-to-dry`          | Reviewing for patterns, architecting plans, eliminating duplication      |
+| Scope creep risk           | `adhering-to-yagni`        | Adding features that were not requested, ask questions for clarification |
+| Investigating issues       | `debugging-systematically` | Root cause analysis during review                                        |
+| Multi-step task (≥2 steps) | `using-todowrite`          | Anything requiring > 1 task to perform                                   |
 
 **Semantic matching guidance:**
 

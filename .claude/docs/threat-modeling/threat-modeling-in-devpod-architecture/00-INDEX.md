@@ -16,16 +16,16 @@ zero-trust security and multi-cloud support.
 
 ## 📚 Document Suite Summary
 
-| Document                                                             | Focus                         | Token Count | Read Time     | Prerequisites      |
-| -------------------------------------------------------------------- | ----------------------------- | ----------- | ------------- | ------------------ |
-| **[00-INDEX.md](00-INDEX.md)**                                       | Master table of contents      | ~3,000      | 8 min         | None               |
-| **[01-ARCHITECTURE-OVERVIEW.md](01-ARCHITECTURE-OVERVIEW.md)**       | System design & decisions     | ~5,400      | 10-15 min     | None (start here)  |
-| **[02-SCM-CREDENTIAL-FLOW.md](02-SCM-CREDENTIAL-FLOW.md)**           | Secure credential handling    | ~12,500     | 25-30 min     | Document 01        |
-| **[03-COMPONENT-IMPLEMENTATION.md](03-COMPONENT-IMPLEMENTATION.md)** | Implementation specifications | ~18,000     | 40-50 min     | Documents 01-02    |
-| **[04-SECURITY-HARDENING.md](04-SECURITY-HARDENING.md)**             | All P0/P1 fixes + P2 enhancements | ~15,000  | 35-45 min     | Documents 01-03    |
-| **[05-DEPLOYMENT-OPERATIONS.md](05-DEPLOYMENT-OPERATIONS.md)**       | Deployment & operations       | ~6,000      | 15-20 min     | Documents 01-04    |
-| **[06-THREAT-MODELING-DATA-CAPTURE.md](06-THREAT-MODELING-DATA-CAPTURE.md)** | Training data & telemetry | ~24,000     | 50-60 min     | Documents 01-05    |
-| **TOTAL**                                                            | Complete documentation        | **~83,900** | **3-4 hours** | Sequential reading |
+| Document                                                                     | Focus                             | Token Count | Read Time     | Prerequisites      |
+| ---------------------------------------------------------------------------- | --------------------------------- | ----------- | ------------- | ------------------ |
+| **[00-INDEX.md](00-INDEX.md)**                                               | Master table of contents          | ~3,000      | 8 min         | None               |
+| **[01-ARCHITECTURE-OVERVIEW.md](01-ARCHITECTURE-OVERVIEW.md)**               | System design & decisions         | ~5,400      | 10-15 min     | None (start here)  |
+| **[02-SCM-CREDENTIAL-FLOW.md](02-SCM-CREDENTIAL-FLOW.md)**                   | Secure credential handling        | ~12,500     | 25-30 min     | Document 01        |
+| **[03-COMPONENT-IMPLEMENTATION.md](03-COMPONENT-IMPLEMENTATION.md)**         | Implementation specifications     | ~18,000     | 40-50 min     | Documents 01-02    |
+| **[04-SECURITY-HARDENING.md](04-SECURITY-HARDENING.md)**                     | All P0/P1 fixes + P2 enhancements | ~15,000     | 35-45 min     | Documents 01-03    |
+| **[05-DEPLOYMENT-OPERATIONS.md](05-DEPLOYMENT-OPERATIONS.md)**               | Deployment & operations           | ~6,000      | 15-20 min     | Documents 01-04    |
+| **[06-THREAT-MODELING-DATA-CAPTURE.md](06-THREAT-MODELING-DATA-CAPTURE.md)** | Training data & telemetry         | ~24,000     | 50-60 min     | Documents 01-05    |
+| **TOTAL**                                                                    | Complete documentation            | **~83,900** | **3-4 hours** | Sequential reading |
 
 ---
 
@@ -448,35 +448,35 @@ generation
 
 ### "Where do I find..." table
 
-| Question                                          | Document                    | Section                                   |
-| ------------------------------------------------- | --------------------------- | ----------------------------------------- |
-| **How to handle SCM credentials securely?**       | 02-SCM-CREDENTIAL-FLOW      | P0-2: Memory-Only Credential Injection    |
-| **Lambda implementation for workspace launch?**   | 03-COMPONENT-IMPLEMENTATION | Component 1: Backend API                  |
-| **Multi-cloud orchestrator implementation?**      | 03-COMPONENT-IMPLEMENTATION | Component 2: DevPod Orchestrator          |
-| **Network firewall setup with TLS inspection?**   | 04-SECURITY-HARDENING       | P1-2: AWS Network Firewall                |
-| **How to prevent command injection?**             | 04-SECURITY-HARDENING       | P0-1: Command Injection Fix               |
-| **Falco runtime monitoring rules?**               | 04-SECURITY-HARDENING       | P1-7: Runtime Security Monitoring         |
-| **React frontend with cloud provider selection?** | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend Components          |
-| **SSH key generation in browser?**                | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend (useSSHKeyPair)     |
-| **Terraform modules for AWS/GCP/Azure?**          | 03-COMPONENT-IMPLEMENTATION | Component 4: Infrastructure               |
-| **DevPod Docker image hardening?**                | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image Specification   |
-| **IMDS protection implementation?**               | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image (entrypoint.sh) |
-| **Git token race condition fix?**                 | 02-SCM-CREDENTIAL-FLOW      | P1-15: Git Token Race Condition Fix       |
-| **AI agent security controls?**                   | 04-SECURITY-HARDENING       | P1-12: AI Agent Permission Hardening      |
-| **LUKS encryption for customer code?**            | 04-SECURITY-HARDENING       | P1-16: LUKS Encryption                    |
-| **Adversarial testing procedures?**               | 05-DEPLOYMENT-OPERATIONS    | Adversarial Test Matrix                   |
-| **Deployment checklist?**                         | 05-DEPLOYMENT-OPERATIONS    | Deployment Checklist                      |
-| **Cost estimates and monitoring?**                | 01-ARCHITECTURE-OVERVIEW    | Cost Estimates                            |
-| **Incident response runbooks?**                   | 05-DEPLOYMENT-OPERATIONS    | Incident Response Procedures              |
-| **Implementation timeline?**                      | 01-ARCHITECTURE-OVERVIEW    | Implementation Roadmap                    |
-| **All security fixes summary?**                   | 04-SECURITY-HARDENING       | Security Vulnerability Summary            |
-| **Training data capture pipeline?**               | 06-THREAT-MODELING-DATA-CAPTURE | Architecture Overview                 |
-| **Telemetry service implementation?**             | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications              |
-| **DPO/RLHF training configuration?**              | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases              |
-| **PII sanitization patterns?**                    | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                 |
-| **Preference pair extraction?**                   | 06-THREAT-MODELING-DATA-CAPTURE | Preference Pair Extraction            |
-| **Privacy consent framework (GDPR)?**             | 06-THREAT-MODELING-DATA-CAPTURE | Privacy & Consent Framework           |
-| **Code detection patterns (40+)?**                | 06-THREAT-MODELING-DATA-CAPTURE | Code Detection Patterns               |
+| Question                                          | Document                        | Section                                   |
+| ------------------------------------------------- | ------------------------------- | ----------------------------------------- |
+| **How to handle SCM credentials securely?**       | 02-SCM-CREDENTIAL-FLOW          | P0-2: Memory-Only Credential Injection    |
+| **Lambda implementation for workspace launch?**   | 03-COMPONENT-IMPLEMENTATION     | Component 1: Backend API                  |
+| **Multi-cloud orchestrator implementation?**      | 03-COMPONENT-IMPLEMENTATION     | Component 2: DevPod Orchestrator          |
+| **Network firewall setup with TLS inspection?**   | 04-SECURITY-HARDENING           | P1-2: AWS Network Firewall                |
+| **How to prevent command injection?**             | 04-SECURITY-HARDENING           | P0-1: Command Injection Fix               |
+| **Falco runtime monitoring rules?**               | 04-SECURITY-HARDENING           | P1-7: Runtime Security Monitoring         |
+| **React frontend with cloud provider selection?** | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend Components          |
+| **SSH key generation in browser?**                | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend (useSSHKeyPair)     |
+| **Terraform modules for AWS/GCP/Azure?**          | 03-COMPONENT-IMPLEMENTATION     | Component 4: Infrastructure               |
+| **DevPod Docker image hardening?**                | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image Specification   |
+| **IMDS protection implementation?**               | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image (entrypoint.sh) |
+| **Git token race condition fix?**                 | 02-SCM-CREDENTIAL-FLOW          | P1-15: Git Token Race Condition Fix       |
+| **AI agent security controls?**                   | 04-SECURITY-HARDENING           | P1-12: AI Agent Permission Hardening      |
+| **LUKS encryption for customer code?**            | 04-SECURITY-HARDENING           | P1-16: LUKS Encryption                    |
+| **Adversarial testing procedures?**               | 05-DEPLOYMENT-OPERATIONS        | Adversarial Test Matrix                   |
+| **Deployment checklist?**                         | 05-DEPLOYMENT-OPERATIONS        | Deployment Checklist                      |
+| **Cost estimates and monitoring?**                | 01-ARCHITECTURE-OVERVIEW        | Cost Estimates                            |
+| **Incident response runbooks?**                   | 05-DEPLOYMENT-OPERATIONS        | Incident Response Procedures              |
+| **Implementation timeline?**                      | 01-ARCHITECTURE-OVERVIEW        | Implementation Roadmap                    |
+| **All security fixes summary?**                   | 04-SECURITY-HARDENING           | Security Vulnerability Summary            |
+| **Training data capture pipeline?**               | 06-THREAT-MODELING-DATA-CAPTURE | Architecture Overview                     |
+| **Telemetry service implementation?**             | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications                  |
+| **DPO/RLHF training configuration?**              | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                  |
+| **PII sanitization patterns?**                    | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                     |
+| **Preference pair extraction?**                   | 06-THREAT-MODELING-DATA-CAPTURE | Preference Pair Extraction                |
+| **Privacy consent framework (GDPR)?**             | 06-THREAT-MODELING-DATA-CAPTURE | Privacy & Consent Framework               |
+| **Code detection patterns (40+)?**                | 06-THREAT-MODELING-DATA-CAPTURE | Code Detection Patterns                   |
 
 ---
 
@@ -561,71 +561,71 @@ generation
 
 ## 📖 Alphabetical Index
 
-| Topic                             | Document                    | Section                                     |
-| --------------------------------- | --------------------------- | ------------------------------------------- |
-| **ACM Private CA**                | 04-SECURITY-HARDENING       | P1-2: Network Firewall (TLS Inspection)     |
-| **AI Agent Security**             | 04-SECURITY-HARDENING       | P1-12: AI Agent Permission Hardening        |
-| **Anthropic API**                 | 02-SCM-CREDENTIAL-FLOW      | P1-11: Credential Rotation                  |
-| **Athena Analytics**              | 06-THREAT-MODELING-DATA-CAPTURE | Training Data Quality Metrics           |
-| **Artifactory**                   | 04-SECURITY-HARDENING       | P1-8: Package Installation Controls         |
-| **AWS Network Firewall**          | 04-SECURITY-HARDENING       | P1-2: AWS Network Firewall Egress Filtering |
-| **Azure**                         | 03-COMPONENT-IMPLEMENTATION | Multi-Cloud Service Mapping                 |
-| **Byte-Based Secrets**            | 02-SCM-CREDENTIAL-FLOW      | P1-4: Byte-Based Secret Handling            |
-| **Claude Code**                   | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image (Claude Skills)   |
-| **CloudWatch**                    | 04-SECURITY-HARDENING       | P1-7: Runtime Security (Falco integration)  |
-| **Code Detection Patterns**       | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                   |
-| **Command Injection**             | 04-SECURITY-HARDENING       | P0-1: Command Injection Fix                 |
-| **Content Security Policy (CSP)** | 04-SECURITY-HARDENING       | Frontend Security Hardening                 |
-| **Cost Estimates**                | 01-ARCHITECTURE-OVERVIEW    | Cost Estimates                              |
-| **Credential Rotation**           | 02-SCM-CREDENTIAL-FLOW      | P1-11: Credential Rotation                  |
-| **Data Flywheel**                 | 06-THREAT-MODELING-DATA-CAPTURE | Executive Summary (Value Proposition)   |
-| **DevPod**                        | 03-COMPONENT-IMPLEMENTATION | Component 2: DevPod Orchestrator            |
-| **DPO (Direct Preference Optimization)** | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases         |
-| **Docker Image**                  | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image Specification     |
-| **DynamoDB**                      | 03-COMPONENT-IMPLEMENTATION | AWS Terraform Module (VPC Endpoints)        |
-| **Egress Filtering**              | 04-SECURITY-HARDENING       | P1-2: AWS Network Firewall                  |
-| **Encryption at Rest**            | 04-SECURITY-HARDENING       | P1-16: LUKS Encryption                      |
-| **Falco**                         | 04-SECURITY-HARDENING       | P1-7: Runtime Security Monitoring           |
-| **Fail-Closed**                   | 04-SECURITY-HARDENING       | P1-13: Fail-Closed Falco Monitoring         |
-| **Frontend**                      | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend Components            |
-| **GCP**                           | 03-COMPONENT-IMPLEMENTATION | GCP Terraform Module                        |
-| **GDPR Compliance**               | 06-THREAT-MODELING-DATA-CAPTURE | Privacy & Consent Framework             |
-| **Git Credentials**               | 02-SCM-CREDENTIAL-FLOW      | P1-15: Git Token Race Condition Fix         |
-| **GIT_ASKPASS**                   | 02-SCM-CREDENTIAL-FLOW      | P1-15: Git Token Race Condition Fix         |
-| **IAM Permissions**               | 04-SECURITY-HARDENING       | P1-3: Scoped IAM Permissions                |
-| **IMDS Protection**               | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image (IMDSv2)          |
-| **Incident Response**             | 05-DEPLOYMENT-OPERATIONS    | Incident Response Procedures                |
-| **JIT Credentials**               | 02-SCM-CREDENTIAL-FLOW      | Token Retrieval Flow (JIT Pattern)          |
-| **Lambda**                        | 03-COMPONENT-IMPLEMENTATION | Component 1: Backend API                    |
-| **LUKS**                          | 04-SECURITY-HARDENING       | P1-16: LUKS Encryption                      |
-| **MCP Server (Telemetry)**        | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications (TypeScript)   |
-| **Memory-Only Injection**         | 02-SCM-CREDENTIAL-FLOW      | P0-2: Memory-Only Credential Injection      |
-| **Multi-Cloud**                   | 01-ARCHITECTURE-OVERVIEW    | Multi-Cloud Support                         |
-| **Network Firewall**              | 04-SECURITY-HARDENING       | P1-2: AWS Network Firewall                  |
-| **OAuth**                         | 02-SCM-CREDENTIAL-FLOW      | SCM Integration Flow                        |
-| **Orchestrator**                  | 03-COMPONENT-IMPLEMENTATION | Component 2: DevPod Orchestrator            |
-| **Orchestrator Isolation**        | 04-SECURITY-HARDENING       | P1-10: Orchestrator Isolation               |
-| **Package Controls**              | 04-SECURITY-HARDENING       | P1-8: Package Installation Controls         |
-| **PII Sanitization**              | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                   |
-| **Preference Pairs**              | 06-THREAT-MODELING-DATA-CAPTURE | Preference Pair Extraction              |
-| **Prompt Injection**              | 04-SECURITY-HARDENING       | P1-12: AI Agent Permission Hardening        |
-| **RAG Retrieval System**          | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                |
-| **React**                         | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend Components            |
-| **RLHF (Reinforcement Learning)** | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                |
-| **SCM Integration**               | 02-SCM-CREDENTIAL-FLOW      | SCM Integration Flow                        |
-| **Secrets Manager**               | 02-SCM-CREDENTIAL-FLOW      | How Tokens Are Stored                       |
-| **Security Testing**              | 05-DEPLOYMENT-OPERATIONS    | Adversarial Test Matrix                     |
-| **Session Recording**             | 03-COMPONENT-IMPLEMENTATION | Component 5: DevPod Image (asciinema)       |
-| **SNI Spoofing**                  | 04-SECURITY-HARDENING       | P1-2: Network Firewall (TLS Inspection)     |
-| **SSH Keys**                      | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend (useSSHKeyPair)       |
-| **Telemetry Service**             | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications                |
-| **TelemetryFeedback Component**   | 06-THREAT-MODELING-DATA-CAPTURE | React TelemetryFeedback Component       |
-| **Terraform**                     | 03-COMPONENT-IMPLEMENTATION | Component 4: Infrastructure                 |
-| **TLS Inspection**                | 04-SECURITY-HARDENING       | P1-2: AWS Network Firewall                  |
-| **Token Lifecycle**               | 02-SCM-CREDENTIAL-FLOW      | Token Lifecycle Summary                     |
-| **Training Data Pipeline**        | 06-THREAT-MODELING-DATA-CAPTURE | Architecture Overview                   |
-| **VPC Endpoints**                 | 04-SECURITY-HARDENING       | P1-14: AWS Service Endpoint Restriction     |
-| **Web Crypto API**                | 03-COMPONENT-IMPLEMENTATION | Component 3: Frontend (SSH key generation)  |
+| Topic                                    | Document                        | Section                                     |
+| ---------------------------------------- | ------------------------------- | ------------------------------------------- |
+| **ACM Private CA**                       | 04-SECURITY-HARDENING           | P1-2: Network Firewall (TLS Inspection)     |
+| **AI Agent Security**                    | 04-SECURITY-HARDENING           | P1-12: AI Agent Permission Hardening        |
+| **Anthropic API**                        | 02-SCM-CREDENTIAL-FLOW          | P1-11: Credential Rotation                  |
+| **Athena Analytics**                     | 06-THREAT-MODELING-DATA-CAPTURE | Training Data Quality Metrics               |
+| **Artifactory**                          | 04-SECURITY-HARDENING           | P1-8: Package Installation Controls         |
+| **AWS Network Firewall**                 | 04-SECURITY-HARDENING           | P1-2: AWS Network Firewall Egress Filtering |
+| **Azure**                                | 03-COMPONENT-IMPLEMENTATION     | Multi-Cloud Service Mapping                 |
+| **Byte-Based Secrets**                   | 02-SCM-CREDENTIAL-FLOW          | P1-4: Byte-Based Secret Handling            |
+| **Claude Code**                          | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image (Claude Skills)   |
+| **CloudWatch**                           | 04-SECURITY-HARDENING           | P1-7: Runtime Security (Falco integration)  |
+| **Code Detection Patterns**              | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                       |
+| **Command Injection**                    | 04-SECURITY-HARDENING           | P0-1: Command Injection Fix                 |
+| **Content Security Policy (CSP)**        | 04-SECURITY-HARDENING           | Frontend Security Hardening                 |
+| **Cost Estimates**                       | 01-ARCHITECTURE-OVERVIEW        | Cost Estimates                              |
+| **Credential Rotation**                  | 02-SCM-CREDENTIAL-FLOW          | P1-11: Credential Rotation                  |
+| **Data Flywheel**                        | 06-THREAT-MODELING-DATA-CAPTURE | Executive Summary (Value Proposition)       |
+| **DevPod**                               | 03-COMPONENT-IMPLEMENTATION     | Component 2: DevPod Orchestrator            |
+| **DPO (Direct Preference Optimization)** | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                    |
+| **Docker Image**                         | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image Specification     |
+| **DynamoDB**                             | 03-COMPONENT-IMPLEMENTATION     | AWS Terraform Module (VPC Endpoints)        |
+| **Egress Filtering**                     | 04-SECURITY-HARDENING           | P1-2: AWS Network Firewall                  |
+| **Encryption at Rest**                   | 04-SECURITY-HARDENING           | P1-16: LUKS Encryption                      |
+| **Falco**                                | 04-SECURITY-HARDENING           | P1-7: Runtime Security Monitoring           |
+| **Fail-Closed**                          | 04-SECURITY-HARDENING           | P1-13: Fail-Closed Falco Monitoring         |
+| **Frontend**                             | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend Components            |
+| **GCP**                                  | 03-COMPONENT-IMPLEMENTATION     | GCP Terraform Module                        |
+| **GDPR Compliance**                      | 06-THREAT-MODELING-DATA-CAPTURE | Privacy & Consent Framework                 |
+| **Git Credentials**                      | 02-SCM-CREDENTIAL-FLOW          | P1-15: Git Token Race Condition Fix         |
+| **GIT_ASKPASS**                          | 02-SCM-CREDENTIAL-FLOW          | P1-15: Git Token Race Condition Fix         |
+| **IAM Permissions**                      | 04-SECURITY-HARDENING           | P1-3: Scoped IAM Permissions                |
+| **IMDS Protection**                      | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image (IMDSv2)          |
+| **Incident Response**                    | 05-DEPLOYMENT-OPERATIONS        | Incident Response Procedures                |
+| **JIT Credentials**                      | 02-SCM-CREDENTIAL-FLOW          | Token Retrieval Flow (JIT Pattern)          |
+| **Lambda**                               | 03-COMPONENT-IMPLEMENTATION     | Component 1: Backend API                    |
+| **LUKS**                                 | 04-SECURITY-HARDENING           | P1-16: LUKS Encryption                      |
+| **MCP Server (Telemetry)**               | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications (TypeScript)       |
+| **Memory-Only Injection**                | 02-SCM-CREDENTIAL-FLOW          | P0-2: Memory-Only Credential Injection      |
+| **Multi-Cloud**                          | 01-ARCHITECTURE-OVERVIEW        | Multi-Cloud Support                         |
+| **Network Firewall**                     | 04-SECURITY-HARDENING           | P1-2: AWS Network Firewall                  |
+| **OAuth**                                | 02-SCM-CREDENTIAL-FLOW          | SCM Integration Flow                        |
+| **Orchestrator**                         | 03-COMPONENT-IMPLEMENTATION     | Component 2: DevPod Orchestrator            |
+| **Orchestrator Isolation**               | 04-SECURITY-HARDENING           | P1-10: Orchestrator Isolation               |
+| **Package Controls**                     | 04-SECURITY-HARDENING           | P1-8: Package Installation Controls         |
+| **PII Sanitization**                     | 06-THREAT-MODELING-DATA-CAPTURE | Sanitization Patterns                       |
+| **Preference Pairs**                     | 06-THREAT-MODELING-DATA-CAPTURE | Preference Pair Extraction                  |
+| **Prompt Injection**                     | 04-SECURITY-HARDENING           | P1-12: AI Agent Permission Hardening        |
+| **RAG Retrieval System**                 | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                    |
+| **React**                                | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend Components            |
+| **RLHF (Reinforcement Learning)**        | 06-THREAT-MODELING-DATA-CAPTURE | Model Training Use Cases                    |
+| **SCM Integration**                      | 02-SCM-CREDENTIAL-FLOW          | SCM Integration Flow                        |
+| **Secrets Manager**                      | 02-SCM-CREDENTIAL-FLOW          | How Tokens Are Stored                       |
+| **Security Testing**                     | 05-DEPLOYMENT-OPERATIONS        | Adversarial Test Matrix                     |
+| **Session Recording**                    | 03-COMPONENT-IMPLEMENTATION     | Component 5: DevPod Image (asciinema)       |
+| **SNI Spoofing**                         | 04-SECURITY-HARDENING           | P1-2: Network Firewall (TLS Inspection)     |
+| **SSH Keys**                             | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend (useSSHKeyPair)       |
+| **Telemetry Service**                    | 06-THREAT-MODELING-DATA-CAPTURE | Component Specifications                    |
+| **TelemetryFeedback Component**          | 06-THREAT-MODELING-DATA-CAPTURE | React TelemetryFeedback Component           |
+| **Terraform**                            | 03-COMPONENT-IMPLEMENTATION     | Component 4: Infrastructure                 |
+| **TLS Inspection**                       | 04-SECURITY-HARDENING           | P1-2: AWS Network Firewall                  |
+| **Token Lifecycle**                      | 02-SCM-CREDENTIAL-FLOW          | Token Lifecycle Summary                     |
+| **Training Data Pipeline**               | 06-THREAT-MODELING-DATA-CAPTURE | Architecture Overview                       |
+| **VPC Endpoints**                        | 04-SECURITY-HARDENING           | P1-14: AWS Service Endpoint Restriction     |
+| **Web Crypto API**                       | 03-COMPONENT-IMPLEMENTATION     | Component 3: Frontend (SSH key generation)  |
 
 ---
 

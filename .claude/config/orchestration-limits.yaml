@@ -1,0 +1,123 @@
+# Orchestration Limits Configuration
+# ==================================
+# Single source of truth for all retry/iteration behavior across orchestration
+# and looping skills. Skills should reference this file rather than defining
+# their own hardcoded values.
+#
+# Referenced by:
+#   - iterating-to-completion (intra_task section)
+#   - orchestrating-multi-agent-workflows (inter_phase, orchestrator sections)
+#   - tight-feedback-loop pattern (inter_phase section)
+#   - All orchestration skills that spawn agents
+
+# =============================================================================
+# INTRA-TASK ITERATION
+# =============================================================================
+# Scope: Same agent looping on ONE task until completion
+# Pattern: Agent retries its own work (test-fix cycles, research accumulation)
+# Used by: iterating-to-completion skill
+#
+# Example: "Run tests, fix failures, run tests again" - single agent loops
+# =============================================================================
+intra_task:
+  max_iterations: 10          # Hard stop after N iterations
+  max_runtime_minutes: 15     # Hard stop after N minutes (prevents runaway)
+  consecutive_error_limit: 3  # Stop if same error appears N times consecutively
+  loop_detection_threshold: 3 # N consecutive similar outputs = agent is stuck
+
+# =============================================================================
+# INTER-PHASE FEEDBACK LOOPS
+# =============================================================================
+# Scope: Multiple agents cycling through Implementation -> Review -> Test
+# Pattern: Developer implements, reviewer checks, tester validates, repeat
+# Used by: orchestrating-multi-agent-workflows (tight-feedback-loop pattern)
+#
+# Example: "Implement feature, get review feedback, fix issues, re-review"
+# =============================================================================
+inter_phase:
+  max_feedback_iterations: 5        # Max full Implementation->Review->Test cycles
+  max_consecutive_review_failures: 3 # Escalate if SAME review issue persists N times
+  max_consecutive_test_failures: 3   # Escalate if SAME test failure persists N times
+
+# =============================================================================
+# ORCHESTRATOR-LEVEL RETRIES
+# =============================================================================
+# Scope: Orchestrator re-invoking ENTIRE patterns or phases
+# Pattern: "Phase failed, try the whole phase again with lessons learned"
+# Used by: orchestrating-multi-agent-workflows (main retry table)
+#
+# IMPORTANT: These are PATTERN-LEVEL retries, not iteration retries.
+# After inter_phase limits exhausted, orchestrator may retry the entire pattern
+# this many times before escalating to user.
+#
+# Example: Feedback loop hit max_feedback_iterations=5, orchestrator can
+#          restart the entire loop (with context) up to N more times.
+# =============================================================================
+orchestrator:
+  requirement_compliance_retries: 2  # Re-verify spec compliance after fixes
+  quality_fix_retries: 2             # Re-attempt quality review cycle
+  test_fix_retries: 2                # Re-attempt test fix cycle
+
+# =============================================================================
+# ESCALATION BEHAVIOR
+# =============================================================================
+# What happens when limits are exceeded
+# =============================================================================
+escalation:
+  default_action: ask_user           # ask_user | accept_partial | abort
+  include_iteration_history: true    # Show full history in escalation prompt
+  max_user_continue_iterations: 3    # When user says "continue", add this many
+
+  # Escalation prompt options (presented via AskUserQuestion)
+  options:
+    - label: "Continue"
+      description: "Add more iterations and keep trying"
+    - label: "Accept current"
+      description: "Proceed with partial/imperfect result"
+    - label: "Review history"
+      description: "Show iteration history and errors"
+    - label: "Abort"
+      description: "Cancel the operation"
+
+# =============================================================================
+# PRECEDENCE RULES
+# =============================================================================
+# When multiple limits could apply, use this precedence:
+#
+# 1. Skill-specific override (if skill declares custom limit)
+# 2. This config file (central defaults)
+# 3. Hardcoded fallback (only if config unavailable)
+#
+# Skills MUST document which section they use:
+#   "This skill uses limits from `intra_task` section of orchestration-limits.yaml"
+# =============================================================================
+
+# =============================================================================
+# RELATIONSHIP BETWEEN SECTIONS
+# =============================================================================
+#
+#   ┌─────────────────────────────────────────────────────────────────────────┐
+#   │  ORCHESTRATOR (orchestrator section)                                    │
+#   │  Can retry entire patterns N times                                      │
+#   │                                                                         │
+#   │   ┌─────────────────────────────────────────────────────────────────┐   │
+#   │   │  INTER-PHASE LOOP (inter_phase section)                         │   │
+#   │   │  Cycles: Implement -> Review -> Test                            │   │
+#   │   │  Max cycles: max_feedback_iterations                            │   │
+#   │   │                                                                 │   │
+#   │   │   ┌─────────────────────────────────────────────────────────┐   │   │
+#   │   │   │  INTRA-TASK (intra_task section)                        │   │   │
+#   │   │   │  Single agent loops on its task                         │   │   │
+#   │   │   │  Max iterations: max_iterations                         │   │   │
+#   │   │   └─────────────────────────────────────────────────────────┘   │   │
+#   │   │                                                                 │   │
+#   │   └─────────────────────────────────────────────────────────────────┘   │
+#   │                                                                         │
+#   └─────────────────────────────────────────────────────────────────────────┘
+#
+# Total possible iterations (worst case):
+#   orchestrator.test_fix_retries × inter_phase.max_feedback_iterations × intra_task.max_iterations
+#   = 2 × 5 × 10 = 100 iterations
+#
+# This is why each level has conservative defaults - they compound.
+# =============================================================================

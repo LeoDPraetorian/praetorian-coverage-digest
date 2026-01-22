@@ -14,13 +14,11 @@ The National Computer Security Center (NCSC) was established in 1981 as part of 
 
 605
 
-
 ---
 
 TABLE 7-1 TCSEC rating levels
 
 <table><tr><td>Rating</td><td>Description</td></tr><tr><td>A1</td><td>Verified design</td></tr><tr><td>B3</td><td>Security domains</td></tr><tr><td>B2</td><td>Structured protection</td></tr><tr><td>B1</td><td>Labeled security protection</td></tr><tr><td>C2</td><td>Controlled access protection</td></tr><tr><td>C1</td><td>Discretionary access protection (obsolete)</td></tr><tr><td>D</td><td>Minimal protection</td></tr></table>
-
 
 The TCSEC standard consists of levels-of-trust ratings, where higher levels build on lower levels
 
@@ -35,26 +33,27 @@ The following were the key requirements for a C2 security rating, and they are s
 core requirements for any secure operating system:
 
 - ■ A secure logon facility This requires that users be able to be uniquely identified and that they
-must be granted access to the computer only after they have been authenticated in some way.
-■ Discretionary access control This allows the owner of a resource (such as a file) to determine
-who can access the resource and what they can do with it. The owner grants rights that permit
-various kinds of access to a user or to a group of users.
-■ Security auditing This affords the ability to detect and record security-related events or any
-attempts to create, access, or delete system resources. Logon identifiers record the identities of
-all users, making it easy to trace anyone who performs an unauthorized action.
-■ Object reuse protection This prevents users from seeing data that another user has deleted
-or from accessing memory that another user previously used and then released. For example,
-in some operating systems, it's possible to create a new file of a certain length and then exam-
-ine the contents of the file to see data that happens to have occupied the location on the disk
-where the file is allocated. This data might be sensitive information that was stored in another
-user's file but had been deleted. Object reuse protection prevents this potential security hole by
-initializing all objects, including files and memory, before they are allocated to a user.
-Windows also meets two requirements of B-level security:
+  must be granted access to the computer only after they have been authenticated in some way.
+  ■ Discretionary access control This allows the owner of a resource (such as a file) to determine
+  who can access the resource and what they can do with it. The owner grants rights that permit
+  various kinds of access to a user or to a group of users.
+  ■ Security auditing This affords the ability to detect and record security-related events or any
+  attempts to create, access, or delete system resources. Logon identifiers record the identities of
+  all users, making it easy to trace anyone who performs an unauthorized action.
+  ■ Object reuse protection This prevents users from seeing data that another user has deleted
+  or from accessing memory that another user previously used and then released. For example,
+  in some operating systems, it's possible to create a new file of a certain length and then exam-
+  ine the contents of the file to see data that happens to have occupied the location on the disk
+  where the file is allocated. This data might be sensitive information that was stored in another
+  user's file but had been deleted. Object reuse protection prevents this potential security hole by
+  initializing all objects, including files and memory, before they are allocated to a user.
+  Windows also meets two requirements of B-level security:
 
 - ■ Trusted path functionality This prevents Trojan horse programs from being able to in-
-tercept users' names and passwords as they try to log on. The trusted path functionality in
-Windows comes in the form of its Ctrl+Alt+Delete logon-attention sequence, which cannot be
-intercepted by nonprivileged applications. This sequence of keystrokes, which is also known
+  tercept users' names and passwords as they try to log on. The trusted path functionality in
+  Windows comes in the form of its Ctrl+Alt+Delete logon-attention sequence, which cannot be
+  intercepted by nonprivileged applications. This sequence of keystrokes, which is also known
+
 ---
 
 as the secure attention sequence (SAS), always displays a system-controlled Windows security screen (if a user is already logged on) or the logon screen so that would-be Trojan horses can easily be recognized. (The SAS can also be sent programmatically via the SendSAS API if Group Policy and other restrictions allow it.) A Trojan horse presenting a fake logon dialog box will be bypassed when the SAS is entered.
@@ -79,8 +78,7 @@ Windows 2000, Windows XP, Windows Server 2003, and Windows Vista Enterprise all 
 
 In March 2011, Windows 7 and Windows Server 2008 R2 were evaluated as meeting the requirements of the US Government Protection Profile for General-Purpose Operating Systems in a Networked Environment, version 1.0 (GPOSPP) (http://www.commoncriteriaportal.org/files/ ppfiles/pp_gpospp_v1.0.pdf). The certification includes the Hyper-V hypervisor. Again, Windows achieved Evaluation Assurance Level 4 with flaw remediation (EAL 4+). The validation report can be found at http://www.commoncriteriaportal.org/files/epfile/st_vid10390-vc.pdf, and the description of the security target, giving details of the requirements satisfied, can be found at http://www. commoncriteriaportal.org/files/epfile/st_vid10390-st.pdf. Similar certifications were achieved by Windows 10 and Windows Server 2012 R2 in June 2016. The report can be found at http://www.commoncriteriaportal.org/files/epfile/cr_windows10.st.pdf.
 
-CHAPTER 7   Security      607
-
+CHAPTER 7 Security 607
 
 ---
 
@@ -89,36 +87,37 @@ Security system components
 These are the core components and databases that implement Windows security. (All files mentioned are in the %SystemRoot%\System32 directory unless otherwise specified.)
 
 - ■ Security reference monitor (SRM) This component in the Windows executive (Ntoskrnl.exe)
-is responsible for defining the access token data structure to represent a security context, per-
-forming security access checks on objects, manipulating privileges (user rights), and generating
-any resulting security audit messages.
-■ Local Security Authority Subsystem Service (Lsass) This user-mode process runs the
-image Lsass.exe that is responsible for the local system security policy (such as which users are
-allowed to log on to the machine, password policies, privileges granted to users and groups,
-and the system security auditing settings), user authentication, and sending security audit mes-
-sages to the event log. The Local Security Authority service (Lsasrv.dll), a library that Lsass loads,
-implements most of this functionality.
-■ LSAlso.exe This is used by Lsass (if so configured on supported Windows 10 and Server 2016
-systems), also known as Credential Guard (see the upcoming "Credential Guard" section for more
-on Credential Guard), to store users' token hashes instead of keeping them in Lsass's memory.
-Because Laiso.exe is a Trustlet (isolated User Mode process) running in VT>L 1, no normal pro-
-cess—not even the normal kernel—can access the address space of this process. Lsass itself stores
-an encrypted blob of the password hash needed when it communicates with Lsaoso (via ALPC).
-■ Lsass policy database This database contains the local system security policy settings. It is
-stored in the registry in an ACL-protected area under HKLM:SECURITY. It includes such infor-
-mation as what domains are entrusted to authenticate logon attempts, who has permission to
-access the system and how (interactive, network, and service logons), who is assigned which
-privileges, and what kind of security auditing is to be performed. The Lsass policy database also
-stores "secrets" that include logon information used for cached domain logons and Windows
-service user-account logons. (See Chapter 9, "Management mechanisms," in Windows Internals
-Part 2 for more information on Windows services.)
-■ Security Accounts Manager (SAM) This service is responsible for managing the database
-that contains the user names and groups defined on the local machine. The SAM service, which
-is implemented in Samsrv.dll, is loaded into the Lsass process.
-■ SAM database This database contains the defined local users and groups along with their
-passwords and other attributes. On domain controllers, the SAM does not store the domain-
-defined users, but stores the system's administrator recovery account definition and password.
-This database is stored in the registry under HKLM:SAM.
+  is responsible for defining the access token data structure to represent a security context, per-
+  forming security access checks on objects, manipulating privileges (user rights), and generating
+  any resulting security audit messages.
+  ■ Local Security Authority Subsystem Service (Lsass) This user-mode process runs the
+  image Lsass.exe that is responsible for the local system security policy (such as which users are
+  allowed to log on to the machine, password policies, privileges granted to users and groups,
+  and the system security auditing settings), user authentication, and sending security audit mes-
+  sages to the event log. The Local Security Authority service (Lsasrv.dll), a library that Lsass loads,
+  implements most of this functionality.
+  ■ LSAlso.exe This is used by Lsass (if so configured on supported Windows 10 and Server 2016
+  systems), also known as Credential Guard (see the upcoming "Credential Guard" section for more
+  on Credential Guard), to store users' token hashes instead of keeping them in Lsass's memory.
+  Because Laiso.exe is a Trustlet (isolated User Mode process) running in VT>L 1, no normal pro-
+  cess—not even the normal kernel—can access the address space of this process. Lsass itself stores
+  an encrypted blob of the password hash needed when it communicates with Lsaoso (via ALPC).
+  ■ Lsass policy database This database contains the local system security policy settings. It is
+  stored in the registry in an ACL-protected area under HKLM:SECURITY. It includes such infor-
+  mation as what domains are entrusted to authenticate logon attempts, who has permission to
+  access the system and how (interactive, network, and service logons), who is assigned which
+  privileges, and what kind of security auditing is to be performed. The Lsass policy database also
+  stores "secrets" that include logon information used for cached domain logons and Windows
+  service user-account logons. (See Chapter 9, "Management mechanisms," in Windows Internals
+  Part 2 for more information on Windows services.)
+  ■ Security Accounts Manager (SAM) This service is responsible for managing the database
+  that contains the user names and groups defined on the local machine. The SAM service, which
+  is implemented in Samsrv.dll, is loaded into the Lsass process.
+  ■ SAM database This database contains the defined local users and groups along with their
+  passwords and other attributes. On domain controllers, the SAM does not store the domain-
+  defined users, but stores the system's administrator recovery account definition and password.
+  This database is stored in the registry under HKLM:SAM.
+
 ---
 
 <table><tr><td>Active Directory</td><td>This is a directory service that contains a database that stores information about the objects in a domain. A domain is a collection of computers and their associated security groups that are managed as a single entity. Active Directory stores information about the objects in the domain, including users, groups, and computers. Password information and privileges for domain users are designated as domain controllers of the domain. The Active Directory serves, implemented as Ntdsa.dll, runs in the Lasso process. For more information on Active Directory, see Chapter 10, "Networking," in Part 2.</td></tr><tr><td>Authentication packages</td><td>The include dynamic link libraries (DLLs) that run in the context of both LSass process and implement Windows authentication policy. An authentication DLL is responsible for authenticating a user by checking whether a given user name and password match (or whatever mechanism was used to provide credentials), and if so, returning to Lasso information detailing the user's security identity, which LSass uses to generate an token.</td></tr><tr><td>Interactive logon manager (Winlogon)</td><td>This is a user-mode process running Winlogon. exo that is responsible for responding to the SAS and for managing interactive logon sessions. Winlogon creates a user's first process when the user logs on, for example.</td></tr><tr><td>Logon user interface (LogonUI)</td><td>This is a user-mode process running the user interface they can use to authenticate themselves on the system. LogonUI uses credential providers to query user credentials through various methods.</td></tr><tr><td>Credential providers (CPs)</td><td>These are in-process COM objects that run in the LogonUI process (started on demand by Winlogon when the SAS is performed) and used to obtain a user's name and password, smartcard PIN, biometric data (such as a fingerprint), SmartcardCredentialProvider.dll, BioCred.Prov.DLL, and FaceCredentialProvider.dll, a face-detection provider added in Windows 10.</td></tr><tr><td>Network logon service (Netlogon)</td><td>This is a Windows service (Netlogon.dll, hosted on a standard SvcHost) that sets up the secure channel to a domain controller, over which security requests—such as an interactive logon (if the domain controller is running Windows NT 4) or LAN Manager and NT LAN Manager (v1 and v2) authentication validation—are sent. Netlogon is also used for Active Directory logons.</td></tr><tr><td>Kernel Security Device Driver (KSecDD)</td><td>This is a kernel-mode library (%SystemRoot%\System32\Drivers\Ksecdd.sys) of functions that implement the advanced local procedure call (ALPC) interfaces that other kernel mode security components, including the Encrypting File System (FS), use to communicate with Lasso in user mode.</td></tr><tr><td>AppLocker</td><td>This is a kernel-based process that allows administrators to specify which users and groups. AppLocker consists of a driver (%SystemRoot%\System32\Drivers\Appld.sys) and a service (AppIdSvc.dll) running in a standard SvcHost process.</td></tr><tr><td colspan="2">Figure 7-1 shows the relationships among some of these components and the databases they manage.</td></tr><tr><td colspan="2">From the Library of Michael Weber</td></tr></table>
@@ -127,7 +126,7 @@ This database is stored in the registry under HKLM:SAM.
 
 ![Figure](figures/Winternals7thPt1_page_627_figure_000.png)
 
-FIGURE 7-1   Windows security components.
+FIGURE 7-1 Windows security components.
 
 ## EXPERIMENT: Looking inside HKLM\SAM and HKLM\Security
 
@@ -146,7 +145,6 @@ desktop. The -d switch just indicates PsExec should not wait until the target pr
 ![Figure](figures/Winternals7thPt1_page_627_figure_006.png)
 
 610 CHAPTER 7 Security
-
 
 ---
 
@@ -180,25 +178,24 @@ Of course, like any trusted component, VTL 1 also makes certain assumptions that
 To understand the security boundary and protection that Credential Guard provides, it is important to understand the various components that provide access to a user's resources and data or login capabilities on a networked environment:
 
 - ■ Password This is the primary credential used by interactive users to identify themselves on
-the machine. This credential is used for authentication and to derive the other components of
-the credential model. It is the most highly sought after piece of a user's identity.
-■ NT one-way function (NT OWF) This is a hash used by legacy components to identify the
-user (after a successful password logon) using the NT LAN Manager (NTLM) protocol. While
-modern networked systems no longer use NTLM to authenticate the user, many local compo-
-nents still do, as do some types of legacy network components (such as NTLM-based authen-
-ticating proxies). Because NTOWF is an MD4 hash, its algorithmic complexity in the face of
-today's hardware, and its lack of anti-repeatability protection, means that intercepting the hash
-leads to instant compromise and even possible recovery of the password.
-■ Ticket-granting ticket (TGT) This is the equivalent of the NTOWF when a much more
-modern remote authentication mechanism is used. Kerberos. This is the default on Windows
-Active Directory-based domains and is enforced on Server 2016. The TGT and a corresponding
-key are provided to the local machine after a successful logon (just like the NTOWF on NTLM),
-and intercepting both components will result in instant compromise of the user's credentials,
-although reuse and password recovery will not be possible.
-Without Credential Guard enabled, some or all of these components of a user's authentication credentials are present in the memory of Laas.
+  the machine. This credential is used for authentication and to derive the other components of
+  the credential model. It is the most highly sought after piece of a user's identity.
+  ■ NT one-way function (NT OWF) This is a hash used by legacy components to identify the
+  user (after a successful password logon) using the NT LAN Manager (NTLM) protocol. While
+  modern networked systems no longer use NTLM to authenticate the user, many local compo-
+  nents still do, as do some types of legacy network components (such as NTLM-based authen-
+  ticating proxies). Because NTOWF is an MD4 hash, its algorithmic complexity in the face of
+  today's hardware, and its lack of anti-repeatability protection, means that intercepting the hash
+  leads to instant compromise and even possible recovery of the password.
+  ■ Ticket-granting ticket (TGT) This is the equivalent of the NTOWF when a much more
+  modern remote authentication mechanism is used. Kerberos. This is the default on Windows
+  Active Directory-based domains and is enforced on Server 2016. The TGT and a corresponding
+  key are provided to the local machine after a successful logon (just like the NTOWF on NTLM),
+  and intercepting both components will result in instant compromise of the user's credentials,
+  although reuse and password recovery will not be possible.
+  Without Credential Guard enabled, some or all of these components of a user's authentication credentials are present in the memory of Laas.
 
 612 CHAPTER 7 Security
-
 
 ---
 
@@ -220,8 +217,7 @@ Even with protected interactive credentials, a successful login results in a dom
 
 FIGURE 7-3 Accessing remote resources.
 
-CHAPTER 7   Security      613
-
+CHAPTER 7 Security 613
 
 ---
 
@@ -233,12 +229,11 @@ Lsas can be configured to run protected by setting the DWORD value RunAsSPL in t
 
 As shown in Chapter 2, VTL 1 has a minimal attack surface, as it does not have the full regular "NT" kernel, nor does it have any drivers or access to I/O of hardware of any kind. As such, isolated LSA, which is a VTL 1 Trustlet, cannot directly communicate with the KDC. This is still the responsibility of the Lsass process, which serves as a proxy and protocol implementer, communicating with the KDC to authenticate the user and to receive the TGT and the key and NTOWF, as well as communicating with the file server by using service ticket. This seemingly results in a problem: the TGT and its key/NTOWF transiently pass through Lsass during authentication, and the TGT and its key are somehow available to Lsass for the generation of service tickets. This leads to two questions: How does Lsass send and receive the secrets from isolated LSA, and how can we prevent an attacker from doing the same?
 
-To answer the first question, recall that Chapter 3, "Processes and jobs," described which services are available to Trustlets. One was the Advanced Local Procedure Call (ALPC), which the Secure Kernel supports by proxying the NtAIpc* calls to the Normal Kernel. Then, the Isolated User Mode environment implements support for the RPC runtime library (Rpcrt4.dll) over the ALPC protocol, which allows a VTL 0 and VTL 1 application to communicate using local RPC just like any other application and service. In Figure 7-4, which shows Process Explorer, you can see the Lsaso.exe process, which has a handle to the LSA_ISO_RPC_SERVERALPC port. This is used to communicate with the Lsas3.exe process. (See Chapter 8 in Part 2 for more information on ALPC.)
+To answer the first question, recall that Chapter 3, "Processes and jobs," described which services are available to Trustlets. One was the Advanced Local Procedure Call (ALPC), which the Secure Kernel supports by proxying the NtAIpc\* calls to the Normal Kernel. Then, the Isolated User Mode environment implements support for the RPC runtime library (Rpcrt4.dll) over the ALPC protocol, which allows a VTL 0 and VTL 1 application to communicate using local RPC just like any other application and service. In Figure 7-4, which shows Process Explorer, you can see the Lsaso.exe process, which has a handle to the LSA_ISO_RPC_SERVERALPC port. This is used to communicate with the Lsas3.exe process. (See Chapter 8 in Part 2 for more information on ALPC.)
 
 To answer the second question, some understanding of cryptographic protocols and challenge/ response models is required. If you're already familiar with some of the basic concepts of SSL/TLS technology and its use in Internet communications to prevent man-in-the-middle (MthM) attacks, you can think of the KDC and isolated LSA protocol in a similar way. Although Lsas sit in the middle as a proxy would, it only sees encrypted traffic between the KDC and isolated LSA, without the ability to understand its contents. Because isolated LSA establishes a local "session key," which only lives in VTL 1, and then uses a secure protocol to send this session key encrypted with yet another key, which only the KDC has, the KDC can then respond with the TGT and its key after encrypting it with the isolated LSA session key. Therefore, Lsas sees an encrypted message to the KDC (which it can't decrypt) and an encrypted message from the KDC (which it can't decrypt).
 
 614 CHAPTER 7 Security
-
 
 ---
 
@@ -256,8 +251,7 @@ Note, however, that four possible attacks exist in this model:
 
 • In the case of physical access, may be able to disable Credential Guard. In this situation, the legacy authentication model is used (a so-called "downgrade attack"), and older attack models can now be employed.
 
-CHAPTER 7    Security      615
-
+CHAPTER 7 Security 615
 
 ---
 
@@ -282,13 +276,12 @@ original credentials, and attempts to use them on a different machine, its TPM-b
 credential will be different.
 616 CHAPTER 7 Security
 
-
 ---
 
 - ■ The NTLM response/user ticket is coming from isolated LSA and has not been manually
-generated from LSass This guarantees that Credential Guard is enabled on the machine,
-even if the physical user can disable it in some way.
-Unfortunately, once again, if the machine is compromised in such a way that the proof-of-originencrypted KDC response that contains the user TGT and its key is intercepted, it can be stored and used to request session key-encrypted service tickets from isolated LSA. This can then be sent to a file server (for example) to access it until a reboot is issued to wipe the session key. As such, on a system with Credential Guard, it is recommended to reboot each time a user logs off. Otherwise, an attacker may be able to issue valid tickets even after the user is no longer present.
+  generated from LSass This guarantees that Credential Guard is enabled on the machine,
+  even if the physical user can disable it in some way.
+  Unfortunately, once again, if the machine is compromised in such a way that the proof-of-originencrypted KDC response that contains the user TGT and its key is intercepted, it can be stored and used to request session key-encrypted service tickets from isolated LSA. This can then be sent to a file server (for example) to access it until a reboot is issued to wipe the session key. As such, on a system with Credential Guard, it is recommended to reboot each time a user logs off. Otherwise, an attacker may be able to issue valid tickets even after the user is no longer present.
 
 ## Future improvements
 
@@ -304,8 +297,7 @@ While Credential Guard is concerned with safeguarding the user's credentials, De
 
 Additionally, Device Guard is fully configurable, thanks to Custom Code Integrity (CCI) and signing policies that are protected by Secure Boot and defined by the enterprise administrator. These policies, which are explained in Chapter 8, allow the enforcement of inclusion/exclusion lists that are based on cryptographically sound information (such as certificate signers or SHA-2 hashes) instead of file paths or file names as with AppLocker's policies. (See the section "AppLocker" later in this chapter for more on AppLocker.)
 
-CHAPTER 7   Security      617
-
+CHAPTER 7 Security 617
 
 ---
 
@@ -316,9 +308,9 @@ defined and customized, we will show how Device Guard enforces whatever these po
 to, through the following guarantees:
 
 - ■ If kernel-mode code signing is enforced, only signed code can load, regardless of the
-kernel itself being compromised This is because the kernel-loading process will notify the
-Secure Kernel in VTL whenever it loads a driver, and only successfully load it once HCVI has
-validated its signature.
+  kernel itself being compromised This is because the kernel-loading process will notify the
+  Secure Kernel in VTL whenever it loads a driver, and only successfully load it once HCVI has
+  validated its signature.
 
 ■ If kernel-mode code signing is enforced, signed code cannot be modified once loaded,
 even by the kernel itself This is because the executable code pages will be marked as read-
@@ -361,8 +353,7 @@ from the kernel scenarios. By default, signed user-mode code is allowed to alloc
 
 CHAPTER 7 Security
 
-From the Library of M
----
+## From the Library of M
 
 executable memory to support JIT scenarios unless a special enhanced key usage (EKU) is present in the application's certificate, which serves as a dynamic code generation entitlement. At present, NGN.EXE (NET Native Image Generation) has this EKU, which allows IL-only .NET executables to function even in this mode.
 
@@ -380,8 +371,7 @@ Finally, as a performance optimization, it is important to understand that the H
 
 Object protection and access logging are the essence of discretionary access control and auditing. The objects that can be protected on Windows include files, devices, mailslots, pipes (named and anonymous), jobs, processes, threads, events, keyed events, event pairs, mutexes, semaphores, shared memory sections, I/O completion ports, LPC ports, writable timers, access tokens, volumes, window stations, desktops, network shares, services, registry keys, printers, Active Directory objects, and so on—theoretically, anything managed by the executive object manager. In practice, objects that are not exposed to user mode (such as driver objects) are usually not protected. Kernel-mode code is trusted, and usually uses interfaces to the object manager that do not perform access checking. Because system resources that are exported to user mode (and hence require security validation) are implemented as objects in kernel mode, the Windows object manager plays a key role in enforcing object security.
 
-CHAPTER 7   Security      619
-
+CHAPTER 7 Security 619
 
 ---
 
@@ -405,8 +395,7 @@ FIGURE 7-5 WinObj with a section object selected.
 
 FIGURE 7-6 An executive object and its security descriptor, viewed by WinObj.
 
-620    CHAPTER 7   Security
-
+620 CHAPTER 7 Security
 
 ---
 
@@ -438,8 +427,7 @@ The Windows security model requires that a thread specify up front, at the time 
 
 One event that causes the object manager to perform security access validation is when a thread opens an existing object using a name. When an object is opened by name, the object manager performs a lookup of the specified object in the object manager namespace. If the object isn't located in a secondary namespace, such as the configuration manager's registry namespace or a file system driver's file system namespace, the object manager calls the internal function ObpCreateHandle once it locates the object. As its name implies, ObpCreateHandle creates an entry in the process handle table that becomes associated with the object. ObpCreateHandle calls first calls ObpGrantAccess to see if the thread has
 
-CHAPTER 7   Security      621
-
+CHAPTER 7 Security 621
 
 ---
 
@@ -467,19 +455,18 @@ Here is an example: Suppose a thread wants to know when a specific process exits
 
 622 CHAPTER 7 Security
 
-
 ---
 
 - ■ If the calling thread can be granted all the permissions, it would get back a valid handle and
-then could call WaitForSingleObject to wait for the process to exit. However, another thread
-in the process, perhaps with fewer privileges, can use the same handle to do other operations
-with the process, such as terminate it prematurely with TerminateProcess, because the handle
-allows all possible operations on the process.
-■ The call can fail if the calling thread does not have sufficient privileges to be granted all possible
-access and the result is an invalid handle, meaning no access to the process. This is unfortunate,
-because the thread just needed to ask for the SYNCHRONIZE access mask. That has a much bet-
-ter chance of succeeding than asking for PROCESS_ALL_ACCESS.
-The simple conclusion here is that a thread should request the exact access it requires—no more, no less.
+  then could call WaitForSingleObject to wait for the process to exit. However, another thread
+  in the process, perhaps with fewer privileges, can use the same handle to do other operations
+  with the process, such as terminate it prematurely with TerminateProcess, because the handle
+  allows all possible operations on the process.
+  ■ The call can fail if the calling thread does not have sufficient privileges to be granted all possible
+  access and the result is an invalid handle, meaning no access to the process. This is unfortunate,
+  because the thread just needed to ask for the SYNCHRONIZE access mask. That has a much bet-
+  ter chance of succeeding than asking for PROCESS_ALL_ACCESS.
+  The simple conclusion here is that a thread should request the exact access it requires—no more, no less.
 
 Another event that causes the object manager to execute access validation is when a process references an object using an existing handle. Such references often occur indirectly, as when a process calls on a Windows API to manipulate an object and passes an object handle. For example, a thread opening a file can request read permission to the file. If the thread has permission to access the object in this way, as dictated by its security context and the security settings of the file, the object manager creates a handle— representing the file—in the handle table of the thread's process. The types of accesses the threads in the process are granted through the handle are stored with the handle by the object manager.
 
@@ -489,8 +476,7 @@ The Windows security functions also enable Windows applications to define their 
 
 The essence of the SRM's security model is an equation that takes three inputs: the security identity of a thread, the access that the thread wants to an object, and the security settings of the object. The output is either yes or no and indicates whether the security model grants the thread the access it desires. The following sections describe the inputs in more detail and then document the model's access-validation algorithm.
 
-CHAPTER 7   Security      623
-
+CHAPTER 7 Security 623
 
 ---
 
@@ -528,7 +514,6 @@ of EVENT_MODIFY_STATE, TERMINATE instead of PROCESS_TERMINATE).
 
 624 CHAPTER 7 Security
 
-
 ---
 
 ## Security identifiers
@@ -557,8 +542,7 @@ S-1-5-21-13124455-12541255-61235125-500
 
 Windows also defines a number of built-in local and domain SIDs to represent well-known groups. For example, a SID that identifies any and all accounts (except anonymous users) is the Everyone SID: S-1-1-0. Another example of a group that a SID can represent is the Network group, which is the group that represents users who have logged on to a machine from the network. The Network group SID is S-1-5-2. Table 7-2, reproduced here from the Windows SDK documentation, shows some basic wellknown SIDs, their numeric values, and their use. Unlike users' SIDs, these SIDs are predefined constants, and have the same values on every Windows system and domain in the world. Thus, a file that
 
-CHAPTER 7   Security      625
-
+CHAPTER 7 Security 625
 
 ---
 
@@ -567,7 +551,6 @@ is accessible by members of the Everyone group on the system where it was create
 TABLE 7-2 A few well-known SIDs
 
 <table><tr><td>SID</td><td>Name</td><td>Use</td></tr><tr><td>S-1-0-0</td><td>Nobody</td><td>Used when the SID is unknown</td></tr><tr><td>S-1-1-0</td><td>Everyone</td><td>A group that includes all users except anonymous users</td></tr><tr><td>S-1-2-0</td><td>Local</td><td>Users who log on to terminals locally (physically) connected to the system</td></tr><tr><td>S-1-3-0</td><td>Creator Owner ID</td><td>A security identifier to be replaced by the security identifier of the user who created a new object (used in inheritable ACEs)</td></tr><tr><td>S-1-3-1</td><td>Creator Group ID</td><td>Identifies a security identifier to be replaced by the Primary group SID of the user who created a new object (used in inheritable ACEs)</td></tr><tr><td>S-1-5-18</td><td>Local System account</td><td>Used by services</td></tr><tr><td>S-1-5-19</td><td>Local Service account</td><td>Used by services</td></tr><tr><td>S-1-5-20</td><td>Network Service account</td><td>Used by services</td></tr></table>
-
 
 ![Figure](figures/Winternals7thPt1_page_643_figure_003.png)
 
@@ -633,8 +616,7 @@ Process Explorer can also show you information on account and group SIDs on your
 
 The information displayed in the User field contains the friendly name of the account owning this process, while the SID field contains the actual SID value. The Group list includes information on all the groups that this account is a member of (groups are described later in this chapter).
 
-CHAPTER 7   Security      627
-
+CHAPTER 7 Security 627
 
 ---
 
@@ -658,7 +640,6 @@ TABLE 7-3 Integrity level SIDs
 
 <table><tr><td>SID</td><td>Name (Level)</td><td>Use</td></tr><tr><td>S-1-16-0x0</td><td>Untrusted (0)</td><td>Used by processes started by the Anonymous group. It blocks most write access.</td></tr><tr><td>S-1-16-0x1000</td><td>Low (1)</td><td>Used by AppContainer processes (UWP) and Protected Mode Internet Explorer. It blocks write access to most objects (such as files and registry keys) on the system.</td></tr><tr><td>S-1-16-0x2000</td><td>Medium (2)</td><td>Used by normal applications being launched while UAC is enabled.</td></tr><tr><td>S-1-16-0x3000</td><td>High (3)</td><td>Used by administrative applications launched through elevation when UAC is enabled, or normal applications if UAC is disabled and the user is an administrator.</td></tr><tr><td>S-1-16-0x4000</td><td>System (4)</td><td>Used by services and other system-level processes (such as Wininit, Winlogon, Smss, and so on).</td></tr><tr><td>S-1-16-0x5000</td><td>Protected (5)</td><td>Currently unused by default. Can be set by kernel-mode caller only.</td></tr></table>
 
-
 Another, seemingly additional, integrity level is called AppContainer, used by UWP apps. Although seemingly another level, it's in fact equal to Low. UWP process tokens have another attribute that indicates they are running inside an AppContainer (described in the "AppContainers" section). This information is available with the GetTokenInformation API with the TokenIsAppContainer enumeration value.
 
 ## EXPERIMENT: Looking at the integrity level of processes
@@ -673,8 +654,7 @@ You can use Process Explorer to quickly display the integrity level for the proc
 
 4. Open an elevated Process Explorer, right-click any column header in the Process list,
 
-and then click Select Columns.
----
+## and then click Select Columns.
 
 5. Select the Process Image tab and select the Integrity Level check box. The dialog box should look similar to the one shown here:
 
@@ -684,8 +664,7 @@ and then click Select Columns.
 
 ![Figure](figures/Winternals7thPt1_page_646_figure_003.png)
 
-CHAPTER 7   Security      629
-
+CHAPTER 7 Security 629
 
 ---
 
@@ -729,7 +708,6 @@ Table 7-4. The integrity level and the mandatory policy are stored together in t
 TABLE 7-4 Object mandatory policies
 
 <table><tr><td>Policy</td><td>Present on, by Default</td><td>Description</td></tr><tr><td>No-Write-Up</td><td>Implicit on all objects</td><td>Used to restrict write access coming from a lower integrity level process to the object.</td></tr><tr><td>No-Read-Up</td><td>Only on process objects</td><td>Used to restrict read access coming from a lower integrity level process to the object. Specific use on process objects protects against information leakage by blocking address space reads from an external process.</td></tr><tr><td>No-Execute-Up</td><td>Only on binaries implementing COM classes</td><td>Used to restrict execute access coming from a lower integrity level process to the object. Specific use on COM classes is to restrict launch-activation permissions on a COM class.</td></tr></table>
-
 
 ## EXPERIMENT: Looking at the integrity level of objects
 
@@ -781,41 +759,41 @@ the user logging on. It then determines whether the user logging on is a member 
 
 or possesses a powerful privilege. The groups checked for in this step are as follows:
 
-- ●  Built-In Administrators
+- ● Built-In Administrators
 
-●  Certificate Administrators
+● Certificate Administrators
 
-●  Domain Administrators
+● Domain Administrators
 
-●  Enterprise Administrators
+● Enterprise Administrators
 
-●  Policy Administrators
+● Policy Administrators
 
-●  Schema Administrators
+● Schema Administrators
 
-●  Domain Controllers
+● Domain Controllers
 
-●  Enterprise Read-Only Domain Controllers
+● Enterprise Read-Only Domain Controllers
 
-●  Read-Only Domain Controllers
+● Read-Only Domain Controllers
 
-●  Account Operators
+● Account Operators
 
-●  Backup Operators
+● Backup Operators
 
-●  Cryptographic Operators
+● Cryptographic Operators
 
-●  Network Configuration Operators
+● Network Configuration Operators
 
-●  Print Operators
+● Print Operators
 
-●  System Operators
+● System Operators
 
-●  RAS Servers
+● RAS Servers
 
-●  Power Users
+● Power Users
 
-●  Pre-Windows 2000 Compatible Access
+● Pre-Windows 2000 Compatible Access
 Many of the groups listed are used only on domain-joined systems and don't give users local administrative rights directly. Instead, they allow users to modify domain-wide settings.
 
 The privileges checked for are as follows:
@@ -827,8 +805,7 @@ The privileges checked for are as follows:
 ● SeDebugPrivilege
 
 ● SeImpersonatePrivilege
-632    CHAPTER 7   Security
-
+632 CHAPTER 7 Security
 
 ---
 
@@ -859,8 +836,7 @@ Tokens vary in size because different user accounts have different sets of privi
 
 FIGURE 7-7 Access tokens.
 
-CHAPTER 7   Security      633
-
+CHAPTER 7 Security 633
 
 ---
 
@@ -883,8 +859,8 @@ Each token's type distinguishes a primary token (a token that identifies the sec
 A token also includes the mandatory policy for the process or thread, which defines how MIC will behave when processing this token. There are two policies:
 
 - ■ TOKEN_MANDATORY_NO_WRITE_UP Enabled by default, this sets the No-Write-Up policy on this
-token, specifying that the process or thread will not be able to access objects with a higher
-integrity level for write access.
+  token, specifying that the process or thread will not be able to access objects with a higher
+  integrity level for write access.
 
 ■ TOKEN_MANDATORY_NEW_PROCESS_MIN Also enabled by default, this specifies that the SRM
 should look at the integrity level of the executable image when launching a child process and
@@ -899,7 +875,6 @@ Each token can also contain attributes that are assigned by the Application Iden
 the access token are described later in this chapter.
 
 634 CHAPTER 7 Security
-
 
 ---
 
@@ -929,7 +904,7 @@ security functions, the fields are similar. For further information on tokens, s
 
 the Windows SDK documentation.
 
-CHAPTER 7   Security      635
+CHAPTER 7 Security 635
 
 ---
 
@@ -986,8 +961,7 @@ tksd- dt_ntl_token
     +0x488 VariablePart     : Uint8B
 ```
 
-636   CHAPTER 7   Security
-
+636 CHAPTER 7 Security
 
 ---
 
@@ -1068,7 +1042,6 @@ Attributes - Mandatory Default Enabled
 11
 
 CHAPTER 7 Security 637
-
 
 ---
 
@@ -1173,8 +1146,7 @@ T5 Session ID: 0x1
    Modified ID:                (0, 4ddb8b2)
 ```
 
-CHAPTER 7   Security      639
-
+CHAPTER 7 Security 639
 
 ---
 
@@ -1231,7 +1203,6 @@ Privs:
 ```
 
 640 CHAPTER 7 Security
-
 
 ---
 
@@ -1326,8 +1297,7 @@ A server impersonates a client only within the thread that makes the impersonati
 
 Thread-control data structures contain an optional entry for an impersonation token. However, a
 
-642      CHAPTER 7   Security
-
+642 CHAPTER 7 Security
 
 ---
 
@@ -1354,38 +1324,35 @@ To prevent the misuse of impersonation, Windows doesn't let servers perform impe
 - ■ SecurityAnonymous This is the most restrictive level of impersonation. The server can't imper-
 
 sonate or identify the client.
-CHAPTER 7   Security      643
-
+CHAPTER 7 Security 643
 
 ---
 
 - ■ SecurityIdentification This lets the server obtain the identity (the SIDs) of the client and
-the client's privileges, but the server can't impersonate the client.
-■ SecurityImpersonation This lets the server identify and impersonate the client on the
-local system.
-■ SecurityDelegation This is the most permissive level of impersonation. It lets the server
-impersonate the client on local and remote systems.
-Other interfaces such as RPC use different constants with similar meanings (for example, RPC_C_
-
+  the client's privileges, but the server can't impersonate the client.
+  ■ SecurityImpersonation This lets the server identify and impersonate the client on the
+  local system.
+  ■ SecurityDelegation This is the most permissive level of impersonation. It lets the server
+  impersonate the client on local and remote systems.
+  Other interfaces such as RPC use different constants with similar meanings (for example, RPC*C*
 
 IMP_LEVEL_IMPERSONATE).
-
 
 1
 
 If the client doesn't set an impersonation level, Windows chooses the SecurityImpersonation
 
-level by default. The CreateFile function also accepts SECURITY_EFFECTIVE_ONLY and SECURITY_
+level by default. The CreateFile function also accepts SECURITY*EFFECTIVE_ONLY and SECURITY*
 
 CONTEXT_TRACKING as modifiers for the impersonation setting:
 
-- ■ SECURITY_EFFECTIVE_ONLY  This prevents a server from enabling or disabling a client's privi-
-leges or groups while the server is impersonating.
-■ SECURITY_CONTEXT_TRACKING  This specifies that any changes a client makes to its security con-
-text are reflected in a server that is impersonating it. If this option isn't specified, the server adopts
-the context of the client at the time of the impersonation and doesn't receive any changes. This
-option is honored only when the client and server processes are on the same system.
-To prevent spoofing scenarios in which a low-integrity process could create a user interface that captured user credentials and then used LogonUser to obtain that user's token, a special integrity policy applies to impersonation scenarios: a thread cannot impersonate a token of higher integrity than its own. For example, a low-integrity application cannot spoof a dialog box that queries administrative credentials and then attempt to launch a process at a higher privilege level. The integrity-mechanism policy for impersonation access tokens is that the integrity level of the access token that is returned by LSalogonUser must be no higher than the integrity level of the calling process.
+- ■ SECURITY_EFFECTIVE_ONLY This prevents a server from enabling or disabling a client's privi-
+  leges or groups while the server is impersonating.
+  ■ SECURITY_CONTEXT_TRACKING This specifies that any changes a client makes to its security con-
+  text are reflected in a server that is impersonating it. If this option isn't specified, the server adopts
+  the context of the client at the time of the impersonation and doesn't receive any changes. This
+  option is honored only when the client and server processes are on the same system.
+  To prevent spoofing scenarios in which a low-integrity process could create a user interface that captured user credentials and then used LogonUser to obtain that user's token, a special integrity policy applies to impersonation scenarios: a thread cannot impersonate a token of higher integrity than its own. For example, a low-integrity application cannot spoof a dialog box that queries administrative credentials and then attempt to launch a process at a higher privilege level. The integrity-mechanism policy for impersonation access tokens is that the integrity level of the access token that is returned by LSalogonUser must be no higher than the integrity level of the calling process.
 
 ## Restricted tokens
 
@@ -1409,8 +1376,7 @@ to the object.
 
 APTEP 7 Security
 
-From the Library of M
----
+## From the Library of M
 
 Restricted tokens are useful when an application wants to impersonate a client at a reduced security
 
@@ -1425,14 +1391,15 @@ security context from rebooting the system.
 As you saw earlier, restricted tokens are also used by UAC to create the filtered admin token that all user applications will inherit. A filtered admin token has the following characteristics:
 
 - The integrity level is set to medium.
-The administrator and administrator-like SIDs mentioned previously are marked as deny-only
-to prevent a security hole if the group were to be removed altogether. For example, if a file
-had an access control list (ACL) that denied the Administrators group all access but granted
-some access to another group the user belongs to, the user would be granted access if the
-Administrators group was absent from the token, which would give the standard user version
-of the user's identity more access than the user's administrator identity.
-All privileges are stripped except Change Notify, Shutdown, Undock, Increase Working Set,
-and Time Zone.
+  The administrator and administrator-like SIDs mentioned previously are marked as deny-only
+  to prevent a security hole if the group were to be removed altogether. For example, if a file
+  had an access control list (ACL) that denied the Administrators group all access but granted
+  some access to another group the user belongs to, the user would be granted access if the
+  Administrators group was absent from the token, which would give the standard user version
+  of the user's identity more access than the user's administrator identity.
+  All privileges are stripped except Change Notify, Shutdown, Undock, Increase Working Set,
+  and Time Zone.
+
 ## EXPERIMENT: Looking at filtered admin tokens
 
 You can make Explorer launch a process with either the standard user token or the administrator token by following these steps on a machine with UAC enabled:
@@ -1455,8 +1422,7 @@ privileges. The properties on the right in the following screenshot are from a c
 
 prompt running with an administrator token, and the properties on the left are from
 
-one running with the filtered administrator token:
----
+## one running with the filtered administrator token:
 
 ![Figure](figures/Winternals7thPt1_page_663_figure_000.png)
 
@@ -1485,7 +1451,6 @@ With virtual service accounts, each service runs under its own account with its 
 Windows automatically sets and periodically changes the password of the virtual service account. Similar to the Local System and Other Service Accounts, there is a password, but the password is unknown to the system administrators.
 
 646 CHAPTER 7 Security
-
 
 ---
 
@@ -1533,8 +1498,7 @@ service name (srvany) by the Check Names function, and it appears in the access 
 
 list in this shortened form.
 
-648    CHAPTER 7   Security
-
+648 CHAPTER 7 Security
 
 ---
 
@@ -1548,7 +1512,7 @@ create a pagefile (using the Local Security Policy editor, secpol.msc).
 
 ![Figure](figures/Winternals7thPt1_page_666_figure_002.png)
 
-CHAPTER 7   Security      649
+CHAPTER 7 Security 649
 
 ---
 
@@ -1571,15 +1535,15 @@ actions on the object. The data structure for this information is called a secur
 descriptor consists of the following attributes:
 
 - ■ Revision number This is the version of the SRM security model used to create the descriptor.
-■ Flags These are optional modifiers that define the behavior or characteristics of the descriptor.
-These flags are listed in Table 7-5 (most are documented in the Windows SDK).
-■ Owner SID This is the owner's SID.
-■ Group SID This is the SID of the primary group for the object (used only by the POSIX subsys-
-tem, now unused since POSIX is no longer supported).
-■ Discretionary access control list (DACL) This specifies who has what access to the object.
-■ System access control list (SACL) This specifies which operations by which users should be
-logged in the security audit log and the explicit integrity level of an object.
-650 CHAPTER 7 Security
+  ■ Flags These are optional modifiers that define the behavior or characteristics of the descriptor.
+  These flags are listed in Table 7-5 (most are documented in the Windows SDK).
+  ■ Owner SID This is the owner's SID.
+  ■ Group SID This is the SID of the primary group for the object (used only by the POSIX subsys-
+  tem, now unused since POSIX is no longer supported).
+  ■ Discretionary access control list (DACL) This specifies who has what access to the object.
+  ■ System access control list (SACL) This specifies which operations by which users should be
+  logged in the security audit log and the explicit integrity level of an object.
+  650 CHAPTER 7 Security
 
 ---
 
@@ -1589,19 +1553,17 @@ TABLE 7-5 Security descriptor flags
 
 CHAPTER 7 Security 651
 
-
 ---
 
 TABLE 7-5 Security descriptor flags (continued)
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>SE_RM_CONTROL_VALID</td><td>This indicates that the resource control manager bits in the security descriptor are valid. The resource control manager bits are 8 bits in the security descriptor structure that contains information specific to the resource manager accessing the structure.</td></tr><tr><td>SE_SELF_RELATIVE</td><td>This indicates a security descriptor in self-relative format, with all the security information in a contiguous block of memory. If this flag is not set, the security descriptor is in absolute format.</td></tr></table>
 
-
 Security descriptors (SDs) can be retrieved programmatically by using various functions, such as GetSecurityInfo, GetKernelObjectSecurity, GetFileSecurity, GetNamedSecurityInfo, and other more esoteric functions. After retrieval, the SD can be manipulated and then the relevant Set function called to make the change. Furthermore, a security descriptor can be constructed using a string in a language called Security Descriptor Definition Language (SDDL), which is capable of representing a security descriptor using a compact string. This string can be converted to a true SD by calling ConvertStringSecurityDescriptorToSecurityDescriptor. As you might expect, the converse function exists as well (ConvertSecurityDescriptorToStringSecurityDescriptor). See the Windows SDK for a detailed description of the SDDL.
 
 An access control list (ACL) is made up of a header and zero or more access control entry (ACE) structures. There are two types of ACLs: DACLs and SACLs. In a DACL, each ACE contains a SID and an access mask (and a set of flags, explained shortly), which typically specifies the access rights (read, write, delete, and so forth) that are granted or denied to the holder of the SID. There are nine types of ACEs that can appear in a DACL: access allowed, access denied, allowed object, denied object, allowed callback, denied callback, allowed object callback, denied-object callback, and conditional claims. As you would expect, the access-allowed ACE grants access to a user, and the access-denied ACE denies the access rights specified in the access mask. The callback ACEs are used by applications that make use of the Auth2 API (described later) to register a callback that AuthZ will call when it performs an access check involving this ACE.
 
-The difference between allowed object and access allowed, and between denied object and access denied, is that the object types are used only within Active Directory. ACEs of these types have a globally unique identifier (GUID) field that indicates that the ACE applies only to particular objects or subobjects (those that have GUID identifiers). (A GUID is a 128-bit identifier guaranteed to be universally unique.) In addition, another optional GUID indicates what type of child object will inherit the ACE when a child is created within an Active Directory container that has the ACE applied to it. The conditional claims ACE is stored in a*-callback type ACE structure and is described in the section on the Auth2 APIs.
+The difference between allowed object and access allowed, and between denied object and access denied, is that the object types are used only within Active Directory. ACEs of these types have a globally unique identifier (GUID) field that indicates that the ACE applies only to particular objects or subobjects (those that have GUID identifiers). (A GUID is a 128-bit identifier guaranteed to be universally unique.) In addition, another optional GUID indicates what type of child object will inherit the ACE when a child is created within an Active Directory container that has the ACE applied to it. The conditional claims ACE is stored in a\*-callback type ACE structure and is described in the section on the Auth2 APIs.
 
 The accumulation of access rights granted by individual ACEs forms the set of access rights granted
 
@@ -1616,7 +1578,6 @@ The ACEs used in DACLs also have a set of flags that control and specify charact
 TABLE 7-6 Inheritance rules for ACE flags
 
 <table><tr><td>Flag</td><td>Inheritance Rule</td></tr><tr><td>CONTAINER_INHERIT_ACE</td><td>Child objects that are containers, such as directories, inherit the ACE as an effective ACE. The inherited ACE is inheritable unless the NO_PROPAGATE_INHERIT_ACE bit flag is also set.</td></tr><tr><td>INHERIT_ONLY_ACE</td><td>This flag indicates an inherit-only ACE that doesn&#x27;t control access to the object it&#x27;s attached to. If this flag is not set, the ACE controls access to the object to which it is attached.</td></tr><tr><td>INHERITED_ACE</td><td>This flag indicates that the ACE was inherited. The system sets this bit when it propagates an inheritable ACE to a child object.</td></tr><tr><td>NO_PROPAGATE_INHERIT_ACE</td><td>If the ACE is inherited by a child object, the system clears the OBJECT_INHERIT_ACE and CONTAINER_INHERIT_ACE flags in the inherited ACE. This action prevents the ACE from being inherited by subsequent generations of objects.</td></tr><tr><td>OBJECT_INHERIT_ACE</td><td>Non-container child objects inherit the ACE as an effective ACE. For child objects that are containers, the ACE is inherited as an inherit-only ACE unless the NO_PROPAGATE_INHERIT_ACE bit flag is also set.</td></tr></table>
-
 
 A SACL contains two types of ACEs: system audit ACEs and system audit-object ACEs. These ACEs specify which operations performed on the object by specific users or groups should be audited. Audit information is stored in the system audit log. Both successful and unsuccessful attempts can be audited. Like their DACL object-specific ACE cousins, system audit-object ACEs specify a GUID indicating the types of objects or sub-objects that the ACE applies to and an optional GUID that controls propagation of the ACE to particular child object types. If a SACL is null, no auditing takes place on the object. (Security auditing is described later in this chapter.) The inheritance flags that apply to DACL ACEs also apply to system audit and system audit-object ACEs.
 
@@ -1731,7 +1692,7 @@ descriptor pointer value:
 ->DacI   :      :-Ace[2] :-AceType: ACCESS_ALLOWED_ACE_TYPE
 ```
 
-CHAPTER 7   Security      655
+CHAPTER 7 Security 655
 
 ---
 
@@ -1767,22 +1728,19 @@ To determine which DACL to assign to a new object, the security system uses the 
 
 4. If there is no specified descriptor, no inherited ACEs, and no default DACL, the system creates the object with no DACL, which allows everyone (all users and groups) full access to the object. This rule is the same as the third rule, in which a token contains a null default DACL.
 
+CHAPTER 7 Security
 
-
-CHAPTER 7   Security
-
-From the Library of M
----
+## From the Library of M
 
 The rules the system uses when assigning a SACL to a new object are similar to those used for DACL
 
 assignment, with some exceptions:
 
 - <table><tr><td>•</td><td>Inherited system audit ACEs don’t propagate to objects with security descriptors marked with the SE_SACL_PROTECTED flag (similar to the SE_DACL_PROTECTED flag, which protects DACLs).</td></tr><tr><td>•</td><td>If there are no specified security audit ACEs and there is no inherited SACL, no SACL is applied to the object. This behavior is different from that used to apply default DACLs because tokens don’t have a default SACL.</td></tr></table>
-When a new security descriptor containing inheritable ACEs is applied to a container, the system automatically propagates the inheritable ACEs to the security descriptors of child objects. (Note that a security descriptor's DACL doesn't accept inherited DACLACEs if its SE_DACL_PROTECTED flag is enabled, and its SACL doesn't inherit SACL ACEs if the descriptor has the SE_SACL_PROTECTED flag set.) The order in which inheritable ACEs are merged with an existing child object's security descriptor is such that any ACEs that were explicitly applied to the ACL are kept ahead of ACEs that the object inherits. The system uses the following rules for propagating inheritable ACEs:
+  When a new security descriptor containing inheritable ACEs is applied to a container, the system automatically propagates the inheritable ACEs to the security descriptors of child objects. (Note that a security descriptor's DACL doesn't accept inherited DACLACEs if its SE_DACL_PROTECTED flag is enabled, and its SACL doesn't inherit SACL ACEs if the descriptor has the SE_SACL_PROTECTED flag set.) The order in which inheritable ACEs are merged with an existing child object's security descriptor is such that any ACEs that were explicitly applied to the ACL are kept ahead of ACEs that the object inherits. The system uses the following rules for propagating inheritable ACEs:
 
 - ■ If a child object with no DACL inherits an ACE, the result is a child object with a DACL containing
-only the inherited ACE.
+  only the inherited ACE.
 
 ■ If a child object with an empty DACL inherits an ACE, the result is a child object with a DACL
 containing only the inherited ACE.
@@ -1802,21 +1760,17 @@ Note Inheritance is generally not directly supported by the object stores, such 
 
 The advent of protected processes and Protected Processes Light (PPL, discussed in Chapter 3) created a need for such a process to make objects as accessible by protected processes only. This is important to protect certain resources such as the KnownD1.s registry key from tampering, even by admin-level code. Such ACEs are specified with well-known SIDs that provide the protection level and signer that is required to obtain access. Table 7-7 shows the SIDs and their level and meaning.
 
-CHAPTER 7   Security      657
-
+CHAPTER 7 Security 657
 
 ---
 
-TABLE 7-7   Trust SIDs
+TABLE 7-7 Trust SIDs
 
 <table><tr><td>SID</td><td>Protection Level</td><td>Protection Signer</td></tr><tr><td>1-19-512-0</td><td>Protected Light</td><td>None</td></tr><tr><td>1-19-512-4096</td><td>Protected Light</td><td>Windows</td></tr><tr><td>1-19-512-8192</td><td>Protected Light</td><td>WinTcb</td></tr><tr><td>1-19-1024-0</td><td>Protected</td><td>None</td></tr><tr><td>1-19-1024-4096</td><td>Protected</td><td>Windows</td></tr><tr><td>1-19-1024-8192</td><td>Protected</td><td>WinTcb</td></tr></table>
 
-
 A trust SID is part of a token object that exists for tokens attached to protected or PPL processes.
 
-
 The higher the SID number, the more powerful the token is. (remember that Protected is higher than
-
 
 Protected Light).
 
@@ -1869,17 +1823,17 @@ That's a PPL with a WinTcb signer.
 Two methods are used for determining access to an object:
 
 - The mandatory integrity check, which determines whether the integrity level of the caller is
-high enough to access the resource, based on the resource's own integrity level and its manda-
-tory policy.
-The discretionary access check, which determines the access that a specific user account has to
-an object.
-When a process tries to open an object, the integrity check takes place before the standard
+  high enough to access the resource, based on the resource's own integrity level and its manda-
+  tory policy.
+  The discretionary access check, which determines the access that a specific user account has to
+  an object.
+  When a process tries to open an object, the integrity check takes place before the standard
 
 Windows DACL check in the kernel's SeaSenseCheck function because it is faster to execute and can
 
 quickly eliminate the need to perform the full discretionary access check. Given the default integrity
 
-policies in its access token (TOKEN_MANDATORY_NO_WRITE_UP and TOKEN_MANDATORY_NEW_PROCESS_
+policies in its access token (TOKEN*MANDATORY_NO_WRITE_UP and TOKEN_MANDATORY_NEW_PROCESS*
 
 MIN, described previously), a process can open an object for write access if its integrity level is equal to
 
@@ -1895,7 +1849,6 @@ TABLE 7-8 Accessing objects and processes based on integrity level
 
 <table><tr><td>Accessing Process</td><td>Access to Objects</td><td>Access to Other Processes</td></tr><tr><td>High integrity level</td><td>Read/write to all objects with integrity level of High or lowerRead access to objects with integrity level of System</td><td>Read/write access to all processes with High or lower integrity levelNo read/write access to processes with System integrity level</td></tr><tr><td>Medium integrity level</td><td>Read/write to all objects with integrity level of Medium or LowRead access to objects with integrity level of High or System</td><td>Read/write access to all processes with Medium or Low integrity levelNo read/write access to processes with High or System integrity level</td></tr><tr><td>Low integrity level</td><td>Read/write to all objects with integrity level of LowRead access to objects with integrity level of Medium or higher</td><td>Read/write access to all processes with Low integrity levelNo read/write access to processes with Medium or higher integrity level</td></tr></table>
 
-
 ---
 
 ![Figure](figures/Winternals7thPt1_page_677_figure_000.png)
@@ -1904,7 +1857,7 @@ Note The read access to a process described in this section means full read acce
 
 reading the contents of the process address space. No-Read-Up does not prevent opening a
 
-higher-integrity-level process from a lower one for a more limited access, such as PROCESS_
+higher-integrity-level process from a lower one for a more limited access, such as PROCESS\_
 
 QUERY_LIMITED_INFORMATION, which provides only basic information about the process.
 
@@ -1929,6 +1882,7 @@ informational messages being exceptions:
 ■ WM_GETTEXTLENGTH
 
 ■ WM_GETTHOTKEY
+
 - ■ WM_GETICON
 
 ■ WM_RENDERFORMAT
@@ -1970,7 +1924,6 @@ Because accessibility applications such as the On-Screen Keyboard (Osk.exe) are 
 
 660 CHAPTER 7 Security
 
-
 ---
 
 can be present in the manifest file of the image and will run the process at a slightly higher integrity level than medium (between 0x2000 and 0x3000) if launched from a standard user account, or at high integrity level if launched from an Administrator account. Note that in the second case, an elevation request won't actually be displayed. For a process to set this flag, its image must also be signed and in one of several secure locations, including %SystemRoot% and %ProgramFiles%.
@@ -1982,40 +1935,39 @@ object based on the caller's integrity, one of two algorithms is used for the di
 object, which will determine the outcome of the access check:
 
 - ■ Determine the maximum access allowed to the object, a form of which is exported to user
-mode using the AuthZ API (described in the section "The AuthZ API" later in this chapter) or
-the older GetEffectiveRightsFromACI function. This is also used when a program specifies
-a desired access of MAXIMUM_ALLOWED, which is what the legacy APIs that don't have a desired
-access parameter use.
+  mode using the AuthZ API (described in the section "The AuthZ API" later in this chapter) or
+  the older GetEffectiveRightsFromACI function. This is also used when a program specifies
+  a desired access of MAXIMUM_ALLOWED, which is what the legacy APIs that don't have a desired
+  access parameter use.
 
 ■ Determine whether a specific desired access is allowed, which can be done with the Windows
 AccessCheck function or the AccessCheckByType function.
 The first algorithm examines the entries in the DACL as follows:
 
 - 1. If the object has no DACL (a null DACL), the object has no protection and the security sys-
-tem grants all access, unless the access is from an AppContainer process (discussed in the
-"AppContainers" section later in this chapter), which means access is denied.
+     tem grants all access, unless the access is from an AppContainer process (discussed in the
+     "AppContainers" section later in this chapter), which means access is denied.
 
 2. If the caller has the take-ownership privilege, the security system grants write-owner access
-before examining the DACL. (Take-ownership privilege and write-owner access are explained
-in a moment.)
+   before examining the DACL. (Take-ownership privilege and write-owner access are explained
+   in a moment.)
 
 3. If the caller is the owner of the object, the system looks for an OWNER_RIGHTS SID and uses that SID
-as the SID for the next steps. Otherwise, read-control and write-DACL access rights are granted.
+   as the SID for the next steps. Otherwise, read-control and write-DACL access rights are granted.
 
 4. For each access-denied ACE that contains a SID that matches one in the caller's access token,
-the ACE's access mask is removed from the granted-access mask.
+   the ACE's access mask is removed from the granted-access mask.
 
 5. For each access-allowed ACE that contains a SID that matches one in the caller's access token,
-the ACE's access mask is added to the granted-access mask being computed, unless that access
-has already been denied.
-When all the entries in the DACL have been examined, the computed granted-access mask is re turned to the caller as the maximum allowed access to the object. This mask represents the total set of
+   the ACE's access mask is added to the granted-access mask being computed, unless that access
+   has already been denied.
+   When all the entries in the DACL have been examined, the computed granted-access mask is re turned to the caller as the maximum allowed access to the object. This mask represents the total set of
 
 access types that the caller will be able to successfully request when opening the object.
 
 The preceding description applies only to the kernel-mode form of the algorithm. The Windows version implemented by GetEffectiveRightsFromAC1 differs in that it doesn’t perform step 2, and it considers a single user or group SID rather than an access token.
 
-CHAPTER 7   Security      661
-
+CHAPTER 7 Security 661
 
 ---
 
@@ -2030,20 +1982,20 @@ exposed by Windows: the Owner Rights SID.
 The Owner Rights SID exists for two main reasons:
 
 - ■ To improve service hardening in the operating system Whenever a service creates an
-object at run time, the Owner SID associated with that object is the account the service is
-running in (such as local system or local service) and not the actual service SID. This means
-that any other service in the same account would have access to the object by being an
-owner. The Owner Rights SID prevents that unwanted behavior.
-■ To allow more flexibility for specific usage scenarios For example, suppose an admin-
-istrator wants to allow users to create files and folders but not to modify the ACLs on those
-objects. (Users could inadvertently or maliciously grant access to those files or folders to
-unwanted accounts.) By using an inheritable Owner Rights SID, the users can be prevented
-from editing or even viewing the ACL on the objects they create. A second usage scenario
-relates to group changes. Suppose an employee has been part of some confidential or
-sensitive group, has created several files while a member of that group, and has now been
-moved from the group for business reasons. Because that employee is still a user, he
-could continue accessing the sensitive files.
-The second algorithm is used to determine whether a specific access request can be granted based on the caller's access token. Each open function in the Windows API that deal with securable objects has a parameter that specifies the desired access mask, which is the last component of the security equation. T o determine whether the caller has access, the following steps are performed:
+  object at run time, the Owner SID associated with that object is the account the service is
+  running in (such as local system or local service) and not the actual service SID. This means
+  that any other service in the same account would have access to the object by being an
+  owner. The Owner Rights SID prevents that unwanted behavior.
+  ■ To allow more flexibility for specific usage scenarios For example, suppose an admin-
+  istrator wants to allow users to create files and folders but not to modify the ACLs on those
+  objects. (Users could inadvertently or maliciously grant access to those files or folders to
+  unwanted accounts.) By using an inheritable Owner Rights SID, the users can be prevented
+  from editing or even viewing the ACL on the objects they create. A second usage scenario
+  relates to group changes. Suppose an employee has been part of some confidential or
+  sensitive group, has created several files while a member of that group, and has now been
+  moved from the group for business reasons. Because that employee is still a user, he
+  could continue accessing the sensitive files.
+  The second algorithm is used to determine whether a specific access request can be granted based on the caller's access token. Each open function in the Windows API that deal with securable objects has a parameter that specifies the desired access mask, which is the last component of the security equation. T o determine whether the caller has access, the following steps are performed:
 
 1. If the object has no DACL (a null DACL), the object has no protection and the security system
 
@@ -2063,17 +2015,15 @@ never examines the DACL.
 
 - • The ACE is an access-deny ACE, and the SID in the ACE matches an enabled SID (SIDs can be
 
-enabled or disabled) or a deny-only SID in the caller's access token.
----
+## enabled or disabled) or a deny-only SID in the caller's access token.
 
 - • The ACE is an access-allowed ACE, and the SID in the ACE matches an enabled SID in the
-caller's token that isn't of type deny-only.
+  caller's token that isn't of type deny-only.
 
 • It is the second pass through the descriptor for restricted-SID checks, and the SID in the ACE
 matches a restricted SID in the caller's access token.
 
-• The ACE isn't marked as inherit-only.
-5. If it is an access-allowed ACE, the rights in the access mask in the ACE that were requested are
+• The ACE isn't marked as inherit-only. 5. If it is an access-allowed ACE, the rights in the access mask in the ACE that were requested are
 
 granted. If all the requested access rights have been granted, the access check succeeds. If it is
 
@@ -2123,8 +2073,7 @@ in the DACL. However, even this dialog box can be confusing because a complex DA
 
 deny ACEs for various accesses followed by allow ACEs for other access types.
 
-664 CHAPTER 7   Security
-
+664 CHAPTER 7 Security
 
 ---
 
@@ -2134,7 +2083,7 @@ The only definitive way to know what access a particular user or group will have
 
 ![Figure](figures/Winternals7thPt1_page_682_figure_002.png)
 
-CHAPTER 7   Security      665
+CHAPTER 7 Security 665
 
 ---
 
@@ -2146,7 +2095,7 @@ Windows 8 and Server 2012 introduced Dynamic Access Control (DAC), a flexible me
 
 ![Figure](figures/Winternals7thPt1_page_683_figure_003.png)
 
-FIGURE 7-10  Dynamic Access Control components.
+FIGURE 7-10 Dynamic Access Control components.
 
 A claim is any piece of information about a user, device (computer in a domain), or resource (generic
 
@@ -2197,7 +2146,7 @@ Attributes can be referenced in what is known as a conditional ACE, where the pr
 
 value of one or more attributes is checked. An attribute name can contain any alphanumeric Unicode
 
-characters, as well as the following characters: colon ( : ), forward slash ( \ ), and underscore ( _ ). The value
+characters, as well as the following characters: colon ( : ), forward slash ( \ ), and underscore ( \_ ). The value
 
 of an attribute can be one of the following: 64-bit integer, Unicode string, byte string, or array.
 
@@ -2219,7 +2168,6 @@ TABLE 7-9 Acceptable Elements for a Conditional Expression
 
 <table><tr><td>Expression Element</td><td>Description</td></tr><tr><td>AttributeName</td><td>Tests whether the specified attribute has a non-zero value.</td></tr><tr><td>existsAttributeName</td><td>Tests whether the specified attribute exists in the client context.</td></tr><tr><td>AttributeName Operator Value</td><td>Returns the result of the specified operation. The following operators are defined for use in conditional expressions to test the values of attributes. All these are binary operators (as opposed to unary) and are used in the form AttributeName Operator Value. The operators are Contains any_of, ==, !=, &lt;, &lt;=, &gt;, &gt;=.</td></tr><tr><td>ConditionalExpression || ConditionalExpression</td><td>Tests whether either of the specified conditional expressions is true.</td></tr><tr><td>ConditionalExpression &amp;amp; ConditionalExpression</td><td>Tests whether both of the specified conditional expressions are true.</td></tr><tr><td>!(ConditionalExpression)</td><td>The inverse of a conditional expression.</td></tr><tr><td>Member_of {SidArray}</td><td>Tests whether the SID_AND_ATTRIBUTES array of the client context contains all the security identifiers (SIDs) in the comma-separated list specified by $SidArray.</td></tr></table>
 
-
 A conditional ACE can contain any number of conditions. It is ignored if the resultant evaluation of
 
 the condition is false or applied if the result is true. A conditional ACE can be added to an object using
@@ -2229,7 +2177,7 @@ the AddConditionalAce API and checked using the AuthzAccessCheck API.
 A conditional ACE could specify that access to certain data records within a program should be granted only to a user who meets the following criteria (for example):
 
 - • Holds the Role attribute, with a value of Architect, Program Manager, or Development Lead,
-and the Division attribute with a value of Windows
+  and the Division attribute with a value of Windows
 
 • Whose ManagementChain attribute contains the value John Smith
 
@@ -2245,7 +2193,6 @@ A privilege is the right of an account to perform a particular system-related op
 
 668 CHAPTER 7 Security
 
-
 ---
 
 A system administrator assigns privileges to groups and accounts using tools such as the Active Directory users and Groups MMC snap-in for domain accounts or the Local Security Policy editor (%SystemRoot%\System32\secpol.msc). Figure 7-11 shows the User Rights Assignment configuration in the Local Security Policy editor, which displays the complete list of privileges and account rights available on Windows. Note that the tool is the complete list of privileges and account rights on is account privilege.
@@ -2257,7 +2204,6 @@ Account rights
 Account rights are not enforced by the SRM, nor are they stored in tokens. The function responsible for logon is LsaLogOnList. Winlogon, for example, calls the LogonUser API when a user logs on interactively to a computer, and LogonUser calls LsaLogOnList. LogonUser takes a parameter that indicates the type of login being performed, which includes interactive, network, batch, service, and Terminal Server client.
 
 CHAPTER 7 Security 669
-
 
 ---
 
@@ -2275,7 +2221,6 @@ TABLE 7-10 Account rights
 
 <table><tr><td>User Right</td><td>Role</td></tr><tr><td>Deny logon locally, allow logon locally</td><td>Used for interactive logons that originate on the local machine</td></tr><tr><td>Deny logon over the network, allow logon over the network</td><td>Used for logons that originate from a remote machine</td></tr><tr><td>Deny logon through Terminal Services, allow logon through Terminal Services</td><td>Used for logons through a Terminal Server client</td></tr><tr><td>Deny logon as a service, allow logon as a service</td><td>Used by the service control manager when starting a service in a particular user account</td></tr><tr><td>Deny logon as a batch job, allow logon as a batch job</td><td>Used when performing a logon of type batch</td></tr></table>
 
-
 Windows applications can add and remove user rights from an account by using the LsaAddAccountRights and LsaRemoveAccountRights functions, and they can determine what rights are assigned to an account with LsaEnumerateAccountRights.
 
 ## Privileges
@@ -2290,30 +2235,25 @@ TABLE 7-11 Privileges
 
 <table><tr><td>Privilege</td><td>User Right</td><td>Privilege Usage</td></tr><tr><td>SeAssignPrimaryTokenPrivilege</td><td>Replace a process-level token</td><td>Checked for by various components, such as NtSetInformationJobObject, that set a process&#x27;s token.</td></tr><tr><td>SeAuditPrivilege</td><td>Generate security audits</td><td>Required to generate events for the Security event log with the ReportEvent API.</td></tr><tr><td colspan="3">CHAPTER 7 Security</td></tr><tr><td colspan="3">From the Library of</td></tr></table>
 
-
 ---
 
-TABLE 7-11   Privileges (continued)
+TABLE 7-11 Privileges (continued)
 
 <table><tr><td>Privilege</td><td>User Right</td><td>Privilege Usage</td></tr><tr><td>SeBackupPrivilege</td><td>Back up files and directories</td><td>Causes NTFS to grant the following access to any file or directory, regardless of the security descriptor that's present: READ_CONTROL, ACCESS_SYSTEM, SECURITY, FILE_GENERIC_READ, and FILE_TRAVERSE. Note that when opening a file for backup, the caller must specify the FILE_FLAG_BACKUP, SEMANTICS flag. Also allows corresponding access to registry keys when using RegsaveKey.</td></tr><tr><td>SeChangeNotifyPrivilege</td><td>Bypass traverse checking</td><td>Used by NTFS to avoid checking permissions on intermediate directories of a multilevel directory lookup. Also used by file systems when applications register for notification of changes to the file system structure.</td></tr><tr><td>SeCreateGlobalPrivilege</td><td>Create global objects</td><td>Required for a process to create section and symbolic link objects in the directories of the object manager namespace that are assigned to a different session than the caller.</td></tr><tr><td>SeCreatePagefilePrivilege</td><td>Create a pagefile</td><td>Checked for by NtCreatePagingFile, which is the function used to create a new paging file.</td></tr><tr><td>SeCreatePermanentPrivilege</td><td>Create permanent shared objects</td><td>Checked for by the object manager when creating a permanent object (one that doesn't get deallocated when there are no more references to it).</td></tr><tr><td>SeCreateSymbolicLinkPrivilege</td><td>Create symbolic links</td><td>Checked for by NTFS when creating symbolic links on the file system with the CreateSymbolicLink API.</td></tr><tr><td>SeCreateTokenPrivilege</td><td>Create a token object</td><td>NtCreateToken, the function that creates a token object, checks for this privilege.</td></tr><tr><td>SeDebugPrivilege</td><td>Debug programs</td><td>If the caller has this privilege enabled, the process manager allows access to any process or thread using NtOpenProcess or NtOpenThread, regardless of the process or thread's security descriptor (except for protected processes).</td></tr><tr><td>SeEnableDelegationPrivilege</td><td>Enable computer and user accounts to be trusted for delegation</td><td>Used by Active Directory services to delegate authenticated credentials.</td></tr><tr><td>SeImpersonatePrivilege</td><td>Impersonate a client after authentication</td><td>The process manager checks for this when a thread wants to use a token for impersonation and the token represents a different user than that of the thread's process token.</td></tr><tr><td>SeIncreaseBasePriorityPrivilege</td><td>Increase scheduling priority</td><td>Checked for by the process manager and is required to raise the priority of a process.</td></tr><tr><td>SeIncreaseQuotaPrivilege</td><td>Adjust memory quotas for a process</td><td>Enforced when changing a process's working set thresholds, a process's tagged and nonpaged pool quotas, and a process's CPU rate quota.</td></tr><tr><td>SeIncreaseWorkingSetPrivilege</td><td>Increase a process working set</td><td>Required to call SetProcessWorkingSetSize to increase the minimum working set. This indirectly allows the process to lock up to the minimum working set of memory using VirtualLock.</td></tr></table>
 
-
-CHAPTER 7   Security      671
-
+CHAPTER 7 Security 671
 
 ---
 
-TABLE 7-11  Privileges (continued)
+TABLE 7-11 Privileges (continued)
 
 <table><tr><td>Privilege</td><td>User Right</td><td>Privilege Usage</td></tr><tr><td>SeLoadDriverPrivilege</td><td>Load and unload device drivers</td><td>Checked for by the NtLoadDriver and NtLoadDriver driver functions.</td></tr><tr><td>SeLockMemoryPrivilege</td><td>Lock pages in memory</td><td>Checked for by NtLockVirtualMemory, the kernel implementation of VirtualLock.</td></tr><tr><td>SeMachineAccountPrivilege</td><td>Add workstations to the domain</td><td>Checked for by the Security Account Manager on a domain controller when creating a machine account in a domain.</td></tr><tr><td>SeManageVolumePrivilege</td><td>Perform volume maintenance tasks</td><td>Enforced by file system drivers during a volume open operation, which is required to perform disk-checking and defragmenting activities.</td></tr><tr><td>SeProfileSingleProcessPrivilege</td><td>Profile single process</td><td>Checked by Superfetch and the prefetcher when requesting information for an individual process through the NtQuerySystemInformation API.</td></tr><tr><td>SeRelabelPrivilege</td><td>Modify an object label</td><td>Checked for by the SMB when raising the integrity level of an object owned by another user, or when attempting to raise the integrity level of an object higher than that of the caller&#x27;s token.</td></tr><tr><td>SeRemoteShutdownPrivilege</td><td>Force shutdown from a remote system</td><td>Winlogon checks that remote callers of the IntateSystemShutdown function have this privilege.</td></tr><tr><td>SeRestorePrivilege</td><td>Restore files and directories</td><td>This privilege causes NTFS to grant the following access to any file or directory, regardless of the security descriptor that&#x27;s present: WRITE_DAC, WRITE_OWNER, ACCESS_SYSTEM_SECURITY, FILE_GENERIC_WRITE, FILE_WRITE_WRITE, FILE_WRITE_WRITE, FILE_WRITE_WRITE, FILE_WRITE_WRITE, FILE_WRITE_WRITE, FILE_WRITE</td></tr></table>
 
-
 ---
 
-TABLE 7-11  Privileges (continued)
+TABLE 7-11 Privileges (continued)
 
 <table><tr><td>Privilege</td><td>User Right</td><td>Privilege Usage</td></tr><tr><td>SeTakeOwnershipPrivilege</td><td>Take ownership of files and other objects</td><td>Required to take ownership of an object without being granted discretionary access.</td></tr><tr><td>SeTcbPrivilege</td><td>Act as part of the operating system</td><td>Checked for by the SRM when the session ID is set in a token, by the Plug and Play manager for Plug and Play event creation and management, by Broccoli Event Manager for Broccoli Event Manager with BSM_ALLDESKTOPS, by LsaRegisterLogonProcess, and when specifying an application as a VDM with NtSetInformationProcess.</td></tr><tr><td>SeTimeZonePrivilege</td><td>Change the time zone</td><td>Required to change the time zone.</td></tr><tr><td>SeTrustedCredManAccessPrivilege</td><td>Access Credential Manager as a trusted caller</td><td>Checked by the Credential Manager to verify that it should trust the caller with credential information that can be queried in plaintext. It is granted only to Winlogon by default.</td></tr><tr><td>SeUndockPrivilege</td><td>Remove computer from a docking station</td><td>Checked for by the user-mode Plug and Play manager when either a computer unlock is initiated or a device eject request is made.</td></tr><tr><td>SeUnsolicitedInputPrivilege</td><td>Receive unsolicited data from a terminal device</td><td>This privilege isn&#x27;t currently used by Windows.</td></tr></table>
-
 
 When a component wants to check a token to see whether a privilege is present, it uses the PrivilegeCheck or LsaEnumerateAccountRights APIs if running in user mode and SeSinglePrivilegeCheck or SePrivilegeCheck if running in kernel mode. The privilege-related APIs are not account-right aware, but the account-right APIs are privilege-aware.
 
@@ -2334,16 +2274,13 @@ of the computer (Windows 10):
 Alternatively, open the Settings app and search for time to open the Date and Time
 
 settings page.
-CHAPTER 7   Security      673
-
+CHAPTER 7 Security 673
 
 ---
 
 3. Right-click the SystemSettings.exe process in Process Explorer and choose Properties.
 
-
 Then click the Security tab in the Properties dialog box. You should see that the
-
 
 SeTimeZonePreviewLege privilege is disabled.
 
@@ -2355,8 +2292,7 @@ Security tab, you should now see that the SetTimeZonePrivileges privilege is ena
 
 ![Figure](figures/Winternals7thPt1_page_691_figure_003.png)
 
-674    CHAPTER 7   Security
-
+674 CHAPTER 7 Security
 
 ---
 
@@ -2400,43 +2336,42 @@ Several privileges are so powerful that a user to which they are assigned is eff
 
 This section lists the privileges and discusses some of the ways they can be exploited. Other privileges, such as Lock Pages in Physical Memory (SeLockMemoryPrivileges), can be exploited for denialof-service attacks on a system, but these are not discussed. Note that on systems with UAC enabled, these privileges will be granted only to applications running at high integrity level or higher, even if the account possesses them:
 
-CHAPTER 7   Security      675
-
+CHAPTER 7 Security 675
 
 ---
 
 - ■ Debug programs (SeDebugPrivilege) A user with this privilege can open any process on the
-system (except for a protected process) without regard to the security descriptor present on the
-process. For example, the user could implement a program that opens the Lsass process, copy
-executable code into its address space, and then inject a thread with the CreateRemoteThread
-Windows API to execute the injected code in a more-privileged security context. The code
-could grant the user additional privileges and group memberships.
-■ Take ownership (SeTakeOwnershipPrivilege) This privilege allows a holder to take owner-
-ship of any securable object (even protected processes and threads) by writing his own SID into
-the owner field of the object's security descriptor. Recall that an owner is always granted per-
-mission to read and modify the DACL of the security descriptor, so a process with this privilege
-could modify the DACL to grant itself full access to the object and then close and reopen the
-object with full access. This would allow the owner to see sensitive data and to even replace sys-
-tem files that execute as part of normal system operation, such as Lsass, with his own programs
-that grant a user elevated privileges.
-■ Restore files and directories (SeRestorePrivilege) A user assigned this privilege can re-
-place any file on the system with her own. She could exploit this power by replacing system files
-as described in the preceding paragraph.
-■ Load and unload device drivers (SeLoadDriverPrivilege) A malicious user could use this
-privilege to load a device driver into the system. Device drivers are considered trusted parts
-of the operating system that can execute within it with System account credentials, so a driver
-could launch privileged programs that assign the user other rights.
-■ Create a token object (SeCreateTokenPrivilege) This privilege can be used in the obvious
-way to generate tokens that represent arbitrary user accounts with arbitrary group membership
-and privilege assignment.
-■ Act as part of operating system (SeIcbPrivilege) LsaRegisterLogonProcess, the function
-a process calls to establish a trusted connection to Lsass, checks for this privilege. A malicious user
-with this privilege can establish a trusted-Lsass connection and then execute LsaLogonUser, a
-function used to create new logon sessions. LsaLogonUser requires a valid user name and pass-
-word and accepts an optional list of SIDs that it adds to the initial token created for a new logon
-session. The user could therefore use her own user name and password to create a new logon
-session that includes the SIDs of more privileged groups or users in the resulting token.
-![Figure](figures/Winternals7thPt1_page_693_figure_001.png)
+  system (except for a protected process) without regard to the security descriptor present on the
+  process. For example, the user could implement a program that opens the Lsass process, copy
+  executable code into its address space, and then inject a thread with the CreateRemoteThread
+  Windows API to execute the injected code in a more-privileged security context. The code
+  could grant the user additional privileges and group memberships.
+  ■ Take ownership (SeTakeOwnershipPrivilege) This privilege allows a holder to take owner-
+  ship of any securable object (even protected processes and threads) by writing his own SID into
+  the owner field of the object's security descriptor. Recall that an owner is always granted per-
+  mission to read and modify the DACL of the security descriptor, so a process with this privilege
+  could modify the DACL to grant itself full access to the object and then close and reopen the
+  object with full access. This would allow the owner to see sensitive data and to even replace sys-
+  tem files that execute as part of normal system operation, such as Lsass, with his own programs
+  that grant a user elevated privileges.
+  ■ Restore files and directories (SeRestorePrivilege) A user assigned this privilege can re-
+  place any file on the system with her own. She could exploit this power by replacing system files
+  as described in the preceding paragraph.
+  ■ Load and unload device drivers (SeLoadDriverPrivilege) A malicious user could use this
+  privilege to load a device driver into the system. Device drivers are considered trusted parts
+  of the operating system that can execute within it with System account credentials, so a driver
+  could launch privileged programs that assign the user other rights.
+  ■ Create a token object (SeCreateTokenPrivilege) This privilege can be used in the obvious
+  way to generate tokens that represent arbitrary user accounts with arbitrary group membership
+  and privilege assignment.
+  ■ Act as part of operating system (SeIcbPrivilege) LsaRegisterLogonProcess, the function
+  a process calls to establish a trusted connection to Lsass, checks for this privilege. A malicious user
+  with this privilege can establish a trusted-Lsass connection and then execute LsaLogonUser, a
+  function used to create new logon sessions. LsaLogonUser requires a valid user name and pass-
+  word and accepts an optional list of SIDs that it adds to the initial token created for a new logon
+  session. The user could therefore use her own user name and password to create a new logon
+  session that includes the SIDs of more privileged groups or users in the resulting token.
+  ![Figure](figures/Winternals7thPt1_page_693_figure_001.png)
 
 Note The use of an elevated privilege does not extend past the machine boundary to the network because any interaction with another computer requires authentication with a domain controller and validation of domain passwords. Domain passwords are not stored on a computer either in plaintext or encrypted form, so they are not accessible to malicious code.
 
@@ -2490,8 +2425,7 @@ applications to generate application-defined audits. Figure 7-14 depicts this ov
 
 FIGURE 7-14 Flow of security audit records.
 
-678    CHAPTER 7   Security
-
+678 CHAPTER 7 Security
 
 ---
 
@@ -2512,12 +2446,13 @@ As was shown in Figure 7-13, object access auditing is disabled by default (as a
 You can observe object access auditing by following these steps:
 
 - 1. In Explorer, navigate to a file to which you would normally have access (such as a
-text file), open its Properties dialog box, click the Security tab, and then select the
-Advanced settings.
+     text file), open its Properties dialog box, click the Security tab, and then select the
+     Advanced settings.
 
 2. Click the Auditing tab and click through the administrative privileges warning. The
-resulting dialog box allows you to add auditing of access control entries to the file's
-system access control list.
+   resulting dialog box allows you to add auditing of access control entries to the file's
+   system access control list.
+
 ---
 
 ![Figure](figures/Winternals7thPt1_page_697_figure_000.png)
@@ -2537,7 +2472,6 @@ Notepad for a text file).
 7. Click the Start menu, type event, and choose Event Viewer.
 
 680 CHAPTER 7 Security
-
 
 ---
 
@@ -2578,8 +2512,7 @@ because the accessor was the owner of the file. The others were granted because 
 indicated access control entry.
 ![Figure](figures/Winternals7thPt1_page_698_figure_001.png)
 
-CHAPTER 7   Security      681
-
+CHAPTER 7 Security 681
 
 ---
 
@@ -2641,8 +2574,7 @@ In addition to the Audit Policy settings described previously, the Local Securit
 
 FIGURE 7-15 The Local Security Policy editor's Advanced Audit Policy Configuration settings.
 
-CHAPTER 7   Security      683
-
+CHAPTER 7 Security 683
 
 ---
 
@@ -2682,7 +2614,6 @@ TABLE 7-12 High-level comparison of UWP and desktop apps
 
 <table><tr><td></td><td>UWP App</td><td>Desktop (Classic) App</td></tr><tr><td>Device Support</td><td>Runs on all Windows device families</td><td>Runs on PCs only</td></tr><tr><td>APIs</td><td>Can access WinRT, subset of COM, and subset of Win32 APIs</td><td>Can access COM, Win32, and subset of WinRT APIs</td></tr><tr><td>Identity</td><td>Strong app identity (static and dynamic)</td><td>Raw EXEs and processes</td></tr><tr><td>Information</td><td>Declarative APFX manifest</td><td>Opaque binaries</td></tr><tr><td>Installation</td><td>Self-contained APFX package</td><td>Loose files or MSI</td></tr><tr><td>App Data</td><td>Isolated per-user/per-app storage (local and roaming)</td><td>Shared user profile</td></tr><tr><td>Lifecycle</td><td>Participates in app resource management and PLM</td><td>Process-level lifecycle</td></tr><tr><td>Instancing</td><td>Single instance only</td><td>Any number of instances</td></tr></table>
 
-
 ![Figure](figures/Winternals7thPt1_page_703_figure_002.png)
 
 FIGURE 7-17 The Windows platform landscape.
@@ -2690,59 +2621,58 @@ FIGURE 7-17 The Windows platform landscape.
 A few items in Figure 7-17 are worth elaborating on:
 
 - ■ UWP apps can produce normal executables, just like desktop apps. Wwahost.exe (%SystemRoot%\System32\wwahost.exe) is used to host HTML/JavaScript-based UWP apps, as those produce a DLL, not an executable.
-■ The UWP is implemented by the Windows Runtime APIs, which are based on an enhanced version of COM. Language projections are provided for C++ (through proprietary language extensions known as C++/CX), .NET languages, and JavaScript. These projections make it relatively easy to access WinRT types, methods, properties, and events from developers' familiar environments.
-■ Several bridging technologies are available, which can transform other types of applications into UWP. See the MSDN documentation for more information on utilizing these technologies.
-■ The Windows Runtime is layered on top of the Windows subsystem DLLs, just like the .NET Framework. It has no kernel components and is not part of a different subsystem because it still leverages the same Win32 APIs that the system offers. However, some policies are implemented in the kernel, as well as the general support for AppContainers.
-APTER 7 Security
+  ■ The UWP is implemented by the Windows Runtime APIs, which are based on an enhanced version of COM. Language projections are provided for C++ (through proprietary language extensions known as C++/CX), .NET languages, and JavaScript. These projections make it relatively easy to access WinRT types, methods, properties, and events from developers' familiar environments.
+  ■ Several bridging technologies are available, which can transform other types of applications into UWP. See the MSDN documentation for more information on utilizing these technologies.
+  ■ The Windows Runtime is layered on top of the Windows subsystem DLLs, just like the .NET Framework. It has no kernel components and is not part of a different subsystem because it still leverages the same Win32 APIs that the system offers. However, some policies are implemented in the kernel, as well as the general support for AppContainers.
+  APTER 7 Security
 
-From the Library of
----
+## From the Library of
 
 - ■ The Windows Runtime APIs are implemented in DLLs residing in the %SystemRoot%\System32
-directory, with names in the form Windows.Xxx.Yyy...DLL, where the file name usually indicates
-the Windows Runtime API namespace implemented. For example, Windows.Globalization.DLL
-implements the classes residing in the windows.Globalization namespace. (See the MSDN
-documentation for the complete WinRT API reference.)
+  directory, with names in the form Windows.Xxx.Yyy...DLL, where the file name usually indicates
+  the Windows Runtime API namespace implemented. For example, Windows.Globalization.DLL
+  implements the classes residing in the windows.Globalization namespace. (See the MSDN
+  documentation for the complete WinRT API reference.)
+
 ## The AppContainer
 
 We've seen the steps required to create processes back in Chapter 3; we've also seen some of the extra steps required to create UWP processes. The initiation of creation is performed by the DCOMLaunch service, because UWP packages support a set of protocols, one of which is the Launch protocol. The resulting process gets to run inside an AppContainer. Here are several characteristics of packaged processes running inside an AppContainer:
 
 - ■ The process token integrity level is set to Low, which automatically restricts access to many
-objects and limits access to certain APIs or functionality for the process, as discussed earlier
-in this chapter.
-■ UWP processes are always created inside a job (one job per UWP app). This job manages the
-UWP process and any background processes that execute on its behalf (through nested jobs).
-The jobs allow the Process State Manager (PSM) to suspend or resume the app or background
-processing in a single stroke.
-■ The token for UWP processes has an AppContainer SID, which represents a distinct identity
-based on the SHA-2 hash of the UWP package name. As you'll see, this SID is used by the system
-and other applications to explicitly allow access to files and other kernel objects. This SID is part
-of the APPLICATION_PACKAGE AUTHORITY instead of the NT AUTHORITY you've mostly seen so
-far in this chapter. Thus, it begins with S-1-15-2-in its string format, corresponding to SECURITY_
-APP_PACKAGE_BASE_RID (15) and SECURITY_APP_PACKAGE_BASE_RID (2). Because a SHA-2
-hash is 32 bytes, there are a total of eight RIDs (recall that a RID is the size of a 4-byte ULONG) in
-the remainder of the SID.
-■ The token may contain a set of capabilities, each represented with a SID. These capabilities are
-declared in the application manifest and shown on the app's page in the store. Stored in the ca-
-pability section of the manifest, they are converted to SID format using rules we'll see shortly, and
-belong to the same SID authority as in the previous bullet, but using the well-known SECURITY_
-CAPABILITY_BASE_RID (3) instead. Various components in the Windows Runtime, user-mode
-device-access classes, and kernel can look for capabilities to allow or deny certain operations.
-■ The token may only contain the following privileges: SeChangeNotifyPrivilege, SeIncrease-
-WorkingSetPrivilege, SeShutdownPrivilege, SetTimeZonePrivilege, and SetIndockPrivilege.
-These are the default set of privileges associated with standard user accounts. Additionally, the
-AppContainerPrivilegesEnabledExt function part of the ms-win-ntos-ksecurity API Set
-contract extension can be present on certain devices to further restrict which privileges are
-enabled by default.
-CHAPTER 7   Security      687
-
+  objects and limits access to certain APIs or functionality for the process, as discussed earlier
+  in this chapter.
+  ■ UWP processes are always created inside a job (one job per UWP app). This job manages the
+  UWP process and any background processes that execute on its behalf (through nested jobs).
+  The jobs allow the Process State Manager (PSM) to suspend or resume the app or background
+  processing in a single stroke.
+  ■ The token for UWP processes has an AppContainer SID, which represents a distinct identity
+  based on the SHA-2 hash of the UWP package name. As you'll see, this SID is used by the system
+  and other applications to explicitly allow access to files and other kernel objects. This SID is part
+  of the APPLICATION*PACKAGE AUTHORITY instead of the NT AUTHORITY you've mostly seen so
+  far in this chapter. Thus, it begins with S-1-15-2-in its string format, corresponding to SECURITY*
+  APP*PACKAGE_BASE_RID (15) and SECURITY_APP_PACKAGE_BASE_RID (2). Because a SHA-2
+  hash is 32 bytes, there are a total of eight RIDs (recall that a RID is the size of a 4-byte ULONG) in
+  the remainder of the SID.
+  ■ The token may contain a set of capabilities, each represented with a SID. These capabilities are
+  declared in the application manifest and shown on the app's page in the store. Stored in the ca-
+  pability section of the manifest, they are converted to SID format using rules we'll see shortly, and
+  belong to the same SID authority as in the previous bullet, but using the well-known SECURITY*
+  CAPABILITY_BASE_RID (3) instead. Various components in the Windows Runtime, user-mode
+  device-access classes, and kernel can look for capabilities to allow or deny certain operations.
+  ■ The token may only contain the following privileges: SeChangeNotifyPrivilege, SeIncrease-
+  WorkingSetPrivilege, SeShutdownPrivilege, SetTimeZonePrivilege, and SetIndockPrivilege.
+  These are the default set of privileges associated with standard user accounts. Additionally, the
+  AppContainerPrivilegesEnabledExt function part of the ms-win-ntos-ksecurity API Set
+  contract extension can be present on certain devices to further restrict which privileges are
+  enabled by default.
+  CHAPTER 7 Security 687
 
 ---
 
 - ■ The token will contain up to four security attributes (see the section on attribute-based access
-control earlier in this chapter) that identify this token as being associated with a UWP packaged
-application. These attributes are added by the DcomLaunch service as indicated earlier, which is
-responsible for the activation of UWP applications. They are as follows:
+  control earlier in this chapter) that identify this token as being associated with a UWP packaged
+  application. These attributes are added by the DcomLaunch service as indicated earlier, which is
+  responsible for the activation of UWP applications. They are as follows:
 
 • WIN://PKG This identifies this token as belonging to a UWP packaged application. It con-
 tains an integer value with the application's origin as well as some flags. See Table 7-13 and
@@ -2774,13 +2704,11 @@ TABLE 7-13 Package origins
 
 <table><tr><td>Origin</td><td>Meaning</td></tr><tr><td>Unknown (0)</td><td>The package origin is unknown.</td></tr><tr><td>Unsigned (1)</td><td>The package is unsigned.</td></tr><tr><td>Inbox (2)</td><td>The package is associated with a built-in (inbox) Windows application.</td></tr><tr><td>Store (3)</td><td>The package is associated with a UWP application downloaded from the store. This origin is validated by checking if the DACL of the file associated with the main UWP application's executable contains a trust ACE.</td></tr><tr><td>Developer Unsigned (4)</td><td>The package is associated with an unsigned developer key.</td></tr><tr><td>Developer Signed (5)</td><td>The package is associated with a signed developer key.</td></tr><tr><td>Line-of-Business (6)</td><td>The package is associated with a side-loaded line-of-business (LOB) application.</td></tr></table>
 
-
 ---
 
 TABLE 7-14 Package flags
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>PSM_ACTIVATION_TOKEN_PACKAGED_APPLICATION (0x1)</td><td>This indicates that the AppContainer UWP application is stored in AppX packaged format. This is the default.</td></tr><tr><td>PSM_ACTIVATION_TOKEN_SHARED_ENTITY (0x2)</td><td>This indicates that this token is being used for multiple executables all part of the same AppX packaged UWP application.</td></tr><tr><td>PSM_ACTIVATION_TOKEN_FULL_TRUST (0x4)</td><td>This indicates that this AppContainer token is being used to host a Project Centennial (Windows Bridge for Desktop) converted Win32 application.</td></tr><tr><td>PSM_ACTIVATION_TOKEN_NATIVE_SERVICE (0x8)</td><td>This indicates that this AppContainer token is being used to host a packaged service created by the Service Control Manager (SCM)&#x27;s Resource Manager. See Chapter 9 in Part 2 for more information on services.</td></tr><tr><td>PSM_ACTIVATION_TOKEN_DEVELOPMENT_APP (0x10)</td><td>This indicates that this is an internal development application. Not used on retail systems.</td></tr><tr><td>BREAKAWAY_INHIBITED (0x20)</td><td>The package cannot create a process that is not itself packaged as well. This is set by using the PROC_THREAD_ATTRIBUTE_DESKTOP_APP_POLICY process-creation attribute. (See Chapter 3 for more information.)</td></tr></table>
-
 
 ## EXPERIMENT: Viewing UWP process information
 
@@ -2788,8 +2716,7 @@ There are several ways to look at UWP processes, some more obvious than others. 
 
 ![Figure](figures/Winternals7thPt1_page_706_figure_004.png)
 
-CHAPTER 7   Security      689
-
+CHAPTER 7 Security 689
 
 ---
 
@@ -2833,8 +2760,7 @@ Accessch v6.10 - Reports effective permissions for sealurable objects Copyright 
 [7416] SearchUI.exe
 ```
 
-CHAPTER 7   Security      691
-
+CHAPTER 7 Security 691
 
 ---
 
@@ -2924,34 +2850,33 @@ This situation causes compatibility problems. Without access to even the most ba
 Note So far we've implied that each UWP packaged application corresponds to one AppContainer token. However, this doesn't necessarily imply that only a single executable file can be associated with an AppContainer. UWP packages can contain multiple executable files, which all belong to the same AppContainer. This allows them to share the same SID and capabilities and exchange data between each other, such as a micro-service back-end executable and a foreground front-end executable.
 
 - ■ The AppContainer SID's string representation is used to create a subdirectory in the object
-manager's namespace under \Sessions\\AppDataContainerNamedObjects. This becomes the pri-
-vate directory of named kernel objects. This specific subdirectory object is then ACLed with the
-AppContainer SID associated with the AppContainer that has an allow-all access mask. This is in
-contrast to desktop apps, which all use the \Sessions\BaselineNamedObjects subdirectory (within
-the same session x). We'll discuss the implications of that shortly, as well as the requirement for
-the token to now store handles.
-■ The token will contain a LowBox number, which is a unique identifier into an array of LowBox
-Number Entry structures that the kernel stores in the g_SessionLowboxArray global variable.
-Each of these maps to a SEP_LOWBOX_NUMBER_ENTRY structure that, most importantly, contains
-an atom table unique to this AppContainer, because the Windows Subsystem Kernel Mode
-Driver (Win32k.sys) does not allow AppContainers access to the global atom table.
-CHAPTER 7   Security      693
-
+  manager's namespace under \Sessions\\AppDataContainerNamedObjects. This becomes the pri-
+  vate directory of named kernel objects. This specific subdirectory object is then ACLed with the
+  AppContainer SID associated with the AppContainer that has an allow-all access mask. This is in
+  contrast to desktop apps, which all use the \Sessions\BaselineNamedObjects subdirectory (within
+  the same session x). We'll discuss the implications of that shortly, as well as the requirement for
+  the token to now store handles.
+  ■ The token will contain a LowBox number, which is a unique identifier into an array of LowBox
+  Number Entry structures that the kernel stores in the g_SessionLowboxArray global variable.
+  Each of these maps to a SEP_LOWBOX_NUMBER_ENTRY structure that, most importantly, contains
+  an atom table unique to this AppContainer, because the Windows Subsystem Kernel Mode
+  Driver (Win32k.sys) does not allow AppContainers access to the global atom table.
+  CHAPTER 7 Security 693
 
 ---
 
 - ■ The file system contains a directory in %LOCALAPPDATA% called Packages. Inside it are the
-package monikers (the string version of the AppContainer SID—that is, the package name) of
-all the installed UWP applications. Each of these application directories contains application-
-specific directories, such as TempState, RoamingState, Settings, LocalCache, and others, which
-are all ACLed with the specific AppContainer SID corresponding to the application, set to an
-allow-all access mask.
-■ Within the Settings directory is a Settings.dat file, which is a registry hive file that is loaded as
-an application hive. (You will learn more about application hives in Chapter 9 in Part 2.) The hive
-acts as the local registry for the application, where WinRT APIs store the various persistent state
-of the application. Once again, the ACL on the registry keys explicitly grants allow-all access to
-the associated AppContainer SID.
-These four jails allow AppContainers to securely, and locally, store their file system, registry, and atom table without requiring access to sensitive user and system areas on the system. That being said, what about the ability to access, at least in read-only mode, critical system files (such as Ntdll.dll and Kernel32.dll) or registry keys (such as the ones these libraries will need), or even named objects (such as the \RPCControl\DNSResolver ALPC port used for DNS lookups)? it would not make sense, on each UWP application or uninstallation, to re-ACL entire directories, registry keys, and object namespaces to add or remove various SIDs.
+  package monikers (the string version of the AppContainer SID—that is, the package name) of
+  all the installed UWP applications. Each of these application directories contains application-
+  specific directories, such as TempState, RoamingState, Settings, LocalCache, and others, which
+  are all ACLed with the specific AppContainer SID corresponding to the application, set to an
+  allow-all access mask.
+  ■ Within the Settings directory is a Settings.dat file, which is a registry hive file that is loaded as
+  an application hive. (You will learn more about application hives in Chapter 9 in Part 2.) The hive
+  acts as the local registry for the application, where WinRT APIs store the various persistent state
+  of the application. Once again, the ACL on the registry keys explicitly grants allow-all access to
+  the associated AppContainer SID.
+  These four jails allow AppContainers to securely, and locally, store their file system, registry, and atom table without requiring access to sensitive user and system areas on the system. That being said, what about the ability to access, at least in read-only mode, critical system files (such as Ntdll.dll and Kernel32.dll) or registry keys (such as the ones these libraries will need), or even named objects (such as the \RPCControl\DNSResolver ALPC port used for DNS lookups)? it would not make sense, on each UWP application or uninstallation, to re-ACL entire directories, registry keys, and object namespaces to add or remove various SIDs.
 
 To solve this problem, the security subsystem understands a specific group SID called ALL APPLICATION PACKAGES, which automatically binds itself to any AppContainer token. Many critical system locations, such as %SystemRoot%\System32 and HKLM\Software\Microsoft\Windows\CurrentVersion, will have this SID as part of their DACL, typically with a read or read-and-execute access mask. Certain objects in the object manager namespace will have this as well, such as the DNSResolver ALPC port in the \RPC Control object manager directory. Other examples include certain COM objects, which grant the execute right. Although not officially documented, third-party developers, as they create non-UWP applications, can also allow interactions with UWP applications by also applying this SID to their own resources.
 
@@ -2971,7 +2896,6 @@ attribute named WIN: //NOALLAPPPKG,with an integer value set to 1.
 
 694 CHAPTER 7 Security
 
-
 ---
 
 Of course, this takes us back to the same problem: How would such an application even be able to load NtDll.dll, which is key to any process initialization? Windows 10 version 1607 introduces a new group, called ALL RESTRICTED APPLICATION PACKAGES, which takes care of this problem. For example, the System32 directory now also contains this SID, also set to allow read and execute permissions, because loading DLLs in this directory is key even to the most sandboxed process. However, the DNSResolver ALPC port does not, so such an AppContainer would lose access to DNS.
@@ -2987,8 +2911,7 @@ In this experiment, we'll look at the security attributes of some of the directo
 sponding to Calculator’s AppContainer SID. (You saw it in a previous experiment.)
 ![Figure](figures/Winternals7thPt1_page_712_figure_004.png)
 
-CHAPTER 7   Security      695
-
+CHAPTER 7 Security 695
 
 ---
 
@@ -3008,8 +2931,7 @@ simply means Calculator can create kernel objects under this directory.
 
 5. In Explorer, open the %SystemRoot% directory (for example, C:\Windows), right-click the System32 directory, select Properties, and click the Security tab. You should see the read and execute permissions for all application packages and all restricted application packages (if using Windows 10 version 1607 or later):
 
-696    CHAPTER 7   Security
-
+696 CHAPTER 7 Security
 
 ---
 
@@ -3049,8 +2971,7 @@ Locked 0.
 !kbd .for (r @$t3 = 0; @$t3 < @$1; r @$t3 = @$3 + 1) { ?? (wchar_t*)0$t0->
 ```
 
-CHAPTER 7   Security      697
-
+CHAPTER 7 Security 697
 
 ---
 
@@ -3127,7 +3048,6 @@ You'll see many types of entries in this list. For example, the Capability entri
 
 CHAPTER 7 Security 699
 
-
 ---
 
 Other entries are prefixed with uap, rescap, and wnicap. One of these (rescap) refers to restricted capabilities. These are capabilities that require special onboarding from Microsoft and custom approvals before being allowed on the store. In Cortana's case, these include capabilities such as accessing SMS text messages, emails, contacts, location, and user data. Windows capabilities, on the other hand, refer to capabilities that are reserved for Windows and system applications. No store application can use these. Finally, UAP capabilities refer to standard capabilities that anyone can request on the store. (Recall that UAP is the older name for UWV.)
@@ -3150,13 +3070,12 @@ lock down access to a particular app through a common security check instead of 
 
 validating the package SID separately.
 
-■ Each capability is re-encoded as a group SID through the use of the SECURITY_CAPABILITY_APP_
+■ Each capability is re-encoded as a group SID through the use of the SECURITY*CAPABILITY_APP*
 
 RID (1024) RID as an additional sub-authority preceding the regular eight-capability hash RIDs.
 After the capabilities are encoded into the token, various components of the system will read them to determine whether an operation being performed by an AppContainer should be permitted. You'll note most of the APIs are undocumented, as communication and interoperability with UWP applications is not officially supported and best left to broker services, inbox drivers, or kernel components. For example, the kernel and drivers can use the RtlCapabilityCheck API to authenticate access to certain hardware interfaces or APIs.
 
-700    CHAPTER 7   Security
-
+700 CHAPTER 7 Security
 
 ---
 
@@ -3186,8 +3105,7 @@ SearchUI.exe shows the following (sorted by the Flags column):
 
 Clearly, Cortana has obtained many capabilities—all the ones in its manifest. Some are those that were originally in Windows 8 and are known to functions like ISEW11KnownSID, for which Process Explorer shows a friendly name. Other capabilities are just shown using their SID, as they represent either hashes or GUIDs, as discussed.
 
-CHAPTER 7   Security      701
-
+CHAPTER 7 Security 701
 
 ---
 
@@ -3299,8 +3217,7 @@ Global\. This creates the object in the session 0 object directory located in \B
 
 to Figure 7-18).
 
-CHAPTER 7   Security      703
-
+CHAPTER 7 Security 703
 
 ---
 
@@ -3316,8 +3233,7 @@ Windows Runtime. (See the MSDN documentation for more information.)
 
 Sharing kernel objects between desktop apps and UWP apps is possible, and often done by broker services. For example, when requesting access to a file in the Documents folder (and getting the right capability validated) from the file picker broker, the UWP app will receive a file handle that it can use for reads and writes directly, without the cost of marshalling requests back and forth. This is achieved by having the broker duplicate the file handle it obtained directly in the handle table of the UWP application. (More information on handle duplication appears in Chapter 8 in Part 2.) To simplify things even further, the ALPC subsystem (also described in Chapter 8) allows the automatic transfer of handles in this way through ALPC handle attributes, and the Remote Procedure Call (RPC) services that use ALPC as their underlying protocol can use this functionality as part of their interfaces. Marshallable handles in the IDL file will automatically be transferred in this way through the ALPC subsystem.
 
-704    CHAPTER 7   Security
-
+704 CHAPTER 7 Security
 
 ---
 
@@ -3341,8 +3257,7 @@ Note Communication between a desktop app and a UWP is not usually required becau
 
 In a typical Win32 application, the presence of the session-local and global BaseNamedObjects directory is guaranteed by the Windows subsystem, as it creates this on boot and session creation. Unfortunately, the AppContainerBaseNamedObjects directory is actually created by the launch application itself. In the case of UWP activation, this is the trusted DComLaunch service, but recall that not all AppContainers are necessarily tied to UWP. They can also be manually created through the right process-creation attributes. (See Chapter 3 for more information on which ones to use.) In this case, it's possible for an untrusted application to have created the object directory (and required symbolic links within it), which would result
 
-CHAPTER 7   Security      705
-
+CHAPTER 7 Security 705
 
 ---
 
@@ -3404,8 +3319,7 @@ Locked 0.
         Job                          ffff828c4d914060
 ```
 
-706    CHAPTER 7   Security
-
+706 CHAPTER 7 Security
 
 ---
 
@@ -3466,8 +3380,7 @@ PROCESS ffff828cd71b3600
     SessionId: 1 Cid: 27c4   Feb: 3fdbf2f000  ParentCid: 2324
 ```
 
-CHAPTER 7   Security      707
-
+CHAPTER 7 Security 707
 
 ---
 
@@ -3584,8 +3497,7 @@ allows Winlogon to simply restart a new LogonUI process should it crash for any 
 
 Winlogon is the only process that intercepts logon requests from the keyboard. These are sent through an RPC message from Win32x.sys. Winlogon immediately launches the LogonUI application to
 
-710    CHAPTER 7   Security
-
+710 CHAPTER 7 Security
 
 ---
 
@@ -3602,36 +3514,35 @@ In addition to supporting alternative credential providers, LogonUI can load add
 During system initialization, before any user applications are active, Winlogon performs the following steps to ensure that it controls the workstation once the system is ready for user interaction:
 
 - 1. It creates and opens an interactive window station (for example, \Sessions\1\Windows\
-WindowStations\WinSta0 in the object manager namespace) to represent the keyboard,
-mouse, and monitor. Winlogon creates a security descriptor for the station that has one and
-only one ACE containing only the system SID. This unique security descriptor ensures that no
-other process can access the workstation unless explicitly allowed by Winlogon.
+     WindowStations\WinSta0 in the object manager namespace) to represent the keyboard,
+     mouse, and monitor. Winlogon creates a security descriptor for the station that has one and
+     only one ACE containing only the system SID. This unique security descriptor ensures that no
+     other process can access the workstation unless explicitly allowed by Winlogon.
 
 2. It creates and opens two desktops: an application desktop (\Sessions\1\Windows\WinSta0\
-Default, also known as the interactive desktop) and a Winlogon desktop (\Sessions\1\Windows\
-WinSta0\Winlogon, also known as the Secure Desktop). The security on the Winlogon desk-
-top is created so that only Winlogon can access that desktop. The other desktop allows both
-CHAPTER 7   Security      711
-
+   Default, also known as the interactive desktop) and a Winlogon desktop (\Sessions\1\Windows\
+   WinSta0\Winlogon, also known as the Secure Desktop). The security on the Winlogon desk-
+   top is created so that only Winlogon can access that desktop. The other desktop allows both
+   CHAPTER 7 Security 711
 
 ---
 
 Winlogon and users to access it. This arrangement means that any time the Winlogon desktop is active, no other process has access to any active code or data associated with the desktop. Windows uses this feature to protect the secure operations that involve passwords and locking and unlocking the desktop.
 
 - 3. Before anyone logs on to a computer, the visible desktop is Winlogon's. After a user logs on,
-pressing the SAS sequence (by default, Ctrl+Alt+Del) switches the desktop from Default to
-Winlogon and launches LogonUI. (This explains why all the windows on your interactive desktop
-seem to disappear when you press Ctrl+Alt+Del, and then return when you dismiss the Windows
-Security dialog box.) Thus, the SAS always brings up a Secure Desktop controlled by Winlogon.
+     pressing the SAS sequence (by default, Ctrl+Alt+Del) switches the desktop from Default to
+     Winlogon and launches LogonUI. (This explains why all the windows on your interactive desktop
+     seem to disappear when you press Ctrl+Alt+Del, and then return when you dismiss the Windows
+     Security dialog box.) Thus, the SAS always brings up a Secure Desktop controlled by Winlogon.
 
 4. It establishes an ALPC connection with Lsas. This connection will be used for exchang-
-ing information during logon, logoff, and password operations, and is made by calling
-LsaRegisterLogonProcess.
+   ing information during logon, logoff, and password operations, and is made by calling
+   LsaRegisterLogonProcess.
 
 5. It registers the Winlogon RPC message server, which listens for SAS, logoff, and workstation
-lock notifications from Win32k. This measure prevents Trojan horse programs from gaining
-control of the screen when the SAS is entered.
-![Figure](figures/Winternals7thPt1_page_729_figure_002.png)
+   lock notifications from Win32k. This measure prevents Trojan horse programs from gaining
+   control of the screen when the SAS is entered.
+   ![Figure](figures/Winternals7thPt1_page_729_figure_002.png)
 
 Note The Wininit process performs steps similar to steps 1 and 2 to allow legacy interactive services running on session 0 to display windows, but it does not perform any other steps because session 0 is not available for user logon.
 
@@ -3645,7 +3556,6 @@ Once the Winlogon desktop is created during initialization, it becomes the activ
 
 712 CHAPTER 7 Security
 
-
 ---
 
 ## User logon steps
@@ -3657,23 +3567,23 @@ When the user name and password have been entered, Winlogon retrieves a handle t
 Windows uses two standard authentication packages for interactive username/password-based logons:
 
 - ■ MSV1_0 The default authentication package on a stand-alone Windows system is MSV1_0
-(Msv1_0.dll), an authentication package that implements LAN Manager 2 protocol. Lsas also
-uses MSV1_0 on domain-member computers to authenticate to pre-Windows 2000 domains
-and computers that can't locate a domain controller for authentication. (Computers that are
-disconnected from the network fall into this latter category.)
-■ Kerberos The Kerberos authentication package, Kerberos.dll, is used on computers that
-are members of Windows domains. The Windows Kerberos package, with the cooperation
-of Kerberos services running on a domain controller, supports the Kerberos protocol. This
-protocol is based on Internet RFC 1510. (Visit the Internet Engineering Task Force [IETF] website
-at http://www.ietf.org for detailed information on the Kerberos standard.)
+  (Msv1_0.dll), an authentication package that implements LAN Manager 2 protocol. Lsas also
+  uses MSV1_0 on domain-member computers to authenticate to pre-Windows 2000 domains
+  and computers that can't locate a domain controller for authentication. (Computers that are
+  disconnected from the network fall into this latter category.)
+  ■ Kerberos The Kerberos authentication package, Kerberos.dll, is used on computers that
+  are members of Windows domains. The Windows Kerberos package, with the cooperation
+  of Kerberos services running on a domain controller, supports the Kerberos protocol. This
+  protocol is based on Internet RFC 1510. (Visit the Internet Engineering Task Force [IETF] website
+  at http://www.ietf.org for detailed information on the Kerberos standard.)
+
 ## MSV1_0
 
 The MSV1_0 authentication package takes the user name and a hashed version of the password and sends a request to the local SAM to retrieve the account information, which includes the hashed password, the groups to which the user belongs, and any account restrictions. MSV1_0 first checks the account restrictions, such as hours or type of accesses allowed. If the user can't log on because of the restrictions in the SAM database, the logon call fails and MSV1_0 returns a failure status to the LSA.
 
 MSV1_0 then compares the hashed password and user name to that obtained from the SAM. In the case of a cached domain logon, MSV1_0 accesses the cached information by using Lsas functions that store and retrieve "secrets" from the LSA database (the SECURITY hive of the registry). If the information matches, MSV1_0 generates a LUID for the logon session and creates the logon session by calling Lsass, associating this unique identifier with the session and passing the information needed to ultimately create an access token for the user. (Recall that an access token includes the user's SID, group SIDs, and assigned privileges.)
 
-CHAPTER 7   Security      713
-
+CHAPTER 7 Security 713
 
 ---
 
@@ -3705,11 +3615,9 @@ When Lsas has accumulated all the necessary information, it calls the executive 
 
 714 CHAPTER 7 Security
 
-
 ---
 
 token for a network token. After the access token is successfully created, Lsass duplicates the token, creating a handle that can be passed to Winlogon, and closes its own handle. If necessary, the logon operation is audited. At this point, Lsass returns success to Winlogon along with a handle to the access token, the LUID for the logon session, and the profile information, if any, that the authentication package returned.
-
 
 EXPERIMENT: Using active logon sessions
 
@@ -3787,10 +3695,7 @@ DNS Domain:
 
 UPN:
 
-
 CHAPTER 7 Security 715
-
-
 
 ---
 
@@ -3897,8 +3802,7 @@ wmvp.exe    pid: 7136    type: WindowStation 170: \Windows\WindowStations\
 Service-0x0-5c2033
 ```
 
-CHAPTER 7   Security      717
-
+CHAPTER 7 Security 717
 
 ---
 
@@ -3944,48 +3848,45 @@ The primary components of the WBF are shown in Figure 7-21. Except as noted in t
 
 CHAPTER 7 Security 719
 
-
-
 ---
 
 - ● The storage adapter This exposes a set of secure storage functions. These are used to
-store and retrieve templates against which scanned biometric data is matched by the engine
-adapter. Windows provides a storage adapter using Windows cryptography services and
-standard disk file storage. A sensor vendor might provide a different storage adapter.
+  store and retrieve templates against which scanned biometric data is matched by the engine
+  adapter. Windows provides a storage adapter using Windows cryptography services and
+  standard disk file storage. A sensor vendor might provide a different storage adapter.
 - ■ The functional device driver for the actual biometric scanner device This exposes the
-WBDI at its upper edge. It usually uses the services of a lower-level bus driver, such as the USB
-bus driver, to access the scanner device. This driver is always provided by the sensor vendor.
-![Figure](figures/Winternals7thPt1_page_737_figure_002.png)
+  WBDI at its upper edge. It usually uses the services of a lower-level bus driver, such as the USB
+  bus driver, to access the scanner device. This driver is always provided by the sensor vendor.
+  ![Figure](figures/Winternals7thPt1_page_737_figure_002.png)
 
 FIGURE 7-21 Windows Biometric Framework components and architecture.
 
 A typical sequence of operations to support logging in via a fingerprint scan might be as follows:
 
 - 1. After initialization, the sensor adapter receives from the service provider a request for cap-
-ture data. The sensor adapter in turn sends a DeviceIoControl request with the IOCTL_
-BIOMETRIC_CAPTURE_DATA control code to the WBDI driver for the fingerprint scanner device.
+     ture data. The sensor adapter in turn sends a DeviceIoControl request with the IOCTL\_
+     BIOMETRIC_CAPTURE_DATA control code to the WBDI driver for the fingerprint scanner device.
 
-2. The WBDI driver puts the scanner into capture mode and queues the IOCTL_BIOMETRIC_
-CAPTURE_DATA request until a fingerprint scan occurs.
+2. The WBDI driver puts the scanner into capture mode and queues the IOCTL*BIOMETRIC*
+   CAPTURE_DATA request until a fingerprint scan occurs.
 
 3. A prospective user swipes a finger across the scanner. The WBDI driver receives notification of
-this, obtains the raw scan data from the sensor, and returns this data to the sensor driver in a
-buffer associated with the IOCTL_BIOMETRIC_CAPTURE_DATA request.
+   this, obtains the raw scan data from the sensor, and returns this data to the sensor driver in a
+   buffer associated with the IOCTL_BIOMETRIC_CAPTURE_DATA request.
 
 4. The sensor adapter provides the data to the fingerprint biometric service provider, which in
-turn passes the data to the engine adapter.
+   turn passes the data to the engine adapter.
 
 5. The engine adapter processes the raw data into a form compatible with its template storage.
 
 6. The fingerprint biometric service provider uses the storage adapter to obtain templates and
-corresponding security IDs from secure storage. It invokes the engine adapter to compare each
-template to the processed scan data. The engine adapter returns a status indicating whether it's
-a match or not a match.
+   corresponding security IDs from secure storage. It invokes the engine adapter to compare each
+   template to the processed scan data. The engine adapter returns a status indicating whether it's
+   a match or not a match.
 
 APTER 7 Security
 
-From the Library of I
----
+## From the Library of I
 
 7. If a match is found, the Windows Biometric Service notifies Winlogon, via a credential provider DLL, of a successful login and passes it the security ID of the identified user. This notification is sent via an ALPC message, providing a path that cannot be spoofed.
 
@@ -4003,22 +3904,22 @@ At the time of this writing, Windows Hello supports three types of biometric ide
 The security aspect of biometrics needs to be considered first. What is the likelihood of someone being identified as you? What is the likelihood of you not being identified as you? These questions are parameterized by two factors:
 
 - ■ False accept rate (uniqueness) This is the probability of another user having the same bio-
-metric data as you. Microsoft's algorithms make sure the likelihood is 1 in 100,000.
-■ False reject rate (reliability) This is the probability of you not being correctly recognized as
-you (for example, in abnormal lighting conditions for face or iris recognition). Microsoft's imple-
-mentation makes sure there is less than 1 percent chance of this happening. If it does happen,
-the user can try again or use a PIN code instead.
-Using a PIN code may seem less secure than using a full-blown password (the PIN can be as simple as a four-digit number). However, a PIN is more secure than a password for two main reasons:
+  metric data as you. Microsoft's algorithms make sure the likelihood is 1 in 100,000.
+  ■ False reject rate (reliability) This is the probability of you not being correctly recognized as
+  you (for example, in abnormal lighting conditions for face or iris recognition). Microsoft's imple-
+  mentation makes sure there is less than 1 percent chance of this happening. If it does happen,
+  the user can try again or use a PIN code instead.
+  Using a PIN code may seem less secure than using a full-blown password (the PIN can be as simple as a four-digit number). However, a PIN is more secure than a password for two main reasons:
 
 - ■ The PIN code is local to the device and is never transmitted across the network. This means that
-even if someone gets a hold of the PIN, they cannot use it to log in as the user from any other
-device. Passwords, on the other hand, travel to the domain controller. If someone gets hold of
-the password, they can log in from another machine into the domain.
-■ The PIN code is stored in the Trusted Platform Module (TPM)—a piece of hardware that also
-plays a part in Secure Boot (discussed in detail in Chapter 11 in Part 2)—so is difficult to access.
-In any case, it requires physical access to the device, raising the bar considerably for a potential
-security compromise.
-Windows Hello is built upon the Windows Biometric Framework (WBF) (described in the previous
+  even if someone gets a hold of the PIN, they cannot use it to log in as the user from any other
+  device. Passwords, on the other hand, travel to the domain controller. If someone gets hold of
+  the password, they can log in from another machine into the domain.
+  ■ The PIN code is stored in the Trusted Platform Module (TPM)—a piece of hardware that also
+  plays a part in Secure Boot (discussed in detail in Chapter 11 in Part 2)—so is difficult to access.
+  In any case, it requires physical access to the device, raising the bar considerably for a potential
+  security compromise.
+  Windows Hello is built upon the Windows Biometric Framework (WBF) (described in the previous
 
 section). Current laptop devices support fingerprint and face biometrics, while iris is only supported
 
@@ -4026,8 +3927,7 @@ on the Microsoft Lumia 950 and 950 XL phones. (This will likely change and expan
 
 Note that face recognition requires an infrared (IR) camera as well as a normal (RGB) one, and is sup ported on devices such as the Microsoft Surface Pro 4 and the Surface Book.
 
-CHAPTER 7   Security      721
-
+CHAPTER 7 Security 721
 
 ---
 
@@ -4073,9 +3973,7 @@ Together, these changes obviate the need for users to run with administrative ri
 
 Although some software legitimately requires administrative rights, many programs needlessly store user data in system-global locations. When an application executes, it can be running in different user accounts, and it should therefore store user-specific data in the per-user %AppData% directory and save per-user settings in the user's registry profile under HKEY_CURRENT_USER\Software. Standard user accounts don't have write access to the %ProgramFiles% directory or HKEY_LOCAL_MACHINE\ Software, but because most Windows systems are single-user and most users have been administrators until UAC was implemented, applications that incorrectly saved user data and settings to these locations worked anyway.
 
-
 CHAPTER 7 Security
-
 
 From the Library of I
 
@@ -4086,9 +3984,9 @@ Windows enables these legacy applications to run in standard user accounts throu
 Windows will always enable this type of virtualization unless:
 
 - ■ The application is 64-bit Because virtualization is purely an application-compatibility tech-
-nology meant to help legacy applications, it is enabled only for 32-bit applications. The world of
-64-bit applications is relatively new and developers should follow the development guidelines
-for creating standard user-compatible applications.
+  nology meant to help legacy applications, it is enabled only for 32-bit applications. The world of
+  64-bit applications is relatively new and developers should follow the development guidelines
+  for creating standard user-compatible applications.
 
 ■ The application is already running with administrative rights In this case, there is no
 need for any virtualization.
@@ -4105,14 +4003,14 @@ requestedExecutionLevel setting, described in the next section.
 ■ The administrator does not have write access to the file or registry key This exception
 exists to enforce backward compatibility because the legacy application would have failed
 before UAC was implemented even if the application was run with administrative rights.
+
 ## ■ Services are never virtualized
 
 You can see the virtualization status (the process virtualization status is stored as a flag in its token) of a process by adding the UAC Virtualization column to Task Manager's Details page, as shown in Figure 7-22. Most Windows components—including the Desktop Window Manager (Dwm.exe), the Client Server Run-Time Subsystem (Csrrs.exe), and Explorer—have virtualization disabled because they have a UAC-compatible manifest or are running with administrative rights and so do not allow virtualization. However, 32-bit Internet Explorer (iexplorer.exe) has virtualization enabled because it can host multiple ActiveX controls and scripts and must assume that they were not written to operate correctly with standard user rights. Note that, if required, virtualization can be completely disabled for a system using a Local Security Policy setting.
 
 In addition to file system and registry virtualization, some applications require additional help to run correctly with standard user rights. For example, an application that tests the account in which it's running for membership in the Administrators group might otherwise work, but it won't run if it's not in that group. Windows defines a number of application-compatible shims to enable such applications to work anyway. The shims most commonly applied to legacy applications for operation with standard user rights are shown in Table 7-15.
 
-CHAPTER 7   Security      723
-
+CHAPTER 7 Security 723
 
 ---
 
@@ -4124,9 +4022,7 @@ TABLE 7-15 UAC virtualization shims
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>ElevateCreateProcess</td><td>This changes CreateProcess to handle ERROR_ELEVATION_REQUIRED errors by calling the application information service to prompt for elevation.</td></tr><tr><td>ForceAdminAccess</td><td>This spoofs queries of Administrator group membership.</td></tr><tr><td>VirtualizeDeleteFile</td><td>This spoofs successful deletion of global files and directories.</td></tr><tr><td>LocalMappedObject</td><td>This forces global section objects into the user&#x27;s namespace.</td></tr><tr><td>VirtualizeHKRLite</td><td>This redirects global registration of COM objects to a per-user location.</td></tr><tr><td>VirtualizeRegisterTypeLib</td><td>This converts per-machine type I b registrations to per-user registrations.</td></tr></table>
 
-
-724    CHAPTER 7   Security
-
+724 CHAPTER 7 Security
 
 ---
 
@@ -4150,8 +4046,7 @@ The UAC File Virtualization filter driver (%SystemRoot%\System32\Drivers\Luaf.sy
 
 FIGURE 7-23 UAC File Virtualization filter driver operation.
 
-CHAPTER 7   Security      725
-
+CHAPTER 7 Security 725
 
 ---
 
@@ -4160,9 +4055,9 @@ CHAPTER 7   Security      725
 In this experiment, you will enable and disable virtualization on the command prompt and see several behaviors to demonstrate UAC file virtualization:
 
 - 1. Open a non-elevated command prompt (you must have UAC enabled for this to work)
-and enable virtualization for it. You can change the virtualization status of a pro-
-cess by right-clicking the process in the Task Manager Details tab and selecting UAC
-Virtualization from the shortcut menu that appears.
+     and enable virtualization for it. You can change the virtualization status of a pro-
+     cess by right-clicking the process in the Task Manager Details tab and selecting UAC
+     Virtualization from the shortcut menu that appears.
 
 2. Navigate to the C:\Windows directory and use the following command to write a file:
 
@@ -4173,24 +4068,23 @@ echo hello-1 > test.txt
 dir test.txt
 
 4. Disable virtualization by right-clicking the process in the Task Manager Details tab and
-deselecting UAC Virtualization. Then list the directory as in step 3. Notice that the file
-is gone. However, a directory listing of the VirtualStore directory will reveal the file:
+   deselecting UAC Virtualization. Then list the directory as in step 3. Notice that the file
+   is gone. However, a directory listing of the VirtualStore directory will reveal the file:
 
 dir %LOCALAPPDATA%\VirtualStore\Windows\test.txt
 
 5. Enable virtualization again for this process.
 
 6. To look at a more complex scenario, create a new command prompt window, but
-elevated this time. Then repeat steps 2 and 3 using the string hello-2.
+   elevated this time. Then repeat steps 2 and 3 using the string hello-2.
 
 7. Examine the text inside these files by using the following command in both command
-prompts. The screenshots that follow show the expected output.
+   prompts. The screenshots that follow show the expected output.
 
 type test.txt
 ![Figure](figures/Winternals7thPt1_page_743_figure_003.png)
 
 726 CHAPTER 7 Security
-
 
 ---
 
@@ -4225,15 +4119,13 @@ Only keys that are commonly modified by legacy applications, but that don’t in
 
 You can use the Reg.exe utility included in Windows, with the flags option, to display the current virtualization state for a key or to set it. In Figure 7-24, note that the HKLM\Software key is fully virtualized, but the Windows subkey (and all its children) have only silent failure enabled.
 
-CHAPTER 7   Security      727
-
+CHAPTER 7 Security 727
 
 ---
 
 TABLE 7-16 Registry virtualization flags
 
 <table><tr><td>Flag</td><td>Meaning</td></tr><tr><td>REG_KEY_DONT_VIRTUALIZE</td><td>This specifies whether virtualization is enabled for this key. If the flag is set, virtualization is disabled.</td></tr><tr><td>REG_KEY_DONT_SILENT_FAIL</td><td>If the REG_KEY_DONT_VIRTUALIZE flag is set (virtualization is disabled), this key specifies that a legacy application that would be denied access performing an operation on the key is instead granted MAXIMUM_ALLOWED rights to the key (any access the account is granted) instead of the rights the application requested. If this flag is set, it implicitly disables virtualization as well.</td></tr><tr><td>REG_KEY_RECURSE_FLAG</td><td>This determines whether the virtualization flags will propagate to the child keys (subkeys) of this key.</td></tr></table>
-
 
 ![Figure](figures/Winternals7thPt1_page_745_figure_002.png)
 
@@ -4246,7 +4138,6 @@ Unlike file virtualization, which uses a filter driver, registry virtualization 
 FIGURE 7-25 UAC registry virtualization operation.
 
 728 CHAPTER 7 Security
-
 
 ---
 
@@ -4280,8 +4171,7 @@ Granting administrative rights to a process is called elevation. When elevation 
 
 Stand-alone systems, which are typically home computers, and domain-joined systems treat AAM access by remote users differently because domain-connected computers can use domain administrative groups in their resource permissions. When a user accesses a stand-alone computer's file share,
 
-CHAPTER 7   Security      729
-
+CHAPTER 7 Security 729
 
 ---
 
@@ -4300,7 +4190,6 @@ The OTS consent dialog box, shown in Figure 7-27, is similar, but prompts for ad
 FIGURE 7-27 OTS consent dialog box.
 
 730 CHAPTER 7 Security
-
 
 ---
 
@@ -4322,15 +4211,13 @@ requestedExecutionLevel tag in its application manifest file. The element's leve
 
 one of the three values shown in Table 7-17.
 
-CHAPTER 7   Security      731
-
+CHAPTER 7 Security 731
 
 ---
 
 TABLE 7-17 Requested elevation levels
 
 <table><tr><td>Elevation Level</td><td>Meaning</td><td>Usage</td></tr><tr><td>As invoker</td><td>No need for administrative rights; never ask for elevation.</td><td>Typical user applications that don&#x27;t need administrative privileges—for example, Notepad.</td></tr><tr><td>Highest available</td><td>Request approval for highest rights available. If the user is logged on as a standard user, the process will be launched as invoker; otherwise, an AAM elevation prompt will appear, and the process will run with full administrative rights.</td><td>Applications that can function without full administrative rights but expect users to want full access if it&#x27;s easily accessible. For example, the Registry Editor, Microsoft Management Console, and the Event Viewer use this level.</td></tr><tr><td>Require administrator</td><td>Always request administrative rights. An OTS elevation dialog box prompt will be shown for standard users; otherwise, AAM.</td><td>Applications that require administrative rights to work, such as the Firewall Settings Editor, which affects system-wide security.</td></tr></table>
-
 
 The presence of the trustInfo element in a manifest (which you can see in the manifest
 
@@ -4407,15 +4294,13 @@ The four possible settings have the effects described in Table 7-18.
 
 The third position is not recommended because the UAC elevation prompt appears not on the Secure Desktop but on the normal user's desktop. This could allow a malicious program running in the same session to change the appearance of the prompt. It is intended for use only in systems where the video subsystem takes a long time to dim the desktop or is otherwise unsuitable for the usual UAC display.
 
-CHAPTER 7   Security      733
-
+CHAPTER 7 Security 733
 
 ---
 
 TABLE 7-18 UAC options
 
 <table><tr><td>Slider Position</td><td colspan="2">When administrative user not running with administrative rights...</td><td>Remarks</td></tr><tr><td></td><td>... attempts to change Windows settings (for example, use certain Control Panel applets)</td><td>... attempts to install software or run a program whose manifest calls for elevation, or uses Run as Administrator</td><td></td></tr><tr><td>Highest position (Always Notify)</td><td>A UAC elevation prompt appears on the Secure Desktop.</td><td>A UAC elevation prompt appears on the Secure Desktop.</td><td>This was the Windows Vista behavior.</td></tr><tr><td>Second position</td><td>UAC elevation occurs automatically with no prompt or notification.</td><td>A UAC elevation prompt appears on the Secure Desktop.</td><td>Windows default setting.</td></tr><tr><td>Third position</td><td>UAC elevation occurs automatically with no prompt or notification.</td><td>A UAC elevation prompt appears on the user&#x27;s normal desktop.</td><td>Not recommended.</td></tr><tr><td>Lowest position (Never Notify)</td><td>UAC is turned off for administrative users.</td><td>UAC is turned off for administrative users.</td><td>Not recommended.</td></tr></table>
-
 
 The lowest position is strongly discouraged because it turns UAC off completely as far as administrative accounts are concerned. Prior to Windows 8, all processes run by a user with an administrative account are run with the user's full administrative rights in effect; there is no filtered admin token. Starting with Windows 8, UAC cannot be turned off completely, because of the AppContainer model. Admin users won't be prompted for elevation, but processes will not elevate unless required to do so by the manifest or launched from an elevated process.
 
@@ -4425,9 +4310,7 @@ TABLE 7-19 UAC registry values
 
 <table><tr><td>Slider Position</td><td>ConsentPrompt BehaviorAdmin</td><td>ConsentPrompt BehaviorUser</td><td>EnableUA</td><td>PromptOnSecureDesktop</td></tr><tr><td>Highest position (Always Notify)</td><td>2 (display AAC UIAC elevation prompt)</td><td>3 (display OTS UIAC elevation prompt)</td><td>1 (enabled)</td><td>1 (enabled)</td></tr><tr><td>Second position</td><td>5 (display AAC UIAC elevation prompt, except for changes to Windows settings)</td><td>3</td><td>1</td><td>1</td></tr><tr><td>Third position</td><td>5</td><td>3</td><td>1</td><td>0 (disabled; UAC prompt appears on user&#x27;s normal desktop)</td></tr><tr><td>Lowest position (Never Notify)</td><td>0</td><td>3</td><td>0 (disabled; logins to administrative accounts do not create a restricted admin access token)</td><td>0</td></tr></table>
 
-
-734    CHAPTER 7   Security
-
+734 CHAPTER 7 Security
 
 ---
 
@@ -4455,13 +4338,11 @@ TABLE 7-20 Process mitigation options
 
 <table><tr><td>Mitigation Name</td><td>Use Case</td><td>Enabling Mechanism</td></tr><tr><td>ASLR Bottom Up Randomization</td><td>This makes calls to VirtualIA1 loc subject to ASLR with 8-bit entropy, including stack-base randomization.</td><td>This is set with the PROCESS_CREATION_MITIGATION_POLICY_BOTTOM_UP_ASLR_ALWAYS_ON_PROCESS-creation attribute flag.</td></tr><tr><td>ASLR Force Relocate Images</td><td>This forces ASLR even on binaries that do not have the /DYNAMICBASE linker flag.</td><td>This is set with SetProcessMitigationPolicy_LOW_MORE_CREATION_MITIGATION_POLICY_FORCE_RELOCATE_IMAGES_ALWAYS_ON_PROCESS-creation flag.</td></tr><tr><td>High Entropy ASLR (HEASLR)</td><td>This significantly increases entropy of ASLR on 64-bit images, increasing bottom-up randomization to up to 1 TB of variance (that is, bottom-up allocations may start anywhere between 64 KB and 1 TB into the address space, giving 24 bits of entropy).</td><td>Must be set through /HIGHENTROPYAL at time or the PROCESS_CREATION_MITIGATION_POLICY_HIGH_HIGH_ENTROPY_ASLR_ALWAYS_ON_process-creation attribute flag.</td></tr></table>
 
-
 ---
 
 TABLE 7-20 Process mitigation options (continued)
 
 <table><tr><td>Mitigation Name</td><td>Use Case</td><td>Enabling Mechanism</td></tr><tr><td>ASLR Disallow Stripped Images</td><td>This blocks the load of any library without relocations (linked with the /FIXED flag) when combined with ASLR Force Relocate Images.</td><td>This is set with SetProcessMitigationPolicy with the PROCESS_CREATION_WITH_POLICY_FORCE_RELOCATE_IMAGES_ALWAYS_ON_REQ_RELOCES process-creation flag.</td></tr><tr><td>DEP: Permanent</td><td>This prevents the process from disabling DEP on itself. Only relevant on x686. Only relevant on 32-bit applications (and/or under WoW64).</td><td>This is set with the SetProcessMitigationPolicy, process-creation attribute or with SetProcessMPolicy.</td></tr><tr><td>DEP: Disable ATL Thunk Emulation</td><td>This prevents legacy ATL library code from executing ATL, thanks in the heap, even if a known compatibility issue could be resolved by adding applications (and/or under WoW64).</td><td>This is set with the SetProcessMitigationPolicy, process-creation attribute or with SetProcessMPolicy.</td></tr><tr><td>SEH Overwrite Protection (SEHOP)</td><td>This prevents structure exception handlers from being overwritten with incorrect ones, even if the image was not limited to a 32-bit (S32B). Only relevant on 32-bit applications (and/or under WoW64).</td><td>This can be set with SetProcessDEPPolicy or with the PROCESS_CREATION_MITIGATION_POLICY_SEHROP_ENABLE_PROCESS-creation flag.</td></tr><tr><td>Raise Exception on Invalid Handle</td><td>This helps catch handle reuse (use-after-handle close) attacks in which a process uses a handle that is no longer the handle it expected (for example: SetEvent on a mutex) by crashing the process instead of returning a failure that the process might ignore.</td><td>This is set with SetProcessMitigationPolicy or the PROCESS_CREATION_MITIGATION_POLICY_STRCT_HANDLE_CHECKS_ALWAYS_ON_PROCESS-creation attribute flag.</td></tr><tr><td>Raise Exception on Invalid Handle Close</td><td>This helps catch handle reuse (double-handle-close) attacks in which a process is attempting to close a handle that has already been closed, suggesting that a different handle may potentially be used in other scenarios, in which an exploit would be successful, ultimately limiting its universal effectiveness.</td><td>Undocumented, and can only be set through an undocumented API.</td></tr><tr><td>Disallow Win32k System Calls</td><td>This disables all access to the Win32 kernel-mode subsystem driver, which implements the Window Manager (GUI) and Graphics Device Interface (GDI) and DirectX. No system calls to this component will be possible.</td><td>This is set with SetProcessMitigationPolicy or the PROCESS_CREATION_MITIGATION_POLICY_WIN32K_SYSTEM_CALL_DISABLE_ALWAYS_ON_PROCESS-creation attribute flag.</td></tr><tr><td>Filter Win32k System Calls</td><td>This filters access to the Win32 kernel-mode subsystem driver only to certain APIs allowing simple GUI and Direct X access, mitigating many of the possible attacks, without completely disabling availability of the GUI/GDI services.</td><td>This is set through an internal process-creation attribute flag, which can define one out of three possible sets of Win32k filters that are enabled. However, because the filter sets are hard-coded, this mitigation is re-served for Microsoft internal usage.</td></tr></table>
-
 
 ---
 
@@ -4469,9 +4350,7 @@ TABLE 7-20 Process mitigation options (continued)
 
 <table><tr><td>Mitigation Name</td><td>Use Case</td><td>Enabling Mechanism</td></tr><tr><td>Disable Extension Points</td><td>This prevents a process from loading an input method editor (IME), a Windows hook DLL (SetWinHookEx), an app initializator (DLL (AppInItD) is value in the registry), or a WinHook layered service provider (LSP).</td><td>This is set with SetProcessMitigationPolicy for the PROCESS_CREATION_MITIGATION_POLICY_EXTENSION_CONTROL_DISABLE_ALWAYS_ON_process-creation attribute flag.</td></tr><tr><td>Arbitrary Code Guard (CFG)</td><td>This prevents a process from allocating executable code or from changing the permission of existing executable code to make it writable. It can be configured to allow a particular thread inside the process to request this capability or to allow a remote process from disabling this mitigation, which are not supported from a security point of view.</td><td>This is set with SetProcessMitigationPolicy for the PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT_DYNAMIC_CODE_ALWAYS_ON_PROCESS_CREATION_MITIGATION_POLICY_PROHIBIT_DYNAMIC_CODE_ALWAYS_ON_PROCESS-creation attribute flags.</td></tr><tr><td>Control Flow Guard (CFG)</td><td>This prevents memory corruption vulnerabilities from being used to hijack control flow by a process. The memory is not a copy of any indirect CALL or JMP instruction against a list of valid expected target functions. Part of Control Flow Integrity (CFI) mechanisms described in the next section.</td><td>The image must be compiled with the /guard: c.f option, and limited to the memory creation. It can be set with the PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_ALWAYS_ON_process-creation attribute flag in case the image does not support it. CFI engine will be disabled for other images loading in the process.</td></tr><tr><td>CFG Export Suppression</td><td>This strengthens CFG by suppressing indirect calls to the exported API table of the image.</td><td>The image must be compiled with /guard: export-suppress, and can also be configured through SetProcessMitigationPolicy or with the PROCESS_CREATION_MITIGATION_POLICY_CONTROL_FLOW_GUARD_EXPORT_SUPPRESSION process-creation attribute flag.</td></tr><tr><td>CFG Strict Mode</td><td>This prevents the loading of any image library within the current process that was not linked with the /guard: c.f option.</td><td>This is set through SetProcessMitigationPolicy or with the PROCESS_CREATION_MITIGATION_POLICY_STRCT_CONTROL_FLOW_GUARD_ALWAYS_ON_process-creation attribute flag.</td></tr><tr><td>Disable Non System Fonts</td><td>This prevents the loading of any font files that have not been registered by Winlogon at user logon time, after being installed in the C:\windows\fonts directory.</td><td>This is set through SetProcessMitigationPolicy or the PROCESS_CREATION_MITIGATION_POLICY_FONT_DISABLE_ALWAYS_ON_process-creation attribute flag.</td></tr><tr><td>Microsoft-Signed Binaries Only</td><td>This prevents the loading of any image library within the current process that has not been signed by a Microsoft CA—issued certificate.</td><td>This is set through the PROCESS_CREATION_MITIGATION_POLICY_BLOCK_NON_MICROSOFT_BINARIES_ALWAYS_ON_process-attribute flag at startup time.</td></tr></table>
 
-
-CHAPTER 7   Security      737
-
+CHAPTER 7 Security 737
 
 ---
 
@@ -4479,9 +4358,7 @@ TABLE 7-20 Process mitigation options (continued)
 
 <table><tr><td>Mitigation Name</td><td>Use Case</td><td>Enabling Mechanism</td></tr><tr><td>Store-Signed Binaries Only</td><td>This prevents the loading of any image library within the current process that has not been signed by the Microsoft Store CA.</td><td>This is set through the PROCESS_CREATION, MITIGATION_POLICY_BLOCK_NON_MICROSOFT_BINARIES_ALLOW_STORE process attribute flag at startup time.</td></tr><tr><td>No Remote Images</td><td>This prevents the loading of any image library within the current process that is present on a non-local (UNC or WebDIN) path.</td><td>This is set through SETPROCESSMutationPolicy or the PROCESS_CREATION, MITIGATION_POLICY_IMAGE_LOAD_NO_LOW_LABEL_ALWAYS_ON process-creation attribute flag.</td></tr><tr><td>No Low IL Images</td><td>This prevents the loading of any image library within the current process that has a mandatory label below medium (0x2000).</td><td>This is set through SETPROCESSMutationPolicy or the PROCESS_CREATION, MITIGATION_POLICY_IMAGE_LOAD_NO_LOW_LABEL_ALWAYS_ON process-creation flag. It can also be set through a resource claim ACE called IMAGELOAD on the file of the process being loaded.</td></tr><tr><td>Prefer System32 Images</td><td>This modifies the loader&#x27;s search path to always look for the given image library being loaded (through a relative name in the %SystemRoot% System32 directory, regardless of the current search path.</td><td>This is set through SETPROCESSMutationPolicy or the PROCESS_CREATION, MITIGATION_POLICY_IMAGE_LOAD_PREFIX_SYSTEM32_ALWAYS_ON process-creation attribute flag.</td></tr><tr><td>Return Flow Guard (RFG)</td><td>This helps prevent additional classes of memory-corruption vulnerabilities that affect control flow by validating, before the execution of a function, that the function was not called through a return-oriented programming (ROP) exploit by not having begun its execution correctly or by executing on an invalid stack. This is part of the Control Flow Integrity (CFI) mechanisms.</td><td>Currently still being implemented in a robust and performant way, this mitigation is not yet available, but is included here for completeness.</td></tr><tr><td>Restrict Set Thread Context</td><td>This restricts the modification of the current thread&#x27;s context.</td><td>Currently disabled pending the availability of RFG, which makes the mitigation more robust, this modification may be included in a future version of Windows. It is included here for completeness.</td></tr><tr><td>Loader Continuity</td><td>This prohibits the process from dynamically loading any DLLs that do not have the same integrity level as the process, in cases where a signature policy mitigation above could not be enabled at startup time due to compatibility concerns. This specifically targets cases of DLL planting attacks.</td><td>This is set through SETPROCESSMutationPolicy or the PROCESS_CREATION, MITIGATION_POLICY2_LOAD_INTEGRITY_CONTINUITY_ALWAYS_ON process-creation attribute flag.</td></tr></table>
 
-
-738    CHAPTER 7   Security
-
+738 CHAPTER 7 Security
 
 ---
 
@@ -4549,8 +4426,7 @@ functions with a special flag indicating that the programmer never expects such 
 
 target of any indirect call or jump.
 
-CHAPTER 7   Security      741
-
+CHAPTER 7 Security 741
 
 ---
 
@@ -4653,7 +4529,7 @@ Section contains the following load config:
          000000140002F80 SmpExecPgm
 ```
 
-CHAPTER 7   Security      743
+CHAPTER 7 Security 743
 
 ---
 
@@ -4688,7 +4564,7 @@ used, regardless of how many functions are present in the table. This constant l
 
 as small as possible. A clear winner of such a requirement would be an array that is indexable by the tar get function’s address, which is an indication if this address is valid or not (such as a simple BOOL). With
 
-a 128 TB of possible addresses, though, such an array would itself have to be 128 TB * s1260F(BOOL),
+a 128 TB of possible addresses, though, such an array would itself have to be 128 TB \* s1260F(BOOL),
 
 which is an unacceptable storage size—bigger than the address space itself. Can we do better?
 
@@ -4696,12 +4572,12 @@ which is an unacceptable storage size—bigger than the address space itself. Ca
 
 ---
 
-First, we can leverage the fact that compilers ought to generate x64 function code on 16-byte boundaries. This reduces the size to the required array to only 8TB * sizeof(BOOL). But using an entire BOOL (which is 4 bytes in the worst case or 1 byte in the best) is extremely wasteful. We only need one state, valid or invalid, which only needs to use 1 bit. This makes the calculation 8 TB / 8, or simply 1TB. Unfortunately, however, there's a snag. There's no guarantee that the compiler will generate all functions on a 16-byte binary. Hand-crafted assembly code and certain optimizations might violate this rule. As such, we'll have to figure out a solution. One possible option is to simply use another bit to indicate if the function begins somewhere on the next 15 bytes instead of on the 16-byte boundary itself. Thus, we have the following possibilities:
+First, we can leverage the fact that compilers ought to generate x64 function code on 16-byte boundaries. This reduces the size to the required array to only 8TB \* sizeof(BOOL). But using an entire BOOL (which is 4 bytes in the worst case or 1 byte in the best) is extremely wasteful. We only need one state, valid or invalid, which only needs to use 1 bit. This makes the calculation 8 TB / 8, or simply 1TB. Unfortunately, however, there's a snag. There's no guarantee that the compiler will generate all functions on a 16-byte binary. Hand-crafted assembly code and certain optimizations might violate this rule. As such, we'll have to figure out a solution. One possible option is to simply use another bit to indicate if the function begins somewhere on the next 15 bytes instead of on the 16-byte boundary itself. Thus, we have the following possibilities:
 
 - • (0, 0) No valid function begins inside this 16-byte boundary.
-• (0, 0) A valid function begins exactly on this aligned 16-byte address.
-• (1, 1) A valid function begins somewhere inside of this 16-byte address.
-Thanks to this setup, if the attacker attempts to call inside a function that was marked as 16-byte
+  • (0, 0) A valid function begins exactly on this aligned 16-byte address.
+  • (1, 1) A valid function begins somewhere inside of this 16-byte address.
+  Thanks to this setup, if the attacker attempts to call inside a function that was marked as 16-byte
 
 aligned by the linker, the 2-bit state will be (1, 0), while the required bits (that is, bits 3 and 4) in the
 
@@ -4718,16 +4594,16 @@ With this understanding in mind, we can apply the following formulas to compute 
 CFG bitmap:
 
 - ■ 32-bit application on x86 or x64
-2 GB / 16 * 2 = 32 MB
+  2 GB / 16 \* 2 = 32 MB
 
 ■ 32-bit application with /LARGEADDRESSAWARE, booted in 3 GB mode on x86
 2 = 48 MB
 
 ■ 64-bit application
-128 TB / 16 * 2 = 2 TB
+128 TB / 16 \* 2 = 2 TB
 
 ■ 32-bit application with /LARGEADDRESSAWARE, on x64
-4 GB / 16 * 2 = 64 MB, plus the size
+4 GB / 16 \* 2 = 64 MB, plus the size
 of the 64-bit bitmap, which is needed to protect 64-bit Ntdll.dll and WoW64 components, so
 2 TB + 64MB
 Allocating and filling out 2 TB of bits on every single process execution is still a tough performance
@@ -4748,8 +4624,7 @@ reserved, and only pages with at least one bit set {1,X} need to be committed.
 
 Next, as described in the ASLR section of Chapter 5, "Memory management," the system performs the randomization/relocation of libraries typically only once at boot, as a performance-saving measure to avoid
 
-CHAPTER 7   Security      745
-
+CHAPTER 7 Security 745
 
 ---
 
@@ -4770,7 +4645,6 @@ Open the VMMap tool and select a Notepad process. You should see a large reserve
 ![Figure](figures/Winternals7thPt1_page_763_figure_004.png)
 
 You can sort the lower pane by size and quickly locate the large chunk used for the
-
 
 CFGBitmap, as shown. Additionally, if you attach to the process and use the !address command
 
@@ -4805,42 +4679,43 @@ After a process is created, the appropriate section is securely mapped into the 
 The user mode CFG bitmap(s) are populated in the following scenarios:
 
 - ■ During image mapping, images that have been dynamically relocated due to ASLR (see Chapter
-5, for more on ASLR) will have their indirect call target metadata extracted. If an image does
-not have indirect call target metadata, meaning it was not compiled with CFG, it is assumed
-that every address within the image can be called indirectly. As explained, because dynamically
-relocated images are expected to load at the same address in every process, their metadata is
-used to populate the shared section that is used for the CFG bitmap.
-■ During image mapping, special care is needed for non-dynamically relocated images and imag-
-es not being mapped at their preferred base. For these image mappings, the relevant pages of
-the CFG bitmap are made private and are populated using the CFG metadata from the image.
-For images whose CFG bits are present in the shared CFG bitmap, a check is made to ensure that
-all the relevant CFG bitmap pages are still shared. If this is not the case, the bits of the private
-CFG bitmap pages are populated using the CFG metadata from the image.
-■ When virtual memory is allocated or re-protected as executable, the relevant pages of the CFG bit-
-map are made private and initialized to all 1s by default. This is needed for cases such as just-in-time
-(JIT) compilation, where code is generated on the fly and then executed (for example, .NET or Java).
+  5, for more on ASLR) will have their indirect call target metadata extracted. If an image does
+  not have indirect call target metadata, meaning it was not compiled with CFG, it is assumed
+  that every address within the image can be called indirectly. As explained, because dynamically
+  relocated images are expected to load at the same address in every process, their metadata is
+  used to populate the shared section that is used for the CFG bitmap.
+  ■ During image mapping, special care is needed for non-dynamically relocated images and imag-
+  es not being mapped at their preferred base. For these image mappings, the relevant pages of
+  the CFG bitmap are made private and are populated using the CFG metadata from the image.
+  For images whose CFG bits are present in the shared CFG bitmap, a check is made to ensure that
+  all the relevant CFG bitmap pages are still shared. If this is not the case, the bits of the private
+  CFG bitmap pages are populated using the CFG metadata from the image.
+  ■ When virtual memory is allocated or re-protected as executable, the relevant pages of the CFG bit-
+  map are made private and initialized to all 1s by default. This is needed for cases such as just-in-time
+  (JIT) compilation, where code is generated on the fly and then executed (for example, .NET or Java).
+
 ## Strengthening CFG protection
 
 Although CFG does an adequate job to prevent types of exploits that leverage indirect calls or jumps, it could be bypassed through the following ways:
 
-CHAPTER 7   Security      747
+CHAPTER 7 Security 747
 
 ---
 
 - ■ If the process can be tricked or an existing JIT engine abused to allocate executable memory, all the
-corresponding bits will be set to {1, 1}, meaning that all memory is considered a valid call target.
-■ For 32-bit applications, if the expected call target is _stdcda11 (standard calling convention),
-but an attacker is able to change the indirect call target to __cdecl (C calling convention), the
-stack will become corrupt, as the C call function will not perform cleanup of the caller's argu-
-ments, unlike a standard call function. Because CFG cannot differentiate between the different
-calling conventions, this results in a corrupt stack, potentially with an attacker-controlled return
-address, bypassing the CFG mitigation.
-■ Similarly, compiler-generated set jmp /long jmp targets behave differently from true indirect
-calls. CFG cannot differentiate between the two.
-■ Certain indirect calls are harder to protect, such as the Import Address Table (IAT) or Delay-
-Load Address Table, which is typically in a read-only section of the executable.
-■ Exported functions may not be desirable indirect function calls.
-Windows 10 introduces advancements to CFG that address all these issues. The first is to introduce a new flag to the VirtualIaoc function called PAGE_TARGETS_INVALID and one to VirtualProtect called PAGE_TARGETS_NO_UPDATE. With these flags set, JIT engines that allocate executable memory will not see all their allocations' bits set to the [1, 1] state. Instead, they must manually call the SetProcessVoidCallTargets function (which calls the native NtSetInformationVirtualMemory function), which will allow them to specify the actual function start addresses of their JITed code. Additionally, this function is marked as a suppressed call with DECLSPEC_GUARD_SUPPRESS, making sure that attackers cannot use an indirect CALL or JMP to redirect into it, even at its function start. (Because it's an inherently dangerous function, calling it with a controlled stack or registers could result in the bypassing of CFG.)
+  corresponding bits will be set to {1, 1}, meaning that all memory is considered a valid call target.
+  ■ For 32-bit applications, if the expected call target is \_stdcda11 (standard calling convention),
+  but an attacker is able to change the indirect call target to \_\_cdecl (C calling convention), the
+  stack will become corrupt, as the C call function will not perform cleanup of the caller's argu-
+  ments, unlike a standard call function. Because CFG cannot differentiate between the different
+  calling conventions, this results in a corrupt stack, potentially with an attacker-controlled return
+  address, bypassing the CFG mitigation.
+  ■ Similarly, compiler-generated set jmp /long jmp targets behave differently from true indirect
+  calls. CFG cannot differentiate between the two.
+  ■ Certain indirect calls are harder to protect, such as the Import Address Table (IAT) or Delay-
+  Load Address Table, which is typically in a read-only section of the executable.
+  ■ Exported functions may not be desirable indirect function calls.
+  Windows 10 introduces advancements to CFG that address all these issues. The first is to introduce a new flag to the VirtualIaoc function called PAGE_TARGETS_INVALID and one to VirtualProtect called PAGE_TARGETS_NO_UPDATE. With these flags set, JIT engines that allocate executable memory will not see all their allocations' bits set to the [1, 1] state. Instead, they must manually call the SetProcessVoidCallTargets function (which calls the native NtSetInformationVirtualMemory function), which will allow them to specify the actual function start addresses of their JITed code. Additionally, this function is marked as a suppressed call with DECLSPEC_GUARD_SUPPRESS, making sure that attackers cannot use an indirect CALL or JMP to redirect into it, even at its function start. (Because it's an inherently dangerous function, calling it with a controlled stack or registers could result in the bypassing of CFG.)
 
 Next, improved CFG changes the default flow you saw in the beginning of this section with a more
 
@@ -4868,8 +4743,7 @@ should be little to no functions in these tables, making the cost bearable.
 
 Finally, improved CFG implements a feature called export suppression, which must be supported by the compiler and enabled by process-mitigation policy. (See the section "Process-mitigation policies" for more on process level mitigations.) With this feature enabled, a new bit state is implemented (recall that bulleted list had {0, 1} as an undefined state). This state indicates that the function is valid but export-suppressed, and it will be treated differently by the loader.
 
-748    CHAPTER 7   Security
-
+748 CHAPTER 7 Security
 
 ---
 
@@ -4887,15 +4761,13 @@ TABLE 7-21 Control Flow Guard flags
 
 <table><tr><td>Flag Symbol</td><td>Value</td><td>Description</td></tr><tr><td>IMAGE_GUARD_CF_INSTRUMENTED</td><td>0x100</td><td>This indicates CFG support is present for this module.</td></tr><tr><td>IMAGE_GUARD_CFW_INSTRUMENTED</td><td>0x200</td><td>This module performs CFG and write integrity checks.</td></tr><tr><td>IMAGE_GUARD_CF_FUNCTION_TABLE_PRESENT</td><td>0x400</td><td>This module contains CFG-aware function lists.</td></tr><tr><td>IMAGE_GUARD_SEURITY_COOKIE_UNUSED</td><td>0x800</td><td>This module does not make use of the security cookie emitted with the comp1er /65 flag.</td></tr><tr><td>IMAGE_GUARD_PROTECT_DELAYLOAD_IAT</td><td>0x1000</td><td>This module supports read-only delay-load Import Address Tables (IATs).</td></tr><tr><td>IMAGE_GUARD_DELAYLOAD_IAT_IN_ITS_OWN_SECTION</td><td>0x2000</td><td>Delay-load IAT is its own section, so it can be re-protected if desired.</td></tr><tr><td>IMAGE_GUARD_CF_EXPORT_SUPPRESSION_INFO_PRESENT</td><td>0x4000</td><td>This module contains suppressed export information.</td></tr><tr><td>IMAGE_GUARD_CF_ENABLE_EXPORT_SUPPRESSION</td><td>0x8000</td><td>This module enables suppression of exports.</td></tr><tr><td>IMAGE_GUARD_CF_LONGJUMP_TABLE_PRESENT</td><td>0x10000</td><td>This module contains long jmp target information.</td></tr></table>
 
-
-CHAPTER 7   Security      749
-
+CHAPTER 7 Security 749
 
 ---
 
 ## Loader interaction with CFG
 
-Although it is the memory manager that builds the CFG bitmap, the user-mode loader (see Chapter 3 for more information) serves two purposes. The first is to dynamically enable CFG support only if the feature is enabled (for example, the caller may have requested no CFG for the child process, or the process itself might not have CFG support). This is done by the LdrpCfgProcessLoadConfig loader function, which is called to initialize CFG for each loaded module. If the module D1Characteristics flags in the optional header of the PE does not have the CFG flag set (IMAGE_DLLCHARACTERISTICS_ GUARD_CFG), the GuardFlags member of IMAGE_LOAD_CONFIG_DIRECTORY structure does not have the IMAGE_GUARD_CFG_INSTRUMENTED flag set, or the kernel has forcibly turned off CFG for this module, then there is nothing to do.
+Although it is the memory manager that builds the CFG bitmap, the user-mode loader (see Chapter 3 for more information) serves two purposes. The first is to dynamically enable CFG support only if the feature is enabled (for example, the caller may have requested no CFG for the child process, or the process itself might not have CFG support). This is done by the LdrpCfgProcessLoadConfig loader function, which is called to initialize CFG for each loaded module. If the module D1Characteristics flags in the optional header of the PE does not have the CFG flag set (IMAGE*DLLCHARACTERISTICS* GUARD_CFG), the GuardFlags member of IMAGE_LOAD_CONFIG_DIRECTORY structure does not have the IMAGE_GUARD_CFG_INSTRUMENTED flag set, or the kernel has forcibly turned off CFG for this module, then there is nothing to do.
 
 Second, if the module is indeed using CFG, LdrpCfgProcessLoadConfig gets the indirect checking function pointer retrieved from the image (the GuardCFCheckFunctionPointer member of IMAGE_LOAD_CONFIG_DIRECTORY structure) and sets it to either LdrpValidatedUserCallTarget or LdrpValidatedUserCallTargetES in NdisI, depending on whether export suppression is enabled. Additionally, the function first makes sure the indirect pointer has not been somehow modified to point outside the module itself.
 
@@ -4920,19 +4792,18 @@ The code generated by the compiler when CFG is enabled issues an indirect call t
 LdrpValidateCallTarget(ES) or LdrpDispatchUserCallTarget(ES) functions in Ntdll. This func tion uses the target branch address and checks the bit state value for the function:
 
 - ■ If the bit state is (0, 0), the dispatch is potentially invalid.
-■ If the bit state is (1, 0), and the address is 16-byte aligned, the dispatch is valid. Otherwise, it is
-potentially invalid.
-■ If the bit state is (1, 1), and the address is not 16-byte aligned, the dispatch is valid. Otherwise,
-it is potentially invalid.
-■ If the bit state is (0, 1), the dispatch is potentially invalid.
-If the dispatch is potentially invalid, the RtlHandle1EnvalIdUserC1Target function will execute
+  ■ If the bit state is (1, 0), and the address is 16-byte aligned, the dispatch is valid. Otherwise, it is
+  potentially invalid.
+  ■ If the bit state is (1, 1), and the address is not 16-byte aligned, the dispatch is valid. Otherwise,
+  it is potentially invalid.
+  ■ If the bit state is (0, 1), the dispatch is potentially invalid.
+  If the dispatch is potentially invalid, the RtlHandle1EnvalIdUserC1Target function will execute
 
 to determine the appropriate action. First, it checks if suppressed calls are allowed in the process, which
 
 is disabled by suppressing the call. If the check passes, the critical section of the driver will begin.
 
-750    CHAPTER 7   Security
-
+750 CHAPTER 7 Security
 
 ---
 
@@ -4954,8 +4825,7 @@ Although drivers compiled with Visual Studio and /guard:cf also ended up with th
 
 With a greater number of users enabling VBS features, once again, the higher security boundary that VTL 1 provides can be leveraged. The SLAT page table entries come to the rescue by providing a second boundary against PTE page protection changes. While the bitmap is readable to VTL 0 because the SLAT entries are marked as read only, if a kernel attacker attempts to change the PTEs to mark them read/write, they cannot do the same to the SLAT entries. As such, this will be detected as an invalid
 
-CHAPTER 7   Security      751
-
+CHAPTER 7 Security 751
 
 ---
 
@@ -4967,9 +4837,9 @@ KCFG is implemented almost identically to regular CFG, except that export suppre
 
 Just like in the user-mode case, a dynamic pointer in the load configuration data directory is
 
-updated, which in the enabled case will point to __guard_check_i call for the check function and
+updated, which in the enabled case will point to \_\_guard_check_i call for the check function and
 
-__guard_di spatch_call for the dispatch function in enhanced CFG mode. Additionally, a variable
+\_\_guard_di spatch_call for the dispatch function in enhanced CFG mode. Additionally, a variable
 
 named guard_i call_bitmap will hold the virtual address of the bitmap.
 
@@ -4994,30 +4864,29 @@ On the flip side, while raising an exception would achieve the desired result, e
 which can be:
 
 - ■ Potentially hooked by attackers if /SAFESHEH and SEHOP mitigations are not enabled, causing the
-security check to be the one that gives control to an attacker in the first place-or an attacker
-can simply "swallow" the exception.
-■ Potentially hooked by legitimate parts of the software through an unhandled exception filter or
-vectored exception handler, both of which might accidentally swallow the exception.
-■ Same as above, but intercepted by a third-party product that has injected its own library into
-the process. Common to many security tools, this can also lead in the exception not being cor-
-rectly delivered to Windows Error Reporting (WER).
+  security check to be the one that gives control to an attacker in the first place-or an attacker
+  can simply "swallow" the exception.
+  ■ Potentially hooked by legitimate parts of the software through an unhandled exception filter or
+  vectored exception handler, both of which might accidentally swallow the exception.
+  ■ Same as above, but intercepted by a third-party product that has injected its own library into
+  the process. Common to many security tools, this can also lead in the exception not being cor-
+  rectly delivered to Windows Error Reporting (WER).
 
 CHAPTER 7 Security
 
-From the Library of
----
+## From the Library of
 
 - ■ A process might have an application recovery callback registered with WER. This might then
-display a less clear UI to the user, and might restart the process in its current exploited state,
-leading anywhere from a recursive crash/start loop to the exception being swallowed whole.
-■ Likely in a C++-based product, caught by an outer exception handler as if "thrown" by the
-program itself, which, once again, might swallow the exception or continue execution in an
-unsafe manner.
-Solving these issues requires a mechanism that can raise an exception that cannot be intercepted by any of the process's components outside of the WER service, which must itself be guaranteed to receive the exception. This is where security assertions come into play.
+  display a less clear UI to the user, and might restart the process in its current exploited state,
+  leading anywhere from a recursive crash/start loop to the exception being swallowed whole.
+  ■ Likely in a C++-based product, caught by an outer exception handler as if "thrown" by the
+  program itself, which, once again, might swallow the exception or continue execution in an
+  unsafe manner.
+  Solving these issues requires a mechanism that can raise an exception that cannot be intercepted by any of the process's components outside of the WER service, which must itself be guaranteed to receive the exception. This is where security assertions come into play.
 
 ## Compiler and OS support
 
-When Microsoft libraries, programs, or kernel components encounter unusual security situations, or when mitigations recognize dangerous violations of security state, they now use a special compiler intrinsic supported by Visual Studio, called __fastfa1, which takes one parameter as input. Alternatively, they can call a runtime library (Rtl) function in Ndtll called RtlFa1Fast2, which itself contains a __fastfa1 intrinsic. In some cases, the WDK or SDK contain inline functions that call this intrinsic, such as when using the LST_ENTRY functions InsertTailList and RemoveEntryList. In other situations, it is the Universal CRT (UCRT) itself that has this intrinsic in its functions. In yet others, APIs will do certain checks when called by applications and may use this intrinsic as well.
+When Microsoft libraries, programs, or kernel components encounter unusual security situations, or when mitigations recognize dangerous violations of security state, they now use a special compiler intrinsic supported by Visual Studio, called **fastfa1, which takes one parameter as input. Alternatively, they can call a runtime library (Rtl) function in Ndtll called RtlFa1Fast2, which itself contains a **fastfa1 intrinsic. In some cases, the WDK or SDK contain inline functions that call this intrinsic, such as when using the LST_ENTRY functions InsertTailList and RemoveEntryList. In other situations, it is the Universal CRT (UCRT) itself that has this intrinsic in its functions. In yet others, APIs will do certain checks when called by applications and may use this intrinsic as well.
 
 Regardless of the situation, when the compiler sees this intrinsic, it generates assembly code that
 
@@ -5039,29 +4908,27 @@ that WER will be notified, and that the process will be terminated (additionally
 
 the exception code). When the exception record is generated, the first exception argument will be the
 
-input parameter to __fastfail.
+input parameter to \_\_fastfail.
 
-Kernel-mode code can also raise exceptions, but in this case KiBugCheckDispatch will be called in stead, which will result in a special kernel mode crash (bugcheck) with code 0x139 (KERNEL_SECURITY_
+Kernel-mode code can also raise exceptions, but in this case KiBugCheckDispatch will be called in stead, which will result in a special kernel mode crash (bugcheck) with code 0x139 (KERNEL*SECURITY*
 
-CHECK_FAILURE), where the first argument will be the input parameter to __fastcall.
+CHECK_FAILURE), where the first argument will be the input parameter to \_\_fastcall.
 
-CHAPTER 7   Security      753
-
+CHAPTER 7 Security 753
 
 ---
 
 ## Fast fail/security assertion codes
 
-Because the __fastfail intrinsic contains an input argument that is bubbled up to the exception
+Because the \_\_fastfail intrinsic contains an input argument that is bubbled up to the exception
 
 record or crash screen, it allows the failing check to identify what part of the system or process is not
 
 working correctly or has encountered a security violation. T able 7-22 shows the various failure condi tions and their meaning or significance.
 
-TABLE 7-22 __fastfail failure codes
+TABLE 7-22 \_\_fastfail failure codes
 
 <table><tr><td>Code</td><td>Meaning</td></tr><tr><td>Legacy OS Violation (0x0)</td><td>An older buffer security check present in a legacy binary has failed, and has been converted to a security assertion instead.</td></tr><tr><td>V-Table Guard Failure (0x1)</td><td>The Virtual Table Guard Mitigation in Internet Explorer 10 and higher has encountered a corrupted virtual function table pointer.</td></tr><tr><td>Stack Cookie Check Failure (0x2)</td><td>The stack cookie generated with the /GS compiler option (also called a stack canary) has been corrupted.</td></tr><tr><td>Corrupt List Entry (0x3)</td><td>One of the macros for manipulating LIST_ENTRY structures has detected an inconsistent listed list, where the grandparent or grandchild entry does not point to the parent or child entry of the item being manipulated.</td></tr><tr><td>Incorrect Stack (0x4)</td><td>A user-mode or kernel-mode API that is often potentially called from ROP-based exploits while operating on an attacker-controlled stack has been called, and the stack is therefore not the expected one.</td></tr><tr><td>Invalid Argument (0x5)</td><td>A user-mode CRT API (typically) or other sensitive function has been called with an invalid argument, suggesting potential ROP-based use or an otherwise corrupted stack.</td></tr><tr><td>Stack Cookie Init Failure (0x6)</td><td>The initialization of the stack cookie has failed, suggesting image patching or corruption.</td></tr><tr><td>Fatal App Exit (0x7)</td><td>The application has used the FatalAppExit user-mode API, which has been converted into a security assertion to grant it the advantages this has.</td></tr><tr><td>Range Check Failure (0x8)</td><td>Additional validation checks in certain fixed array buffers to check if the array element index is within expected bounds.</td></tr><tr><td>Unsafe Registry Access (0x9)</td><td>A kernel-mode driver is attempting to access registry data from a user-control-lable hive (such as an application hive or user profile hive) and is not using the RTL_QUERY_REGISTRY_TYPECHECK flag to protect itself.</td></tr><tr><td>CFG Indirect Call Failure (0xA)</td><td>Control Flow Guard has detected an indirect CALL or JMP instruction to a target address that is not a valid dispatch per the CFG bitmap.</td></tr><tr><td>CFG Write Check Failure (0xB)</td><td>Control Flow Guard with write protection has detected an invalid write to protected data. This feature (/guard/cfw) is not supported outside of testing at Microsoft.</td></tr><tr><td>Invalid Fiber Switch (0xC)</td><td>The SwiCtoFiber API was used on an invalid fiber or from a thread which has not been converted to a fiber.</td></tr><tr><td>Invalid Set of Context (0xD)</td><td>An invalid context record structure was detected while attempting to restore it (due to an exception or SetThreadContext API), in which the stack pointer is not valid. Checked only when CFG is active on the process.</td></tr><tr><td>Invalid Reference Count (0xE)</td><td>A reference counted object (such as the OBJECT_HEADER in kernel-mode or a Win32.sys GDI object) has underflowed its reference count below 0 or over-flowed beyond its maximum capacity back to 0.</td></tr><tr><td>Invalid Jump Buffer (0x12)</td><td>A long jmp attempt is being made with a jump buffer that contains an invalid stack address or invalid instruction pointer. Checked only when CFG is active on the process.</td></tr><tr><td colspan="2">CHAPTER 7 Security</td></tr><tr><td colspan="2">From the Library of</td></tr></table>
-
 
 ---
 
@@ -5069,10 +4936,9 @@ TABLE 7-22 __fastfail failure codes
 
 ---
 
-TABLE 7-22 __fastfail failure codes (continued)
+TABLE 7-22 \_\_fastfail failure codes (continued)
 
 <table><tr><td>Code</td><td>Meaning</td></tr><tr><td>Invalid Dispatch Context (0x27)</td><td>Checked by the exception handler in kernel-mode when an exception is attempted to be dispatched with an incorrect CONTEXT record.</td></tr><tr><td>Invalid Thread (0x28)</td><td>Checked by the scheduler in kernel-mode when the KTHREAD structure is corrupt during certain scheduling operations.</td></tr><tr><td>Invalid System Call Number (0x29)</td><td>Similar to Deprecated Service Called, but WER will mark the exception as handled, resulting in the process continuing and therefore only used for telemetry.</td></tr><tr><td>Invalid File Operation (0x2A)</td><td>Used by the I/O Manager and certain file systems, as another telemetry-type failure as above.</td></tr><tr><td>LPAC Access Denied (0x2B)</td><td>Used by the SRM&#x27;s access check function when a lower-privilege AppContainer attempts to access an object that does not have the ALL_RESTRICTED_APPLICATION_PACKAGES SID and tracing of such failures is enabled. Once more, results only in telemetry data, not a process crash.</td></tr><tr><td>RFG Stack Failure (0x2C)</td><td>Used by Return Flow Guard (RFG), although this feature is currently disabled.</td></tr><tr><td>Loader Continuity Failure (0x2D)</td><td>Used by the process-mitigation policy of the same name, shown earlier, to indicate that an unexpected image with a different signature or no signature has been loaded.</td></tr><tr><td>CFG Export Suppression Failure (0x2D)</td><td>Used by CFG when enabled with export suppression to indicate that a suppressed export has been the target of an indirect branch.</td></tr><tr><td>Invalid Control Stack (0x2E)</td><td>Used by RFG, although this feature is currently disabled.</td></tr><tr><td>Set Context Denied (0x2F)</td><td>Used by the process-mitigation policy of the same name, shown earlier, although this feature is currently disabled.</td></tr></table>
-
 
 ## Application Identification
 
@@ -5084,16 +4950,13 @@ Note This is not the same as the AppID used by DOM/COM+ applications, where a GU
 
 Just as a user is identified when she logs in, an application is identified just before it is started by
 
-
 generating the main program's AppID. An AppID can be generated from any of the following attributes
-
 
 of the application:
 
 - ■ Fields Fields within a code-signing certificate embedded within the file allow for different
-combinations of publisher name, product name, file name, and version. APPID: //FQBN is a
-756    CHAPTER 7   Security
-
+  combinations of publisher name, product name, file name, and version. APPID: //FQBN is a
+  756 CHAPTER 7 Security
 
 ---
 
@@ -5112,7 +4975,7 @@ code, using the following fields:
 • C Country
 • File hash there are several methods that can be used for hashing. The default is APID: // SHA256HASH. However, for backward compatibility with SRP and most x.509 certificates, SHA-1 (APID://SHA1HASH) is still supported. APID://SHA256HASH specifies the SHA-256 hash of the file.
 
-■ The partial or complete path to the file APIDF://Path specifies a path with optional wildcard characters (*).
+■ The partial or complete path to the file APIDF://Path specifies a path with optional wildcard characters (\*).
 
 ![Figure](figures/Winternals7thPt1_page_774_figure_004.png)
 
@@ -5128,8 +4991,7 @@ Windows 8.1 and Windows 10 (Enterprise editions) and Windows Server 2012/RS/2016
 
 Another feature that makes AppLocker superior to SRP is AppLocker's auditing mode, which allows an administrator to create an AppLocker policy and examine the results (stored in the system event log) to determine whether the policy will perform as expected—without actually performing the
 
-CHAPTER 7   Security      757
-
+CHAPTER 7 Security 757
 
 ---
 
@@ -5159,9 +5021,9 @@ rules, for determining which applications or scripts are allowed to be run by sp
 using conditional ACEs and AppID attributes. There are two types of rules in AppLocker:
 
 - ■ Allow the specified files to run, denying everything else.
-■ Deny the specified files from being run, allowing everything else. Deny rules take precedence
-over allow rules.
-Each rule can also have a list of exceptions to exclude files from the rule. Using an exception, you
+  ■ Deny the specified files from being run, allowing everything else. Deny rules take precedence
+  over allow rules.
+  Each rule can also have a list of exceptions to exclude files from the rule. Using an exception, you
 
 could create a rule to, for example, allow everything in the C:\Windows or C:\Program Files directories
 
@@ -5172,10 +5034,11 @@ AppLocker rules can be associated with a specific user or group. This allows an 
 AppLocker rules depend upon conditional ACEs and attributes defined by AppID. Rules can be created using the following criteria:
 
 - ■ Fields within a code-signing certificate embedded within the file, allowing for different
-combinations of publisher name, product name, file name, and version For example,
-a rule could be created to allow all versions greater than 9.0 of Contoso Reader to run or allow
-anyone in the Graphics group to run the installer or application from Contoso for GraphicsShop
-as long as the version is 14.*. For example, the following SDDL string denies execute access to
+  combinations of publisher name, product name, file name, and version For example,
+  a rule could be created to allow all versions greater than 9.0 of Contoso Reader to run or allow
+  anyone in the Graphics group to run the installer or application from Contoso for GraphicsShop
+  as long as the version is 14.\*. For example, the following SDDL string denies execute access to
+
 ---
 
 any signed programs published by Contoso for the RestrictedUser user account (identified by the user's SID):
@@ -5208,19 +5071,18 @@ msc, see Figure 7-33) or a Windows PowerShell script, or they can be pushed to m
 domain using Group Policy. AppLocker rules are stored in multiple locations within the registry:
 
 - ■ HKLM\Software\Policies\Microsoft\Windows\SrpV2 This key is also mirrored to
-HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\SrpV2. The rules are stored
-in XML format.
-■ HKLM\SYSTEM\CurrentControlSet\Control\Srp\Gp\Exe The rules are stored as SDDL
-and a binary ACE.
-■ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Group Policy
-Objects\{GUID\Machine\Software\Policies\Microsoft\Windows\SrpV2 AppLocker policy
-pushed down from a domain as part of a GPO are stored here in XML format.
-Certificates for files that have been run are cached in the registry under the key HKLM\SYSTEM\CurrentControlSet\Control\ApID\certStore. AppLocker also builds a certificate chain (stored in HKLM\SYSTEM\CurrentControlSet\Control\ApID\CertChainStore) from the certificate found in a file back to a trusted root certificate.
+  HKLM\SOFTWARE\Wow6432Node\Policies\Microsoft\Windows\SrpV2. The rules are stored
+  in XML format.
+  ■ HKLM\SYSTEM\CurrentControlSet\Control\Srp\Gp\Exe The rules are stored as SDDL
+  and a binary ACE.
+  ■ HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Group Policy
+  Objects\{GUID\Machine\Software\Policies\Microsoft\Windows\SrpV2 AppLocker policy
+  pushed down from a domain as part of a GPO are stored here in XML format.
+  Certificates for files that have been run are cached in the registry under the key HKLM\SYSTEM\CurrentControlSet\Control\ApID\certStore. AppLocker also builds a certificate chain (stored in HKLM\SYSTEM\CurrentControlSet\Control\ApID\CertChainStore) from the certificate found in a file back to a trusted root certificate.
 
 There are also AppLocker-specific PowerShell commands (cmdlets) to enable deployment and testing via scripting. After using the Import-Module AppLocker to get AppLocker cmdlets into PowerShell, several cmdlets are available. These include Get-AppLockerFileInformation, Get-AppLockerPolicy, New-AppLockerPolicy, Set-AppLockerPolicy, and Test-AppLockerPolicy.
 
-CHAPTER 7   Security      759
-
+CHAPTER 7 Security 759
 
 ---
 
@@ -5228,7 +5090,7 @@ CHAPTER 7   Security      759
 
 FIGURE 7-33 AppLocker configuration page in Local Security Policy.
 
-The AppID and SRP services coexist in the same binary (AppIdSvc.dll), which runs within an SvCHost process. The service requests a registry change notification to monitor any changes under that key, which is written by either a GPO or the AppLocker UI in the Local Security Policy MMC snap-in. When a change is detected, the AppID service triggers a user-mode task (AppIdPolicyConverter.exe), which reads the new rules (described with XML) and translates them into binary format ACEs and SDDL strings, which are understandable by both the user-mode and kernel-mode AppID and AppLocker components. The task stores the translated rules under HKLM\SYSTEM\CurrentControlSet\Control\Scrp\ Gp. This key is writable only by System and Administrators, and it is marked read-only for authenticated users. Both user-mode and kernel-mode AppID components read the translated rules from the registry directly. The service also monitors the local machine trusted root certificate store, and it invokes a usermode task (AppIdCertStoreCheck.exe) to reverify the certificates at least once per day and whenever there is a change to the certificate store. The AppID kernel-mode driver (%SystemRoot%\System32\ drivers\AppId.sys) is notified about rule changes by the AppID service through an APPID_POLICY_ CHANGEDDeviceIoControl request.
+The AppID and SRP services coexist in the same binary (AppIdSvc.dll), which runs within an SvCHost process. The service requests a registry change notification to monitor any changes under that key, which is written by either a GPO or the AppLocker UI in the Local Security Policy MMC snap-in. When a change is detected, the AppID service triggers a user-mode task (AppIdPolicyConverter.exe), which reads the new rules (described with XML) and translates them into binary format ACEs and SDDL strings, which are understandable by both the user-mode and kernel-mode AppID and AppLocker components. The task stores the translated rules under HKLM\SYSTEM\CurrentControlSet\Control\Scrp\ Gp. This key is writable only by System and Administrators, and it is marked read-only for authenticated users. Both user-mode and kernel-mode AppID components read the translated rules from the registry directly. The service also monitors the local machine trusted root certificate store, and it invokes a usermode task (AppIdCertStoreCheck.exe) to reverify the certificates at least once per day and whenever there is a change to the certificate store. The AppID kernel-mode driver (%SystemRoot%\System32\ drivers\AppId.sys) is notified about rule changes by the AppID service through an APPID*POLICY* CHANGEDDeviceIoControl request.
 
 An administrator can track which applications are being allowed or denied by looking at the
 
@@ -5259,13 +5121,11 @@ for the following:
 ■ Detecting AppLocker rule updates and notifying the AppID driver
 The AppID driver performs the majority of the AppLocker functionality and relies on communication (via DeviceIoControl requests) from the AppID service, so its device object is protected by an ACL, granting access only to the NT SERVICE\ApIDSvc, LOCAL SERVICE and BUILTIN\Administrators groups. Thus, the driver cannot be spoofed by malware.
 
-When the AppID driver is first loaded, it requests a process-creation callback by calling PSetCreateProcessNotifyRoutineEx. When the notification routine is called, it is passed a PPS_
+When the AppID driver is first loaded, it requests a process-creation callback by calling PSetCreateProcessNotifyRoutineEx. When the notification routine is called, it is passed a PPS\_
 
 CREATE_NOTIFY_INFO structure (describing the process being created). It then gathers the AppID attributes that identify the executable image and writes them to the process's access token. Then it calls the undocumented routine SeSrpAccessCheck, which examines the process token and the conditional ACE AppLocker rules, and determines whether the process should be allowed to run. If the process should
 
-
 CHAPTER 7 Security 761
-
 
 From the Library of Micha
 
@@ -5295,13 +5155,12 @@ FIGURE 7-35 Software Restriction Policy configuration.
 
 762 CHAPTER 7 Security
 
-
 ---
 
 Several global policy settings appear beneath the Software Restriction Policies node:
 
 - ■ Enforcement This policy configures whether restriction policies apply to libraries, such as
-DLLs, and whether policies apply to users only or to administrators as well.
+  DLLs, and whether policies apply to users only or to administrators as well.
 
 ■ Designated File Types This policy records the extensions for files that are considered
 executable code.
@@ -5319,7 +5178,7 @@ Unrestricted security policy.
 Enforcement of SRPs takes place within various components where files are treated as containing executable code. Some of these components are listed here:
 
 - The user-mode Windows CreateProcess function in Kernel32.dll enforces it for
-executable images.
+  executable images.
 
 • The DLL loading code in Ndtll enforces it for DLLs.
 
@@ -5362,7 +5221,7 @@ Restriction Policies node.
 4. Run Process Monitor and set an include a Path filter for Safer.
 
 5. Open a command prompt and run Notepad from the prompt.
-Your attempt to run Notepad should result in a message telling you that you cannot execute
+   Your attempt to run Notepad should result in a message telling you that you cannot execute
 
 the specified program, and Process Monitor should show the command prompt (cmd.exe) query ing the local machine restriction policies.
 
@@ -5381,11 +5240,12 @@ disable, patch, or fool the detection/prevention mechanism. That being said, eve
 mechanism to react to such unwanted operations can still be useful in the following ways:
 
 - By crashing the machine with a clearly identifiable kernel-mode crash dump, both users and ad-
-ministrators can easily see that an unwanted behavior has been operating inside of their kernel
-and they can take action. Additionally, it means that legitimate software vendors will not want
-to take the risk of crashing their customers' systems and will find supported ways of extending
-kernel functionality (such as by using the filter manager for file system filters or other callback-
-based mechanisms).
+  ministrators can easily see that an unwanted behavior has been operating inside of their kernel
+  and they can take action. Additionally, it means that legitimate software vendors will not want
+  to take the risk of crashing their customers' systems and will find supported ways of extending
+  kernel functionality (such as by using the filter manager for file system filters or other callback-
+  based mechanisms).
+
 ---
 
 <table><tr><td>■</td><td>Obfuscation (which is not a security boundary) can make it costly—either in time or in complex-ity—for the unwanted behavior to disable the detection mechanism. This added cost means that the unwanted behavior is more clearly identified as potentially malicious, and that its com-plexity results in additional costs to a potential attacker. By shifting the obfuscation techniques, it means that legitimate vendors will be better off taking the time to move away from their legacy extension mechanisms and implement supported techniques instead, without the risk of looking malware. ■</td><td>Randomization and non-documentation of which specification makes to ensure kernel integrity, and non-determinism of which check are executed, cripple the ability of attackers to ensure their exploits are reliable. It forces them to account for every possible non-deterministic variable and state transition that the mechanism has through static analysis, which obfuscation makes nearly impossible within the timeframe required before another obfuscation change is implemented in the mechanism. ■</td><td>Because kernel mode crash dumps are automatically submitted to Microsoft, it allows the company to receive telemetry of in-the-wild unwanted code, and to either identify software vendors whose code is unsupported and is crashinging systems, or to track the progress of mali-cious drivers in the wild, or even zero-day kernel-mode exploitations, and fix bugs that may not have been reported, but are actively exploited.</td></tr></table>
@@ -5400,13 +5260,11 @@ KPP has a variety of checks that it makes on protected systems, and documenting 
 
 CHAPTER 7 Security 765
 
-
 ---
 
 TABLE 7-23 Generalized description of elements protected by KPP
 
 <table><tr><td>Component</td><td>Legitimate Usage</td><td>Potential Unwanted Usage</td></tr><tr><td>Executable code in the kernel, its dependencies, and core drivers, as well as the Import Address Table (IAT) of these components</td><td>Standard Windows components key to operation of kernel-mode usage.</td><td>Patching code in these components can modify their behavior and introduce unwanted back doors to the system, hide data or unwanted communications between them, as well as reduce the stability of the system, or even add additional vulnerabilities through buggy third-party code.</td></tr><tr><td>Global Descriptor Table (GDT)</td><td>CPU hardware protection for the implementation of ring privilege levels (ring 0 versus ring 3).</td><td>Modification of expected permissions and mappings between code and ring levels, allowing ring 3 code ring 0 access.</td></tr><tr><td>Interrupt Descriptor Table (IDT) or Interrupt Vector Table</td><td>Table read by the CPU to deliver interrupt vectors to the correct handling routine.</td><td>Hacking of keystrokes, network packets, paging mechanism, system calls, hypervisor communication, and more, which can be used for back-dooring, hiding malicious data or communications, or accidentally adding vulnerabilities through buggy third-party code.</td></tr><tr><td>System Service Descriptor Table (SSDT)</td><td>Table containing the array of pointers for each system call handler.</td><td>Hacking of all user-mode communications with the kernel. Same issues as above.</td></tr><tr><td>Critical CPU registers such as Control Registers, Vector Base Address Register, and Model Specific Registers</td><td>Used for system calls, virtualization, enabling CPU security features such as SMEP, and more.</td><td>Same as above, plus disabling of key CPU security features or hypervisor protection.</td></tr><tr><td>Various function pointers in the kernel</td><td>Used as indirect calls to various internal functionality.</td><td>Can be used to hook certain internal kernel operations, leading to back doors and/or instability.</td></tr><tr><td>Various global variables in the kernel</td><td>Used to configure various parts of the kernel, including certain security features.</td><td>Malicious code would disable these security features, such as through an exploit from user mode allowing arbitrary memory overwrites.</td></tr><tr><td>Process and module list</td><td>Used to show the user, in tools such as Task Manager, Process Explorer, and the Windows Debugger, which processes are active, and which drivers are loaded.</td><td>Malicious code can hide the existence of certain processes or drivers on the machine, making them invisible to the user and most applications such as security software.</td></tr><tr><td>Kernel stacks</td><td>Store function arguments, the call stack (where a function should return), and variables.</td><td>Operating on a non-standard kernel stack is often the sign of a return-oriented programming (ROP) exploit operating on a pivoted stack as part of the attack.</td></tr><tr><td>Window Manager, graphical system calls, callbacks, and more</td><td>Provides the GUI, GDI, and DirectX services.</td><td>Same hooking abilities as described earlier, but specifically targeting the graphics and window-management stack. Same issues as other types of hooks.</td></tr><tr><td>Object types</td><td>Definitions for the various objects (such as processes and files) that the system supports through the object manager.</td><td>Can be used as another hooking technique, which does not target indirect function pointers in binaries&#x27; data sections, nor patching code directly. Same issues.</td></tr><tr><td colspan="3">CHAPTER 7 Security</td></tr><tr><td colspan="3">From the Library of</td></tr></table>
-
 
 ---
 
@@ -5414,41 +5272,40 @@ TABLE 7-23 Generalized description of elements protected by KPP (continued)
 
 <table><tr><td>Component</td><td>Legitimate Usage</td><td>Potential Unwanted Usage</td></tr><tr><td>Local APIC</td><td>Used to receive hardware interrupts on the processor, receive timer interrupts, and inter-processor interrupts (IPI).</td><td>Can be used to hook timer execution, IPIs, or interrupts, or as a way for persistent code to covertly maintain liveness on the machine, executing on a periodic basis.</td></tr><tr><td>Filter and third-party notification callbacks</td><td>Used by legitimate third-party security software (and Windows Defender) to receive notifications about system actions, and in some cases even block/defend against certain actions. Exists as the supported way to achieve much of what KPP prevents.</td><td>Could be used by malicious code to hook all the filterable operations, as well as maintain liveness on a machine, executing on a periodic basis.</td></tr><tr><td>Specialized configuration and flags</td><td>Various data structures, flags, and elements of legitimate components that provide security and/or mitigation guarantees to them.</td><td>Could be used by malicious code to bypass certain mitigations or violate certain guarantees or expectations that user-mode processes might have, such as unprotected a protected process.</td></tr><tr><td>KPP engine itself</td><td>Code related to bug-checking the system during a KPP violation, executing the callbacks associated with KPP, and more.</td><td>By modifying certain parts of the system used by KPP, unwanted components could attempt to silence, ignore, or otherwise cripple KPP.</td></tr></table>
 
-
-As mentioned, when KPP detects unwanted code on the system, it crashes the system with an easily identifiable code. This corresponds to buchgeek code 0x109, which stands for CRITICAL_STRUCTURE_ CORRUPTION, and the Windows Debugger can be used to analyze this crash dump. (See Chapter 15, "Crash dump analysis," in Part 2 for more information.) The dump information will contain some information about the corrupted or scumptuously modified part of the kernel, but any additional data must be analyzed by Microsoft's Online Crash Analysis (OCA) and/or Windows Error Reporting (WER) teams and is not exposed to users.
+As mentioned, when KPP detects unwanted code on the system, it crashes the system with an easily identifiable code. This corresponds to buchgeek code 0x109, which stands for CRITICAL*STRUCTURE* CORRUPTION, and the Windows Debugger can be used to analyze this crash dump. (See Chapter 15, "Crash dump analysis," in Part 2 for more information.) The dump information will contain some information about the corrupted or scumptuously modified part of the kernel, but any additional data must be analyzed by Microsoft's Online Crash Analysis (OCA) and/or Windows Error Reporting (WER) teams and is not exposed to users.
 
 For third-party developers who use techniques that KPP deters, the following supported techniques can be used:
 
 - ■ File system (mini) filters Use these to hook all file operations, including loading image
-files and DLLs, that can be intercepted to purge malicious code on-the-fly or block reading of
-known bad executables or DLLs. (See Chapter 13, “File systems,” in Part 2 for more information
-on these.)
-■ Registry filter notifications Use these to hook all registry operations. (See Chapter 9 in Part
-2 for more information on these notifications.) Security software can block modification of criti-
-cal parts of the registry, as well as heuristically determine malicious software by registry access
-patterns or known bad registry keys.
-■ Process notifications Security software can monitor the execution and termination of
-all processes and threads on the system, as well as DLLs being loaded or unloaded. With the
-enhanced notifications added for antivirus and other security vendors, they also can block
-process launch. (See Chapter 3 for more information on these notifications.)
-CHAPTER 7   Security      767
-
+  files and DLLs, that can be intercepted to purge malicious code on-the-fly or block reading of
+  known bad executables or DLLs. (See Chapter 13, “File systems,” in Part 2 for more information
+  on these.)
+  ■ Registry filter notifications Use these to hook all registry operations. (See Chapter 9 in Part
+  2 for more information on these notifications.) Security software can block modification of criti-
+  cal parts of the registry, as well as heuristically determine malicious software by registry access
+  patterns or known bad registry keys.
+  ■ Process notifications Security software can monitor the execution and termination of
+  all processes and threads on the system, as well as DLLs being loaded or unloaded. With the
+  enhanced notifications added for antivirus and other security vendors, they also can block
+  process launch. (See Chapter 3 for more information on these notifications.)
+  CHAPTER 7 Security 767
 
 ---
 
 - ● Object manager filtering Security software can remove certain access rights being granted
-to processes and/or threads to defend their own utilities against certain operations. (These are
-discussed in Chapter 8 in Part 2.)
-● NDIS Lightweight Filters (LWF) and Windows Filtering Platform (WFP) filters Security
-software can intercept all socket operations (accept, listen, connect, close, and so on) and even
-the packets themselves. With LWF, security vendors have access to the raw Ethernet frame data
-that is going from the network card (NIC) to the wire.
-● Event Tracing for Windows (ETW) Through ETW, many types of operations that have
-interesting security properties can be consumed by a user-mode component, which can then
-react to data in near real-time. In certain cases, special secure ETW notifications are available to
-anti-malware-protected processes under NDA with Microsoft and participation in various secu-
-rity programs, which give access to a greater set of tracing data. (ETW is discussed in Chapter 8
-in Part 2.)
+  to processes and/or threads to defend their own utilities against certain operations. (These are
+  discussed in Chapter 8 in Part 2.)
+  ● NDIS Lightweight Filters (LWF) and Windows Filtering Platform (WFP) filters Security
+  software can intercept all socket operations (accept, listen, connect, close, and so on) and even
+  the packets themselves. With LWF, security vendors have access to the raw Ethernet frame data
+  that is going from the network card (NIC) to the wire.
+  ● Event Tracing for Windows (ETW) Through ETW, many types of operations that have
+  interesting security properties can be consumed by a user-mode component, which can then
+  react to data in near real-time. In certain cases, special secure ETW notifications are available to
+  anti-malware-protected processes under NDA with Microsoft and participation in various secu-
+  rity programs, which give access to a greater set of tracing data. (ETW is discussed in Chapter 8
+  in Part 2.)
+
 ## HyperGuard
 
 On systems that run with virtualization-based security (described earlier in this chapter in the section
@@ -5460,17 +5317,17 @@ Update of Windows 10 (version 1607), such a mechanism does indeed exist, which i
 named HyperGuard. HyperGuard has a few interesting properties that set it apart from PatchGuard:
 
 - ■ It does not need to rely on obfuscation. The symbol files and function names that implement
-HyperGuard are available for anyone to see, and the code is not obfuscated. Complete static
-analysis is possible. This is because HyperGuard is a true security boundary.
-■ It does not need to operate non-deterministically because this would provide no advantage
-due to the preceding property. In fact, by operating deterministically, HyperGuard can crash
-the system at the precise time unwanted behavior is detected. This means crash data will con-
-tain clear and actionable data for the administrator (and Microsoft's analysis teams), such as the
-kernel stack, which will show the code that performed the undesirable behavior.
-■ Due to the preceding property, it can detect a wider variety of attacks, because the malicious
-code does not have the chance to restore a value back to its correct value during a precise time
-window, which is an unfortunate side-effect of PatchGuard's non-determinism.
-HyperGuard is also used to extend PatchGuard's capabilities in certain ways, and to strengthen its
+  HyperGuard are available for anyone to see, and the code is not obfuscated. Complete static
+  analysis is possible. This is because HyperGuard is a true security boundary.
+  ■ It does not need to operate non-deterministically because this would provide no advantage
+  due to the preceding property. In fact, by operating deterministically, HyperGuard can crash
+  the system at the precise time unwanted behavior is detected. This means crash data will con-
+  tain clear and actionable data for the administrator (and Microsoft's analysis teams), such as the
+  kernel stack, which will show the code that performed the undesirable behavior.
+  ■ Due to the preceding property, it can detect a wider variety of attacks, because the malicious
+  code does not have the chance to restore a value back to its correct value during a precise time
+  window, which is an unfortunate side-effect of PatchGuard's non-determinism.
+  HyperGuard is also used to extend PatchGuard's capabilities in certain ways, and to strengthen its
 
 ability to run undetected by attackers trying to disable it. When HyperGuard detects an inconsistency,
 
@@ -5486,7 +5343,6 @@ TABLE 7-24 Generalized description of elements protected by HyperGuard
 
 <table><tr><td>Component</td><td>Legitimate Usage</td><td>Potential Unwanted Usage</td></tr><tr><td>Executable code in the kernel, its dependencies, and core drivers, as well as the Import Address Table (IAT) of these components</td><td>Refer to Table 7-23.</td><td>Refer to Table 7-23.</td></tr><tr><td>Global Descriptor Table (GDT)</td><td>Refer to Table 7-23.</td><td>Refer to Table 7-23.</td></tr><tr><td>Interrupt Descriptor Table (IDT) or Interrupt Vector Table</td><td>Refer to Table 7-23.</td><td>Refer to Table 7-23.</td></tr><tr><td>Critical CPU registers such as Control Registers, GDR, IDTR, Vector Base Address Register, and Model Specific Registers</td><td>Refer to Table 7-23.</td><td>Refer to Table 7-23.</td></tr><tr><td>Executable code, callbacks, and data regions in the Secure Kernel and its dependencies, including HyperGuard itself</td><td>Standard Windows components key to operation of VTL1 and secure kernel-mode usage.</td><td>Patching code in these components implies the attacker has access to some sort of vulnerability in VTL1, either through hardware or the hyper-visor. Could be used to subvert Device Guard, HyperGuard, and Credential Guard.</td></tr><tr><td>Structures and features used by Trustlets</td><td>Sharing data between one Trustlet to another, or Trustlets and the kernel, or Trustlets and VTL 0.</td><td>Implies that some vulnerability might exist in one or more Trustlets, which could be used to hamper features such as Credential Guard or Shielded Fabric/vTPM.</td></tr><tr><td>Hypervisor structures and regions</td><td>Used by the hypervisor to communicate with VTL1.</td><td>Implies a potential vulnerability in a VTL1 component or the hypervisor itself, which may be accessible from ring 0 in VTL 0.</td></tr><tr><td>Kernel CFG bitmap</td><td>Used to identify valid kernel functions that are the subject of indirect function calls or jumps, as described earlier.</td><td>Implies that an attacker has been able to perform a modification to the VTL1-protected KCFG bitmap through some sort of hardware or hypervisor exploit.</td></tr><tr><td>Page verification</td><td>Used to implement HVCI-related work for Device Guard.</td><td>Implies that an attacker has somehow attacked SKCI, which could result in Device Guard compromise or non-authorized IUM Trustlets.</td></tr><tr><td>NULL page</td><td>None.</td><td>Implies that an attacker has somehow coerced the kernel and/or secure kernel to allocate virtual page 0, which can be used to exploit NULL-page vulnerabilities in either VTL 0 or VTL 1.</td></tr></table>
 
-
 On systems with VBS enabled, there is another security-related feature that is worth describing, which is implemented in the hypervisor itself: Non-Privileged Instruction Execution Prevention (NPIEP). This mitigation targets specific x64 instructions that can be used to leak the kernel-mode addresses of the GDT, IDT, and LDT, which are SGDT, SIDT, and SLDT. With NPIEP, these instructions are still allowed to execute (due to compatibility concerns), but will return a per-processor unique number that is not actually the kernel address of these structures. This serves as a mitigation against Kernel ASLR (KASLR) information leaks from local attackers.
 
 Finally, note that there is no way to disable PatchGuard or HyperGuard once they are enabled.
@@ -5499,8 +5355,7 @@ remote kernel-debugging connection. Similarly, HyperGuard is disabled if the hyp
 
 debugging mode with a remote debugger attached.
 
-CHAPTER 7   Security      769
-
+CHAPTER 7 Security 769
 
 ---
 
@@ -5525,7 +5380,6 @@ user address spaces. See user address spaces viewing usage, 361-363 x64 virtual 
 applications. See also processes APIs. See APIs AppContainer. See AppContainers AppIDa, 756-757 AppLocker, 757-762 AppCatalog, 103 desktop apps, 103 immersive apps, 103 large address spaces, 351 modern apps, 103 UWP apps, 685-687 AppLocker, 757-762 applying priority boosts, 249 accessing components, 61-62 kernel mode, 47-49 overview, 47-49, 61-62 user mode, 47-49 VBS, 59-61 ARM address space layouts, 356-357 ARM virtual address translation, 381-382 ASLR. See Address spaces assertions compilers, 753 fast failure codes, 754-756 operating system, 753 overview, 752-753 assigning factors, 656-657 factors (groups), 271-273 assured authentication, 718-719 asymmetric multiprocessing, 51 asynchronous I/O, 511 atom tables, 697-698 attributes AppContainer security, 695-697 configuring, 131-135 trustlets, 125 auditing (security) advanced audit policy, 683-684 global audit policy, 682-683 object access auditing, 679-681 overview, 677-679 authentication authentic credential Guard, 616-617 users, 713-718 Kerberos, 714-715 MSV1_0, 713-714 viewing active logon sessions, 715-717 AuthZ API, 656-667 Autoboot, 253 auto-elevation (UAC), 732-733 AWE (Address Windowing Extensions), 22, 323-324
 
 771
-
 
 ---
 
@@ -5579,7 +5433,6 @@ editions (Windows), 54–57 EMET (Enhanced Mitigation Experience Toolkit), 370 e
 
 773
 
-
 ---
 
 executive resources (priority boosts)-free pages
@@ -5600,7 +5453,6 @@ facilities (Windows edition enabled features), 56-57 fast file failure codes, 75
 
 774
 
-
 ---
 
 freezing threads-hypervisor
@@ -5608,7 +5460,6 @@ freezing threads-hypervisor
 freezing threads, 264-266 FTH (fault-tolerant heaps), 347-348 functions
 
 AllocConrole, 63 AvTaskInHandle, 254 BaseThreadIn, 160, 170 CThreadThreadToBuffer, 19 CreateFiber, 19 CreateFile, 34 CreateProcess, 101-104, 129-131, 134, 157 CreateProcessAsUser, 101-103, 139 CreateProcessInternal, 101-103 CreateProcessInternalW, 129, 131, 134-138, 140-142 CreateProcessWithCoonW, 101-103 CreateProcessWithTokenW, 101-103 CreateRemoteThread, 193-194 CreateRemoteThreadEx, 194, 206-207 CreateThread, 193-194, 199, 208 Csr, 71-72 Debug, 12 DebugActiveProcess, 39 DebugBreak, 194 DeviceIoControl, 73 DbgPrintEx, 58 DllMain, 154 drivers, 493 Elf, 72 Ex, 73 ExitProcess, 154 exported, 34-35 GetQueueCompletionStatus, 176 GetSystemTimeAdjustment, 232 GetThreadContext, 18 GetVersionX, 2 HeapAlloc, 322 HeapFree, 312 HeapDestroy, 332 HeapFree, 332 HeapLock, 332 HeapRelAlloc, 332 HeapUnlock, 332 HeapWalk, 332 Inv, 73 IoCompleteRequest, 241 Iop, 73 Ke, 75 KeStartDynamicProcessor, 245 KConvertDynamicMemoryPolicy, 287 KiDeferredReadyThread, 274, 284 KiBusyWaitThread, 256 KiExitDispatch, 241 KiProcessDeferredReadyList, 274 KiRemoveBoosThread, 241, 250 KiSearchForNewThreadOnProcessor, 283 KiSelectThreatyThreadEx, 267 KiSelectNextThread, 266-267 Ldr, 70-71 LoadAppickleNameRedirection, 175 Mi, 75 MiZeroinParallel, 303 NiCreateProcessEx, 104, 120 NiCreateThreadEx, 207
-
 
 1
 
@@ -5637,7 +5488,6 @@ IBAC (Identity-Based Access Control), 667 ideal node, 278 ideal processor, 277�
 776
 
 overview, 4 Windows Runtime, 5-6 internal synchronization, 308 Interrupt Request Levels (IRQLs), 488-490, 491 invalid PTEs, 384-385 inversion I/O priorities, 549 priority boosts, 246 I/O asynchronous, 511 overview, 537 thread termination, 539 users, 537-538 completion ports, 541-546 components, 483-488 concurrency, 542 conditional notifications, 532 device drivers. See device drivers DPCs, 400-492 Driver Verifier, 554-555, 557 fast I/O, 511-513 file caching, 513 in-paging I/O, 386-387 I/O manager, 485-486 IRPs (I/O request packets). See IRPs (Non-device specific) IRQLs, 488-490, 557 mapped-file I/O, 513 overview, 483-488 Plug and Play catalog files, 574 device enumeration, 561-563 device stacks, 563-569 device context, 560-561 device trees, 561-563 devnodes, 563-569 driver installation, 571-575 driver support, 560-561, 569-571 INF files, 573 overview, 559-560 power management complete power, 599-600 drivers, 596 overview, 590-594 performance states, 601 power availability requests, 602-603 power management framework, 600-601 power warnings, 595 power states, 590-594 system capabilities, 597-599 priorities. See priorities priority boosts, 241-242 processing, 486-488 scatter/gather I/O, 513 synchronous, 511 threads, see specific I/O, 536-537 WDF. See WDF I/O manager, 485-486 I/O request packets. See IRPs IoCompletion object, 542 IRPs (I/O request packets), 513
-
 
 1
 
@@ -5725,14 +5575,13 @@ Physical Address Extension (PAE), 371 physical memory limits, 446–447 PCI crea
 
 778
 
-
 ---
 
 policies-quotas (address spaces)
 
 trustlets, 124–125 Windows edition enabled features, 56–57 pools size, 326–327 threads, 299–300 usage, 327–329 port drivers, 494–495 portability (Windows), 50–51 ports completion ports, 541–546 port drivers, 494–495 power manager Connected Standy, 594 controlling power, 599–600 drivers, 596 Logical Standy, 594 Modern Standy, 594 overview, 590–594 performance states, 601 power availability requests, 602–603 power management framework, 600–601 power mappings, 595 power states, 590–594 system capabilities, 597–599 PREemption (Windows Light), 115–120 preemption (threads), 257–258 prefetcher (working sets), 413–416 prefixes (functions), 87–88 priorities. See also priority boosts I/O bandwidth reservation, 551–552 boots, 549, 551 bumps, 549, 551 inversion, 549 overview, 546 strategies, 547–548 viewing throughput, 549–551 pages, 436–437 SuperFetch, 476–478 threads threads, 215–219 real-time, 218–219 viewing, 219–222 priority boosts. See also priorities applying, 249 Autobot, 254 balance set manager, 247 CPU starvation, 246–248 default interrupting, 254 dispatch events, 239–240 executive resources, 242–243 foreground threads, 243–245 games, 251–254 GUI threads, 245–246 I/O, 241–242 locks, 241 MMO, 239, 251–254 minimedia, 251–254 overview, 238–239 priority inversion, 246 removing, 250 scheduling category, 251 unwait boosts, 240–241
 
-private pages (committed pages), 310–313 privileges (accounts), 668–675 Bypass Traverse Checking privilege, 675 super privileges, 675–676 _process, 109–110 process control block (PCB), 106 Process Environmental Block (PEB), 105 overview, 105 see also viewing, 110–111 Process Explorer, 14–18 process reflection (SuperFetch), 480–482 process tree, viewing, 12–14 process VADs, 402–403 processes. See also applications access tokens, 677 authentication process, 310 console host, 65 creating address space, 140–142 converting attributes, 131–135 converting flags, 131–135 executing initial thread, 148 executive process object, 138–143 initial thread, 148–149 initializing process, 148–149 initializing subsystem, 146–147 kernel process structure, 141 opening images, 135–138 overview, 101–104, 129–130 setting up EPROCESSSS object, 138–140 setting up PEB, 142 training startup, 142–154 validating parameters, 131–135 data structures
+private pages (committed pages), 310–313 privileges (accounts), 668–675 Bypass Traverse Checking privilege, 675 super privileges, 675–676 \_process, 109–110 process control block (PCB), 106 Process Environmental Block (PEB), 105 overview, 105 see also viewing, 110–111 Process Explorer, 14–18 process reflection (SuperFetch), 480–482 process tree, viewing, 12–14 process VADs, 402–403 processes. See also applications access tokens, 677 authentication process, 310 console host, 65 creating address space, 140–142 converting attributes, 131–135 converting flags, 131–135 executing initial thread, 148 executive process object, 138–143 initial thread, 148–149 initializing process, 148–149 initializing subsystem, 146–147 kernel process structure, 141 opening images, 135–138 overview, 101–104, 129–130 setting up EPROCESSSS object, 138–140 setting up PEB, 142 training startup, 142–154 validating parameters, 131–135 data structures
 
 Iprocess command, 109 CSR_PROCESS, 105, 111–112 DXGPROCESS, 105 EPROCESS, 105–108 ETHODS, 105 EXPROCESS, 106–107 W32PROCESS, 105, 113
 
@@ -5745,7 +5594,6 @@ terminating, 154-155 trustlets. See trustlets UWP processes, 687-692 VADs, 402-4
 quantum (threads), 258-260 accounting, 233 clock specification, 232-234 clock interval, 232 configuring, 237-238 controlling, 234-235 overview, 231-232 resource, 236-237 variable quantum, 235-236 qotide (address spaces), 364-365
 
 779
-
 
 ---
 
@@ -5765,7 +5613,6 @@ ratings. See ratings (security) secure communication (Credential Guard), 614–6
 
 780
 
-
 ---
 
 SIDs (security identifiers)-thread pools
@@ -5781,7 +5628,6 @@ system PTEs (page table entries) address spaces, 355-356 address translation, 37
 tables (PTEs, page table entries) address spaces, 355–356 address translation, 375–376 creating shared PTEs, 462–464 default, 196 invalid PTEs, 384–385 prototype PTEs, 385–386 Task Manager, 9–11 TCB (thread control block) minimum TCB list, 117 overview, 196 TCSE (Trusted Computer System Evaluation Criteria), 605–607 TBE (thread environment block) overview, 194, 198 viewing, 201–205 Terminal Services, 29–30 terminating I/O, 539 processes, 154–155 TerminalObject function, 179 threads, 260, 539 thread-agnostic I/O, 536–537 thread control block (TCB) minimum TCB list, 117 overview, 196 thread environment block (TEB) overview, 194, 198 viewing, 201–205 Thread Information Block (TIB), 201 thread local storage (TLS), 18 thread pool, 297–300
 
 781
-
 
 ---
 
@@ -5837,7 +5683,6 @@ priorities, 437 PTEs (page table entries), 355-356 standby page lists, 430-435 v
 
 783
 
-
 ---
 
 ## viewing-zero page lists
@@ -5869,5 +5714,3 @@ x68 virtual address translation, 371–375
 zero page lists, 429–430
 
 784
-
-

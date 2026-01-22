@@ -16,16 +16,16 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read actual code before planning tests                                 |
-| `gateway-testing`                   | Routes to mandatory + task-specific testing library skills                                           |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST                        |
-| `writing-plans`                     | Test plans follow the same rigor as architecture plans                                               |
-| `verifying-before-completion`       | Ensures plan is complete and verified before handoff                                                 |
+| Skill                               | Why Always Invoke                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure. |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing      |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts               |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read actual code before planning tests             |
+| `gateway-testing`                   | Routes to mandatory + task-specific testing library skills                       |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST    |
+| `writing-plans`                     | Test plans follow the same rigor as architecture plans                           |
+| `verifying-before-completion`       | Ensures plan is complete and verified before handoff                             |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -120,10 +120,38 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 
 **Agent-specific values:**
 
-| Field                | Value                                                      |
-| -------------------- | ---------------------------------------------------------- |
-| `output_type`        | `test-plan` or `test-validation`                           |
+| Field                | Value                                                  |
+| -------------------- | ------------------------------------------------------ |
+| `output_type`        | `test-plan` or `test-validation`                       |
 | `handoff.next_agent` | `frontend-tester` or `backend-tester` or `tool-tester` |
+
+### REQUIRED: Result Marker (for feedback loop enforcement)
+
+Your output MUST include one of these markers for the Stop hook to track test planning status:
+
+**If test plan is complete and ready:**
+
+```
+## Test Planning Result
+TEST_PLAN_READY
+
+[Your test plan...]
+```
+
+**If unable to create test plan (blocked):**
+
+```
+## Test Planning Result
+TEST_PLAN_BLOCKED
+
+### Blocking Issues
+- [Issue 1: e.g., missing architecture documentation]
+- [Issue 2: e.g., unclear requirements]
+
+[Your explanation...]
+```
+
+The marker must appear in your output text. The feedback-loop-stop.sh hook parses this to determine if the test planning phase passed.
 
 ---
 

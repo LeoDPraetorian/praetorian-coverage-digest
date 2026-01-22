@@ -1,37 +1,21 @@
 # Changelog
 
-## 2025-12-29
+## 2026-01-19
 
-### Fixed (Audit Compliance)
+### Fixed
+- Fixed Phase 4 & 27 compliance issue: Removed 5-level deep relative path
+  - Removed link to `.claude/skills/managing-skills/references/patterns/repo-root-detection.md` (required 5 levels of `../`)
+  - Replaced with inline note explaining the repo root navigation pattern
+  - Content preserved: Pattern works from super-repo root, submodules, or subdirectories using `--show-superproject-working-tree` and `--show-toplevel` with `head -1`
+  - Backup created: `.local/SKILL.md.backup-20260119-122440`
+  - Verification: No remaining relative paths (`../`) in SKILL.md
+  - Final line count: 180 lines (within 500-line limit, reduced by 1 line from inline replacement)
 
-**Issues resolved:**
-- Phase 3 (Line Count): Reduced from 590 to 130 lines (Claude-Automated)
-- Phase 14a (Table Formatting): Applied Prettier formatting (CLI)
-- Phase 7 (Output Directory): Created .local/.gitignore (CLI)
-- Semantic (Description Quality): Added discoverable terms (Claude-Automated)
-
-**Changes applied:**
-
-1. **Description Enhancement** (Claude-Automated)
-   - Updated description to include key search terms
-   - Now mentions: frontmatter, directory path, references
-   - Improves discoverability in skill search
-
-2. **Progressive Disclosure** (Claude-Automated)
-   - Extracted detailed step-by-step instructions to `references/detailed-workflow.md` (460 lines)
-   - Extracted common scenarios to `references/common-scenarios.md`
-   - Extracted rollback procedures to `references/rollback-procedures.md`
-   - Main SKILL.md now references detailed documentation
-   - Result: 130 lines (well under 500-line limit)
-
-3. **Table Formatting** (CLI via Phase 14a)
-   - Applied Prettier formatting to all markdown tables
-   - Ensures consistent table structure
-
-4. **Output Directory** (CLI via Phase 7)
-   - Created .local/.gitignore
-   - Ensures proper gitignore for temporary files
-
-**Method:** Mixed (CLI deterministic + Claude-automated semantic fixes)
-
-**Verification:** Re-audit passed all 22 phases + semantic review
+- Fixed step numbering inconsistency in SKILL.md and references/detailed-workflow.md
+  - Renamed "Step 0: Navigate to Repository Root" to "Step 1: Navigate to Repository Root"
+  - Incremented all subsequent step numbers by 1 (old Step 1 → Step 2, Step 2 → Step 3, etc.)
+  - Updated description from "10-step protocol" to "11-step protocol"
+  - Updated Quick Reference table to show Steps 1-11
+  - Updated TodoWrite checklist to include Step 1 as first step
+  - Updated all cross-references in detailed-workflow.md to match new numbering
+  - Final line count: 180 lines (within 500-line limit)

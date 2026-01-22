@@ -1,0 +1,17 @@
+{
+  "name": "@claude-skills/list-tools",
+  "version": "1.0.0",
+  "description": "Fast TypeScript utility for listing MCP tool services",
+  "type": "module",
+  "scripts": {
+    "list": "tsx src/list-tools.ts",
+    "list:json": "tsx src/list-tools.ts --json"
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3"
+  }
+}

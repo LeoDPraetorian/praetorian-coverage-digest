@@ -124,6 +124,7 @@
 ### SPDX FDA-Specific Extensions
 
 **FDA recommends including:**
+
 - **Support lifecycle annotations**: End-of-support dates, active maintenance status
 - **Vulnerability references**: CVE IDs, CVSS scores, mitigation status
 - **Component criticality**: Life-sustaining components flagged
@@ -231,9 +232,7 @@
   "dependencies": [
     {
       "ref": "pkg:npm/react@18.2.0",
-      "dependsOn": [
-        "pkg:npm/scheduler@0.23.0"
-      ]
+      "dependsOn": ["pkg:npm/scheduler@0.23.0"]
     }
   ],
   "vulnerabilities": [
@@ -301,12 +300,14 @@
 ### 1. Support Lifecycle Documentation
 
 **FDA expects clear lifecycle information:**
+
 - Active support vs. end-of-life status
 - End-of-support (EOS) dates
 - Upgrade/migration timelines
 - Vendor commitments for security patches
 
 **Example:**
+
 ```json
 "properties": [
   {

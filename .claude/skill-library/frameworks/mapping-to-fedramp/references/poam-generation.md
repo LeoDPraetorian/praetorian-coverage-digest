@@ -7,6 +7,7 @@
 ## What is a POA&M?
 
 A **Plan of Action and Milestones (POA&M)** is a required FedRAMP document that:
+
 - Tracks security control weaknesses and deficiencies
 - Documents remediation plans with specific milestones
 - Provides risk context and mitigation timelines
@@ -23,6 +24,7 @@ A **Plan of Action and Milestones (POA&M)** is a required FedRAMP document that:
 **Format**: Excel spreadsheet with required fields
 
 **Key Characteristics**:
+
 - Standardized across all CSPs
 - Required for authorization package
 - Updated monthly for ConMon submissions
@@ -33,9 +35,11 @@ A **Plan of Action and Milestones (POA&M)** is a required FedRAMP document that:
 ## Required POA&M Fields
 
 ### 1. Control Identifier
+
 **Format**: Control-ID with enhancement (if applicable)
 
 **Examples**:
+
 - `SI-2` (base control)
 - `SI-2(2)` (control with enhancement 2)
 - `RA-5(1)` (RA-5 with enhancement 1)
@@ -43,19 +47,24 @@ A **Plan of Action and Milestones (POA&M)** is a required FedRAMP document that:
 **Source**: NIST 800-53 Rev 5 control catalog
 
 ### 2. Control Name
+
 **Examples**:
+
 - Flaw Remediation (for SI-2)
 - Vulnerability Monitoring and Scanning (for RA-5)
 - Transmission Confidentiality and Integrity (for SC-8)
 
 ### 3. Weakness Description
+
 **What to Include**:
+
 - Specific finding details
 - Affected systems/components
 - Current state vs required state
 - Impact if not remediated
 
 **Example**:
+
 ```
 Web application servers are running TLS 1.0/1.1 which are deprecated protocols.
 NIST SP 800-52 Rev 2 requires TLS 1.2 or higher.
@@ -64,7 +73,9 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 ```
 
 ### 4. Point of Contact (POC)
+
 **Include**:
+
 - Name
 - Title/Role
 - Email
@@ -73,13 +84,16 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 **Example**: "John Smith, Security Engineer, john.smith@example.com"
 
 ### 5. Resources Required
+
 **Categories**:
+
 - **Personnel**: Who will perform the work?
 - **Tools/Technology**: What software/hardware needed?
 - **Budget**: Estimated cost (if applicable)
 - **External Support**: Contractors, vendors, consultants
 
 **Example**:
+
 ```
 - Personnel: DevOps Engineer (40 hours), Security Engineer (8 hours)
 - Tools: Load balancer configuration update, SSL certificate renewal
@@ -88,7 +102,9 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 ```
 
 ### 6. Scheduled Completion Date
+
 **Rules**:
+
 - Must align with vulnerability severity timelines
 - High: ≤30 days
 - Moderate: ≤90 days
@@ -98,9 +114,11 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 **Example**: "2026-02-05" (30 days for high severity)
 
 ### 7. Milestones with Completion Dates
+
 **Breakdown work into measurable steps**:
 
 **Example**:
+
 1. Obtain TLS 1.3 certificates - 2026-01-15
 2. Update load balancer configuration - 2026-01-22
 3. Test TLS 1.2/1.3 on staging - 2026-01-29
@@ -110,25 +128,32 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 **Best Practice**: 3-7 milestones per POA&M
 
 ### 8. Status
+
 **Options**:
+
 - **Ongoing**: Work in progress
 - **Completed**: Remediation finished, validated
 - **Risk Accepted**: Approved waiver (requires justification + AO approval)
 
 ### 9. Risk Level
+
 **Based on likelihood × impact**:
+
 - **Critical**: Immediate exploitation risk, severe impact
 - **High**: Likely exploitation, significant impact
 - **Moderate**: Possible exploitation, moderate impact
 - **Low**: Unlikely exploitation, minimal impact
 
 ### 10. Original Detection Date
+
 **When was the finding first identified?**
 
 **Example**: "2025-12-15" (from quarterly vulnerability scan)
 
 ### 11. Vendor Dependency (Optional)
+
 **If remediation depends on vendor**:
+
 - Vendor name
 - Ticket/case number
 - Expected vendor fix date
@@ -138,15 +163,16 @@ Impact: Potential man-in-the-middle attacks, data interception, non-compliance w
 
 ## Vulnerability Remediation Timelines
 
-| Severity | Maximum Time | FedRAMP Requirement |
-|---|---|---|
-| **Critical/High** | 30 days | Mandatory |
-| **Moderate** | 90 days | Mandatory |
-| **Low** | 180 days | Mandatory |
-| **Operational Requirement (OR)** | 365 days | Requires AO approval + risk acceptance |
+| Severity                         | Maximum Time | FedRAMP Requirement                    |
+| -------------------------------- | ------------ | -------------------------------------- |
+| **Critical/High**                | 30 days      | Mandatory                              |
+| **Moderate**                     | 90 days      | Mandatory                              |
+| **Low**                          | 180 days     | Mandatory                              |
+| **Operational Requirement (OR)** | 365 days     | Requires AO approval + risk acceptance |
 
 **Deviation Process**:
 If cannot meet timeline, must:
+
 1. Document reason in POA&M
 2. Provide compensating controls
 3. Obtain AO approval for extension
@@ -159,6 +185,7 @@ If cannot meet timeline, must:
 ### Step 1: Identify Control Deficiency
 
 From assessment, scan, or continuous monitoring:
+
 - Control not implemented
 - Control partially implemented
 - Control fails validation testing
@@ -167,12 +194,14 @@ From assessment, scan, or continuous monitoring:
 ### Step 2: Map to Control(s)
 
 Use finding-to-control mapping patterns:
+
 - Primary control (main deficiency)
 - Related controls (if affected)
 
 ### Step 3: Determine Severity
 
 **Factors**:
+
 - CVSS score (for vulnerabilities)
 - Likelihood of exploitation
 - Impact if exploited
@@ -182,6 +211,7 @@ Use finding-to-control mapping patterns:
 ### Step 4: Calculate Remediation Timeline
 
 Based on severity:
+
 - High → 30 days maximum
 - Moderate → 90 days maximum
 - Low → 180 days maximum
@@ -189,6 +219,7 @@ Based on severity:
 ### Step 5: Create Milestones
 
 Break down remediation into phases:
+
 1. Planning/design
 2. Development/configuration
 3. Testing (dev/staging)
@@ -198,6 +229,7 @@ Break down remediation into phases:
 ### Step 6: Assign POC and Resources
 
 Identify:
+
 - Who owns the remediation?
 - What resources are needed?
 - Are there dependencies?
@@ -205,6 +237,7 @@ Identify:
 ### Step 7: Submit for Approval
 
 **Review by**:
+
 - ISSO (Information System Security Officer)
 - CSO (Cloud Security Officer)
 - AO (Authorizing Official) for risk acceptances
@@ -236,8 +269,7 @@ Resources Required:
 
 Scheduled Completion Date: 2026-02-05 (within 30 days - High severity)
 
-Milestones:
-  1. Download and test patch in dev environment - 2026-01-15
+Milestones: 1. Download and test patch in dev environment - 2026-01-15
   2. Validate application functionality with patch - 2026-01-22
   3. Deploy patch to staging and retest - 2026-01-29
   4. Deploy to production during maintenance window - 2026-02-05
@@ -273,8 +305,7 @@ Resources Required:
 
 Scheduled Completion Date: 2026-03-15 (within 90 days - Moderate severity)
 
-Milestones:
-  1. Procure TLS 1.3 certificates from DigiCert - 2026-02-01
+Milestones: 1. Procure TLS 1.3 certificates from DigiCert - 2026-02-01
   2. Update load balancer to disable TLS 1.0/1.1, enable TLS 1.2/1.3 - 2026-02-15
   3. Test configuration on staging environment - 2026-02-22
   4. Deploy to production (api.agency.gov) - 2026-03-01
@@ -346,6 +377,7 @@ Risk Acceptance Justification:
 **FedRAMP Requirement**: Update POA&M monthly with ConMon submissions.
 
 **Required Updates**:
+
 1. **Status Changes**: Mark completed POA&Ms, update ongoing status
 2. **Milestone Updates**: Revise dates if delayed, add explanations
 3. **New Findings**: Add POA&Ms for new scan/assessment findings
@@ -380,6 +412,7 @@ Risk Acceptance Justification:
 ### From Vulnerability Scanners
 
 Many scanners can export findings in formats compatible with POA&M generation:
+
 - CVSS scores → Severity mapping
 - CVE IDs → Control mappings (with custom rules)
 - Affected hosts → System inventory correlation
@@ -387,6 +420,7 @@ Many scanners can export findings in formats compatible with POA&M generation:
 ### POA&M Management Tools
 
 Third-party tools provide:
+
 - Automated POA&M generation from scans
 - Workflow tracking (milestones, deadlines)
 - Dashboard reporting for AO visibility

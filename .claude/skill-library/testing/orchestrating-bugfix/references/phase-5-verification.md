@@ -13,6 +13,7 @@ MUST invoke before proceeding: `verifying-before-completion`
 ## Inputs
 
 From Phase 4:
+
 - Code changes (in working branch)
 - New/updated test file
 - `implementation-report.md`
@@ -38,6 +39,7 @@ pytest tests/test_validation.py::test_validate_email_edge_cases -v
 **Expected:** All new tests pass
 
 **If new test fails:**
+
 - ❌ Fix is incorrect
 - STOP workflow
 - Return to Phase 4 with error details
@@ -59,11 +61,13 @@ pytest
 ```
 
 **Capture output:**
+
 ```bash
 npm test 2>&1 | tee $OUTPUT_DIR/full-test-results.txt
 ```
 
 **Parse results:**
+
 ```json
 {
   "total_tests": 47,
@@ -91,6 +95,7 @@ python -m build  # if applicable
 ```
 
 **If build fails:**
+
 - ❌ Fix introduced build error
 - STOP workflow
 - Return to Phase 4 with build output
@@ -120,12 +125,14 @@ After verification steps complete:
 ### Scenario A: All Pass ✅
 
 **Conditions:**
+
 - New test passes
 - Full test suite passes (no regressions)
 - Build succeeds
 - Lint passes (or no linter configured)
 
 **Action:**
+
 - ✅ Mark workflow COMPLETE
 - Write verification-report.md (see format below)
 - Inform user: "Bug fix complete and ready for commit"
@@ -133,10 +140,12 @@ After verification steps complete:
 ### Scenario B: New Test Fails ❌
 
 **Conditions:**
+
 - New test fails
 - OR full test suite has new failures
 
 **Action:**
+
 - ❌ Return to Phase 4
 - Pass error details to developer agent
 - Developer agent must revise fix
@@ -145,11 +154,13 @@ After verification steps complete:
 ### Scenario C: Regressions Detected 🛑
 
 **Conditions:**
+
 - New test passes
 - Build succeeds
 - BUT existing tests fail that were passing before
 
 **Action:**
+
 - 🛑 STOP for human checkpoint
 - Present regression details to user
 - Wait for user decision (see "Human Checkpoint" section)
@@ -187,33 +198,41 @@ Options:
 ### User Choice Handling
 
 **Choice 1: Show me the failures**
+
 - Display full-test-results.txt
 - Re-ask the question with same options
 
 **Choice 2: Fix the regressions**
+
 - Return to Phase 4
 - Agent prompt includes:
+
   ```
   Previous fix introduced regressions. Update tests to match correct behavior:
   [Paste regression details from verification-report.md]
 
   CRITICAL: Only update tests, do NOT change the fix implementation.
   ```
+
 - After test updates, re-run Phase 5
 
 **Choice 3: Proceed anyway**
+
 - ⚠️ Mark workflow complete WITH WARNINGS
 - Document in verification-report.md:
+
   ```markdown
   ## ⚠️ WARNINGS
 
   User accepted {N} regressions to ship this fix:
+
   - [List failing tests]
 
   Risk: These regressions may indicate incorrect fix or broken tests.
   ```
 
 **Choice 4: Abort this fix**
+
 - Discard all changes
 - Optionally: Escalate to orchestrating-feature-development
   ```
@@ -237,11 +256,12 @@ Write comprehensive verification report:
 ## Test Results
 
 ### New Tests (3 added, 3 passing)
-
 ```
+
 ✓ LoginForm › email validation › should return false for undefined email
 ✓ LoginForm › email validation › should return false for empty string email
 ✓ LoginForm › email validation › should return false for null email
+
 ```
 
 **Duration:** 0.234s
@@ -249,10 +269,12 @@ Write comprehensive verification report:
 ### Full Test Suite
 
 ```
+
 Test Suites: 12 passed, 12 total
-Tests:       47 passed, 47 total
-Duration:    3.247s
-```
+Tests: 47 passed, 47 total
+Duration: 3.247s
+
+````
 
 **Regressions:** 0
 
@@ -264,7 +286,7 @@ Duration:    3.247s
 $ npm run build
 ✓ Build succeeded
 Output: dist/ (234 KB)
-```
+````
 
 ---
 
@@ -311,7 +333,8 @@ empty string edge cases.
 
 Fixes: #[issue-number]"
 ```
-```
+
+````
 
 ## Exit Criteria
 
@@ -330,9 +353,10 @@ Phase 5 is complete when ONE of:
 ```bash
 # Run test 10 times
 for i in {1..10}; do npm test -- LoginForm.test.tsx || echo "FAIL $i"; done
-```
+````
 
 **Solutions:**
+
 - Fix test timing issues (use waitFor, proper async handling)
 - Document flaky test in verification-report.md
 - Consider test infrastructure improvements (separate from bug fix)
@@ -342,6 +366,7 @@ for i in {1..10}; do npm test -- LoginForm.test.tsx || echo "FAIL $i"; done
 **Symptom:** Tests pass in dev, fail in CI
 
 **Diagnosis:** Check for:
+
 - Missing environment variables
 - Different Node/Go/Python versions
 - OS-specific behavior (path separators, etc.)
@@ -353,6 +378,7 @@ for i in {1..10}; do npm test -- LoginForm.test.tsx || echo "FAIL $i"; done
 **Symptom:** Build fails but code looks correct
 
 **Solution:**
+
 ```bash
 # Clear cache and rebuild
 npm run clean

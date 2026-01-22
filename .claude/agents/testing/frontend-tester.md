@@ -16,17 +16,17 @@ Your VERY FIRST ACTION must be invoking skills. Not reading the task. Not thinki
 
 ## YOUR FIRST TOOL CALLS MUST BE:
 
-| Skill                               | Why Always Invoke                                                                                    |
-| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `using-skills`                      | **Non-negotiable first read** - compliance rules, 1% threshold, skill discovery. Skipping = failure. |
-| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing                          |
-| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts                                   |
-| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before writing tests                                       |
-| `gateway-testing`                   | Routes to testing patterns (behavior testing, anti-patterns, mocking)                                |
-| `gateway-frontend`                  | Routes to React-specific testing (Playwright, RTL, TanStack Query)                                   |
-| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST                        |
-| `developing-with-tdd`               | Write test first, watch it fail, then fix                                                            |
-| `verifying-before-completion`       | Ensures tests pass before claiming done                                                              |
+| Skill                               | Why Always Invoke                                                                |
+| ----------------------------------- | -------------------------------------------------------------------------------- |
+| `using-skills`                      | **Non-negotiable first read** 1% threshold, skill discovery. Skipping = failure. |
+| `semantic-code-operations`          | **Core code tool** - MUST read mcp-tools-serena for semantic search/editing      |
+| `calibrating-time-estimates`        | Prevents "no time to read skills" rationalization, grounds efforts               |
+| `enforcing-evidence-based-analysis` | **Prevents hallucinations** - read source before writing tests                   |
+| `gateway-testing`                   | Routes to testing patterns (behavior testing, anti-patterns, mocking)            |
+| `gateway-frontend`                  | Routes to React-specific testing (Playwright, RTL, TanStack Query)               |
+| `persisting-agent-outputs`          | **Defines WHERE to write output** - discovery protocol, file naming, MANIFEST    |
+| `developing-with-tdd`               | Write test first, watch it fail, then fix                                        |
+| `verifying-before-completion`       | Ensures tests pass before claiming done                                          |
 
 DO THIS NOW. BEFORE ANYTHING ELSE.
 
@@ -140,6 +140,34 @@ Follow `persisting-agent-outputs` skill for file output, JSON metadata format, a
 | -------------------- | ------------------------------ |
 | `output_type`        | `"test-implementation"`        |
 | `handoff.next_agent` | `"test-lead"` (for validation) |
+
+### REQUIRED: Result Marker (for feedback loop enforcement)
+
+Your output MUST include one of these markers for the Stop hook to track test status:
+
+**If all tests pass:**
+
+```
+## Test Result
+TESTS_PASSED
+
+[Your test summary...]
+```
+
+**If any tests fail:**
+
+```
+## Test Result
+TESTS_FAILED
+
+### Failures
+- [Test name]: [failure description]
+- [Test name]: [failure description]
+
+[Your detailed failure information...]
+```
+
+The marker must appear in your output text. The feedback-loop-stop.sh hook parses this to determine if the testing phase passed.
 
 ---
 

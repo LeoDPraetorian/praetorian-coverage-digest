@@ -1,6 +1,6 @@
 ---
 name: gateway-frontend
-description: Routes frontend tasks to library skills. Intent detection + progressive loading.
+description: Use when developing frontend - routes to React, TypeScript, state management, UI components, and testing skills via progressive loading.
 allowed-tools: Read
 ---
 

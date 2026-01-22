@@ -182,6 +182,7 @@ def request_with_retry(self, func, *args, **kwargs):
 **Cause:** Invalid/expired PAT or OAuth token
 
 **Solution:**
+
 ```go
 if resp.StatusCode == 401 {
     log.Printf("Authentication failed - PAT may be expired")
@@ -195,6 +196,7 @@ if resp.StatusCode == 401 {
 **Cause:** Insufficient permissions
 
 **Solution:**
+
 ```go
 if resp.StatusCode == 403 {
     log.Printf("Access denied - check Azure DevOps permissions")
@@ -209,6 +211,7 @@ if resp.StatusCode == 403 {
 **Cause:** Exceeded TSTU limit
 
 **Solution:**
+
 ```go
 if resp.StatusCode == 429 {
     retryAfter := resp.Header.Get("Retry-After")

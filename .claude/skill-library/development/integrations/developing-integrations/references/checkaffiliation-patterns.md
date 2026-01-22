@@ -7,20 +7,24 @@ Choose the right pattern based on your integration's API capabilities:
 ### Pattern A - Direct Ownership Query (PREFERRED)
 
 **When to use:**
+
 - API has endpoint to verify asset existence/ownership (e.g., GET /asset/{id}, query by identifier)
 - Single-asset lookup is supported without full enumeration
 
 **Example integrations:**
+
 - Wiz (GraphQL query for `graphEntityByProviderUniqueId`)
 - Any SaaS platform with asset-specific API endpoints
 
 **Implementation approach:**
+
 - Query specific asset by ID/key
 - Return `true` if exists and not deleted
 - Return `false` if not found or deleted
 - Return error only on API failures (not for "not found")
 
 **Code example:**
+
 ```go
 func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
     resp, err := task.client.GetAsset(asset.CloudId)
@@ -37,20 +41,24 @@ func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
 ### Pattern B - CheckAffiliationSimple (ACCEPTABLE for cloud providers)
 
 **When to use:**
+
 - API requires full enumeration to verify ownership (no single-asset lookup endpoint)
 - Cloud provider where assets are scoped to authenticated account (AWS, Azure, GCP)
 - Full re-enumeration is the only reliable way to verify ownership
 
 **Example integrations:**
+
 - Amazon AWS (no single-asset query across all services)
 - Microsoft Azure (subscription-scoped resources)
 - Google Cloud Platform (project-scoped resources)
 
 **Implementation approach:**
+
 - Use `BaseCapability.CheckAffiliationSimple()` which re-runs `Invoke()`
 - Less efficient but acceptable when Pattern A is impossible
 
 **Code example:**
+
 ```go
 func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
     return task.BaseCapability.CheckAffiliationSimple(asset)
@@ -62,21 +70,25 @@ func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
 ### Pattern C - Seed-Based Affiliation (ACCEPTABLE for seed-scoped integrations)
 
 **When to use:**
+
 - Integration only discovers assets from user-provided seeds (domains, IPs, CIDR ranges)
 - Discovery is inherently scoped to what the user explicitly provided
 - No external account or organization concept
 
 **Example integrations:**
+
 - Shodan (queries user-provided IPs)
 - DNS enumeration tools (user-provided domains)
 - Network scanners (user-provided CIDR blocks)
 
 **Implementation approach:**
+
 - Check if asset key/DNS matches any seed in `Job.Seeds`
 - Return `true` if asset was discovered from a user-provided seed
 - Rationale: User explicitly provided the seed, so affiliation is implied
 
 **Code example:**
+
 ```go
 func (task *Integration) CheckAffiliation(asset model.Asset) (bool, error) {
     // Check all relevant asset fields against user-provided seeds

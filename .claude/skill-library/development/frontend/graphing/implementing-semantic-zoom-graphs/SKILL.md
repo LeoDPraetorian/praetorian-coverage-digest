@@ -39,11 +39,11 @@ Semantic Zoom Flow (Scales to 100k+):
 
 ## Quick Reference
 
-| Zoom Level | Camera Ratio | Data Loaded | Max Items | Query Pattern |
-|------------|-------------|-------------|-----------|---------------|
-| Overview | < 0.3 | Cluster metadata | ~50 | Aggregation query |
-| Cluster Focus | 0.3-1.0 | Focused cluster nodes | ~1000 | Filtered asset query |
-| Detail View | > 1.0 | Visible relationships | ~200 | Bounded IN query |
+| Zoom Level    | Camera Ratio | Data Loaded           | Max Items | Query Pattern        |
+| ------------- | ------------ | --------------------- | --------- | -------------------- |
+| Overview      | < 0.3        | Cluster metadata      | ~50       | Aggregation query    |
+| Cluster Focus | 0.3-1.0      | Focused cluster nodes | ~1000     | Filtered asset query |
+| Detail View   | > 1.0        | Visible relationships | ~200      | Bounded IN query     |
 
 ## Core Patterns
 
@@ -52,28 +52,34 @@ Semantic Zoom Flow (Scales to 100k+):
 **The #1 cause of graph failure is query explosion with OR conditions.**
 
 **Wrong (creates N OR conditions):**
+
 ```typescript
 // queries.ts - THIS BREAKS at 5000 nodes
-filters: [{
-  field: '',
-  operator: 'OR',
-  value: assetKeys.map((key: string) => ({
-    field: 'key',
-    operator: '=',
-    value: key,
-  })) as any,
-}]
+filters: [
+  {
+    field: "",
+    operator: "OR",
+    value: assetKeys.map((key: string) => ({
+      field: "key",
+      operator: "=",
+      value: key,
+    })) as any,
+  },
+];
 // Generates: WHERE (key='A' OR key='B' OR key='C' ...)
 ```
 
 **Correct (single IN clause):**
+
 ```typescript
 // Uses double-bracket syntax for IN operator
-filters: [{
-  field: 'key',
-  operator: 'IN',
-  value: [assetKeys],  // [[key1, key2, key3]]
-}]
+filters: [
+  {
+    field: "key",
+    operator: "IN",
+    value: [assetKeys], // [[key1, key2, key3]]
+  },
+];
 // Generates: WHERE key IN $p1 (parameterized array)
 ```
 
@@ -84,33 +90,30 @@ filters: [{
 Different data hooks at different zoom levels:
 
 ```typescript
-const useSemanticZoomData = (
-  sigma: Sigma,
-  cameraState: CameraState
-) => {
+const useSemanticZoomData = (sigma: Sigma, cameraState: CameraState) => {
   const zoomLevel = useMemo(() => {
-    if (cameraState.ratio < 0.3) return 'overview';
-    if (cameraState.ratio < 1.0) return 'cluster-focus';
-    return 'detail';
+    if (cameraState.ratio < 0.3) return "overview";
+    if (cameraState.ratio < 1.0) return "cluster-focus";
+    return "detail";
   }, [cameraState.ratio]);
 
   // Level 1: Overview - only cluster metadata
   const { data: clusters } = useClusterOverview({
-    enabled: zoomLevel === 'overview',
+    enabled: zoomLevel === "overview",
   });
 
   // Level 2: Cluster focus - assets in focused cluster
   const focusedCluster = useFocusedCluster(cameraState, clusters);
   const { data: clusterAssets } = useClusterExpansion({
     clusterId: focusedCluster?.id,
-    enabled: zoomLevel === 'cluster-focus' && !!focusedCluster,
+    enabled: zoomLevel === "cluster-focus" && !!focusedCluster,
   });
 
   // Level 3: Detail - relationships for visible nodes
   const visibleKeys = useVisibleNodeKeys(sigma, 200);
   const { data: relationships } = useVisibleRelationships({
     nodeKeys: visibleKeys,
-    enabled: zoomLevel === 'detail' && visibleKeys.length > 0,
+    enabled: zoomLevel === "detail" && visibleKeys.length > 0,
   });
 
   return { zoomLevel, clusters, clusterAssets, relationships };
@@ -168,26 +171,29 @@ const useIncrementalGraph = (
     if (expandedClustersRef.current.has(expandedClusterId)) return;
 
     // Add new nodes without clearing existing
-    graph.import({
-      nodes: clusterAssets.map(asset => ({
-        key: asset.key,
-        attributes: {
-          x: asset.x ?? Math.random(),
-          y: asset.y ?? Math.random(),
-          size: 10,
-          label: asset.name,
-          clusterId: expandedClusterId,
-          hidden: false,
-        },
-      })),
-    }, false); // false = merge, don't replace
+    graph.import(
+      {
+        nodes: clusterAssets.map((asset) => ({
+          key: asset.key,
+          attributes: {
+            x: asset.x ?? Math.random(),
+            y: asset.y ?? Math.random(),
+            size: 10,
+            label: asset.name,
+            clusterId: expandedClusterId,
+            hidden: false,
+          },
+        })),
+      },
+      false
+    ); // false = merge, don't replace
 
     // Mark cluster as expanded
     expandedClustersRef.current.add(expandedClusterId);
 
     // Hide cluster hull node, show individual nodes
     if (graph.hasNode(`cluster:${expandedClusterId}`)) {
-      graph.setNodeAttribute(`cluster:${expandedClusterId}`, 'hidden', true);
+      graph.setNodeAttribute(`cluster:${expandedClusterId}`, "hidden", true);
     }
   }, [graph, clusterAssets, expandedClusterId]);
 };
@@ -210,18 +216,22 @@ const useVisibleRelationships = ({
 
     return {
       node: {
-        labels: ['Risk'],
-        relationships: [{
-          label: 'HAS_VULNERABILITY',
-          source: {
-            labels: ['Asset'],
-            filters: [{
-              field: 'key',
-              operator: 'IN',
-              value: [nodeKeys],  // Double-bracket syntax
-            }],
+        labels: ["Risk"],
+        relationships: [
+          {
+            label: "HAS_VULNERABILITY",
+            source: {
+              labels: ["Asset"],
+              filters: [
+                {
+                  field: "key",
+                  operator: "IN",
+                  value: [nodeKeys], // Double-bracket syntax
+                },
+              ],
+            },
           },
-        }],
+        ],
       },
       limit: nodeKeys.length * 5, // Estimate 5 relationships per node
     };
@@ -265,13 +275,14 @@ const useVisibleRelationships = ({
 
 For full semantic zoom, the backend should provide:
 
-| Endpoint | Purpose | Example Response |
-|----------|---------|------------------|
-| `POST /my` with aggregation | Cluster overview | `[{cluster: "GOOGLE", count: 929, centroid: {x, y}}]` |
-| `POST /my` with cluster filter | Cluster expansion | `[{key: "asset1", name: "...", ...}]` |
-| `POST /my` with IN clause | Bounded relationships | `[{risk: "...", asset: "..."}]` |
+| Endpoint                       | Purpose               | Example Response                                      |
+| ------------------------------ | --------------------- | ----------------------------------------------------- |
+| `POST /my` with aggregation    | Cluster overview      | `[{cluster: "GOOGLE", count: 929, centroid: {x, y}}]` |
+| `POST /my` with cluster filter | Cluster expansion     | `[{key: "asset1", name: "...", ...}]`                 |
+| `POST /my` with IN clause      | Bounded relationships | `[{risk: "...", asset: "..."}]`                       |
 
 **Existing Chariot capability:** The `/my` endpoint already supports:
+
 - IN clause filtering (use `operator: 'IN'` with double-bracket value)
 - Pagination (`page`, `limit` parameters)
 - Conditional relationships (`optional: true`)
@@ -280,12 +291,12 @@ For full semantic zoom, the backend should provide:
 
 ## Performance Targets
 
-| Metric | Target | Current Problem |
-|--------|--------|-----------------|
-| Initial render | < 2s | Never completes at 5000+ |
-| Cluster expansion | < 1s | N/A |
+| Metric            | Target  | Current Problem               |
+| ----------------- | ------- | ----------------------------- |
+| Initial render    | < 2s    | Never completes at 5000+      |
+| Cluster expansion | < 1s    | N/A                           |
 | Relationship load | < 500ms | Timeout at 5000 OR conditions |
-| Interaction FPS | > 30 | Freezes during load |
+| Interaction FPS   | > 30    | Freezes during load           |
 
 ## Implementation Checklist
 
@@ -321,10 +332,10 @@ For full semantic zoom, the backend should provide:
 
 ### Requires (invoke before starting)
 
-| Skill | When | Purpose |
-|-------|------|---------|
-| `preventing-react-hook-infinite-loops` | Camera handlers | Ensure debouncing and stable deps |
-| `working-with-sigma-js` | Sigma integration | Camera events, node programs |
+| Skill                                  | When              | Purpose                           |
+| -------------------------------------- | ----------------- | --------------------------------- |
+| `preventing-react-hook-infinite-loops` | Camera handlers   | Ensure debouncing and stable deps |
+| `working-with-sigma-js`                | Sigma integration | Camera events, node programs      |
 
 ### Calls (during execution)
 
@@ -332,11 +343,11 @@ None - this skill provides implementation patterns and doesn't invoke other skil
 
 ### Pairs With
 
-| Skill | Trigger | Purpose |
-|-------|---------|---------|
-| `optimizing-large-data-visualization` | Render performance | LOD, culling after data loads |
-| `coordinating-competing-systems` | Layout conflicts | Prevent layout vs zoom conflicts |
-| `constructing-graph-queries` | Query construction | Graph query patterns and allowed columns |
+| Skill                                 | Trigger            | Purpose                                  |
+| ------------------------------------- | ------------------ | ---------------------------------------- |
+| `optimizing-large-data-visualization` | Render performance | LOD, culling after data loads            |
+| `coordinating-competing-systems`      | Layout conflicts   | Prevent layout vs zoom conflicts         |
+| `constructing-graph-queries`          | Query construction | Graph query patterns and allowed columns |
 
 ## Research Reference
 
@@ -344,6 +355,7 @@ For detailed research on the patterns in this skill, see:
 `.claude/.output/research/2026-01-15-161918-semantic-zoom-graph-api/SYNTHESIS.md`
 
 This research documents:
+
 - IN clause discovery (backend supports, frontend doesn't use)
 - Aggregation query patterns (40+ examples in codebase)
 - Zoom-triggered loading best practices

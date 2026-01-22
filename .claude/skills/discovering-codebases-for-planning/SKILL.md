@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Bash, Grep, Glob, TodoWrite, Task, AskUserQuestion
 
 Invoke this skill when:
 
-- **Orchestration workflows** (orchestrating-feature-development, orchestrating-capability-development, orchestrating-fingerprintx-development) reach Phase 2 Discovery
+- **Orchestration workflows** (`orchestrating-feature-development` (LIBRARY), `orchestrating-capability-development`, `orchestrating-fingerprintx-development`) reach Phase 2 Discovery
 - **Planning implementation** requires understanding existing code to maximize DRY/reuse
 - **Direct invocation** when you need structured, parallelized codebase analysis before architecture/planning phases
 
@@ -39,11 +39,11 @@ Current Phase 2 Discovery spawns **fixed agent counts** regardless of codebase s
 
 ## Solution: Three-Stage Discovery
 
-| Stage       | Executor    | Purpose                                     | Output                    |
-| ----------- | ----------- | ------------------------------------------- | ------------------------- |
-| 1. Scoping  | Orchestrator | Parse feature context, count files, plan agents | scoping-report.json       |
-| 2. Discovery | N Explore agents | Parallel DRY-focused analysis per component | discovery-{component}.md  |
-| 3. Synthesis | Orchestrator | Merge findings, deduplicate, summarize      | discovery.md + summary.json |
+| Stage        | Executor         | Purpose                                         | Output                      |
+| ------------ | ---------------- | ----------------------------------------------- | --------------------------- |
+| 1. Scoping   | Orchestrator     | Parse feature context, count files, plan agents | scoping-report.json         |
+| 2. Discovery | N Explore agents | Parallel DRY-focused analysis per component     | discovery-{component}.md    |
+| 3. Synthesis | Orchestrator     | Merge findings, deduplicate, summarize          | discovery.md + summary.json |
 
 ---
 
@@ -171,29 +171,29 @@ THOROUGHNESS: very thorough mode
 
 ### Called By
 
-- `orchestrating-feature-development` (Phase 2 Discovery)
+- `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 2 Discovery)
 - `orchestrating-capability-development` (Phase 2 Discovery)
 - `orchestrating-fingerprintx-development` (Phase 2 Discovery, if applicable)
 - Direct invocation when exhaustive discovery needed before planning
 
 ### Requires (invoke before starting)
 
-| Skill                       | When  | Purpose                                    |
-| --------------------------- | ----- | ------------------------------------------ |
-| `persisting-agent-outputs`  | Start | Establish OUTPUT_DIR for discovery artifacts |
+| Skill                      | When  | Purpose                                      |
+| -------------------------- | ----- | -------------------------------------------- |
+| `persisting-agent-outputs` | Start | Establish OUTPUT_DIR for discovery artifacts |
 
 ### Calls (during execution)
 
-| Tool/Skill      | Phase   | Purpose                                  |
-| --------------- | ------- | ---------------------------------------- |
-| Task (Explore)  | Stage 2 | Spawn N parallel agents for deep discovery |
+| Tool/Skill     | Phase   | Purpose                                    |
+| -------------- | ------- | ------------------------------------------ |
+| Task (Explore) | Stage 2 | Spawn N parallel agents for deep discovery |
 
 ### Pairs With (conditional)
 
-| Skill              | Trigger                     | Purpose                            |
-| ------------------ | --------------------------- | ---------------------------------- |
-| `writing-plans`    | After discovery complete    | Use findings to create implementation plan |
-| `brainstorming`    | Before discovery (optional) | Clarify feature requirements for better scoping |
+| Skill           | Trigger                     | Purpose                                         |
+| --------------- | --------------------------- | ----------------------------------------------- |
+| `writing-plans` | After discovery complete    | Use findings to create implementation plan      |
+| `brainstorming` | Before discovery (optional) | Clarify feature requirements for better scoping |
 
 ---
 
@@ -268,7 +268,7 @@ THOROUGHNESS: very thorough mode
 - [ ] Spawned N Explore agents in SINGLE Task message (parallel execution verified)
 - [ ] All agents configured with 'very thorough' mode
 - [ ] All agents received DRY-focused prompt template
-- [ ] Collected all discovery-*.md reports (one per agent)
+- [ ] Collected all discovery-\*.md reports (one per agent)
 
 ### Stage 3: Synthesis
 
@@ -283,13 +283,13 @@ THOROUGHNESS: very thorough mode
 
 ## Error Handling
 
-| Error                             | Response                                                      |
-| --------------------------------- | ------------------------------------------------------------- |
-| **Agent timeout**                 | Mark component as incomplete, proceed with available reports, note gap in discovery.md |
-| **No reusable code found**        | Document 'greenfield' justification in discovery.md, proceed to planning |
-| **Conflicting recommendations**   | Flag in discovery.md with both options, let architect resolve in next phase |
-| **Scoping finds 0 relevant components** | Error - design.md may be incomplete, return to brainstorming phase |
-| **Agent reports missing tables**  | Request structured output, re-run that agent if needed      |
+| Error                                   | Response                                                                               |
+| --------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Agent timeout**                       | Mark component as incomplete, proceed with available reports, note gap in discovery.md |
+| **No reusable code found**              | Document 'greenfield' justification in discovery.md, proceed to planning               |
+| **Conflicting recommendations**         | Flag in discovery.md with both options, let architect resolve in next phase            |
+| **Scoping finds 0 relevant components** | Error - design.md may be incomplete, return to brainstorming phase                     |
+| **Agent reports missing tables**        | Request structured output, re-run that agent if needed                                 |
 
 ---
 
@@ -297,23 +297,23 @@ THOROUGHNESS: very thorough mode
 
 **This skill is NOT security-focused.**
 
-| Aspect          | discovering-codebases-for-planning | codebase-mapping (threat modeling) |
-| --------------- | ---------------------------------- | ---------------------------------- |
-| **Goal**        | Maximize DRY/reuse for planning    | Identify security boundaries       |
+| Aspect          | discovering-codebases-for-planning  | codebase-mapping (threat modeling)         |
+| --------------- | ----------------------------------- | ------------------------------------------ |
+| **Goal**        | Maximize DRY/reuse for planning     | Identify security boundaries               |
 | **Focus**       | Patterns, utilities, file placement | Trust boundaries, data flows, entry points |
-| **Output**      | discovery.md (reuse tables)        | architecture.md (security artifacts) |
-| **Consumers**   | Architect, planning phases         | threat-modeler, security analysis  |
-| **When to use** | Before implementation planning     | Before threat modeling (Phase 3)   |
+| **Output**      | discovery.md (reuse tables)         | architecture.md (security artifacts)       |
+| **Consumers**   | Architect, planning phases          | threat-modeler, security analysis          |
+| **When to use** | Before implementation planning      | Before threat modeling (Phase 3)           |
 
 ---
 
 ## Related Skills
 
-| Skill                                | Purpose                                          |
-| ------------------------------------ | ------------------------------------------------ |
-| `orchestrating-feature-development`  | Primary consumer - invokes this in Phase 2       |
-| `orchestrating-capability-development` | Primary consumer - invokes this in Phase 2     |
-| `persisting-agent-outputs`           | Required before starting - establishes OUTPUT_DIR |
-| `writing-plans`                      | Downstream consumer - uses discovery findings    |
-| `brainstorming`                      | Upstream (optional) - clarifies feature context  |
-| `codebase-mapping`                   | Parallel skill for security/threat modeling      |
+| Skill                                  | Purpose                                           |
+| -------------------------------------- | ------------------------------------------------- |
+| `orchestrating-feature-development`    | Primary consumer - invokes this in Phase 2        |
+| `orchestrating-capability-development` | Primary consumer - invokes this in Phase 2        |
+| `persisting-agent-outputs`             | Required before starting - establishes OUTPUT_DIR |
+| `writing-plans`                        | Downstream consumer - uses discovery findings     |
+| `brainstorming`                        | Upstream (optional) - clarifies feature context   |
+| `codebase-mapping`                     | Parallel skill for security/threat modeling       |

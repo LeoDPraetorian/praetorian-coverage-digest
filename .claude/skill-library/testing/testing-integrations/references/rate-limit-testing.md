@@ -96,7 +96,7 @@ func TestAPI_ExponentialBackoff(t *testing.T) {
     }))
     defer server.Close()
 
-    client := NewRetryableClientWithBackoff(server.URL, 
+    client := NewRetryableClientWithBackoff(server.URL,
         InitialBackoff: 1*time.Second,
         MaxBackoff: 30*time.Second,
         Multiplier: 2.0,
@@ -107,7 +107,7 @@ func TestAPI_ExponentialBackoff(t *testing.T) {
 
     // Verify backoff intervals: 1s, 2s, 4s
     require.Len(t, attempts, 4)
-    
+
     interval1 := attempts[1].Sub(attempts[0])
     interval2 := attempts[2].Sub(attempts[1])
     interval3 := attempts[3].Sub(attempts[2])
@@ -195,7 +195,7 @@ func TestAPI_MaxRetriesExceeded(t *testing.T) {
 
     server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
         attemptCount++
-        
+
         // Always return 429
         w.Header().Set("Retry-After", "1")
         w.WriteHeader(http.StatusTooManyRequests)
@@ -264,7 +264,7 @@ func TestAPI_JitterInBackoff(t *testing.T) {
 2. ✅ Implement exponential backoff with jitter
 3. ✅ Respect max retries limit
 4. ✅ Log rate limit occurrences
-5. ✅ Track rate limit headers (X-RateLimit-*)
+5. ✅ Track rate limit headers (X-RateLimit-\*)
 6. ✅ Test progressive scenarios (fail, fail, fail, success)
 7. ✅ Verify retry intervals with timing assertions
 

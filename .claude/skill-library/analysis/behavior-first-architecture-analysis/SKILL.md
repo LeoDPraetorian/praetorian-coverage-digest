@@ -200,11 +200,11 @@ After all agents return:
 
 ## Related Skills
 
-| Skill                               | When to Use                                            |
-| ----------------------------------- | ------------------------------------------------------ |
-| `orchestrating-research`            | Complex multi-source research with intent expansion    |
-| `enforcing-evidence-based-analysis` | Prevent hallucination in implementation plans          |
-| `debugging-systematically`          | When architecture analysis reveals bugs to investigate |
+| Skill                               | When to Use                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ |
+| `orchestrating-research` (LIBRARY)  | Complex multi-source research with intent expansion - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `enforcing-evidence-based-analysis` | Prevent hallucination in implementation plans                                                                                  |
+| `debugging-systematically`          | When architecture analysis reveals bugs to investigate                                                                         |
 
 ## References
 

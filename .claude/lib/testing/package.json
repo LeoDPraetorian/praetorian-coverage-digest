@@ -22,8 +22,5 @@
     "mocking",
     "unit-tests",
     "vitest"
-  ],
-  "dependencies": {
-    "zod": "^3.22.4"
-  }
+  ]
 }

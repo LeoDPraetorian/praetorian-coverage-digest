@@ -1,0 +1,11 @@
+{
+  "name": "@claude-tools/serena",
+  "version": "1.0.0",
+  "description": "Semantic code analysis and symbol navigation via LSP",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  }
+}

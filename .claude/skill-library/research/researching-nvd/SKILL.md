@@ -54,14 +54,14 @@ Use this skill when:
 
 Ask via AskUserQuestion or extract from context:
 
-| Question                               | Purpose                                  |
-| -------------------------------------- | ---------------------------------------- |
-| What product/vendor are you focused on | Define search scope                      |
-| Severity filter needed?                | CRITICAL/HIGH/MEDIUM/LOW                 |
-| Date range (recent vs all-time)?       | Published date filtering                 |
-| Specific CVE IDs to investigate?       | Direct CVE lookup                        |
-| CPE-based product matching?            | Precise affected version identification  |
-| Context (research, prioritization)?    | Determines CVSS vs KEV emphasis          |
+| Question                               | Purpose                                 |
+| -------------------------------------- | --------------------------------------- |
+| What product/vendor are you focused on | Define search scope                     |
+| Severity filter needed?                | CRITICAL/HIGH/MEDIUM/LOW                |
+| Date range (recent vs all-time)?       | Published date filtering                |
+| Specific CVE IDs to investigate?       | Direct CVE lookup                       |
+| CPE-based product matching?            | Precise affected version identification |
+| Context (research, prioritization)?    | Determines CVSS vs KEV emphasis         |
 
 **Output:** Research focus statement (1-2 sentences).
 
@@ -92,6 +92,7 @@ https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-1234
 ### 1.3 Rate Limiting Strategy
 
 **NVD API Rate Limits:**
+
 - Without API key: 5 requests per 30 seconds
 - With API key: 50 requests per 30 seconds
 
@@ -107,13 +108,13 @@ https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-1234
 
 **Critical Parameters:**
 
-| Parameter        | Values                           | Use Case                         |
-| ---------------- | -------------------------------- | -------------------------------- |
-| `keywordSearch`  | {query}                          | Vendor/product search            |
-| `cveId`          | CVE-YYYY-NNNNN                   | Specific CVE lookup              |
-| `cvssV3Severity` | CRITICAL\|HIGH\|MEDIUM\|LOW      | Severity filter                  |
-| `cpeName`        | cpe:2.3:a:{vendor}:{product}:... | CPE-based product matching       |
-| `resultsPerPage` | 1-2000 (default 2000)            | Results pagination               |
+| Parameter        | Values                           | Use Case                   |
+| ---------------- | -------------------------------- | -------------------------- |
+| `keywordSearch`  | {query}                          | Vendor/product search      |
+| `cveId`          | CVE-YYYY-NNNNN                   | Specific CVE lookup        |
+| `cvssV3Severity` | CRITICAL\|HIGH\|MEDIUM\|LOW      | Severity filter            |
+| `cpeName`        | cpe:2.3:a:{vendor}:{product}:... | CPE-based product matching |
+| `resultsPerPage` | 1-2000 (default 2000)            | Results pagination         |
 
 **See:** [references/query-patterns.md](references/query-patterns.md) for CPE syntax
 
@@ -177,11 +178,13 @@ WebFetch("https://services.nvd.nist.gov/rest/json/cves/2.0?cveId=CVE-2024-1234",
 For each CVE, extract and interpret:
 
 **CVSS v3.1 Components:**
+
 - Base Score (0.0-10.0)
 - Base Severity (NONE, LOW, MEDIUM, HIGH, CRITICAL)
 - Vector String (CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:H/I:H/A:H)
 
 **Vector Breakdown:**
+
 - AV (Attack Vector): N=Network, A=Adjacent, L=Local, P=Physical
 - AC (Attack Complexity): L=Low, H=High
 - PR (Privileges Required): N=None, L=Low, H=High
@@ -194,11 +197,13 @@ For each CVE, extract and interpret:
 ### 3.2 Extract Affected Products (CPE)
 
 **CPE 2.3 Format:**
+
 ```
 cpe:2.3:part:vendor:product:version:update:edition:language:sw_edition:target_sw:target_hw:other
 ```
 
 **Example:**
+
 ```
 cpe:2.3:a:apache:tomcat:9.0.50:*:*:*:*:*:*:*
 ```
@@ -210,10 +215,12 @@ Decodes to: Apache Tomcat version 9.0.50 (application)
 ### 3.3 Extract CWE and References
 
 **CWE (Common Weakness Enumeration):**
+
 - Classifies vulnerability type
 - Example: CWE-79 (Cross-site Scripting), CWE-89 (SQL Injection)
 
 **References:**
+
 - Vendor advisories
 - Patch links
 - Exploit code (if public)
@@ -277,10 +284,10 @@ WebFetch("https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve
 
 ### KEV Cross-Reference
 
-| CVE ID           | CVSS | KEV Status | Priority |
-| ---------------- | ---- | ---------- | -------- |
-| CVE-YYYY-000001  | 9.8  | In KEV     | P0       |
-| CVE-YYYY-000002  | 8.1  | Not in KEV | P1       |
+| CVE ID          | CVSS | KEV Status | Priority |
+| --------------- | ---- | ---------- | -------- |
+| CVE-YYYY-000001 | 9.8  | In KEV     | P0       |
+| CVE-YYYY-000002 | 8.1  | Not in KEV | P1       |
 
 ### Synthesis
 
@@ -293,6 +300,7 @@ WebFetch("https://www.cisa.gov/known-exploited-vulnerabilities-catalog?field_cve
 ### 4.2 Output Location
 
 **Mode 1 (Standalone):**
+
 ```bash
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
 TIMESTAMP=$(date +"%Y-%m-%d-%H%M%S")
@@ -302,6 +310,7 @@ mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-nvd"
 ```
 
 **Mode 2 (Orchestrated via orchestrating-research):**
+
 - Write to: `${OUTPUT_DIR}/nvd.md`
 
 **See:** [references/output-format.md](references/output-format.md)
@@ -314,51 +323,51 @@ mkdir -p "$ROOT/.claude/.output/research/${TIMESTAMP}-${TOPIC}-nvd"
 
 **Priority = CVSS Score + KEV Status**
 
-| Priority | Criteria                          | Action              |
-| -------- | --------------------------------- | ------------------- |
-| P0       | CVSS ≥9.0 AND In KEV              | Immediate patch     |
-| P1       | CVSS ≥7.0 AND In KEV              | Urgent patch        |
-| P2       | CVSS ≥9.0 AND Not in KEV          | Monitor, plan patch |
-| P3       | CVSS 7.0-8.9 AND Not in KEV       | Standard timeline   |
-| P4       | CVSS <7.0                         | Low priority        |
+| Priority | Criteria                    | Action              |
+| -------- | --------------------------- | ------------------- |
+| P0       | CVSS ≥9.0 AND In KEV        | Immediate patch     |
+| P1       | CVSS ≥7.0 AND In KEV        | Urgent patch        |
+| P2       | CVSS ≥9.0 AND Not in KEV    | Monitor, plan patch |
+| P3       | CVSS 7.0-8.9 AND Not in KEV | Standard timeline   |
+| P4       | CVSS <7.0                   | Low priority        |
 
 ### 5.2 Detection/Capability Guidance
 
 Use NVD findings to guide security work:
 
-| Task                    | NVD Research Input                      |
-| ----------------------- | --------------------------------------- |
-| Capability Development  | CWE patterns, attack vectors            |
-| Nuclei Template         | CVE details, exploitation requirements  |
-| Vulnerability Scanning  | CPE matching, affected versions         |
-| Patch Prioritization    | CVSS + KEV status combined              |
-| Threat Intelligence     | References, public exploits             |
+| Task                   | NVD Research Input                     |
+| ---------------------- | -------------------------------------- |
+| Capability Development | CWE patterns, attack vectors           |
+| Nuclei Template        | CVE details, exploitation requirements |
+| Vulnerability Scanning | CPE matching, affected versions        |
+| Patch Prioritization   | CVSS + KEV status combined             |
+| Threat Intelligence    | References, public exploits            |
 
 ---
 
 ## Common Query Patterns
 
-| Research Focus       | NVD API Query Example                                                                                  |
-| -------------------- | ------------------------------------------------------------------------------------------------------ |
-| **Vendor-Specific**  | `?keywordSearch=microsoft`                                                                             |
-| **Product + Severity | ** | `?keywordSearch=tomcat&cvssV3Severity=CRITICAL`                                                        |
-| **CPE-Based**        | `?cpeName=cpe:2.3:a:apache:tomcat:9.0.50`                                                              |
-| **Recent CVEs**      | `?keywordSearch=apache&pubStartDate=2024-01-01T00:00:00`                                               |
-| **CWE Category**     | `?keywordSearch=CWE-79` (XSS vulnerabilities)                                                          |
-| **Specific CVE**     | `?cveId=CVE-2024-1234`                                                                                 |
+| Research Focus         | NVD API Query Example                                    |
+| ---------------------- | -------------------------------------------------------- | ----------------------------------------------- |
+| **Vendor-Specific**    | `?keywordSearch=microsoft`                               |
+| \*\*Product + Severity | \*\*                                                     | `?keywordSearch=tomcat&cvssV3Severity=CRITICAL` |
+| **CPE-Based**          | `?cpeName=cpe:2.3:a:apache:tomcat:9.0.50`                |
+| **Recent CVEs**        | `?keywordSearch=apache&pubStartDate=2024-01-01T00:00:00` |
+| **CWE Category**       | `?keywordSearch=CWE-79` (XSS vulnerabilities)            |
+| **Specific CVE**       | `?cveId=CVE-2024-1234`                                   |
 
 ---
 
 ## NVD vs CISA KEV Comparison
 
-| Aspect           | NVD                                | CISA KEV                    |
-| ---------------- | ---------------------------------- | --------------------------- |
-| **Scope**        | 250,000+ CVEs (comprehensive)      | ~1,200 CVEs (exploited)     |
-| **Purpose**      | Vulnerability details & scoring    | Exploitation confirmation   |
-| **Key Data**     | CVSS, CPE, CWE, references         | Remediation deadlines       |
-| **API**          | JSON REST API (v2.0)               | Web scraping only           |
-| **Update Freq**  | Continuous (daily)                 | As exploitation confirmed   |
-| **Use For**      | DETAILS and comprehensive research | PRIORITIZATION for patching |
+| Aspect          | NVD                                | CISA KEV                    |
+| --------------- | ---------------------------------- | --------------------------- |
+| **Scope**       | 250,000+ CVEs (comprehensive)      | ~1,200 CVEs (exploited)     |
+| **Purpose**     | Vulnerability details & scoring    | Exploitation confirmation   |
+| **Key Data**    | CVSS, CPE, CWE, references         | Remediation deadlines       |
+| **API**         | JSON REST API (v2.0)               | Web scraping only           |
+| **Update Freq** | Continuous (daily)                 | As exploitation confirmed   |
+| **Use For**     | DETAILS and comprehensive research | PRIORITIZATION for patching |
 
 **Recommended Workflow:** Query NVD for details → Cross-reference CISA KEV for exploitation → Prioritize by CVSS + KEV.
 
@@ -369,7 +378,7 @@ Use NVD findings to guide security work:
 This skill is invoked during research orchestration via `orchestrating-research`:
 
 ```
-skill: "orchestrating-research"
+Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
 ```
 
 Research orchestration delegates to:
@@ -385,14 +394,14 @@ Research orchestration delegates to:
 
 ## Quality Indicators
 
-| Indicator             | What It Means                                |
-| --------------------- | -------------------------------------------- |
-| NVD authority         | NIST-maintained, official CVE details        |
-| CVSS standardization  | Industry-standard severity metrics           |
-| CPE precision         | Exact affected product/version identification |
-| CWE classification    | Weakness type categorization                 |
-| Reference completeness | Vendor advisories, patches, exploits         |
-| JSON API              | Structured, parseable data                   |
+| Indicator              | What It Means                                 |
+| ---------------------- | --------------------------------------------- |
+| NVD authority          | NIST-maintained, official CVE details         |
+| CVSS standardization   | Industry-standard severity metrics            |
+| CPE precision          | Exact affected product/version identification |
+| CWE classification     | Weakness type categorization                  |
+| Reference completeness | Vendor advisories, patches, exploits          |
+| JSON API               | Structured, parseable data                    |
 
 **All NVD entries authoritative** - NIST is CVE Numbering Authority (CNA).
 
@@ -400,13 +409,13 @@ Research orchestration delegates to:
 
 ## Common Rationalizations (DO NOT SKIP)
 
-| Rationalization                    | Why It's Wrong                                       |
-| ---------------------------------- | ---------------------------------------------------- |
-| "CISA KEV is enough"               | KEV only covers exploited CVEs, not all vulnerabilities |
-| "CVSS scores alone tell priority"  | CVSS ≠ exploitation. Need KEV cross-reference        |
-| "Too many CVEs to research"        | Filter by severity + product CPE for focus           |
-| "I'll use CVE.org instead"         | CVE.org redirects to NVD for details                 |
-| "No time for API setup"            | 10 min API setup prevents hours of manual searching  |
+| Rationalization                   | Why It's Wrong                                          |
+| --------------------------------- | ------------------------------------------------------- |
+| "CISA KEV is enough"              | KEV only covers exploited CVEs, not all vulnerabilities |
+| "CVSS scores alone tell priority" | CVSS ≠ exploitation. Need KEV cross-reference           |
+| "Too many CVEs to research"       | Filter by severity + product CPE for focus              |
+| "I'll use CVE.org instead"        | CVE.org redirects to NVD for details                    |
+| "No time for API setup"           | 10 min API setup prevents hours of manual searching     |
 
 ---
 
@@ -433,10 +442,10 @@ Before completing research:
 
 ## Related Skills
 
-| Skill                        | Purpose                                  |
-| ---------------------------- | ---------------------------------------- |
-| `orchestrating-research`     | Orchestrator delegating to this skill (CORE) |
-| `researching-cisa-kev`       | Sibling skill for exploitation confirmation |
-| `researching-arxiv`          | Sibling skill for academic research      |
-| `writing-nuclei-signatures`  | Uses NVD research for template development |
-| `creating-vql-capabilities`  | Uses NVD research for detection logic    |
+| Skill                              | Purpose                                                                                                          |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `orchestrating-research` (LIBRARY) | Orchestrator delegating to this skill - `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` |
+| `researching-cisa-kev`             | Sibling skill for exploitation confirmation                                                                      |
+| `researching-arxiv`                | Sibling skill for academic research                                                                              |
+| `writing-nuclei-signatures`        | Uses NVD research for template development                                                                       |
+| `creating-vql-capabilities`        | Uses NVD research for detection logic                                                                            |

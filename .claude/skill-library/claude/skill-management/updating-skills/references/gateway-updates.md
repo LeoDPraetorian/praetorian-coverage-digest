@@ -68,7 +68,7 @@ Options:
 **Example:**
 
 ```markdown
-| TanStack Query Patterns | `.claude/skill-library/frontend/state/frontend-tanstack-query/SKILL.md` | TanStack, cache, fetch |
+| TanStack Query Patterns | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md` | TanStack, cache, fetch |
 ```
 
 **CRITICAL RULES:**
@@ -79,16 +79,17 @@ Options:
 - ✅ Path must end with `/SKILL.md`
 - ✅ Triggers must be comma-separated keywords matching Intent Detection
 
-**Step 5: Run Gateway Audit**
+**Step 5: Verify Gateway**
+
+Manually verify:
+
+- **Phase 18** - Routing table format (check table syntax is valid markdown)
+- **Phase 19** - Path resolution (verify all paths exist using `test -f {path}`)
 
 ```bash
-cd .claude/skill-library/claude/skill-management/auditing-skills/scripts
-npm run audit -- gateway-frontend --phase 18
-npm run audit -- gateway-frontend --phase 19
+# Verify all paths in routing table exist
+grep "\.claude/skill-library" .claude/skills/gateway-frontend/SKILL.md | grep -oE '`[^`]+`' | tr -d '`' | while read path; do test -f "$path" && echo "✓ $path" || echo "✗ $path"; done
 ```
-
-**Phase 18** - Routing table format (checks table syntax)
-**Phase 19** - Path resolution (verifies all paths exist)
 
 ---
 
@@ -126,13 +127,14 @@ grep -r "frontend-old-skill" .claude/skills/gateway-*/SKILL.md
 
 Should return no results. If found, remove those references too.
 
-**Step 4: Run Gateway Audit**
+**Step 4: Verify No Broken References**
 
 ```bash
-npm run audit -- gateway-frontend --phase 19
+# Verify all paths in routing table exist
+grep "\.claude/skill-library" .claude/skills/gateway-frontend/SKILL.md | grep -oE '`[^`]+`' | tr -d '`' | while read path; do test -f "$path" || echo "✗ BROKEN: $path"; done
 ```
 
-Verifies no broken references remain.
+Should return no output if all paths are valid.
 
 ---
 
@@ -155,7 +157,7 @@ Note which section header it's under.
 ```
 Edit {
   file_path: ".claude/skills/gateway-frontend/SKILL.md",
-  old_string: "| TanStack Query | `.claude/skill-library/frontend/state/frontend-tanstack-query/SKILL.md` |\n",
+  old_string: "| TanStack Query | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md` |\n",
   new_string: ""
 }
 ```
@@ -168,7 +170,7 @@ Find the State Management section and add row:
 Edit {
   file_path: ".claude/skills/gateway-frontend/SKILL.md",
   old_string: "## State Management\n\n| Skill Name | Path |\n|-----------|------|",
-  new_string: "## State Management\n\n| Skill Name | Path |\n|-----------|------|\n| TanStack Query | `.claude/skill-library/frontend/state/frontend-tanstack-query/SKILL.md` |"
+  new_string: "## State Management\n\n| Skill Name | Path |\n|-----------|------|\n| TanStack Query | `.claude/skill-library/development/frontend/using-tanstack-query/SKILL.md` |"
 }
 ```
 
@@ -180,11 +182,16 @@ Ensure table formatting remains consistent:
 - Full path in backticks
 - Newline after each row
 
-**Step 5: Run Gateway Audit**
+**Step 5: Verify Gateway**
+
+Manually verify:
+
+- **Phase 18**: Table syntax is valid markdown
+- **Phase 19**: All paths exist
 
 ```bash
-npm run audit -- gateway-frontend --phase 18
-npm run audit -- gateway-frontend --phase 19
+# Verify all paths exist
+grep "\.claude/skill-library" .claude/skills/gateway-frontend/SKILL.md | grep -oE '`[^`]+`' | tr -d '`' | while read path; do test -f "$path" || echo "✗ BROKEN: $path"; done
 ```
 
 ---
@@ -245,7 +252,7 @@ After ANY gateway update:
 ### If Skill Doesn't Exist Yet
 
 1. Create skill first: `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`
-2. Audit new skill: `npm run audit -- new-skill-name`
+2. Audit new skill: `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
 3. Then add to gateway using workflows above
 
 ### If Gateway Doesn't Exist Yet
@@ -344,9 +351,19 @@ done
 
 ---
 
-## Related Skills
+## Integration
 
-- `creating-skills` - Create new skills or gateways
-- `auditing-skills` - Run gateway-specific audit phases
-- `fixing-skills` - Fix gateway structure issues
-- `syncing-gateways` - Automated gateway synchronization
+### Pairs With (conditional)
+
+- **`creating-skills`** (LIBRARY) - When creating new gateways
+  - Purpose: Create new skills or gateways
+  - `Read(".claude/skill-library/claude/skill-management/creating-skills/SKILL.md")`
+- **`auditing-skills`** (LIBRARY) - When validating gateway compliance
+  - Purpose: Run gateway-specific audit phases
+  - `Read(".claude/skill-library/claude/skill-management/auditing-skills/SKILL.md")`
+- **`fixing-skills`** (LIBRARY) - When gateway audit fails
+  - Purpose: Fix gateway structure issues
+  - `Read(".claude/skill-library/claude/skill-management/fixing-skills/SKILL.md")`
+- **`syncing-gateways`** (LIBRARY) - When gateways need synchronization
+  - Purpose: Gateway synchronization workflow
+  - `Read(".claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md")`
