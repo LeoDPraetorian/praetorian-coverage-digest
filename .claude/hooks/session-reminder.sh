@@ -6,6 +6,14 @@
 
 set -euo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing - reminder is non-critical)
+if ! require_jq; then
+  exit 0
+fi
+
 # Read input to get session_id for state file lookup
 input=$(cat)
 session_id=$(echo "$input" | jq -r '.session_id // "default"')

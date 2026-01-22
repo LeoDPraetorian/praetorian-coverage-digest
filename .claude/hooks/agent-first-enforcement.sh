@@ -16,6 +16,14 @@
 # jq returns non-zero on invalid JSON which causes pipefail to fail the whole script
 set -eu
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (fatal if missing)
+if ! require_jq; then
+  fatal_missing_jq "agent-first-enforcement"
+fi
+
 # Read input from stdin
 input=$(cat)
 

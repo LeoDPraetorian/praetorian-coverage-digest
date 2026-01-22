@@ -15,6 +15,19 @@
 
 set -uo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing - escalation is non-critical)
+if ! require_jq; then
+  exit 0
+fi
+
+# Ensure curl is available (exit silently if missing - escalation is non-critical)
+if ! require_curl; then
+  exit 0
+fi
+
 # Read hook input to get session ID
 input=$(cat)
 session_id=$(echo "$input" | jq -r '.session_id // "default"')

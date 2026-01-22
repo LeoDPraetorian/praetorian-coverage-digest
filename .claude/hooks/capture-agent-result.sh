@@ -9,6 +9,15 @@
 
 set -uo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (fatal if missing)
+if ! require_jq; then
+  echo "Hook error: jq required but not installed" >&2
+  exit 0
+fi
+
 # Read hook input from stdin
 input=$(cat)
 

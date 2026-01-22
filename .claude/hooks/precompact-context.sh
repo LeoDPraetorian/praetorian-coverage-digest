@@ -10,6 +10,14 @@
 
 set -euo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing - don't break compaction)
+if ! require_jq; then
+  exit 0
+fi
+
 # Read input from stdin
 input=$(cat)
 

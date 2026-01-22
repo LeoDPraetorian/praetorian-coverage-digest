@@ -9,6 +9,15 @@
 
 set -uo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (fatal if missing - emit approve to not block on setup issues)
+if ! require_jq; then
+  echo '{"decision": "approve"}'
+  exit 0
+fi
+
 # Read hook input
 input=$(cat)
 transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')

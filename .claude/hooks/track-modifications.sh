@@ -10,6 +10,14 @@ set -uo pipefail
 # Note: Not using set -e because jq operations may fail on corrupted state files
 # and we want the hook to degrade gracefully rather than error out
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing - tracking is non-critical)
+if ! require_jq; then
+  exit 0
+fi
+
 # Read hook input from stdin
 input=$(cat)
 

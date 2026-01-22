@@ -9,6 +9,14 @@
 
 set -euo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing)
+if ! require_jq; then
+  exit 0
+fi
+
 input=$(cat)
 
 # Extract task output

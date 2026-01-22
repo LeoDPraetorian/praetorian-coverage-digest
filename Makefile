@@ -399,7 +399,7 @@ endif
 
 setup-mac:
 	@echo "Installing core packages on macOS..."
-	@brew install awscli aws-sam-cli jq node python docker go gh pipx uv
+	@brew install awscli aws-sam-cli curl jq yq node python docker go gh pipx uv
 	@echo "Installing LSP dependencies..."
 	@command -v rustup >/dev/null 2>&1 && rustup component add rust-analyzer 2>/dev/null || echo "  ⚠️ rustup not found, skipping rust-analyzer"
 	@pipx ensurepath > /dev/null 2>&1 || true
@@ -414,7 +414,7 @@ setup-mac:
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
-	@brew upgrade awscli aws-sam-cli jq node python docker go gh pipx uv
+	@brew upgrade awscli aws-sam-cli curl jq yq node python docker go gh pipx uv
 	@echo "Updating LSP servers..."
 	@npm update -g typescript-language-server typescript pyright > /dev/null 2>&1 || true
 	@go install golang.org/x/tools/gopls@latest 2>/dev/null || true
@@ -431,6 +431,12 @@ setup-ubuntu:
 # go, npm, jq, python, gh are installed in the devcontainer, upgrade them manually in devcontainer
 	@test -d /usr/local/aws-cli/v2/current || make install-aws-cli-ubuntu
 	@test -d /usr/local/aws-sam-cli/current || make install-sam-cli-ubuntu
+	@echo "Installing jq (if missing)..."
+	@command -v jq >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq jq)
+	@echo "Installing yq (YAML processor)..."
+	@command -v yq >/dev/null 2>&1 || (sudo wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && sudo chmod +x /usr/local/bin/yq)
+	@echo "Installing curl (if missing)..."
+	@command -v curl >/dev/null 2>&1 || (sudo apt-get update -qq && sudo apt-get install -y -qq curl)
 	@echo "Installing Praetorian CLI..."
 	@sudo python3 -m pip install --no-cache-dir praetorian-cli --break-system-packages > /dev/null
 	@echo "Installing Claude Code..."

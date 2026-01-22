@@ -2,6 +2,12 @@
 # Sound notification system for Claude Code hooks
 # Plays sound when agent finishes and waits for user input
 
+# Source shared utilities (for require_jq)
+if [[ -n "${CLAUDE_PROJECT_DIR:-}" && -f "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh" ]]; then
+  source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+  require_jq || true  # Non-fatal, functions have fallbacks
+fi
+
 # Use absolute path anchored to project root to prevent creation in wrong directories
 SOUND_CONFIG_FILE="${CLAUDE_PROJECT_DIR:-$(git rev-parse --show-toplevel 2>/dev/null)}/scripts/sound/sound-config.json"
 DEFAULT_SOUND_FILE="$HOME/.claude/sounds/completion.aiff"
