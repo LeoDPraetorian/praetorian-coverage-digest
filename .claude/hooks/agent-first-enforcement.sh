@@ -47,43 +47,57 @@ lower_path=$(echo "$file_path" | tr '[:upper:]' '[:lower:]')
 # =============================================================================
 # SUBAGENT DETECTION: Allow developer agents to edit their own domain
 # =============================================================================
-# When a subagent is spawned via Task tool, it gets its own transcript file
-# named agent-{agentId}.jsonl. The subagent_type parameter is in the PARENT
-# orchestrator's transcript, not the subagent's transcript.
+# When a subagent is spawned via Task tool, the subagent_type is recorded in
+# the transcript. We check the LAST 100 lines to find the most recent Task
+# tool call's subagent_type, which indicates the currently running agent.
 #
-# Detection: If transcript_path basename starts with "agent-", we're in a
-# subagent context. Allow edits that match any developer agent's domain.
+# If we find a recent subagent_type that matches a developer agent for this
+# file type, allow the edit.
 
-if [[ -n "$transcript_path" ]]; then
-    transcript_basename=$(basename "$transcript_path")
+if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
+    # Extract the most recent subagent_type from the last 100 lines of the transcript
+    subagent_type=$(tail -100 "$transcript_path" 2>/dev/null | grep -o '"subagent_type":"[^"]*"' | tail -1 | sed 's/"subagent_type":"\([^"]*\)"/\1/')
 
-    # Check if we're in a subagent context (transcript is agent-{id}.jsonl)
-    if [[ "$transcript_basename" == agent-*.jsonl ]]; then
-        # We're in a subagent - allow edits that match developer agent domains
-        # Trust that orchestrator spawned the correct agent type
-
-        # Frontend files (.ts, .tsx, .js, .jsx in ui/components/frontend)
-        if [[ "$extension" =~ ^(ts|tsx|js|jsx)$ ]] && echo "$lower_path" | grep -qE '(ui|components|frontend)'; then
-            exit 0
-        fi
-
-        # Backend Go files
-        if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '(backend|pkg|cmd|modules|integrations|janus|fingerprintx|/capabilities/|/scanners/|/aegis/)'; then
-            exit 0
-        fi
-
-        # Tool wrapper files
-        if [[ "$extension" == "ts" ]] && echo "$lower_path" | grep -q '\.claude/tools'; then
-            exit 0
-        fi
-
-        # VQL and Nuclei templates
-        if [[ "$extension" == "vql" ]]; then
-            exit 0
-        fi
-        if [[ "$extension" =~ ^(yaml|yml)$ ]] && echo "$lower_path" | grep -qE '(nuclei|templates|capabilities)'; then
-            exit 0
-        fi
+    if [[ -n "$subagent_type" ]]; then
+        # Check if this subagent is allowed to edit this file type
+        case "$subagent_type" in
+            frontend-developer)
+                # Frontend devs can edit .ts, .tsx, .js, .jsx in ui/components/frontend
+                if [[ "$extension" =~ ^(ts|tsx|js|jsx)$ ]] && echo "$lower_path" | grep -qE '(ui|components|frontend)'; then
+                    exit 0
+                fi
+                ;;
+            backend-developer)
+                # Backend devs can edit .go files in backend paths
+                if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '(backend|pkg|cmd|modules)'; then
+                    exit 0
+                fi
+                ;;
+            integration-developer)
+                # Integration devs can edit .go files in integrations paths
+                if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '/integrations/'; then
+                    exit 0
+                fi
+                ;;
+            capability-developer)
+                # Capability devs can edit .go in capability paths, .vql, nuclei .yaml
+                if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '(janus|fingerprintx|/capabilities/|/scanners/|/aegis/)'; then
+                    exit 0
+                fi
+                if [[ "$extension" == "vql" ]]; then
+                    exit 0
+                fi
+                if [[ "$extension" =~ ^(yaml|yml)$ ]] && echo "$lower_path" | grep -qE '(nuclei|templates|capabilities)'; then
+                    exit 0
+                fi
+                ;;
+            tool-developer)
+                # Tool devs can edit .ts files in .claude/tools/
+                if [[ "$extension" == "ts" ]] && echo "$lower_path" | grep -q '\.claude/tools'; then
+                    exit 0
+                fi
+                ;;
+        esac
     fi
 fi
 # =============================================================================
