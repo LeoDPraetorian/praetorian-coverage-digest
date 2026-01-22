@@ -439,13 +439,39 @@ This skill provides a high-level workflow. For detailed implementation guidance:
 - **Common Mistakes:** [references/common-mistakes.md](references/common-mistakes.md)
 - **Security Audit Checklist:** [references/security-audit-checklist.md](references/security-audit-checklist.md)
 
-## Related Skills
+## Integration
 
-- `frontend-security` - Agent for automated security review of React code
-- `testing-security-with-e2e-tests` - E2E security testing with Playwright (XSS, auth, CSRF tests)
-- `adhering-to-uiux-laws` - UI/UX patterns that impact security (clickjacking, phishing)
-- `using-modern-react-patterns` - React 19 patterns including security considerations
-- `frontend-testing-patterns` - Testing patterns including security test cases
+### Called By
+
+- **`gateway-frontend`** (CORE) - Routes frontend security tasks
+  - Purpose: Entry point for React security workflows
+  - `skill: "gateway-frontend"`
+
+### Requires (invoke before starting)
+
+None - Entry point skill for security workflows
+
+### Calls (during execution)
+
+None - Provides reference documentation only
+
+### Pairs With (conditional)
+
+- **`frontend-security`** (AGENT) - When automated security review needed
+  - Purpose: Agent-based code security analysis
+  - Trigger: User requests security review
+
+- **`testing-security-with-e2e-tests`** (LIBRARY) - When implementing security tests
+  - Purpose: E2E security test patterns with Playwright
+  - `Read(".claude/skill-library/testing/testing-security-with-e2e-tests/SKILL.md")`
+
+- **`using-modern-react-patterns`** (LIBRARY) - When implementing React 19 features
+  - Purpose: Modern React patterns with security considerations
+  - `Read(".claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md")`
+
+- **`adhering-to-uiux-laws`** (LIBRARY) - When UI affects security
+  - Purpose: UI/UX patterns that impact security (clickjacking, phishing)
+  - `Read(".claude/skill-library/development/frontend/adhering-to-uiux-laws/SKILL.md")`
 
 ## Changelog
 
