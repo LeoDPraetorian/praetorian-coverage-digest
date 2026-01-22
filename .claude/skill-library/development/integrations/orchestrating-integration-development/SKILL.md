@@ -105,6 +105,30 @@ See [references/compaction-gates.md](references/compaction-gates.md) for the ful
 
 Quick summary: Do NOT proceed past compaction checkpoints (Phase 3→4, Phase 8→9, Phase 13→14) without completing verification. Cannot skip without explicit user approval.
 
+<EXTREMELY-IMPORTANT>
+**MANDATORY: Read compaction gate counters before proceeding:**
+
+```
+Read('.claude/skill-library/development/integrations/orchestrating-integration-development/references/compaction-gate-counters.md')
+```
+
+**Compaction is a 5-step procedure at EACH gate:**
+
+| Step | Action | Skip Consequence |
+|------|--------|------------------|
+| 1 | Invoke `persisting-progress-across-sessions` | Context strategy undefined |
+| 2 | Write full content to progress file | No recovery if context lost |
+| 3 | **Replace inline context with <200 token summary** | Context bloat, token waste |
+| 4 | Verify write succeeded | Corrupted state files |
+| 5 | Complete verification checklist | Incomplete compaction |
+
+**If you think "Writing the file is enough":**
+- That's Step 2 of 5
+- Steps 3-5 are MANDATORY
+- Read the counters file above BEFORE proceeding
+
+</EXTREMELY-IMPORTANT>
+
 ### P0 Compliance is NON-NEGOTIABLE
 
 Integration development has 7 mandatory P0 requirements verified in Phase 10:

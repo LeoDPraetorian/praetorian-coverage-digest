@@ -13,6 +13,14 @@
 
 set -euo pipefail
 
+# Source shared utilities
+source "${CLAUDE_PROJECT_DIR}/.claude/hooks/hook-utils.sh"
+
+# Ensure jq is available (exit silently if missing - don't block spawning)
+if ! require_jq; then
+  exit 0
+fi
+
 # Read input from stdin
 input=$(cat)
 
@@ -49,7 +57,16 @@ if [[ -z "$MANIFEST" ]]; then
 fi
 
 # Check if MANIFEST has current_phase (orchestrated workflow)
-current_phase=$(yq -r '.current_phase // ""' "$MANIFEST" 2>/dev/null || echo "")
+# Try yq first (auto-installs via require_yq), fallback to grep
+require_yq  # Non-fatal, just attempts install
+
+if command -v yq &>/dev/null; then
+  current_phase=$(yq -r '.current_phase // ""' "$MANIFEST" 2>/dev/null || echo "")
+else
+  # Fallback: grep-based extraction (handles "current_phase: 2" or "current_phase: "planning"")
+  current_phase=$(grep -E '^current_phase:\s*' "$MANIFEST" 2>/dev/null | sed 's/^current_phase:\s*//' | tr -d '"' | tr -d "'" | xargs || echo "")
+fi
+
 if [[ -z "$current_phase" ]]; then
   # No current_phase = ad-hoc agent work, not orchestrated
   exit 0
@@ -93,6 +110,7 @@ CURRENT_CONTEXT=$((CACHE_READ + CACHE_CREATE + INPUT_TOKENS))
 # --- Step 3: Check threshold ---
 
 # 85% of 200k = 170k (enforcement layer - skill guidance at 75%/80% should prevent reaching this)
+# Compaction discipline operates on 200k context segments for workflow hygiene
 THRESHOLD=170000
 CONTEXT_WINDOW=200000
 
