@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowImportingTsExtensions": true,
+    "noEmit": true
+  },
+  "include": [
+    "errors.ts",
+    "utils.ts",
+    "shared-utils.ts",
+    "shared-schemas.ts",
+    "security-utils.ts",
+    "fetch-current-class.ts",
+    "get-selected-text.ts",
+    "get-android-manifest.ts",
+    "get-strings.ts",
+    "get-all-resource-file-names.ts",
+    "get-main-activity-class.ts",
+    "get-class-sources.ts",
+    "get-smali-of-class.ts",
+    "get-resource-file.ts",
+    "../config/lib/mcp-client.ts",
+    "../config/lib/response-utils.ts",
+    "../config/lib/sanitize.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*.test.ts"
+  ]
+}
