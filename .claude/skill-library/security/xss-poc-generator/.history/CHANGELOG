@@ -1,0 +1,29 @@
+# Changelog
+
+## [2026-01-22] - Two-Stage Token Fetch Pattern
+
+### Fixed
+- **CRITICAL BUG**: Skill was incorrectly assuming CSRF token exists on XSS injection page
+- Added Question 3 to ask user where CSRF token is located (token page URL)
+- Updated Phase 2 to generate two-stage fetch pattern by default (GET to fetch token, then POST with token)
+- Updated Phase 3 templates to include three variants:
+  - Template A: Two-stage (token on same/different page) - MOST COMMON
+  - Template B: Current page token (rare edge case)
+  - Template C: No CSRF token
+- Updated Common Patterns section with realistic two-stage examples
+- Added anti-patterns: "Assuming token on current page" and "Extracting from document without fetch"
+
+### Changed
+- Phase 2: Token extraction code now uses `doc.querySelector()` (fetched page) instead of `document.querySelector()` (current page)
+- Phase 3: Default template now includes `fetch()` + `DOMParser` pattern for token fetch
+- Renumbered Question 3 → Question 4 (constraints) due to new token page question
+
+### Rationale
+Examples in examples/ directory (aspnet-viewstate-password-change.md, csrf-meta-tag-admin-creation.md) 
+both demonstrate correct two-stage pattern. Original skill was generating broken payloads that would fail 
+when XSS injection point was on a different page than the CSRF token location.
+
+### Evidence
+- aspnet-viewstate-password-change.md lines 30-40: Fetches form page first
+- csrf-meta-tag-admin-creation.md lines 26-33: Fetches /users page to extract token
+- User engagement (PortSwigger lab): Token was on /my-account/change-email form, not on XSS injection page
