@@ -112,7 +112,7 @@ fi
 basename=$(basename "$file_path")
 
 # Allow test files to be edited (by tester agents or orchestrator)
-if [[ "$basename" =~ \.(test|spec)\.(ts|tsx|js|jsx)$ ]]; then
+if [[ "$basename" =~ \.(test|spec)\.(ts|tsx|js|jsx)$ ]] || [[ "$basename" =~ _test\.go$ ]]; then
     exit 0
 fi
 
