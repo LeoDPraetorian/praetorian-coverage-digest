@@ -28,7 +28,7 @@ This super-repository unifies all Chariot repositories and provides shared workf
 
 ```bash
 # recursively clone the repository
-git clone --recurse-submodules https://github.com/praetorian-inc/chariot-development-platform.git
+git clone --recurse-submodules https://github.com/praetorian-inc/praetorian-development-platform.git
 # set up the repository
 make setup
 

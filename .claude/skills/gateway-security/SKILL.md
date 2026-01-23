@@ -61,7 +61,8 @@ This gateway implements 3-tier loading:
 | "CVSS calibration" / "scoring findings" / "avoid over-inflation" | → `scoring-cvss-findings`                  |
 | "security test plan" / "pentest" / "Phase 6"                     | → `security-test-planning`                 |
 | "codebase size" / "complexity"                                   | → `sizing-codebases`                       |
-| "threat intelligence" / "KEV" / "vulnerability report"           | → `generating-threat-intelligence-reports` |
+| "threat report" / "customer impact report" / "KEV + customer"    | → `orchestrating-threat-reports` (FULL workflow: KEV + customer impact + gap remediation) |
+| "threat intelligence" / "KEV only" / "vulnerability report"      | → `generating-threat-intelligence-reports` (Phase 1 only: KEV research + attribution) |
 | "CVE impact" / "customer exposure" / "asset vulnerability"       | → `analyzing-cve-customer-impact`          |
 | "CVE research" / "nuclei template" / "detection gap"             | → `orchestrating-cve-research-jobs`        |
 | "security review" / "OWASP" / "Go security"                      | → `reviewing-backend-security`             |
@@ -122,9 +123,10 @@ This gateway implements 3-tier loading:
 | Scoring CVSS Threats          | `.claude/skill-library/security/threat-model/scoring-cvss-threats/SKILL.md`         | CVSS, severity score, threat modeling Phase 3                 |
 | Scoring CVSS Findings         | `.claude/skill-library/security/threat-model/scoring-cvss-findings/SKILL.md`        | CVSS calibration, scoring findings, avoid over-inflation      |
 | Security Test Planning        | `.claude/skill-library/security/threat-model/security-test-planning/SKILL.md`       | security test plan, pentest, Phase 6                          |
-| Threat Intelligence Reporting | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`    | threat intelligence, KEV, vulnerability report                |
-| CVE Customer Impact Analysis  | `.claude/skill-library/research/analyzing-cve-customer-impact/SKILL.md`             | CVE impact, customer exposure, asset vulnerability            |
-| CVE Research Orchestration    | `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`           | CVE research, nuclei template, detection gap                  |
+| Threat Report Orchestration   | `.claude/skill-library/research/orchestrating-threat-reports/SKILL.md`              | threat report, KEV + customer (FULL: 3-phase workflow)       |
+| Threat Intelligence Reporting | `.claude/skill-library/research/generating-threat-intelligence-reports/SKILL.md`    | threat intelligence, KEV only (Phase 1: KEV research + attribution) |
+| CVE Customer Impact Analysis  | `.claude/skill-library/research/analyzing-cve-customer-impact/SKILL.md`             | CVE impact, customer exposure (Phase 2: asset vulnerability) |
+| CVE Research Orchestration    | `.claude/skill-library/research/orchestrating-cve-research-jobs/SKILL.md`           | CVE research, nuclei template (Phase 3: detection gap remediation) |
 
 ### Security Review
 

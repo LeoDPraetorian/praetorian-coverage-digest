@@ -157,7 +157,7 @@ Instructions say WHAT, not HOW. "Add X" or "Fix Y" doesn't mean skip workflows.
 This is a **super-repository** containing submodules organized under `/modules/`:
 
 ```
-chariot-development-platform/                  # Super-repo root
+praetorian-development-platform/               # Super-repo root
 ├── modules/                                   # Core platform submodules
 │   ├── chariot/                               # Core platform (backend API + React UI)
 │   ├── chariot-ui-components/                 # Shared React component library (end-of-lifing)
