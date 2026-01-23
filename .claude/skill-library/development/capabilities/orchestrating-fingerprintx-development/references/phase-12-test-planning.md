@@ -126,9 +126,9 @@ Return:
 
 | Test Type         | Framework            | Location                                                        |
 | ----------------- | -------------------- | --------------------------------------------------------------- |
-| Unit              | Go testing + testify | pkg/plugins/services/{protocol}/{protocol}\_test.go             |
-| Integration       | Go httptest/net      | pkg/plugins/services/{protocol}/{protocol}\_integration_test.go |
-| Shodan Validation | Manual + Go          | pkg/plugins/services/{protocol}/{protocol}\_shodan_test.go      |
+| Unit              | Go testing + testify | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go             |
+| Integration       | Go httptest/net      | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_integration_test.go |
+| Shodan Validation | Manual + Go          | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_shodan_test.go      |
 
 ---
 

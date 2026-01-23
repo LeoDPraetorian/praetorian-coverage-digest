@@ -28,7 +28,7 @@
 | ----------------------------------- | -------------------------------------------- |
 | Full protocol research findings     | Protocol detection strategy (3-5 bullets)    |
 | Version fingerprint matrix details  | Version ranges summary (major versions only) |
-| File lists with 50+ items           | Affected directories (pkg/plugins/, etc.)    |
+| File lists with 50+ items           | Affected directories ({CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/, etc.)    |
 | Pattern analysis across all plugins | Technologies detected (Go, testing patterns) |
 | Agent conversation history          | Discovery file path reference                |
 | Shodan query exploration logs       | Key banner patterns (2-3 examples)           |
@@ -83,7 +83,7 @@ Phase 8 (Implementation): COMPLETE
 
 ```
 Phase 13 (Testing): COMPLETE
-- Unit tests: 15/15 passed (pkg/plugins/mysql/*_test.go)
+- Unit tests: 15/15 passed ({CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/mysql/*_test.go)
 - Docker tests: 4/4 passed (MySQL 5.7, 8.0, MariaDB 10.x, Percona)
 - Shodan validation: 85% detection rate (17/20 hosts)
 - Coverage: 91% (target: 80%)

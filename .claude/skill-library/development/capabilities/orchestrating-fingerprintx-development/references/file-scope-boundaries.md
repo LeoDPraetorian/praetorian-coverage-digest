@@ -10,15 +10,30 @@ When spawning parallel agents, define non-overlapping file scopes to prevent con
 
 ---
 
+## Fingerprintx Repository Location
+
+Fingerprintx has been migrated to the external capabilities repository:
+
+```
+{CAPABILITIES_ROOT}/modules/fingerprintx/
+```
+
+Where `{CAPABILITIES_ROOT}` is resolved via:
+1. `CAPABILITIES_ROOT` environment variable
+2. `.claude/config.local.json` (`external_repos.capabilities`)
+3. Common locations (`../capabilities`, `~/dev/capabilities`)
+
+---
+
 ## Fingerprintx File Scope Matrix
 
-| Agent Type           | File Scope                                  | Access Mode | Phase |
-| -------------------- | ------------------------------------------- | ----------- | ----- |
-| Explore              | `pkg/plugins/services/`                     | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                       | WRITE       | 7     |
-| capability-developer | `pkg/plugins/services/{protocol}/`          | READ-WRITE  | 8     |
-| capability-reviewer  | `pkg/plugins/services/{protocol}/`          | READ-ONLY   | 11    |
-| capability-tester    | `pkg/plugins/services/{protocol}/*_test.go` | READ-WRITE  | 13    |
+| Agent Type           | File Scope                                                                  | Access Mode | Phase |
+| -------------------- | --------------------------------------------------------------------------- | ----------- | ----- |
+| Explore              | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/`            | READ-ONLY   | 3     |
+| capability-lead      | Output directory only                                                       | WRITE       | 7     |
+| capability-developer | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/` | READ-WRITE  | 8     |
+| capability-reviewer  | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/` | READ-ONLY   | 11    |
+| capability-tester    | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/*_test.go` | READ-WRITE  | 13    |
 
 ---
 
@@ -28,17 +43,17 @@ When spawning parallel agents, define non-overlapping file scopes to prevent con
 
 These files are modified exclusively by capability-developer:
 
-| File                                        | Purpose              | Phase |
-| ------------------------------------------- | -------------------- | ----- |
-| `pkg/plugins/services/{protocol}/plugin.go` | Main detection logic | 8     |
-| `pkg/plugins/types.go`                      | Type constant        | 8     |
-| `pkg/plugins/plugins.go`                    | Plugin import        | 8     |
+| File                                                                         | Purpose              | Phase |
+| ---------------------------------------------------------------------------- | -------------------- | ----- |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go` | Main detection logic | 8     |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`              | Type constant        | 8     |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`            | Plugin import        | 8     |
 
 ### Test Files (Tester Only)
 
-| File                                                 | Purpose    | Phase |
-| ---------------------------------------------------- | ---------- | ----- |
-| `pkg/plugins/services/{protocol}/{protocol}_test.go` | Unit tests | 13    |
+| File                                                                                  | Purpose    | Phase |
+| ------------------------------------------------------------------------------------- | ---------- | ----- |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go` | Unit tests | 13    |
 
 ---
 
@@ -49,7 +64,7 @@ These files are modified exclusively by capability-developer:
 While capability-reviewer reads plugin.go, test planning can happen in parallel:
 
 ```
-capability-reviewer → READ pkg/plugins/services/{protocol}/plugin.go
+capability-reviewer → READ {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 orchestrator → WRITE .fingerprintx-development/test-plan.md
 ```
 
@@ -60,8 +75,8 @@ orchestrator → WRITE .fingerprintx-development/test-plan.md
 If developing multiple plugins in separate worktrees:
 
 ```
-Worktree A: capability-developer → pkg/plugins/services/mysql/
-Worktree B: capability-developer → pkg/plugins/services/redis/
+Worktree A: capability-developer → {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/
+Worktree B: capability-developer → {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/redis/
 ```
 
 **No conflict** - different directories in different worktrees.
@@ -69,8 +84,8 @@ Worktree B: capability-developer → pkg/plugins/services/redis/
 ### Scenario 3: Implementation and Testing (CONFLICT)
 
 ```
-capability-developer → WRITE pkg/plugins/services/{protocol}/plugin.go
-capability-tester → RUN go test ./pkg/plugins/services/{protocol}/...
+capability-developer → WRITE {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
+capability-tester → RUN go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 ```
 
 **CONFLICT** - developer may change files tester is using.
@@ -98,8 +113,8 @@ Phase 13 (Testing) → START
 
 These shared files are only modified once per plugin:
 
-- `pkg/plugins/types.go` - Add type constant (Phase 8)
-- `pkg/plugins/plugins.go` - Add import (Phase 8)
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` - Add type constant (Phase 8)
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` - Add import (Phase 8)
 
 **Rule:** Complete these modifications before any parallel activity.
 

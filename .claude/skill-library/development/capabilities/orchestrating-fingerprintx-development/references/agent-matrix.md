@@ -20,7 +20,7 @@ All fingerprintx plugin development uses the capability agent family:
 
 ```typescript
 // Discovery
-Task("Explore", "Find similar plugin patterns in pkg/plugins/services/...");
+Task("Explore", "Find similar plugin patterns in {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/...");
 
 // Architecture
 Task("capability-lead", "Design detection strategy for {protocol} plugin...");
@@ -145,7 +145,7 @@ Task("capability-lead", "Design plugin architecture...");
 
 ```typescript
 // Discovery
-Task("Explore", "Find similar plugins in pkg/plugins/services/...");
+Task("Explore", "Find similar plugins in {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/...");
 
 // Architecture (after discovery)
 Task("capability-lead", "Design {protocol} detection strategy...");

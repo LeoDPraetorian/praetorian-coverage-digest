@@ -21,9 +21,9 @@ Domain Compliance validates that implementation meets mandatory patterns specifi
 | Protocol Detection  | Service/protocol identification logic implemented | P0       | grep for Match/Detect method        |
 | Banner Parsing      | Banner response parsing handles malformed input   | P0       | Check error handling in parse logic |
 | Default Ports       | Default port(s) documented in package comment     | P0       | grep for port documentation         |
-| Type Constant       | Type constant added to pkg/plugins/types.go       | P0       | grep for Service constant           |
+| Type Constant       | Type constant added to {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go       | P0       | grep for Service constant           |
 | Type Alphabetical   | Type constant in alphabetical position            | P0       | sort -c validation                  |
-| Plugin Import       | Plugin imported in pkg/plugins/plugins.go         | P0       | grep for package import             |
+| Plugin Import       | Plugin imported in {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go         | P0       | grep for package import             |
 | Import Alphabetical | Plugin import in alphabetical position            | P0       | sort -c validation                  |
 | Version Extraction  | Version extraction implemented (if open-source)   | P1       | Check for version parsing           |
 | Shodan Test Vectors | At least 3 Shodan query test vectors documented   | P1       | Check test file or docs             |
@@ -37,11 +37,11 @@ Domain Compliance validates that implementation meets mandatory patterns specifi
 
 ```bash
 # Verify Match or Detect method exists
-grep -E "func.*Match\(|func.*Detect\(" pkg/plugins/services/{protocol}/plugin.go
+grep -E "func.*Match\(|func.*Detect\(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Detection method found
 
 # Verify ServiceMatch return
-grep "ServiceMatch" pkg/plugins/services/{protocol}/plugin.go
+grep "ServiceMatch" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Returns ServiceMatch type
 ```
 
@@ -49,11 +49,11 @@ grep "ServiceMatch" pkg/plugins/services/{protocol}/plugin.go
 
 ```bash
 # Check for banner parsing logic
-grep -A5 "banner\|Banner\|response\|Response" pkg/plugins/services/{protocol}/plugin.go
+grep -A5 "banner\|Banner\|response\|Response" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Banner parsing present
 
 # Check for malformed input handling
-grep -E "len\(.*\)\s*[<>=]|if.*==.*nil" pkg/plugins/services/{protocol}/plugin.go
+grep -E "len\(.*\)\s*[<>=]|if.*==.*nil" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Length/nil checks present
 ```
 
@@ -61,11 +61,11 @@ grep -E "len\(.*\)\s*[<>=]|if.*==.*nil" pkg/plugins/services/{protocol}/plugin.g
 
 ```bash
 # Check package comment for ports
-head -30 pkg/plugins/services/{protocol}/plugin.go | grep -i "port\|Port"
+head -30 {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go | grep -i "port\|Port"
 -> PASS: Default port documented
 
 # Or check DefaultPorts constant/variable
-grep "DefaultPort\|defaultPort" pkg/plugins/services/{protocol}/plugin.go
+grep "DefaultPort\|defaultPort" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Port constant defined
 ```
 
@@ -73,11 +73,11 @@ grep "DefaultPort\|defaultPort" pkg/plugins/services/{protocol}/plugin.go
 
 ```bash
 # Check type constant exists
-grep "Service{Protocol}" pkg/plugins/types.go
+grep "Service{Protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go
 -> PASS: Service{Protocol} = "service-{protocol}"
 
 # Check alphabetical order
-grep "Service" pkg/plugins/types.go | sort -c
+grep "Service" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go | sort -c
 -> PASS: Constants sorted alphabetically
 ```
 
@@ -85,11 +85,11 @@ grep "Service" pkg/plugins/types.go | sort -c
 
 ```bash
 # Check plugin import exists
-grep "{protocol}" pkg/plugins/plugins.go
+grep "{protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go
 -> PASS: Plugin package imported
 
 # Check import alphabetical order
-grep "plugins/services" pkg/plugins/plugins.go | sort -c
+grep "plugins/services" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go | sort -c
 -> PASS: Imports sorted alphabetically
 ```
 
@@ -97,11 +97,11 @@ grep "plugins/services" pkg/plugins/plugins.go | sort -c
 
 ```bash
 # Check for error returns
-grep -E "err != nil|return nil" pkg/plugins/services/{protocol}/plugin.go
+grep -E "err != nil|return nil" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Error handling present
 
 # Check for graceful handling (no panics)
-grep -v "panic" pkg/plugins/services/{protocol}/plugin.go | wc -l
+grep -v "panic" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go | wc -l
 -> PASS: No panic statements
 ```
 
@@ -113,7 +113,7 @@ grep -v "panic" pkg/plugins/services/{protocol}/plugin.go | wc -l
 
 ```bash
 # Check for version extraction
-grep -i "version\|Version" pkg/plugins/services/{protocol}/plugin.go
+grep -i "version\|Version" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Version extraction implemented
 # OR
 -> ADVISORY: Version extraction not implemented (acceptable for proprietary protocols)
@@ -123,7 +123,7 @@ grep -i "version\|Version" pkg/plugins/services/{protocol}/plugin.go
 
 ```bash
 # Check for Shodan queries in tests or docs
-grep -r "shodan\|Shodan\|product:" pkg/plugins/services/{protocol}/
+grep -r "shodan\|Shodan\|product:" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
 -> PASS: Shodan queries documented
 # OR
 -> ADVISORY: Shodan queries not documented (add before production)

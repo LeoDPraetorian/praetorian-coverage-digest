@@ -20,8 +20,8 @@ You are testing fingerprintx plugin: [PROTOCOL_NAME]
 ## Plugin Context
 
 **Service**: [PROTOCOL_NAME]
-**Plugin Location**: `pkg/plugins/services/[protocol]/plugin.go`
-**Test Location**: `pkg/plugins/services/[protocol]/[protocol]_test.go`
+**Plugin Location**: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/plugin.go`
+**Test Location**: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/[protocol]_test.go`
 
 ## Test Plan (from Phase 12)
 
@@ -51,12 +51,12 @@ You MUST use these skills during this task:
 
 1. Run existing unit tests:
    ```bash
-   go test ./pkg/plugins/services/[protocol]/... -v
+   go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/... -v
    ```
 2. Verify all tests pass
 3. Check coverage:
    ```bash
-   go test ./pkg/plugins/services/[protocol]/... -cover
+   go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/... -cover
    ```
 
 ### Phase B: Additional Tests (if needed)

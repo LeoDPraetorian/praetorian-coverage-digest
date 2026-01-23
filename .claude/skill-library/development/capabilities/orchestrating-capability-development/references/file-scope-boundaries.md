@@ -12,74 +12,131 @@ When spawning parallel agents, define non-overlapping file scopes to prevent con
 
 ---
 
+## Dual Repository Structure
+
+Capabilities exist in **two locations** during the migration period:
+
+1. **External capabilities repo** (migrated): `{CAPABILITIES_ROOT}/modules/{capability}/`
+2. **Internal chariot modules** (not yet migrated): `modules/{module}/`
+
+### External Capabilities Repository
+
+Capabilities that have been migrated live in a separate super-repo (`capabilities`) that can be cloned anywhere:
+
+```
+{CAPABILITIES_ROOT}/modules/{capability}/
+```
+
+**Migrated capabilities include:** nebula, fingerprintx, nuclei-templates, trajan, augustus, diocletian, noseyparker, noseyparker-explorer, noseyparkerplusplus, brutus, capability-sdk
+
+### Internal Chariot Modules (Pending Migration)
+
+Capabilities not yet migrated remain in chariot-development-platform:
+
+```
+modules/{module}/
+```
+
+**Not yet migrated:** chariot-aegis-capabilities, msp-definitions, and any other modules in `modules/` that capability-developer may need
+
+### Path Resolution
+
+During Phase 3 (Codebase Discovery), determine which location applies:
+
+1. Check if capability exists in `{CAPABILITIES_ROOT}/modules/`
+2. If not found, check `modules/` in chariot-development-platform
+3. Document resolved path in MANIFEST.yaml
+
+---
+
+## Discovery Protocol for External Repo
+
+Resolve `{CAPABILITIES_ROOT}` in this order:
+
+1. **Environment variable** (highest priority):
+   ```bash
+   export CAPABILITIES_ROOT="/path/to/capabilities"
+   ```
+
+2. **Config file** (`.claude/config.local.json`, gitignored):
+   ```json
+   {
+     "external_repos": {
+       "capabilities": "../capabilities"
+     }
+   }
+   ```
+
+3. **Common locations** (fallback search):
+   - `../capabilities`
+   - `~/dev/capabilities`
+   - `$GOPATH/src/github.com/praetorian-inc/capabilities`
+
+4. **Ask user** if not found
+
+### Validation
+
+Before proceeding, verify the path exists:
+
+```bash
+# External repo
+ls {CAPABILITIES_ROOT}/modules/
+
+# Internal modules
+ls modules/
+```
+
+---
+
 ## Capability File Scope Matrix
 
-Based on `capability_type` from Phase 3:
+All capabilities follow a unified pattern. The `{resolved_path}` is determined during Phase 3 (Codebase Discovery) based on where the capability lives.
 
-### VQL Capabilities
+| Agent Type           | File Scope                  | Access Mode | Phase |
+| -------------------- | --------------------------- | ----------- | ----- |
+| Explore              | Both repos (discovery)      | READ-ONLY   | 3     |
+| capability-lead      | Output directory only       | WRITE       | 7     |
+| capability-developer | `{resolved_path}/`          | READ-WRITE  | 8     |
+| capability-reviewer  | `{resolved_path}/`          | READ-ONLY   | 11    |
+| capability-tester    | `{resolved_path}/`          | READ-WRITE  | 13    |
 
-| Agent Type           | File Scope                                                   | Access Mode | Phase |
-| -------------------- | ------------------------------------------------------------ | ----------- | ----- |
-| Explore              | `modules/chariot-aegis-capabilities/`                        | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                                        | WRITE       | 7     |
-| capability-developer | `modules/chariot-aegis-capabilities/{capability}/`           | READ-WRITE  | 8     |
-| capability-reviewer  | `modules/chariot-aegis-capabilities/{capability}/`           | READ-ONLY   | 11    |
-| capability-tester    | `modules/chariot-aegis-capabilities/{capability}/*_test.vql` | READ-WRITE  | 13    |
+### Examples
 
-### Nuclei Templates
+| User Request | Location | Resolved Path |
+|--------------|----------|---------------|
+| "Add MySQL fingerprint" | External | `{CAPABILITIES_ROOT}/modules/fingerprintx/` |
+| "Create CVE template" | External | `{CAPABILITIES_ROOT}/modules/nuclei-templates/` |
+| "Improve secret scanning" | External | `{CAPABILITIES_ROOT}/modules/noseyparker/` |
+| "Add AWS capability" | External | `{CAPABILITIES_ROOT}/modules/diocletian/` |
+| "CI/CD security check" | External | `{CAPABILITIES_ROOT}/modules/trajan/` |
+| "VQL artifact" | Internal | `modules/chariot-aegis-capabilities/` |
+| "MSP definition" | Internal | `modules/msp-definitions/` |
 
-| Agent Type           | File Scope                                            | Access Mode | Phase |
-| -------------------- | ----------------------------------------------------- | ----------- | ----- |
-| Explore              | `modules/nuclei-templates/`                           | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                                 | WRITE       | 7     |
-| capability-developer | `modules/nuclei-templates/{category}/{template}.yaml` | READ-WRITE  | 8     |
-| capability-reviewer  | `modules/nuclei-templates/{category}/`                | READ-ONLY   | 11    |
-| capability-tester    | Test environment only                                 | READ-WRITE  | 13    |
+### Path Resolution in MANIFEST
 
-### Janus Tool Chains
-
-| Agent Type           | File Scope                                | Access Mode | Phase |
-| -------------------- | ----------------------------------------- | ----------- | ----- |
-| Explore              | `modules/janus/`                          | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                     | WRITE       | 7     |
-| backend-lead         | Output directory only                     | WRITE       | 7     |
-| capability-developer | `modules/janus/pkg/{toolchain}/`          | READ-WRITE  | 8     |
-| capability-reviewer  | `modules/janus/pkg/{toolchain}/`          | READ-ONLY   | 11    |
-| backend-reviewer     | `modules/janus/pkg/{toolchain}/`          | READ-ONLY   | 11    |
-| capability-tester    | `modules/janus/pkg/{toolchain}/*_test.go` | READ-WRITE  | 13    |
-
-### Fingerprintx Modules
-
-| Agent Type           | File Scope                                  | Access Mode | Phase |
-| -------------------- | ------------------------------------------- | ----------- | ----- |
-| Explore              | `pkg/plugins/services/`                     | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                       | WRITE       | 7     |
-| capability-developer | `pkg/plugins/services/{protocol}/`          | READ-WRITE  | 8     |
-| capability-reviewer  | `pkg/plugins/services/{protocol}/`          | READ-ONLY   | 11    |
-| capability-tester    | `pkg/plugins/services/{protocol}/*_test.go` | READ-WRITE  | 13    |
-
-### Scanner Integrations
-
-| Agent Type           | File Scope                                                 | Access Mode | Phase |
-| -------------------- | ---------------------------------------------------------- | ----------- | ----- |
-| Explore              | `modules/janus-framework/`                                 | READ-ONLY   | 3     |
-| capability-lead      | Output directory only                                      | WRITE       | 7     |
-| capability-developer | `modules/janus-framework/pkg/scanners/{scanner}/`          | READ-WRITE  | 8     |
-| capability-reviewer  | `modules/janus-framework/pkg/scanners/{scanner}/`          | READ-ONLY   | 11    |
-| capability-tester    | `modules/janus-framework/pkg/scanners/{scanner}/*_test.go` | READ-WRITE  | 13    |
+```yaml
+capability_location:
+  type: "external"  # or "internal"
+  resolved_path: "{CAPABILITIES_ROOT}/modules/fingerprintx/"
+  # OR for internal:
+  # type: "internal"
+  # resolved_path: "modules/chariot-aegis-capabilities/"
+```
 
 ---
 
 ## Shared Files (Conflict Risk)
 
-These files may be touched by capability development - require coordination:
+Within each capability module, certain files may be shared registration points:
 
-| File                                 | Capability Type | Risk                    | Mitigation            |
-| ------------------------------------ | --------------- | ----------------------- | --------------------- |
-| `pkg/plugins/types.go`               | Fingerprintx    | Type constant additions | Lock before modifying |
-| `pkg/plugins/plugins.go`             | Fingerprintx    | Plugin imports          | Sequential edits only |
-| `modules/janus/pkg/registry.go`      | Janus           | Tool registration       | Lock before modifying |
-| `modules/nuclei-templates/README.md` | Nuclei          | Template index          | Sequential edits only |
+| Pattern | Risk | Mitigation |
+|---------|------|------------|
+| `**/registry.go` | Tool/plugin registration | Lock before modifying |
+| `**/types.go` | Type constant additions | Lock before modifying |
+| `**/plugins.go` | Plugin imports | Sequential edits only |
+| `README.md` | Index/documentation | Sequential edits only |
+
+**Note**: Specific shared files vary by capability. Identify them during Phase 3 (Codebase Discovery).
 
 ---
 
@@ -90,11 +147,23 @@ These files may be touched by capability development - require coordination:
 - capability-lead + security-lead (separate output files)
 - capability-reviewer + backend-reviewer (READ-ONLY, same paths OK)
 - Multiple testers on different test files
+- Work on different capabilities (`{CAPABILITIES_ROOT}/modules/A/` vs `{CAPABILITIES_ROOT}/modules/B/`)
 
 ### Requires Sequential Execution
 
-- Any agent modifying shared registration files
+- Any agent modifying shared registration files within a capability
 - capability-developer on same capability (single implementation at a time)
+- Cross-capability changes (e.g., SDK changes affecting multiple consumers)
+
+---
+
+## Cross-Repository Considerations
+
+The capabilities repo is separate from chariot-development-platform. When capability changes require corresponding changes in the main platform:
+
+1. **Identify dependencies**: Does the capability change require backend/frontend updates?
+2. **Coordinate branches**: Create matching feature branches in both repos
+3. **Test integration**: Verify capability works with platform before merging either
 
 ---
 

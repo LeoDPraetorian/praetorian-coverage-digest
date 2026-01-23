@@ -56,8 +56,8 @@ For each detection pattern:
 {
 'status': 'complete',
 'tasks_completed': ['T001', 'T002'],
-'files_modified': ['chariot-aegis-capabilities/vql/...'],
-'files_created': ['chariot-aegis-capabilities/vql/..._test.go'],
+'files_modified': ['{CAPABILITIES_ROOT}/modules/{capability}/...'],
+'files_created': ['{CAPABILITIES_ROOT}/modules/{capability}/..._test.go'],
 'tests_written': 5,
 'detection_accuracy': 0.96,
 'skills_invoked': ['developing-with-tdd', 'writing-vql-capabilities', ...]
@@ -280,8 +280,8 @@ For each tool in chain:
 {
 'status': 'complete',
 'tasks_completed': ['T001', 'T002'],
-'files_modified': ['modules/janus/...'],
-'files_created': ['modules/janus/..._test.go'],
+'files_modified': ['{CAPABILITIES_ROOT}/modules/{capability}/...'],
+'files_created': ['{CAPABILITIES_ROOT}/modules/{capability}/..._test.go'],
 'tests_written': 10,
 'pipeline_success_rate': 0.99,
 'skills_invoked': ['developing-with-tdd', ...]

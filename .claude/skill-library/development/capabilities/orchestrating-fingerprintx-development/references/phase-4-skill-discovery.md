@@ -48,7 +48,7 @@ technologies_detected:
 
 | Technology Category   | Primary Gateway      | Secondary Gateways   |
 | --------------------- | -------------------- | -------------------- |
-| Go, pkg/plugins       | gateway-backend      | gateway-capabilities |
+| Go, {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins       | gateway-backend      | gateway-capabilities |
 | fingerprintx patterns | gateway-capabilities | -                    |
 | Go testing, testify   | gateway-testing      | -                    |
 | Security scanning     | gateway-security     | -                    |

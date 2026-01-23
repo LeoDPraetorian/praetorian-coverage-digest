@@ -112,8 +112,8 @@
 
 **Solution**:
 
-1. Check import in `pkg/plugins/plugins.go`
-2. Verify type constant in `pkg/plugins/types.go` (alphabetically ordered)
+1. Check import in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`
+2. Verify type constant in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` (alphabetically ordered)
 3. Ensure plugin struct implements all interface methods
 4. Run `go vet` for additional checks
 
@@ -157,8 +157,8 @@
 
 | Violation             | Fix                                          |
 | --------------------- | -------------------------------------------- |
-| Missing type constant | Add to `pkg/plugins/types.go` alphabetically |
-| Not imported          | Add import in `pkg/plugins/plugins.go`       |
+| Missing type constant | Add to `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` alphabetically |
+| Not imported          | Add import in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`       |
 | Wrong interface       | Implement all 5 required methods             |
 | No error handling     | Add graceful failure for connection errors   |
 
@@ -318,7 +318,7 @@
 
 If issue not covered here:
 
-1. Search existing plugins: `pkg/plugins/services/`
+1. Search existing plugins: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/`
 2. Review fingerprintx README
 3. Ask user for domain-specific guidance
 4. Do NOT guess - blocked is better than wrong

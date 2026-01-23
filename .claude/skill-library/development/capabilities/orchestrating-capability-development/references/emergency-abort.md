@@ -172,12 +172,10 @@ agents_spawned:
     status: partial
 
 capability_files:
-  vql:
-    - "modules/chariot-aegis-capabilities/{capability}/*.vql"
-  nuclei:
-    - "modules/nuclei-templates/{category}/{template}.yaml"
-  janus:
-    - "modules/janus/pkg/{toolchain}/*.go"
+  external:
+    - "{CAPABILITIES_ROOT}/modules/{capability}/"
+  internal:
+    - "modules/{module}/"  # e.g., modules/chariot-aegis-capabilities/
 
 validation_status:
   syntax_valid: true | false
@@ -275,35 +273,25 @@ git worktree remove .worktrees/{workflow-id}
 
 #### Option 3: Rollback Changes
 
-**VQL Capability Rollback:**
+**Capability Rollback (External):**
 
 ```bash
-cd modules/chariot-aegis-capabilities
-git checkout -- {capability}/
-git clean -fd {capability}/
-
-# Remove worktree
-git worktree remove .worktrees/{workflow-id}
+cd {CAPABILITIES_ROOT}/modules/{capability}
+git checkout -- .
+git clean -fd
 ```
 
-**Nuclei Template Rollback:**
+**Capability Rollback (Internal):**
 
 ```bash
-cd modules/nuclei-templates
-git checkout -- {category}/{template}.yaml
-
-# Remove worktree
-git worktree remove .worktrees/{workflow-id}
+cd modules/{module}
+git checkout -- .
+git clean -fd
 ```
 
-**Janus Tool Chain Rollback:**
+**Remove worktree (if using worktrees):**
 
 ```bash
-cd modules/janus
-git checkout -- pkg/{toolchain}/
-git clean -fd pkg/{toolchain}/
-
-# Remove worktree
 git worktree remove .worktrees/{workflow-id}
 ```
 
@@ -320,16 +308,13 @@ git worktree remove .worktrees/{workflow-id}
 #### Option 4: Full Cleanup
 
 ```bash
-# VQL capability cleanup
-rm -rf modules/chariot-aegis-capabilities/{capability}/
+# Capability cleanup (external)
+rm -rf {CAPABILITIES_ROOT}/modules/{capability}/
 
-# Nuclei template cleanup
-rm -rf modules/nuclei-templates/{category}/{template}.yaml
+# Capability cleanup (internal)
+rm -rf modules/{module}/
 
-# Janus cleanup (built binaries)
-rm -rf modules/janus/bin/{toolchain}
-
-# Remove worktree
+# Remove worktree (if using worktrees)
 git worktree remove .worktrees/{workflow-id}
 
 # Remove OUTPUT_DIR

@@ -75,8 +75,8 @@ The capability progress file is stored at:
 
 ### Files Modified
 
-- chariot-aegis-capabilities/vql/s3-credential-scanner.vql (created)
-- chariot-aegis-capabilities/collectors/s3_collector.go (created)
+- {CAPABILITIES_ROOT}/modules/{capability}/s3-credential-scanner.vql (created)
+- {CAPABILITIES_ROOT}/modules/{capability}/collectors/s3_collector.go (created)
 
 ### Blockers
 

@@ -6,14 +6,28 @@
 
 Post-execution conflict detection catches problems AFTER agents have done work. Proactive checking prevents wasted effort and merge conflicts.
 
-## Capability-Specific File Patterns
+## Capability File Patterns
 
-| Capability Type | File Locations                                  |
-| --------------- | ----------------------------------------------- |
-| VQL             | `modules/chariot-aegis-capabilities/artifacts/` |
-| Nuclei          | `modules/nuclei-templates/`                     |
-| fingerprintx    | `modules/fingerprintx/pkg/plugins/`             |
-| Janus           | `modules/janus/`                                |
+Capabilities exist in two locations during the migration period:
+
+### External (Migrated)
+
+```
+{CAPABILITIES_ROOT}/modules/{capability}/
+```
+
+Where `{CAPABILITIES_ROOT}` is resolved via:
+1. `CAPABILITIES_ROOT` environment variable
+2. `.claude/config.local.json` (`external_repos.capabilities`)
+3. Common locations (`../capabilities`, `~/dev/capabilities`)
+
+### Internal (Not Yet Migrated)
+
+```
+modules/{module}/
+```
+
+Examples: `modules/chariot-aegis-capabilities/`, `modules/msp-definitions/`
 
 ## Protocol Steps
 
@@ -22,14 +36,8 @@ Post-execution conflict detection catches problems AFTER agents have done work. 
 For each agent, list files it will likely modify:
 
 ```bash
-# VQL capability scope
-Glob("modules/chariot-aegis-capabilities/artifacts/**/*.yaml")
-
-# Nuclei template scope
-Glob("modules/nuclei-templates/**/*.yaml")
-
-# fingerprintx module scope
-Glob("modules/fingerprintx/pkg/plugins/{protocol}/**/*.go")
+# Capability scope (all types)
+Glob("{CAPABILITIES_ROOT}/modules/{capability}/**/*")
 ```
 
 ### 2. Check for Overlap
@@ -39,16 +47,16 @@ Compare file sets to detect conflicts:
 **Example A - NO OVERLAP (safe to parallelize):**
 
 ```
-Agent A: modules/chariot-aegis-capabilities/artifacts/s3-exposure.yaml
-Agent B: modules/nuclei-templates/cves/CVE-2024-1234.yaml
+Agent A: {CAPABILITIES_ROOT}/modules/nebula/scanner.go
+Agent B: {CAPABILITIES_ROOT}/modules/fingerprintx/mysql/mysql.go
 Overlap: NONE → Parallelize
 ```
 
 **Example B - OVERLAP DETECTED (conflict risk):**
 
 ```
-Agent A: modules/fingerprintx/pkg/plugins/mysql/mysql.go
-Agent B: modules/fingerprintx/pkg/plugins/mysql/mysql_test.go, registry.go
+Agent A: {CAPABILITIES_ROOT}/modules/fingerprintx/mysql/mysql.go
+Agent B: {CAPABILITIES_ROOT}/modules/fingerprintx/mysql/mysql_test.go, registry.go
 Overlap: Both touch mysql plugin area → POTENTIAL CONFLICT
 ```
 
@@ -81,8 +89,8 @@ When overlap is detected, choose a resolution strategy:
   "parallel_execution": {
     "agents": ["capability-developer", "capability-tester"],
     "file_scopes": {
-      "capability-developer": ["modules/fingerprintx/pkg/plugins/mysql/"],
-      "capability-tester": ["modules/fingerprintx/pkg/plugins/mysql/*_test.go"]
+      "capability-developer": ["{CAPABILITIES_ROOT}/modules/fingerprintx/mysql/"],
+      "capability-tester": ["{CAPABILITIES_ROOT}/modules/fingerprintx/mysql/*_test.go"]
     },
     "overlap_check": "passed",
     "overlap_files": []
@@ -97,8 +105,8 @@ Explicitly define what each agent should and should NOT modify:
 ```markdown
 SCOPE BOUNDARIES:
 
-- Only modify files in: modules/fingerprintx/pkg/plugins/mysql/
-- Do NOT modify: modules/fingerprintx/pkg/plugins/ registry files (other agent's scope)
+- Only modify files in: {CAPABILITIES_ROOT}/modules/fingerprintx/mysql/
+- Do NOT modify: registry files (other agent's scope)
 ```
 
 ## When to Skip Conflict Checking
@@ -119,5 +127,5 @@ SCOPE BOUNDARIES:
 
 1. **Registry files** are common conflict points - assign to one agent
 2. **Test files** typically belong with implementation agent
-3. **YAML templates** (VQL, Nuclei) rarely conflict due to separate namespaces
+3. **Different capabilities** (`modules/A/` vs `modules/B/`) rarely conflict
 4. **Go modules** may share common interfaces - check import graphs

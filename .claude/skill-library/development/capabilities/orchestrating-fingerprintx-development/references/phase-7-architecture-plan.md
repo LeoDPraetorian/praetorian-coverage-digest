@@ -44,8 +44,8 @@ Collect from previous phases:
 
 **Affected Files:** {from Phase 3 Codebase Discovery}
 
-- Modify: pkg/plugins/types.go, pkg/plugins/plugins.go
-- Create: pkg/plugins/services/{protocol}/plugin.go
+- Modify: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go, {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go
+- Create: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 
 **Skills Available:** {from Phase 4 Skill Discovery manifest}
 
@@ -207,7 +207,7 @@ Architecture file structure (`.fingerprintx-development/architecture.md`):
 
 ### Main Plugin: {protocol}Plugin
 
-**Package:** pkg/plugins/services/{protocol}
+**Package:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}
 **File:** plugin.go
 **Exports:**
 
@@ -277,10 +277,10 @@ Plan file structure (`.fingerprintx-development/plan.md`):
 
 | ID   | Task              | File                                                | Batch | Dependencies |
 | ---- | ----------------- | --------------------------------------------------- | ----- | ------------ |
-| T001 | Add type constant | pkg/plugins/types.go                                | 1     | None         |
-| T002 | Add plugin import | pkg/plugins/plugins.go                              | 1     | T001         |
-| T003 | Create plugin     | pkg/plugins/services/{protocol}/plugin.go           | 2     | T001         |
-| T004 | Add tests         | pkg/plugins/services/{protocol}/{protocol}\_test.go | 3     | T003         |
+| T001 | Add type constant | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go                                | 1     | None         |
+| T002 | Add plugin import | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go                              | 1     | T001         |
+| T003 | Create plugin     | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go           | 2     | T001         |
+| T004 | Add tests         | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go | 3     | T003         |
 
 ---
 
@@ -305,7 +305,7 @@ Plan file structure (`.fingerprintx-development/plan.md`):
 
 ### T001: Add type constant
 
-**File:** pkg/plugins/types.go
+**File:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go
 **Change Type:** Modify
 **Dependencies:** None
 **Batch:** 1
@@ -321,7 +321,7 @@ Add constant in alphabetical order: Service{Protocol} = "service-{protocol}"
 
 ### T003: Create plugin
 
-**File:** pkg/plugins/services/{protocol}/plugin.go
+**File:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 **Change Type:** Create
 **Dependencies:** T001
 **Batch:** 2

@@ -36,8 +36,8 @@ When returning to parent workflow:
   "status": "complete",
   "workflow_type": "fingerprintx-development",
   "outputs": [
-    "pkg/plugins/services/{protocol}/{protocol}.go",
-    "pkg/plugins/services/{protocol}/{protocol}_test.go"
+    "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}.go",
+    "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go"
   ],
   "quality_metrics": {
     "detection_accuracy": 98,

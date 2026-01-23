@@ -168,8 +168,8 @@ Fingerprintx development has specific P0 requirements:
 | Protocol Detection  | Service/protocol identification logic implemented        | P0       |
 | Banner Parsing      | Banner response parsing handles malformed input          | P0       |
 | Default Ports       | Default port(s) documented and used                      | P0       |
-| Type Constants      | Type constant added to pkg/plugins/types.go              | P0       |
-| Plugin Import       | Plugin imported in pkg/plugins/plugins.go (alphabetical) | P0       |
+| Type Constants      | Type constant added to `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`              | P0       |
+| Plugin Import       | Plugin imported in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` (alphabetical) | P0       |
 | Version Extraction  | Version extraction implemented (if open-source)          | P1       |
 | Shodan Test Vectors | At least 3 Shodan query test vectors documented          | P1       |
 | Error Handling      | Connection errors handled gracefully                     | P0       |
@@ -219,15 +219,21 @@ Task("capability-tester", "Live Shodan validation tests...");
 
 ## File Scope Boundaries
 
+Fingerprintx has been migrated to the external capabilities repository:
+
+```
+{CAPABILITIES_ROOT}/modules/fingerprintx/
+```
+
 When spawning parallel agents:
 
-| Agent                | Scope                                 |
-| -------------------- | ------------------------------------- |
-| capability-developer | pkg/plugins/{protocol}/ (plugin code) |
-| capability-reviewer  | READ-ONLY on plugin paths             |
-| capability-tester    | test files only (\*\_test.go)         |
+| Agent                | Scope                                                                  |
+| -------------------- | ---------------------------------------------------------------------- |
+| capability-developer | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/` |
+| capability-reviewer  | READ-ONLY on plugin paths                                              |
+| capability-tester    | test files only (\*\_test.go)                                          |
 
-See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict detection protocol.
+See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict detection protocol and path resolution.
 
 ## Rationalization Prevention
 

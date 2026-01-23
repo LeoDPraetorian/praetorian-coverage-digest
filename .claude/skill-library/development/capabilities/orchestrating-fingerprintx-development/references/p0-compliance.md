@@ -22,10 +22,10 @@ P0 Compliance Validation is a **blocking gate** that verifies fingerprintx imple
 | ----------------------- | ------------------------------ | -------------------------------------------------- | -------- |
 | **Go Compilation**      | Module compiles without errors | `go build ./...`                                   | Always   |
 | **5-Method Interface**  | All 5 methods implemented      | `go vet` + manual check                            | Always   |
-| **Type Constant**       | Added to types.go              | `grep "{SERVICE}Type" pkg/plugins/types.go`        | Always   |
-| **Plugin Registration** | Registered in plugins.go       | `grep "{service}" pkg/plugins/plugins.go`          | Always   |
-| **Unit Tests Exist**    | \*\_test.go file created       | `ls pkg/plugins/services/{service}/*_test.go`      | Always   |
-| **No Panics**           | No panic() calls in code       | `grep -r "panic(" pkg/plugins/services/{service}/` | Always   |
+| **Type Constant**       | Added to types.go              | `grep "{SERVICE}Type" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`        | Always   |
+| **Plugin Registration** | Registered in plugins.go       | `grep "{service}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`          | Always   |
+| **Unit Tests Exist**    | \*\_test.go file created       | `ls {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*_test.go`      | Always   |
+| **No Panics**           | No panic() calls in code       | `grep -r "panic(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/` | Always   |
 
 ## 5-Method Interface Requirements
 
@@ -52,7 +52,7 @@ Every fingerprintx plugin MUST implement these 5 methods:
 ### Step 1: Go Compilation Check
 
 ```bash
-cd modules/fingerprintx
+cd {CAPABILITIES_ROOT}/modules/fingerprintx
 go build ./...
 ```
 
@@ -62,11 +62,11 @@ go build ./...
 
 ```bash
 # Verify all 5 methods exist
-grep -c "func (p \*.*Plugin) Name()" pkg/plugins/services/{service}/*.go
-grep -c "func (p \*.*Plugin) Priority()" pkg/plugins/services/{service}/*.go
-grep -c "func (p \*.*Plugin) Type()" pkg/plugins/services/{service}/*.go
-grep -c "func (p \*.*Plugin) Run(" pkg/plugins/services/{service}/*.go
-grep -c "func (p \*.*Plugin) Scan(" pkg/plugins/services/{service}/*.go
+grep -c "func (p \*.*Plugin) Name()" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*.go
+grep -c "func (p \*.*Plugin) Priority()" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*.go
+grep -c "func (p \*.*Plugin) Type()" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*.go
+grep -c "func (p \*.*Plugin) Run(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*.go
+grep -c "func (p \*.*Plugin) Scan(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/*.go
 ```
 
 **Expected:** Each grep returns 1 (exactly one implementation)
@@ -74,7 +74,7 @@ grep -c "func (p \*.*Plugin) Scan(" pkg/plugins/services/{service}/*.go
 ### Step 3: Type Constant Check
 
 ```bash
-grep "{SERVICE}Type" pkg/plugins/types.go
+grep "{SERVICE}Type" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go
 ```
 
 **Expected:** Type constant defined (e.g., `MySQLType`)
@@ -82,7 +82,7 @@ grep "{SERVICE}Type" pkg/plugins/types.go
 ### Step 4: Registration Check
 
 ```bash
-grep -i "{service}" pkg/plugins/plugins.go
+grep -i "{service}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go
 ```
 
 **Expected:** Import and registration entry present
@@ -90,7 +90,7 @@ grep -i "{service}" pkg/plugins/plugins.go
 ### Step 5: Panic Check
 
 ```bash
-grep -rn "panic(" pkg/plugins/services/{service}/ || echo "No panics found"
+grep -rn "panic(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{service}/ || echo "No panics found"
 ```
 
 **Expected:** No output (no panic calls)

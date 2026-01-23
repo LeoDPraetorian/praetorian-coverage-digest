@@ -90,7 +90,7 @@ Protocol detection details:
 - Version extraction: {method}
 - Default ports: {ports}
 
-Location: pkg/plugins/services/{protocol}/
+Location: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
 
 Implementation order (TDD):
 
@@ -102,8 +102,8 @@ Implementation order (TDD):
 Scope:
 
 - DO: Implement plugin.go and {protocol}\_test.go
-- DO: Update pkg/plugins/types.go with type constant
-- DO: Update pkg/plugins/plugins.go with import
+- DO: Update {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go with type constant
+- DO: Update {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go with import
 - DO NOT: Implement Docker validation (Phase 13)
 - DO NOT: Skip tests or write code before tests
 
@@ -131,10 +131,10 @@ Task: Review {protocol} fingerprintx plugin for code quality and pattern complia
 
 Implementation to review:
 
-- Plugin: pkg/plugins/services/{protocol}/plugin.go
-- Tests: pkg/plugins/services/{protocol}/{protocol}\_test.go
-- Type constant: pkg/plugins/types.go (diff only)
-- Import: pkg/plugins/plugins.go (diff only)
+- Plugin: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
+- Tests: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go
+- Type constant: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go (diff only)
+- Import: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go (diff only)
 
 Architecture to compare against:
 
@@ -180,8 +180,8 @@ Task: Comprehensive testing of {protocol} fingerprintx plugin
 
 Implementation to test:
 
-- Plugin: pkg/plugins/services/{protocol}/plugin.go
-- Existing tests: pkg/plugins/services/{protocol}/{protocol}\_test.go
+- Plugin: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
+- Existing tests: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go
 
 Test plan from Phase 12:
 

@@ -39,10 +39,10 @@ Is the code well-built?
 
 ## Files to Review
 
-- `pkg/plugins/services/[protocol]/plugin.go`
-- `pkg/plugins/services/[protocol]/[protocol]_test.go`
-- `pkg/plugins/types.go` (diff only)
-- `pkg/plugins/plugins.go` (diff only)
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/plugin.go`
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/[protocol]_test.go`
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` (diff only)
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` (diff only)
 
 ## Output Directory
 

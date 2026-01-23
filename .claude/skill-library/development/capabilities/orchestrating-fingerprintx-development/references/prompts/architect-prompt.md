@@ -64,10 +64,10 @@ You MUST use these skills during this task:
    - Plan fallback for unrecognized versions
 
 3. **Define File Structure**
-   - Plugin location: `pkg/plugins/services/{protocol}/plugin.go`
-   - Test location: `pkg/plugins/services/{protocol}/{protocol}_test.go`
-   - Type constant: `pkg/plugins/types.go`
-   - Import: `pkg/plugins/plugins.go`
+   - Plugin location: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go`
+   - Test location: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go`
+   - Type constant: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`
+   - Import: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`
 
 4. **Create Implementation Plan**
    - Break into discrete tasks
@@ -114,10 +114,10 @@ You MUST use these skills during this task:
 
 ## File Structure
 
-- `pkg/plugins/services/{protocol}/plugin.go`
-- `pkg/plugins/services/{protocol}/{protocol}_test.go`
-- Type constant in `pkg/plugins/types.go`
-- Import in `pkg/plugins/plugins.go`
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go`
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go`
+- Type constant in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`
+- Import in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`
 ```
 
 ## Implementation Plan Structure

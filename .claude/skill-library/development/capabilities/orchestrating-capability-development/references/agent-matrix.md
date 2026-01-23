@@ -164,11 +164,15 @@ YOU MUST READ THESE BEFORE WRITING CODE. No exceptions.
 
 ## File Scope Boundaries
 
-| Agent                  | Allowed Paths                                  | Mode       |
-| ---------------------- | ---------------------------------------------- | ---------- |
-| `capability-developer` | `chariot-aegis-capabilities/`, `fingerprintx/` | Read/Write |
-| `capability-reviewer`  | Capability artifact paths                      | Read-only  |
-| `capability-tester`    | `*_test.go`, `*_test.vql`, test data           | Read/Write |
+| Agent                  | Allowed Paths                               | Mode       |
+| ---------------------- | ------------------------------------------- | ---------- |
+| `capability-developer` | `{resolved_path}/` (see below)              | Read/Write |
+| `capability-reviewer`  | Capability artifact paths                   | Read-only  |
+| `capability-tester`    | `*_test.go`, `*_test.vql`, test data        | Read/Write |
+
+**Path locations:**
+- External (migrated): `{CAPABILITIES_ROOT}/modules/{capability}/`
+- Internal (not yet migrated): `modules/{module}/` (e.g., chariot-aegis-capabilities, msp-definitions)
 
 ---
 

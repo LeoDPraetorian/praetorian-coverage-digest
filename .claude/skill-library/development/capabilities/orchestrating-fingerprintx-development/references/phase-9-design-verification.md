@@ -49,7 +49,7 @@ For each task in plan.md:
 verification_checklist:
   - task_id: "T001"
     title: "Add type constant"
-    file: "pkg/plugins/types.go"
+    file: "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go"
     acceptance_criteria:
       - "Constant added in alphabetical position" -> VERIFY
       - "Format matches existing constants" -> VERIFY
@@ -58,7 +58,7 @@ verification_checklist:
 
   - task_id: "T002"
     title: "Add plugin import"
-    file: "pkg/plugins/plugins.go"
+    file: "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"
     acceptance_criteria:
       - "Import added in alphabetical position" -> VERIFY
       - "Plugin registered in init()" -> VERIFY
@@ -66,7 +66,7 @@ verification_checklist:
 
   - task_id: "T003"
     title: "Create plugin"
-    file: "pkg/plugins/services/{protocol}/plugin.go"
+    file: "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go"
     acceptance_criteria:
       - "Plugin detects service correctly" -> VERIFY
       - "Version extracted (if applicable)" -> VERIFY
@@ -91,33 +91,33 @@ For each task:
 # Example: Verify T001 acceptance criteria
 
 # Criterion 1: "Constant added in alphabetical position"
-grep "Service" pkg/plugins/types.go | sort -c
+grep "Service" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go | sort -c
 -> PASS: Constants are sorted alphabetically
 
 # Criterion 2: "Format matches existing constants"
-grep "Service{Protocol}" pkg/plugins/types.go
+grep "Service{Protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go
 -> PASS: Found Service{Protocol} = "service-{protocol}"
 
 # Criterion 3: "No duplicate names"
-grep "Service{Protocol}" pkg/plugins/types.go | wc -l
+grep "Service{Protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go | wc -l
 -> PASS: Exactly 1 occurrence
 
 # Example: Verify T003 acceptance criteria
 
 # Criterion 1: "Plugin detects service correctly"
-grep -A10 "func.*Match\|func.*Detect" pkg/plugins/services/{protocol}/plugin.go
+grep -A10 "func.*Match\|func.*Detect" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Detection method implemented
 
 # Criterion 2: "Version extracted (if applicable)"
-grep "version\|Version" pkg/plugins/services/{protocol}/plugin.go
+grep "version\|Version" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Version extraction implemented
 
 # Criterion 3: "Error handling complete"
-grep "err != nil\|return nil" pkg/plugins/services/{protocol}/plugin.go
+grep "err != nil\|return nil" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Error returns present
 
 # Criterion 4: "Package comment documents detection strategy"
-head -20 pkg/plugins/services/{protocol}/plugin.go
+head -20 {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 -> PASS: Package comment explains detection
 ```
 
@@ -205,11 +205,11 @@ go build ./...
 -> Build successful, 0 errors
 
 # Type constant alphabetical
-grep "Service" pkg/plugins/types.go | sort -c
+grep "Service" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go | sort -c
 -> Sorted correctly
 
 # Plugin import alphabetical
-grep "plugins/services" pkg/plugins/plugins.go | sort -c
+grep "plugins/services" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go | sort -c
 -> Sorted correctly
 ```
 ````

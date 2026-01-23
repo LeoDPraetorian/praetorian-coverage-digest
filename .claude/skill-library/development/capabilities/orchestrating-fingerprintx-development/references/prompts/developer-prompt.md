@@ -92,15 +92,15 @@ You MUST use these skills during this task:
 
 ## Your Job
 
-1. Create plugin directory: `pkg/plugins/services/[protocol]/`
+1. Create plugin directory: `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/`
 2. Implement the 5-method plugin interface:
    - `Type() plugins.Protocol`
    - `Priority() int`
    - `Run(conn net.Conn, timeout time.Duration, target plugins.Target) (*plugins.Service, error)`
    - `PortPriority(port uint16) bool`
    - `Name() string`
-3. Add type constant to `pkg/plugins/types.go` (alphabetically)
-4. Register plugin in `pkg/plugins/plugins.go` (alphabetically)
+3. Add type constant to `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` (alphabetically)
+4. Register plugin in `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` (alphabetically)
 5. Implement two-phase detection (detect then enrich)
 6. Implement version extraction using version matrix (if available)
 7. Implement CPE generation
@@ -140,10 +140,10 @@ You MUST use these skills during this task:
   ],
   "status": "complete",
   "files_created": [
-    "pkg/plugins/services/[protocol]/plugin.go",
-    "pkg/plugins/services/[protocol]/[protocol]_test.go"
+    "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/plugin.go",
+    "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/[protocol]/[protocol]_test.go"
   ],
-  "files_modified": ["pkg/plugins/types.go", "pkg/plugins/plugins.go"],
+  "files_modified": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go", "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"],
   "build_status": "passing",
   "test_status": "passing",
   "handoff": {

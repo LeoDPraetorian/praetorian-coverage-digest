@@ -37,8 +37,8 @@ Codebase Discovery for fingerprintx has two components:
 
 Focus discovery on:
 
-- `pkg/plugins/` - Existing plugin implementations
-- `pkg/plugins/*/` - Individual plugin patterns
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/` - Existing plugin implementations
+- `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/*/` - Individual plugin patterns
 - `pkg/scan/` - Scanner integration patterns
 
 ---
@@ -58,10 +58,10 @@ Based on work_type from Triage:
 
 | Area     | Explore Focus                                      |
 | -------- | -------------------------------------------------- |
-| Plugins  | pkg/plugins/\*/ - similar protocol implementations |
-| Types    | pkg/plugins/types.go - type constants              |
-| Registry | pkg/plugins/plugins.go - plugin imports            |
-| Testing  | pkg/plugins/\*/\*\_test.go - test patterns         |
+| Plugins  | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/\*/ - similar protocol implementations |
+| Types    | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go - type constants              |
+| Registry | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go - plugin imports            |
+| Testing  | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/\*/\*\_test.go - test patterns         |
 
 **Agent prompt template:**
 
@@ -93,19 +93,19 @@ Agent returns structured findings:
   "similar_plugins": [
     {
       "plugin": "postgres",
-      "location": "pkg/plugins/services/postgres/",
+      "location": "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/postgres/",
       "similarity": "Same connection-based protocol",
       "patterns_to_reuse": ["Banner parsing", "Version extraction"]
     }
   ],
   "affected_files": [
     {
-      "path": "pkg/plugins/types.go",
+      "path": "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go",
       "change_type": "modify",
       "reason": "Add type constant"
     },
     {
-      "path": "pkg/plugins/plugins.go",
+      "path": "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go",
       "change_type": "modify",
       "reason": "Add plugin import"
     }
@@ -304,22 +304,22 @@ Create `.fingerprintx-development/discovery.md`:
 
 | Plugin   | Location                       | Patterns to Reuse  |
 | -------- | ------------------------------ | ------------------ |
-| postgres | pkg/plugins/services/postgres/ | Banner parsing     |
-| mysql    | pkg/plugins/services/mysql/    | Version extraction |
+| postgres | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/postgres/ | Banner parsing     |
+| mysql    | {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/    | Version extraction |
 
 ### Files to Modify
 
 | File                   | Reason            |
 | ---------------------- | ----------------- |
-| pkg/plugins/types.go   | Add type constant |
-| pkg/plugins/plugins.go | Add plugin import |
+| {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go   | Add type constant |
+| {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go | Add plugin import |
 
 ### Files to Create
 
 | File                                                | Purpose              |
 | --------------------------------------------------- | -------------------- |
-| pkg/plugins/services/{protocol}/plugin.go           | Main detection logic |
-| pkg/plugins/services/{protocol}/{protocol}\_test.go | Unit tests           |
+| {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go           | Main detection logic |
+| {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go | Unit tests           |
 
 ### Test Patterns
 
@@ -360,8 +360,8 @@ codebase_discovery:
 
   similar_plugins: ["postgres", "mysql"]
   affected_files:
-    modify: ["pkg/plugins/types.go", "pkg/plugins/plugins.go"]
-    create: ["pkg/plugins/services/{protocol}/plugin.go"]
+    modify: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go", "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"]
+    create: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go"]
 
   test_patterns: "Table-driven with mock responses"
 
@@ -425,7 +425,7 @@ Output to user:
 If protocol is unique:
 
 - Document as novel implementation
-- Reference general plugin pattern from `pkg/plugins/services/`
+- Reference general plugin pattern from `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/`
 - Flag for extra attention in Architecture phase
 
 ### Shodan Has Limited Data

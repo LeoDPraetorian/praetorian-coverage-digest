@@ -251,9 +251,13 @@ When spawning parallel agents:
 
 | Agent                | Scope                                              |
 | -------------------- | -------------------------------------------------- |
-| capability-developer | modules/chariot-aegis-capabilities/, fingerprintx/ |
+| capability-developer | `{resolved_path}/` (external or internal)          |
 | capability-reviewer  | READ-ONLY on capability paths                      |
 | capability-tester    | test files only (_\_test.go, _\_test.vql)          |
+
+**Path locations:**
+- External (migrated): `{CAPABILITIES_ROOT}/modules/{capability}/`
+- Internal (not yet migrated): `modules/{module}/` (e.g., chariot-aegis-capabilities, msp-definitions)
 
 See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict detection protocol.
 

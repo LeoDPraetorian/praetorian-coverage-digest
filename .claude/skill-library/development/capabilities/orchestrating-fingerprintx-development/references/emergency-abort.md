@@ -142,9 +142,9 @@ agents_spawned:
     status: partial
 
 plugin_files:
-  - "pkg/plugins/services/{protocol}/plugin.go"
-  - "pkg/plugins/types.go"
-  - "pkg/plugins/plugins.go"
+  - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go"
+  - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go"
+  - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"
 
 uncommitted_changes: true
 
@@ -244,10 +244,10 @@ git worktree remove {worktree-dir}/{protocol}-fingerprintx
 
 ```bash
 cd {worktree-dir}/{protocol}-fingerprintx
-git checkout -- pkg/plugins/services/{protocol}/
-git checkout -- pkg/plugins/types.go
-git checkout -- pkg/plugins/plugins.go
-git clean -fd pkg/plugins/services/{protocol}/
+git checkout -- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
+git checkout -- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go
+git checkout -- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go
+git clean -fd {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
 
 # Remove worktree
 git worktree remove {worktree-dir}/{protocol}-fingerprintx

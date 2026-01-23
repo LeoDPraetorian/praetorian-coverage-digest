@@ -175,20 +175,20 @@ batches:
   batch_1:
     name: "Plugin implementation"
     files:
-      - "fingerprintx/pkg/plugins/services/mysql/mysql.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql.go"
     reason: "Core plugin logic"
 
   batch_2:
     name: "Plugin tests"
     files:
-      - "fingerprintx/pkg/plugins/services/mysql/mysql_test.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql_test.go"
     reason: "Test implementation"
     depends_on: ["batch_1"]
 
   batch_3:
     name: "Registration"
     files:
-      - "fingerprintx/pkg/plugins/plugins.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"
     reason: "Plugin registration"
     depends_on: ["batch_1"]
 ```

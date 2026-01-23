@@ -72,10 +72,10 @@ Before proceeding, present:
 
 **Plugin Structure**:
 
-- pkg/plugins/{protocol}/plugin.go - Main detection logic
-- pkg/plugins/{protocol}/util.go - Helper functions
-- pkg/plugins/plugins.go - Import registration
-- pkg/plugins/types.go - Type constant
+- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/{protocol}/plugin.go - Main detection logic
+- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/{protocol}/util.go - Helper functions
+- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go - Import registration
+- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go - Type constant
 
 **Implementation Tasks** ({count} tasks):
 

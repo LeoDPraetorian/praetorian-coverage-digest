@@ -34,7 +34,7 @@ Coverage Verification validates that test implementation meets fingerprintx-spec
 
 ```bash
 # Run tests with coverage
-go test -coverprofile=coverage.out ./pkg/plugins/services/{protocol}/...
+go test -coverprofile=coverage.out ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # View coverage summary
 go tool cover -func=coverage.out
@@ -53,15 +53,15 @@ go tool cover -func=coverage.out | grep -E "Match|Detect|parse|extract"
 ```bash
 # Extract detection logic coverage
 go tool cover -func=coverage.out | grep -E "Match|Detect"
--> pkg/plugins/services/{protocol}/plugin.go:45: Match 96.0%
+-> {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go:45: Match 96.0%
 
 # Extract parsing coverage
 go tool cover -func=coverage.out | grep -i "parse"
--> pkg/plugins/services/{protocol}/plugin.go:78: parseBanner 92.0%
+-> {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go:78: parseBanner 92.0%
 
 # Extract version extraction coverage
 go tool cover -func=coverage.out | grep -i "version"
--> pkg/plugins/services/{protocol}/plugin.go:102: extractVersion 88.0%
+-> {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go:102: extractVersion 88.0%
 ```
 
 ---
@@ -85,10 +85,10 @@ Compare actual vs target for each category:
 
 ```bash
 # Verify Shodan tests exist and pass
-go test -tags=shodan -v ./pkg/plugins/services/{protocol}/... | grep -E "PASS|FAIL"
+go test -tags=shodan -v ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/... | grep -E "PASS|FAIL"
 
 # Count Shodan test cases
-grep -c "shodanBanners\|Shodan" pkg/plugins/services/{protocol}/*_shodan_test.go
+grep -c "shodanBanners\|Shodan" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/*_shodan_test.go
 -> PASS: 3+ Shodan banners validated
 ```
 
@@ -217,7 +217,7 @@ coverage:
   plugin_type: "fingerprintx"
 
   commands:
-    profile: "go test -coverprofile=coverage.out ./pkg/plugins/services/{protocol}/..."
+    profile: "go test -coverprofile=coverage.out ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/..."
     report: "go tool cover -func=coverage.out"
 
   targets:

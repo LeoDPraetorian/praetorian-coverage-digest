@@ -19,8 +19,8 @@ Locks are stored in the workflow output directory:
 {
   "agent": "capability-developer",
   "locked_at": "2026-01-17T15:30:00Z",
-  "files": ["pkg/plugins/services/mysql/mysql.go", "pkg/plugins/services/mysql/mysql_test.go"],
-  "directories": ["pkg/plugins/services/mysql/"],
+  "files": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql.go", "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql_test.go"],
+  "directories": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/"],
   "task_description": "Implement MySQL fingerprintx plugin",
   "expires_at": "2026-01-17T16:30:00Z"
 }
@@ -41,9 +41,9 @@ Locks are stored in the workflow output directory:
 
 | Lock Scope       | Files Included                                   | Use When                         |
 | ---------------- | ------------------------------------------------ | -------------------------------- |
-| Plugin directory | `pkg/plugins/services/{protocol}/`               | Implementation phase             |
-| Test files only  | `pkg/plugins/services/{protocol}/*_test.go`      | Testing phase                    |
-| Registry         | `pkg/plugins/plugins.go`, `pkg/plugins/types.go` | Registration (orchestrator only) |
+| Plugin directory | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/`               | Implementation phase             |
+| Test files only  | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/*_test.go`      | Testing phase                    |
+| Registry         | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`, `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go` | Registration (orchestrator only) |
 
 ## Lock Acquisition Protocol
 
@@ -63,7 +63,7 @@ Before writing a new lock, check existing locks for file overlap.
 {
   "agent": "capability-developer",
   "locked_at": "2026-01-17T15:30:00Z",
-  "files": ["pkg/plugins/services/mysql/mysql.go"],
+  "files": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql.go"],
   "expires_at": "2026-01-17T16:30:00Z"
 }
 ```
@@ -86,8 +86,8 @@ When overlap is detected:
 **Example conflict:**
 
 ```
-capability-developer.lock: ["pkg/plugins/plugins.go"]
-capability-tester.lock: ["pkg/plugins/plugins.go"]
+capability-developer.lock: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"]
+capability-tester.lock: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"]
 
 Resolution: Run capability-tester after capability-developer completes
 ```

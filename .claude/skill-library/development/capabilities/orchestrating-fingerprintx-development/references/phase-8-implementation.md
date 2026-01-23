@@ -156,13 +156,13 @@ When agent returns:
 
 ```bash
 # Verify plugin files exist
-[ -f "pkg/plugins/services/{protocol}/plugin.go" ] && echo "FOUND" || echo "MISSING"
+[ -f "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go" ] && echo "FOUND" || echo "MISSING"
 
 # Verify type constant added
-grep -q "Service{Protocol}" pkg/plugins/types.go && echo "FOUND" || echo "MISSING"
+grep -q "Service{Protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go && echo "FOUND" || echo "MISSING"
 
 # Verify plugin import added
-grep -q "{protocol}" pkg/plugins/plugins.go && echo "FOUND" || echo "MISSING"
+grep -q "{protocol}" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go && echo "FOUND" || echo "MISSING"
 ```
 
 **If agent skipped injected skills:**
@@ -179,8 +179,8 @@ Before completing Phase 8, verify P0 compliance:
 
 | Check                      | Verification                                    |
 | -------------------------- | ----------------------------------------------- | -------- |
-| Type constant alphabetical | `grep "Service" pkg/plugins/types.go            | sort -c` |
-| Plugin import alphabetical | `grep "plugins/services" pkg/plugins/plugins.go | sort -c` |
+| Type constant alphabetical | `grep "Service" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go            | sort -c` |
+| Plugin import alphabetical | `grep "plugins/services" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go | sort -c` |
 | Default ports documented   | Check package comment                           |
 | Error handling complete    | Review error returns                            |
 

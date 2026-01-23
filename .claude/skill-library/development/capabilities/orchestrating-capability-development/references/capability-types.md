@@ -54,7 +54,7 @@ Security capabilities in Chariot span multiple technologies and frameworks. Each
 
 ### Key Files
 
-- Location: `chariot-aegis-capabilities/vql/`
+- Location: `{CAPABILITIES_ROOT}/modules/{capability}/`
 - Pattern: `*.vql` artifact definitions
 - Tests: `*_test.vql` or Go-based test harness
 
@@ -120,7 +120,7 @@ Security capabilities in Chariot span multiple technologies and frameworks. Each
 
 ### Key Files
 
-- Location: `modules/janus/` or integration points
+- Location: `{CAPABILITIES_ROOT}/modules/{capability}/`
 - Pattern: `*.go` implementing Tool interface
 - Interface: `janus.Tool`
 

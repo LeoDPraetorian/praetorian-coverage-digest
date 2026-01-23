@@ -45,12 +45,12 @@ mkdir -p $OUTPUT_DIR/agents
 │       ├── capability-reviewer.md               # Phase 11: Review findings
 │       └── capability-tester.md                 # Phase 13: Test results
 │
-├── pkg/plugins/services/{protocol}/             # Plugin code location
+├── {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/             # Plugin code location
 │   ├── plugin.go                                # Phase 8: Main detection logic
 │   └── {protocol}_test.go                       # Phase 13: Unit tests
 │
-├── pkg/plugins/types.go                         # Phase 8: Type constant (modify)
-└── pkg/plugins/plugins.go                       # Phase 8: Plugin import (modify)
+├── {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go                         # Phase 8: Type constant (modify)
+└── {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go                       # Phase 8: Plugin import (modify)
 ```
 
 ---
@@ -88,15 +88,15 @@ mkdir -p $OUTPUT_DIR/agents
 
 | File                  | Location                                             | Phase |
 | --------------------- | ---------------------------------------------------- | ----- |
-| Plugin implementation | `pkg/plugins/services/{protocol}/plugin.go`          | 8     |
-| Unit tests            | `pkg/plugins/services/{protocol}/{protocol}_test.go` | 13    |
+| Plugin implementation | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go`          | 8     |
+| Unit tests            | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go` | 13    |
 
 ### Files Modified
 
 | File                     | Change            | Phase |
 | ------------------------ | ----------------- | ----- |
-| `pkg/plugins/types.go`   | Add type constant | 8     |
-| `pkg/plugins/plugins.go` | Add plugin import | 8     |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`   | Add type constant | 8     |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` | Add plugin import | 8     |
 
 ---
 
@@ -109,7 +109,7 @@ All work happens in an isolated git worktree:
 ├── .worktrees/                          # Worktree storage
 │   └── {protocol}-fingerprintx/         # Isolated worktree
 │       ├── .fingerprintx-development/   # Output artifacts
-│       └── pkg/plugins/services/...     # Plugin code
+│       └── {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/...     # Plugin code
 ```
 
 **Benefits:**

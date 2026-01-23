@@ -10,11 +10,11 @@ Post-execution conflict detection catches problems AFTER agents have done work. 
 
 | Component      | File Pattern                                         |
 | -------------- | ---------------------------------------------------- |
-| Plugin source  | `pkg/plugins/services/{protocol}/{protocol}.go`      |
-| Plugin tests   | `pkg/plugins/services/{protocol}/{protocol}_test.go` |
-| Plugin types   | `pkg/plugins/services/{protocol}/types.go`           |
-| Registry       | `pkg/plugins/plugins.go`                             |
-| Type constants | `pkg/plugins/types.go`                               |
+| Plugin source  | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}.go`      |
+| Plugin tests   | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go` |
+| Plugin types   | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/types.go`           |
+| Registry       | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go`                             |
+| Type constants | `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`                               |
 
 ## Protocol Steps
 
@@ -24,11 +24,11 @@ For each agent, list files it will likely modify:
 
 ```bash
 # Plugin implementation scope
-Glob("pkg/plugins/services/{protocol}/**/*.go")
+Glob("{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/**/*.go")
 
 # Registry scope (shared - conflict risk)
-Glob("pkg/plugins/plugins.go")
-Glob("pkg/plugins/types.go")
+Glob("{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go")
+Glob("{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go")
 ```
 
 ### 2. Check for Overlap
@@ -38,16 +38,16 @@ Compare file sets to detect conflicts:
 **Example A - NO OVERLAP (safe to parallelize):**
 
 ```
-Agent A: pkg/plugins/services/mysql/mysql.go
-Agent B: pkg/plugins/services/mysql/mysql_test.go
+Agent A: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql.go
+Agent B: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/mysql_test.go
 Overlap: NONE → Safe if one writes, one reads
 ```
 
 **Example B - OVERLAP DETECTED (conflict risk):**
 
 ```
-Agent A: pkg/plugins/plugins.go (adding import)
-Agent B: pkg/plugins/plugins.go (adding import)
+Agent A: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go (adding import)
+Agent B: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go (adding import)
 Overlap: BOTH modify registry → CONFLICT
 ```
 
@@ -80,8 +80,8 @@ When overlap is detected, choose a resolution strategy:
   "parallel_execution": {
     "agents": ["capability-developer", "capability-tester"],
     "file_scopes": {
-      "capability-developer": ["pkg/plugins/services/mysql/"],
-      "capability-tester": ["pkg/plugins/services/mysql/*_test.go"]
+      "capability-developer": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/"],
+      "capability-tester": ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/mysql/*_test.go"]
     },
     "overlap_check": "passed",
     "overlap_files": []
@@ -96,17 +96,17 @@ Explicitly define what each agent should and should NOT modify:
 ```markdown
 SCOPE BOUNDARIES:
 
-- Only modify files in: pkg/plugins/services/{protocol}/
-- Do NOT modify: pkg/plugins/plugins.go (orchestrator handles registration)
-- Do NOT modify: pkg/plugins/types.go (orchestrator handles type constant)
+- Only modify files in: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
+- Do NOT modify: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go (orchestrator handles registration)
+- Do NOT modify: {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go (orchestrator handles type constant)
 ```
 
 ## Fingerprintx Shared Files (Conflict Risk)
 
 | File                     | Touched By                      | Mitigation                       |
 | ------------------------ | ------------------------------- | -------------------------------- |
-| `pkg/plugins/plugins.go` | All new plugins (registration)  | Orchestrator handles, sequential |
-| `pkg/plugins/types.go`   | All new plugins (type constant) | Orchestrator handles, sequential |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go` | All new plugins (registration)  | Orchestrator handles, sequential |
+| `{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go`   | All new plugins (type constant) | Orchestrator handles, sequential |
 | `go.mod` / `go.sum`      | Dependency changes              | Single agent per workflow        |
 
 ## When to Skip Conflict Checking

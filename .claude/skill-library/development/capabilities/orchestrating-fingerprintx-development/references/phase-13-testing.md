@@ -42,7 +42,7 @@ TEST MODE: unit
 PLAN LOCATION: .fingerprintx-development/test-plan.md
 
 FILES TO TEST:
-pkg/plugins/services/{protocol}/plugin.go
+{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go
 
 REQUIREMENTS:
 
@@ -56,9 +56,9 @@ REQUIREMENTS:
    - NO happy path only tests
    - NO testing implementation details
    - NO mocking Match() method itself
-8. Verify tests pass with: go test ./pkg/plugins/services/{protocol}/...
+8. Verify tests pass with: go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
-**Test file location:** pkg/plugins/services/{protocol}/{protocol}\_test.go
+**Test file location:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}\_test.go
 
 **Table-driven test pattern:**
 
@@ -118,9 +118,9 @@ REQUIREMENTS:
 5. Test connection failure handling (port closed)
 6. Test graceful handling of slow servers
 7. Avoid anti-patterns from test plan
-8. Verify tests pass with: go test -tags=integration ./pkg/plugins/services/{protocol}/...
+8. Verify tests pass with: go test -tags=integration ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
-**Test file location:** pkg/plugins/services/{protocol}/{protocol}_integration_test.go
+**Test file location:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_integration_test.go
 
 **Mock server pattern:**
 ```go
@@ -173,9 +173,9 @@ REQUIREMENTS:
 3. Document the Shodan query used to find each banner
 4. Test detection accuracy against real banners
 5. Test version extraction against real versions
-6. Verify tests pass with: go test -tags=shodan ./pkg/plugins/services/{protocol}/...
+6. Verify tests pass with: go test -tags=shodan ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
-**Test file location:** pkg/plugins/services/{protocol}/{protocol}_shodan_test.go
+**Test file location:** {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_shodan_test.go
 
 **Shodan validation pattern:**
 ```go
@@ -224,19 +224,19 @@ Return:
 
 ```bash
 # Unit tests with coverage
-go test -coverprofile=coverage.out ./pkg/plugins/services/{protocol}/...
+go test -coverprofile=coverage.out ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # View coverage by function
 go tool cover -func=coverage.out
 
 # Integration tests
-go test -tags=integration ./pkg/plugins/services/{protocol}/...
+go test -tags=integration ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # Shodan validation tests
-go test -tags=shodan ./pkg/plugins/services/{protocol}/...
+go test -tags=shodan ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # All tests
-go test ./pkg/plugins/services/{protocol}/...
+go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # Generate HTML coverage report
 go tool cover -html=coverage.out -o coverage.html

@@ -152,21 +152,21 @@ batches:
   batch_1:
     name: "Type registration"
     files:
-      - "pkg/plugins/types.go"
-      - "pkg/plugins/plugins.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"
     reason: "Must exist before plugin"
 
   batch_2:
     name: "Plugin implementation"
     files:
-      - "pkg/plugins/services/{protocol}/plugin.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go"
     reason: "Core detection logic"
     depends_on: ["batch_1"]
 
   batch_3:
     name: "Tests"
     files:
-      - "pkg/plugins/services/{protocol}/{protocol}_test.go"
+      - "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go"
     reason: "Test the implementation"
     depends_on: ["batch_2"]
 ```
@@ -243,13 +243,13 @@ complexity:
 
   batches:
     - name: "Type registration"
-      files: ["pkg/plugins/types.go", "pkg/plugins/plugins.go"]
+      files: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go", "{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go"]
       depends_on: []
     - name: "Plugin implementation"
-      files: ["pkg/plugins/services/{protocol}/plugin.go"]
+      files: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/plugin.go"]
       depends_on: ["batch_1"]
     - name: "Tests"
-      files: ["pkg/plugins/services/{protocol}/{protocol}_test.go"]
+      files: ["{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/{protocol}_test.go"]
       depends_on: ["batch_2"]
 
   triage_revised: false

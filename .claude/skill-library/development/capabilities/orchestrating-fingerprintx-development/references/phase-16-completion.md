@@ -21,22 +21,22 @@ Completion finalizes the fingerprintx plugin development workflow with fingerpri
 go build ./...
 
 # Lint check
-golangci-lint run ./pkg/plugins/services/{protocol}/...
+golangci-lint run ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # All tests pass
-go test ./pkg/plugins/services/{protocol}/...
+go test ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # Integration tests
-go test -tags=integration ./pkg/plugins/services/{protocol}/...
+go test -tags=integration ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # Shodan validation
-go test -tags=shodan ./pkg/plugins/services/{protocol}/...
+go test -tags=shodan ./{CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/...
 
 # Verify type constant alphabetical
-grep "Service" pkg/plugins/types.go | sort -c
+grep "Service" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/types.go | sort -c
 
 # Verify plugin import alphabetical
-grep "plugins/services" pkg/plugins/plugins.go | sort -c
+grep "plugins/services" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/plugins.go | sort -c
 ```
 
 ---
@@ -183,7 +183,7 @@ Adds fingerprintx plugin for {protocol} protocol detection.
 
 - Add Service{Protocol} type constant to types.go
 - Add {protocol} plugin import to plugins.go
-- Create {protocol} plugin in pkg/plugins/services/{protocol}/
+- Create {protocol} plugin in {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/{protocol}/
 
 ### Detection
 
@@ -396,7 +396,7 @@ git diff main...HEAD --stat
 git log main..HEAD --oneline
 
 # Show plugin-specific changes
-git diff main...HEAD -- pkg/plugins/
+git diff main...HEAD -- {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/
 ```
 
 Then re-ask about PR creation.

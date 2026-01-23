@@ -50,7 +50,7 @@ For each task in plan.md:
 verification_checklist:
   - task_id: "T001"
     title: "Implement detection query"
-    file: "modules/chariot-aegis-capabilities/vql/exposed_creds.vql"
+    file: "{CAPABILITIES_ROOT}/modules/{capability}/exposed_creds.vql"
     acceptance_criteria:
       - "Query parses without syntax errors" → VERIFY
       - "Detection logic matches architecture spec" → VERIFY

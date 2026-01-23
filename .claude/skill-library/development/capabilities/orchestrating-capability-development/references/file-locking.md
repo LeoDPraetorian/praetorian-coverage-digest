@@ -27,12 +27,12 @@ Locks are stored in the workflow output directory:
   "agent": "capability-developer",
   "locked_at": "2026-01-17T15:30:00Z",
   "files": [
-    "modules/chariot-aegis-capabilities/artifacts/definitions/Custom.S3BucketScanner/artifact.yaml"
+    "{CAPABILITIES_ROOT}/modules/{capability}/scanner.go"
   ],
   "directories": [
-    "modules/chariot-aegis-capabilities/artifacts/definitions/Custom.S3BucketScanner/"
+    "{CAPABILITIES_ROOT}/modules/{capability}/"
   ],
-  "task_description": "Implement S3 bucket exposure VQL capability",
+  "task_description": "Implement S3 bucket exposure capability",
   "expires_at": "2026-01-17T16:30:00Z"
 }
 ```
@@ -50,12 +50,16 @@ Locks are stored in the workflow output directory:
 
 ## Capability-Specific File Patterns
 
-| Capability Type | Typical Lock Scope                                                           |
-| --------------- | ---------------------------------------------------------------------------- |
-| VQL             | `modules/chariot-aegis-capabilities/artifacts/definitions/{CapabilityName}/` |
-| Nuclei          | `modules/nuclei-templates/{category}/{template-name}.yaml`                   |
-| fingerprintx    | `modules/fingerprintx/pkg/plugins/services/{service}/`                       |
-| Janus           | `modules/janus/internal/tools/{tool}/`                                       |
+Capabilities follow one of two patterns depending on migration status:
+
+| Location | Typical Lock Scope |
+| -------- | ------------------------------------------- |
+| External (migrated) | `{CAPABILITIES_ROOT}/modules/{capability}/` |
+| Internal (not yet migrated) | `modules/{module}/` |
+
+**Examples:**
+- External: `{CAPABILITIES_ROOT}/modules/fingerprintx/`
+- Internal: `modules/chariot-aegis-capabilities/`
 
 ## Lock Acquisition Protocol
 
@@ -85,7 +89,7 @@ For each existing *.lock file:
   "agent": "capability-developer",
   "locked_at": "2026-01-17T15:30:00Z",
   "files": [
-    "modules/chariot-aegis-capabilities/artifacts/definitions/Custom.S3Scanner/artifact.yaml"
+    "{CAPABILITIES_ROOT}/modules/nebula/scanner.go"
   ],
   "expires_at": "2026-01-17T16:30:00Z"
 }
@@ -109,8 +113,8 @@ When overlap is detected:
 **Example conflict in capability development:**
 
 ```
-capability-developer.lock: ["modules/chariot-aegis-capabilities/artifacts/shared/utils.vql"]
-capability-reviewer.lock: ["modules/chariot-aegis-capabilities/artifacts/shared/utils.vql"]
+capability-developer.lock: ["{CAPABILITIES_ROOT}/modules/nebula/shared/utils.go"]
+capability-reviewer.lock: ["{CAPABILITIES_ROOT}/modules/nebula/shared/utils.go"]
 
 Resolution options:
 1. Run reviewer after developer completes (RECOMMENDED)
@@ -149,7 +153,7 @@ If lock's expires_at is in the past:
 **Use file locking when:**
 
 - Multiple capability agents running in parallel
-- Shared utility files exist (e.g., common VQL includes)
+- Shared utility files exist (e.g., common includes)
 - Long-running capability tests (>30 minutes)
 - Complex capability with cross-file dependencies
 

@@ -28,8 +28,8 @@
 
 | What to Compact                               | What to Keep                                              |
 | --------------------------------------------- | --------------------------------------------------------- |
-| Full VQL/Nuclei/Go file contents from Explore | Capability type determination (VQL/Nuclei/Janus/etc.)     |
-| File lists with 30+ items                     | Module location paths (e.g., chariot-aegis-capabilities/) |
+| Full VQL/Nuclei/Go file contents from Explore | Capability type determination (VQL/Nuclei/Janus/etc.)              |
+| File lists with 30+ items                     | Module location paths (e.g., {CAPABILITIES_ROOT}/modules/nebula/) |
 | Pattern analysis across all capability files  | Technologies detected (Go, VQL, YAML templates)           |
 | Detailed code snippets from exploration       | Existing similar capabilities found (names only)          |
 | Agent conversation history                    | Discovery file path reference                             |
@@ -38,8 +38,8 @@
 
 ```
 Phase 3 (Discovery): COMPLETE
-- Capability Type: VQL (Velociraptor-based detection)
-- Module Location: chariot-aegis-capabilities/vql/
+- Capability Type: {type} (determined from codebase)
+- Module Location: {CAPABILITIES_ROOT}/modules/{capability}/
 - Similar Capabilities: s3-credential-scanner, ssh-key-exposure
 - Technologies: VQL, Go collectors
 - Full details: .capability-development/discovery.md

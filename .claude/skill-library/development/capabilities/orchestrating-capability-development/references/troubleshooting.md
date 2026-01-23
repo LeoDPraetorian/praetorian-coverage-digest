@@ -35,8 +35,8 @@
 1. Review [file-scope-boundaries.md](file-scope-boundaries.md)
 2. Add explicit scope in prompt:
    ```
-   Scope: ONLY modify files in chariot-aegis-capabilities/vql/
-   Do NOT modify: other capability types, backend code
+   Scope: ONLY modify files in {CAPABILITIES_ROOT}/modules/{capability}/
+   Do NOT modify: other capabilities, backend code
    ```
 3. Use file locking protocol for parallel agents
 
@@ -71,7 +71,7 @@
 1. Reduce explore agent count (use 3-5 for medium codebases)
 2. Scope patterns to capability area:
    ```
-   Pattern: "chariot-aegis-capabilities/vql/**/*.vql"
+   Pattern: "{CAPABILITIES_ROOT}/modules/{capability}/**/*"
    NOT: "**/*.vql"
    ```
 
