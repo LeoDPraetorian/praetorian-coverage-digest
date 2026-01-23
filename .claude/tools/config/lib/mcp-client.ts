@@ -17,6 +17,7 @@ import { getToolConfig } from '../config-loader';
 import { resolveProjectPath, findProjectRoot } from '../../../lib/find-project-root.js';
 import { routeToSerena } from '../../serena/semantic-router.js';
 import { createSerenaHTTPClient } from './serena-http-client.js';
+import { createPyghidraHTTPClient } from './pyghidra-http-client.js';
 import { serenaLog, mcpLog, isDebugEnabled } from './debug.js';
 
 // Global type declarations for Serena semantic routing state
@@ -227,6 +228,11 @@ function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServe
       command: 'npx',
       args: ['-y', 'ghydra-mcp'],
       envVars: {} // No authentication required (connects to local Ghidra instances)
+    },
+    'pyghidra': {
+      command: 'uvx',
+      args: ['pyghidra-mcp'],
+      envVars: {} // Uses GHIDRA_INSTALL_DIR from environment
     }
   };
 
@@ -482,6 +488,7 @@ export async function callMCPTool<T = any>(
     'chrome-devtools',  // No auth needed (local browser)
     'chariot',          // Internal tool, no auth
     'serena',           // No auth needed (local tool)
+    'pyghidra',         // Uses GHIDRA_INSTALL_DIR from environment
   ];
 
   // Get credentials from shared config (only once, not per retry)
@@ -683,7 +690,119 @@ export async function callMCPTool<T = any>(
     );
   }
 
-  // Non-Serena MCPs use existing fresh-connection logic
+  // Special handling for PyGhidra - ALWAYS use HTTP client (streamable-http transport mode)
+  // This prevents lock conflicts by ensuring all calls go through a single persistent server
+  if (mcpName === 'pyghidra') {
+    const httpPort = parseInt(process.env.PYGHIDRA_HTTP_PORT || '8765', 10);
+    mcpLog.info(`[PyGhidra] Using streamable-http mode on port ${httpPort}`);
+
+    // Create HTTP client (connects to PyGhidra running in streamable-http mode)
+    const httpClient = createPyghidraHTTPClient({ port: httpPort });
+
+    // Retry configuration for PyGhidra (matches DEFAULT_MAX_RETRIES for consistency)
+    let lastError: Error | null = null;
+
+    // Retry loop
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      try {
+        // Health check before call (fast HTTP check)
+        if (attempt === 0) {
+          const health = await httpClient.healthCheck({ timeoutMs: 5000 });
+          if (!health.healthy) {
+            throw new Error(
+              `PyGhidra HTTP server not running on port ${httpPort}.\n` +
+              `Start it with: cd .claude/tools/pyghidra && ./start-server.sh`
+            );
+          }
+        }
+
+        if (attempt > 0) {
+          mcpLog.info(`[PyGhidra] Retry attempt ${attempt}/${maxRetries} for ${toolName}`);
+        }
+
+        // Call tool via HTTP
+        const result = await httpClient.callTool(
+          {
+            name: toolName,
+            arguments: params,
+          },
+          { timeoutMs }
+        );
+
+        // Result is already parsed by HTTP client (JSON or plain text)
+        let parsedResult: T;
+        if (typeof result === 'string') {
+          // Try to parse as JSON, fall back to string
+          try {
+            parsedResult = JSON.parse(result) as T;
+          } catch {
+            parsedResult = result as T;
+          }
+        } else {
+          parsedResult = result as T;
+        }
+
+        // Check response size (serialize to estimate)
+        const responseBytes = JSON.stringify(parsedResult).length;
+        if (responseBytes > maxResponseBytes) {
+          throw new ResponseTooLargeError(responseBytes, maxResponseBytes, mcpName, toolName);
+        }
+
+        // Warn at 80% threshold
+        if (responseBytes > maxResponseBytes * 0.8) {
+          mcpLog.warn(
+            `Response size ${responseBytes.toLocaleString()} bytes approaching limit of ${maxResponseBytes.toLocaleString()} bytes ` +
+            `(${Math.round((responseBytes / maxResponseBytes) * 100)}%)`
+          );
+        }
+
+        // Log success
+        const durationMs = Date.now() - callStartTime;
+        logAuditEvent({
+          timestamp: new Date().toISOString(),
+          event: 'mcp_call_success',
+          mcpName,
+          toolName,
+          success: true,
+          durationMs,
+        });
+
+        mcpLog.info(`[PyGhidra] ✓ ${toolName} completed in ${durationMs}ms (HTTP mode)`);
+
+        return parsedResult;
+      } catch (error) {
+        lastError = error as Error;
+
+        // Don't retry on last attempt
+        if (attempt === maxRetries) {
+          break;
+        }
+
+        // Don't retry certain error types
+        const errorMessage = lastError.message.toLowerCase();
+        if (
+          errorMessage.includes('not found') ||
+          errorMessage.includes('permission denied') ||
+          errorMessage.includes('not reachable')
+        ) {
+          mcpLog.info(`[PyGhidra] Terminal error, not retrying: ${errorMessage}`);
+          break;
+        }
+
+        // Small delay before retry
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 100));
+        }
+      }
+    }
+
+    // All retries exhausted
+    throw new Error(
+      `[PyGhidra] All ${maxRetries + 1} attempts failed for ${toolName}. Last error: ${lastError?.message}`
+    );
+  }
+
+  // Non-Serena/PyGhidra MCPs use existing fresh-connection logic
   let lastError: Error | null = null;
 
   // Retry loop with exponential backoff

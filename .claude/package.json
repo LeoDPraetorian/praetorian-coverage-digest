@@ -11,7 +11,8 @@
     "skill-library/lib",
     "skill-library/claude/skill-management/*/scripts",
     "skill-library/claude/agent-management/*/scripts",
-    "skill-library/claude/mcp-tools/*/scripts"
+    "skill-library/claude/mcp-tools/*/scripts",
+    "skills/managing-tool-wrappers/scripts"
   ],
   "devDependencies": {
     "@claude/testing": "*",

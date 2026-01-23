@@ -64,3 +64,6 @@ docs/plans/
 .claude/hooks/*-state*.json
 .claude/hooks/escalation-context*.json
 .worktrees/
+
+# Pyghidra projects
+**/pyghidra_mcp_projects/
