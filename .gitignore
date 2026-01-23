@@ -36,6 +36,7 @@ hive-mind-prompt-*.txt
 __pycache__/
 .claude/config/credentials.json
 .claude/node_modules/
+.claude/coverage/
 
 # Temporary and generated files
 .tmp/
