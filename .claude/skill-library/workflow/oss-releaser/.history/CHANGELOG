@@ -1,0 +1,196 @@
+# Changelog
+
+All notable changes to the oss-releaser skill will be documented in this file.
+
+## [1.1.3] - 2026-01-22
+
+### Added - Safety Confirmation for Repository Rename
+
+- **Added mandatory user confirmation before repository rename**
+  - Uses `AskUserQuestion` after Step 1 (metadata capture) and before Step 2 (rename)
+  - Shows user exactly what will happen: `${ORG}/${REPO_NAME}` → `${ORG}/${REPO_NAME}-internal`
+  - Warns about irreversible nature and impact (breaks clones, CI/CD)
+  - Provides clear "Yes, I understand" vs "No, cancel" options
+
+- **Safety applies even with `dangerously-skip-permissions` enabled**
+  - Repository rename is destructive and irreversible
+  - Users need explicit confirmation to prevent accidental execution
+  - Confirmation shows specific repository names from captured metadata
+
+### Changed
+
+- Updated Example 3 to show confirmation prompt in the workflow
+- Release execution now has explicit "STOP immediately" if user cancels
+
+## [1.1.2] - 2026-01-22
+
+### Fixed - Release Mode Execution Bug
+
+- **Release mode now ENFORCES command execution** instead of just showing templates
+  - Changed "Release Commands (Summary)" to "Release Execution (MUST RUN THESE COMMANDS)"
+  - Added explicit instruction: "You MUST execute these commands in order. Do NOT just show them to the user."
+  - Added critical note at bottom: "These steps MUST be executed. The skill should run each command and verify success before proceeding to the next step."
+
+- **Bug identified:** Test run of release mode failed to:
+  - Rename repository (testrepo → testrepo-internal)
+  - Create new repository (praetorian-inc/testrepo)
+  - Squash commit history to single commit
+  - Issue: Commands were displayed as templates but not executed
+
+- **Updated Example 3** to show actual command execution with step-by-step progress:
+  - Shows "Executing Step N: [action]..." format
+  - Displays checkmarks for completed actions
+  - Demonstrates that commands are run, not just displayed
+
+### Changed
+
+- Release execution section now includes all 7 steps with full command details
+- Added ORG variable capture for proper repository URLs
+- Added mktemp for temporary directory creation during clean history copy
+
+## [1.1.1] - 2026-01-22
+
+### Fixed - Release Mode Permissions
+
+- **Release mode now creates PRIVATE repository** (changed from public)
+  - Users lack permissions to create public repos directly
+  - New repos created as private, then IT makes them public via ticket
+
+- **Removed archive step** - Users lack permissions to archive repositories
+  - Replaced with IT ticket template generation
+  - Ticket requests: (1) archive internal repo, (2) make new repo public
+
+- **Enhanced metadata copy emphasis** - SEO optimization explicitly called out
+  - Step 1: Capture metadata (description, topics/tags)
+  - Step 6: Copy metadata to new repo for SEO
+  - Ensures new public repo maintains discoverability
+
+### Changed
+
+- Updated release-mode.md workflow (8 steps including IT ticket)
+- Updated SKILL.md release example to show IT ticket requirement
+- Added explicit warnings about permission limitations
+
+## [1.1.0] - 2026-01-22
+
+### Added - Subcommand Architecture
+
+**Major refactoring to support three distinct modes:**
+
+1. **`audit` mode** - Read-only compliance validation
+   - Check LICENSE, documentation, copyright coverage, GitHub metadata
+   - Run noseyparker scan without modifications
+   - Generate compliance report with action items
+   - CI/CD-friendly (exit code 0/1)
+   - Reference: audit-mode.md
+
+2. **`prepare` mode** - File creation and modification
+   - Create LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY
+   - Add copyright headers with year detection
+   - Set GitHub metadata (description, topics)
+   - Run security scans
+   - All operations idempotent
+   - Reference: prepare-mode.md
+
+3. **`release` mode** - Clean public repository creation
+   - Rename current repo to `{name}-internal`
+   - Create new public repo with original name
+   - Copy metadata (description, topics, settings)
+   - Copy code with single "Initial public release" commit (clean history)
+   - Archive internal repository
+   - Reference: release-mode.md
+
+### Changed
+
+- **SKILL.md structure** - Condensed from 502 to 368 lines via progressive disclosure
+  - Moved detailed phase procedures to references
+  - Added subcommand detection table
+  - Added mode-specific workflows
+  - Added common workflow examples
+  - Added Phase Reference table showing which phases run in each mode
+
+- **Progressive Disclosure** - Better organized reference files
+  - Created audit-mode.md for read-only validation procedures
+  - Created prepare-mode.md for file modification procedures
+  - Created release-mode.md for clean repo creation procedures
+
+### Benefits
+
+- **Separation of Concerns** - Audit without modifying, prepare incrementally, release when ready
+- **CI/CD Integration** - Audit mode can run in pipelines
+- **Safer Workflow** - Can verify readiness before making changes
+- **Flexible** - Can run full workflow or individual modes
+
+## [1.0.1] - 2026-01-22
+
+### Changed
+
+- **Secret Scanning:** Updated to use noseyparker exclusively instead of gitleaks/trufflehog
+  - Updated Phase 6.1 commands to use `noseyparker scan` and `noseyparker report`
+  - Rewrote secret-scanning-strategy.md (530 lines) with comprehensive noseyparker guidance
+  - Updated troubleshooting-guide.md with noseyparker installation and `.noseyparker.ignore` usage
+  - Reason: Standardization on Praetorian-developed tool with 130+ built-in rules and low false positive rate
+
+## [1.0.0] - 2026-01-22
+
+### Initial Creation
+
+**RED Phase Failure:**
+Without this skill, agents preparing repositories for OSS release:
+- Did not optimize GitHub metadata (description, topics) for SEO
+- Used non-idempotent scripts that created duplicate copyright headers
+- Did not detect year ranges from git history for copyright headers
+- Generated generic CONTRIBUTING.md without tech stack customization
+- Did not provide structured summary reports
+- Had no systematic 8-phase workflow
+
+**Skill Category:** Process/Pattern
+**Skill Type:** Workflow methodology for OSS release preparation
+**Location:** .claude/skill-library/workflow/oss-releaser/
+
+### Features
+
+- **8-Phase Workflow:** Prerequisites → GitHub Metadata → LICENSE → Documentation → Copyright → Security Scan → Verification → Final Review
+- **Idempotent Operations:** Safe to run multiple times without side effects
+- **Year Range Detection:** Copyright headers use git history to determine appropriate year ranges
+- **Tech Stack Detection:** Automatically detects Go/Python/TypeScript/Rust and customizes CONTRIBUTING.md
+- **GitHub SEO Optimization:** Sets repository description, topics, and metadata for discoverability
+- **Secret Scanning:** Integrates noseyparker for secret detection
+- **False Positive Filtering:** Identifies test fixtures and documentation examples
+- **Template Library:** Complete templates for LICENSE, CODE_OF_CONDUCT, SECURITY, CONTRIBUTING
+- **Summary Report Generation:** Structured compliance report with actionable items
+- **Progressive Disclosure:** 498-line SKILL.md with detailed references/
+
+### Templates Included
+
+- LICENSE - Full Apache 2.0 text with Praetorian copyright
+- CODE_OF_CONDUCT.md - Contributor Covenant v2.1
+- SECURITY.md - Vulnerability reporting policy
+- CONTRIBUTING.md - Customizable by tech stack
+
+### Reference Files
+
+- copyright-header-automation.md - Complete implementation with year detection
+- customization-requirements.md - Tech-stack-specific CONTRIBUTING.md guidance
+- summary-report-template.md - Structured compliance report format
+- idempotent-operations.md - Safe re-run guarantees
+- prerequisite-checks.md - Validation checklist
+- github-seo-optimization.md - Discoverability strategies
+- secret-scanning-strategy.md - Noseyparker comprehensive guide
+- false-positive-patterns.md - Common scanner false positives
+- license-validation.md - Apache 2.0 compliance
+- troubleshooting-guide.md - Common issues and solutions
+
+### Integration
+
+- Standalone workflow skill (no dependencies)
+- Pairs with `optimizing-github-seo` for advanced strategies
+- Pairs with `verifying-before-completion` for final validation
+- Gateway: workflow/ (library skill)
+
+### Testing
+
+- RED phase: Agent without skill showed systematic but incomplete approach
+- Gap identified: Missing GitHub metadata, non-idempotent operations, no customization
+- GREEN phase: Pending (Phase 8)
+- REFACTOR phase: Pending (Phase 9)

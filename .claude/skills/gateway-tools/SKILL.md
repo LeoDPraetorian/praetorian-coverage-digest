@@ -46,17 +46,19 @@ This gateway implements 3-tier loading:
 
 **Match your task to a routing pattern:**
 
-| Task Intent                               | Route To                             |
-| ----------------------------------------- | ------------------------------------ |
-| "transcribe" / "audio" / "speech-to-text" | → `transcribing-audio`               |
-| "Whisper" / "transcription" / "voice"     | → `transcribing-audio`               |
-| "recording" / "capture audio" / "record"  | → `recording-audio`                  |
-| "FFmpeg" / "microphone" / "audio input"   | → `recording-audio`                  |
-| "Docker tool" / "containerized utility"   | → Check Docker Tools section         |
-| "CLI wrapper" / "command-line tool"       | → Check CLI Utilities section        |
-| "system utility" / "system-level tool"    | → Check System Tools section         |
-| "testing" (tool tests)                    | → also invoke `gateway-testing`      |
-| "integration" (third-party tools)         | → also invoke `gateway-integrations` |
+| Task Intent                                       | Route To                             |
+| ------------------------------------------------- | ------------------------------------ |
+| "transcribe" / "audio" / "speech-to-text"         | → `transcribing-audio`               |
+| "Whisper" / "transcription" / "voice"             | → `transcribing-audio`               |
+| "recording" / "capture audio" / "record"          | → `recording-audio`                  |
+| "FFmpeg" / "microphone" / "audio input"           | → `recording-audio`                  |
+| "OSS release" / "prepare for OSS" / "open source" | → `oss-releaser`                     |
+| "copyright headers" / "LICENSE" / "CONTRIBUTING"  | → `oss-releaser`                     |
+| "Docker tool" / "containerized utility"           | → Check Docker Tools section         |
+| "CLI wrapper" / "command-line tool"               | → Check CLI Utilities section        |
+| "system utility" / "system-level tool"            | → Check System Tools section         |
+| "testing" (tool tests)                            | → also invoke `gateway-testing`      |
+| "integration" (third-party tools)                 | → also invoke `gateway-integrations` |
 
 ## Routing Algorithm
 
@@ -94,6 +96,12 @@ This gateway implements 3-tier loading:
 | Skill                                                   | Path | Triggers |
 | ------------------------------------------------------- | ---- | -------- |
 | _(Future: video processing, file conversion utilities)_ |      |          |
+
+### Workflow Tools
+
+| Skill        | Path                                                          | Triggers                                                                                                                      |
+| ------------ | ------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| OSS Releaser | `.claude/skill-library/workflow/oss-releaser/SKILL.md` | OSS release, open source release, prepare for OSS, copyright headers, LICENSE, CONTRIBUTING, CODE_OF_CONDUCT, SECURITY, release prep |
 
 ## Cross-Gateway Routing
 
