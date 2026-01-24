@@ -1,0 +1,26 @@
+# Changelog
+
+## 2026-01-22 - Initial Creation
+
+**Phase:** RED
+
+**Gap Documented:**
+- Graph Explorer 100K Scale requires sub-clustering but no existing skill covers:
+  - When to use Louvain vs Leiden vs attribute-based clustering
+  - Server-side vs client-side computation trade-offs
+  - Caching strategies for expensive computations
+  - Handling cluster instability
+
+**Test Scenario:** Developer needs to sub-divide a 50K node cluster by ASN attribute.
+
+**Expected Failure:**
+- Run clustering client-side → browser freezes
+- Doesn't cache result → re-computes on every drill-down
+- Uses Louvain → unstable results
+- Doesn't validate quality → produces degenerate clusters
+
+**Category:** development/frontend/graphing
+
+**Skill Type:** Process/Pattern
+
+**Location:** Library skill

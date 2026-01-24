@@ -1,0 +1,31 @@
+# Changelog
+
+## 2026-01-22 - Initial Creation
+
+**RED Phase Evidence:**
+- Gap: No existing skill covers drill-down/drill-up navigation in clustered graphs
+- Failure scenario: Developer implements breadcrumb navigation without guidance
+- Expected failures: Re-render cascades, broken back button, lost selections, jarring transitions
+- Codebase evidence: `modules/chariot/ui/src/hooks/useGraphClustering.ts` disabled with no navigation patterns
+
+**Category:** development/frontend/graphing
+
+**Skill Type:** Process/Pattern
+
+**Key Patterns:**
+- Breadcrumb state management with immutable updates
+- Camera animation timing (500ms drill-down, 300ms drill-up)
+- URL state synchronization with browser history
+- Per-level selection preservation
+- Performance thresholds (1K/10K node breakpoints)
+- Table fallback integration
+
+**Research Sources:**
+- Cambridge Intelligence: Progressive Disclosure
+- Nielsen Norman Group: Progressive Disclosure
+- Sigma.js Performance Issue #567
+- yFiles Large Graph Performance
+
+**Integration:**
+- Requires: preventing-react-hook-infinite-loops, working-with-sigma-js
+- Pairs with: coordinating-competing-systems, prefetching-react-routes, graph-layout-coordination

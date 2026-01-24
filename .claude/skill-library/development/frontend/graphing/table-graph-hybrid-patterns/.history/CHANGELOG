@@ -1,0 +1,27 @@
+# Changelog
+
+## 2026-01-22 - Initial Creation
+
+**Phase:** RED (Proof of Gap)
+
+**Gap Documented:** Graph Explorer requires table fallback when sub-clustering is exhausted (cluster still >1K nodes after max depth). No existing skill covers:
+- Preserving selection when switching views
+- Synchronizing filters between graph and table
+- Smooth animations during transitions
+- Drawer integration for side-by-side comparison
+
+**Test Scenario:** User selects 5 nodes in graph view, switches to table view.
+
+**Expected Failure:**
+- Selection lost (table shows all rows, no highlighting)
+- Applied filters reset (graph filtered by "active", table shows all)
+- Jarring transition (instant swap, no animation)
+- No way to return to graph (navigation broken)
+
+**Category:** development/frontend/patterns
+
+**Skill Type:** Process/Pattern
+
+**Created By:** table-graph-hybrid-patterns specification from Graph Explorer 100K Scale feature research
+
+---

@@ -1,0 +1,25 @@
+# Changelog
+
+## 2026-01-22 - Initial Creation
+
+**RED Phase Evidence:**
+- Chariot codebase has `useViewportCulling.ts` with partial phase guards (lines 140-145)
+- Existing guards receive phase as prop but don't subscribe to layout events
+- No layout instance management patterns documented
+- No camera coordination during layout
+- Developers implementing hierarchical navigation lack complete coordination guidance
+
+**Category:** development/frontend/graphing
+
+**Skill Type:** Process/Pattern
+
+**Location:** Library skill
+
+**Created by:** /skill-manager create graph-layout-coordination
+
+**Research Sources:**
+- ForceAtlas2 Paper (https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0098679)
+- Sigma.js Issue #567 (https://github.com/jacomyal/sigma.js/issues/567)
+- D3-Force Optimization (https://www.nebula-graph.io/posts/d3-force-layout-optimization)
+- Cambridge Intelligence - Large Networks (https://cambridge-intelligence.com/visualize-large-networks/)
+- Chariot codebase: modules/chariot/ui/src/components/nodeGraph/hooks/useViewportCulling.ts
