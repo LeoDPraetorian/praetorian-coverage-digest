@@ -8,5 +8,5 @@
     "VNC_RESOLUTION": "1600x1200x16"
   },
   "runArgs": ["--shm-size=2gb"],
-  "postCreateCommand": "sudo chsh -s $(which zsh) $(whoami)"
+  "postCreateCommand": "git pull origin main && git submodule update --init --recursive && make submodule-pull && sudo chsh -s $(which zsh) $(whoami)"
 }
