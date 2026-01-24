@@ -254,16 +254,36 @@ See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict
 ## Rationalization Prevention
 
 <EXTREMELY-IMPORTANT>
-You MUST read rationalization-table.md BEFORE proceeding past any compaction gate (after phases 3, 8, or 13).
+You MUST read BOTH counter files BEFORE proceeding past any compaction gate (after phases 3, 8, or 13).
 
+**MANDATORY at every phase transition:**
 ```
-Read(.claude/skills/orchestrating-feature-development/references/rationalization-table.md)
+Read(.claude/skill-library/development/orchestrating-feature-development/references/compaction-gate-counters.md)
+```
+
+This file contains counters for:
+- "Phase Transition Momentum Bias" - completing phase N and immediately starting N+1 without gate check
+- "Outputs Already Persisted" - confusing file creation with compaction protocol
+- "Context Seems Fine" - subjective assessment of token usage
+- "Resume Workflow" bypass
+
+**MANDATORY at gates:**
+```
+Read(.claude/skill-library/development/orchestrating-feature-development/references/rationalization-table.md)
 ```
 
 This file contains anti-rationalization counters for "Momentum Bias", "Context Seems Fine", and other compaction gate bypass patterns.
+
+**Phase Transition Protocol:**
+1. STOP after completing any phase
+2. CHECK: Is this a compaction gate? (3→4, 8→9, 13→14)
+3. READ: compaction-gate-counters.md
+4. If at gate: Execute 5-step compaction protocol BEFORE any other action
+5. ONLY THEN proceed to next phase
 </EXTREMELY-IMPORTANT>
 
 See [rationalization-table.md](references/rationalization-table.md) for feature-specific rationalizations.
+See [compaction-gate-counters.md](references/compaction-gate-counters.md) for phase transition counters.
 
 ## Emergency Abort Protocol
 

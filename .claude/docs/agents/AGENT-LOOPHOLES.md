@@ -15,6 +15,7 @@ Track rationalization failures and their counters using `closing-rationalization
 | 2026-01-19 | Main Claude        | audit orchestrating-capability-development | "Reference Skipping + Completion Fabrication" - read SKILL.md but skipped mandatory verification-counters.md, then claimed "31 phases checked" despite ~12 actual | auditing-skills SKILL.md (mandatory Read block)                                                   | ✅       |
 | 2026-01-19 | Main Claude        | /integration extrahop                      | "Outputs Already Persisted" - confused writing output files with completing compaction protocol, skipped persisting-progress-across-sessions invocation           | orchestrating-integration-development/references/rationalization-prevention-integration.md#L26-28 | ❌       |
 | 2026-01-19 | Main Claude        | /feature integrations-refactor             | "Momentum Bias" + "Context Seems Fine" - completed PR 1 (8 tasks), immediately spawned PR 2 without compaction check. Reached 10% context.                        | TBD                                                                                               | ❌       |
+| 2026-01-23 | Main Claude        | Resume /feature at Phase 3→4 transition    | "Phase Transition Momentum Bias" - completed Phase 3b successfully, immediately created Phase 4 tasks and spawned developer without checking compaction gate        | orchestrating-feature-development/references/compaction-gate-counters.md                          | ❌       |
 
 ## Loophole Details
 
@@ -336,14 +337,15 @@ If you think: "I'll check the important phases" → WRONG. You MUST check ALL 30
 
 ## Pattern Index
 
-| Pattern                   | Description                                                             | Counter Location                       |
-| ------------------------- | ----------------------------------------------------------------------- | -------------------------------------- |
-| Completion Fabrication    | Claiming complete when incomplete ("All X checked" when only Y checked) | auditing-skills                        |
-| Selective Execution Trap  | Checking "important" phases instead of all required                     | auditing-skills                        |
-| Phase Conflation          | Assuming checking one phase implicitly covers a related phase           | auditing-skills                        |
-| Superficial Verification  | Seeing similar structure, not verifying against criteria                | auditing-skills                        |
-| Calls vs Files            | Counting different unit than specified                                  | verifying-before-completion            |
-| Quick Question Trap       | Skipping full protocol for "simple" tasks                               | using-skills, persisting-agent-outputs |
-| Description Hallucination | Inventing skill description to justify non-use                          | closing-rationalization-loopholes      |
-| Outputs Already Persisted | Confusing writing files with completing compaction protocol             | orchestrating-integration-development  |
-| Add References Later      | Proceeding past phase gate without creating required files              | creating-skills                        |
+| Pattern                           | Description                                                             | Counter Location                                             |
+| --------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Completion Fabrication            | Claiming complete when incomplete ("All X checked" when only Y checked) | auditing-skills                                              |
+| Selective Execution Trap          | Checking "important" phases instead of all required                     | auditing-skills                                              |
+| Phase Conflation                  | Assuming checking one phase implicitly covers a related phase           | auditing-skills                                              |
+| Superficial Verification          | Seeing similar structure, not verifying against criteria                | auditing-skills                                              |
+| Calls vs Files                    | Counting different unit than specified                                  | verifying-before-completion                                  |
+| Quick Question Trap               | Skipping full protocol for "simple" tasks                               | using-skills, persisting-agent-outputs                       |
+| Description Hallucination         | Inventing skill description to justify non-use                          | closing-rationalization-loopholes                            |
+| Outputs Already Persisted         | Confusing writing files with completing compaction protocol             | orchestrating-integration-development, orchestrating-feature-development |
+| Add References Later              | Proceeding past phase gate without creating required files              | creating-skills                                              |
+| Phase Transition Momentum Bias    | Completing phase N and immediately starting N+1 without gate check      | orchestrating-feature-development                            |
