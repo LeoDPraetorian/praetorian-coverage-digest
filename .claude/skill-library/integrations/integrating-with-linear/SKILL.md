@@ -252,6 +252,70 @@ export const operation = {
 
 **See:** [references/adding-parameters.md](references/adding-parameters.md)
 
+### Task: Create Issue with Project Template
+
+**Example:** "Create an issue for project X with its template auto-applied"
+
+**Workflow Options:**
+
+**Option A: Auto-apply template (recommended for Claude workflows)**
+
+When creating issues for a project, automatically find and apply the project's template:
+
+```typescript
+await createIssue.execute({
+  title: '[Agentification] Implement feature X',
+  team: 'Chariot Team',
+  project: 'Development Agentification',
+  autoApplyProjectTemplate: true  // Will lookup template for this project
+});
+// Linear applies template: title prefix, description structure, default properties
+```
+
+**Option B: Direct template ID**
+
+When you know the template ID:
+
+```typescript
+await createIssue.execute({
+  title: 'Implement feature X',
+  team: 'Chariot Team',
+  templateId: '0259235b-2bf0-459d-8b10-bd8039986239'
+});
+```
+
+**Option C: Query templates for a project first**
+
+For discovery or when building UI:
+
+```typescript
+// Find templates associated with a specific project
+const templates = await listProjectTemplates.execute({
+  type: 'issue',
+  projectId: '48e717eb-2956-4a92-bf35-ad72f32371bf'
+});
+
+// Use the first matching template
+if (templates.templates.length > 0) {
+  await createIssue.execute({
+    title: 'Feature X',
+    team: 'Engineering',
+    templateId: templates.templates[0].id
+  });
+}
+```
+
+**How Templates Work:**
+
+1. Templates can have `templateData` containing `projectId` (linking template to project)
+2. When `autoApplyProjectTemplate: true`:
+   - Resolves project name to ID
+   - Queries all issue templates
+   - Finds template with matching `projectId` in `templateData`
+   - Passes `templateId` to Linear's `issueCreate` mutation
+3. Linear applies template: prefills title, description, labels, state, etc.
+4. If no template found, issue is created normally (graceful fallback)
+
 ---
 
 ## Direct API Querying

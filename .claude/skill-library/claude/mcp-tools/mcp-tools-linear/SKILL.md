@@ -91,11 +91,36 @@ These operations are exported and ready to use via the Linear wrapper index.
 
 | Wrapper        | Purpose                 | Key Parameters                                            |
 | -------------- | ----------------------- | --------------------------------------------------------- |
-| `create-issue` | Create new issue        | `title`, `team`, `description`, `assignee`, `priority`    |
+| `create-issue` | Create new issue        | `title`, `team`, `description`, `assignee`, `priority`, `project`, `templateId`, `autoApplyProjectTemplate` |
 | `get-issue`    | Get issue by ID         | `id` (e.g., "ENG-1234")                               |
 | `find-issue`   | Search issues           | `query`, `limit`                                          |
 | `list-issues`  | List recent issues      | `limit` (default: 20)                                     |
 | `update-issue` | Update issue fields     | `id`, `title`, `state`, `priority`, `assignee`, `project` |
+
+#### Template Auto-Apply for Issues
+
+When creating issues for a project, use `autoApplyProjectTemplate: true` to automatically apply the project's associated template:
+
+```typescript
+await createIssue.execute({
+  title: 'Implement feature X',
+  team: 'Engineering',
+  project: 'Development Agentification',
+  autoApplyProjectTemplate: true  // Looks up and applies project template
+});
+```
+
+**Parameters:**
+- `templateId` - Direct template ID (optional, overrides auto-apply)
+- `autoApplyProjectTemplate` - Boolean, auto-find template for project (default: false)
+
+**Behavior:**
+1. If `autoApplyProjectTemplate: true` and `project` is specified:
+   - Resolves project name → ID
+   - Queries templates with matching `projectId` in `templateData`
+   - Passes `templateId` to Linear's `issueCreate` mutation
+2. Linear applies template: prefills description structure, labels, state
+3. If no template found, issue created normally (graceful fallback)
 
 ### Projects
 

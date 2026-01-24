@@ -23,6 +23,8 @@
  * - dueDate: string (optional) - Due date in ISO format
  * - parentId: string (optional) - Parent issue ID for sub-issues
  * - cycle: string (optional) - Cycle (sprint) ID or name (set via automatic update after creation)
+ * - templateId: string (optional) - Issue template ID to apply
+ * - autoApplyProjectTemplate: boolean (optional) - Auto-lookup template for project (default: false)
  *
  * OUTPUT (after filtering):
  * - success: boolean - Always true on successful creation
@@ -74,6 +76,7 @@ import {
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
 import { resolveStateId, resolveAssigneeId, resolveProjectId } from './lib/resolve-ids.js';
+import { resolveTemplateForProject } from './lib/resolve-template.js';
 
 /**
  * GraphQL mutation for creating an issue
@@ -149,7 +152,17 @@ export const createIssueParams = z.object({
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
-    .describe('Cycle (sprint) ID or name - will be set via update after creation')
+    .describe('Cycle (sprint) ID or name - will be set via update after creation'),
+  templateId: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoPathTraversal, 'Path traversal not allowed')
+    .refine(validateNoCommandInjection, 'Invalid characters detected')
+    .optional()
+    .describe('Issue template ID to apply'),
+  autoApplyProjectTemplate: z.boolean()
+    .default(false)
+    .optional()
+    .describe('Automatically find and apply template for the specified project')
 });
 
 export type CreateIssueInput = z.infer<typeof createIssueParams>;
@@ -223,11 +236,25 @@ export const createIssue = {
     // Validate input
     const validated = createIssueParams.parse(input);
 
-    // Extract cycle parameter (not supported by Linear issueCreate mutation)
-    const { cycle, ...createParams } = validated;
+    // Extract cycle, templateId, and autoApplyProjectTemplate parameters
+    const { cycle, templateId, autoApplyProjectTemplate, ...createParams } = validated;
 
     // Create client (with optional test token)
     const client = await createLinearClient(testToken);
+
+    // Resolve template ID if auto-apply is requested
+    let resolvedTemplateId: string | undefined = templateId;
+
+    if (autoApplyProjectTemplate && createParams.project && !resolvedTemplateId) {
+      try {
+        const projectId = await resolveProjectId(client, createParams.project);
+        resolvedTemplateId = await resolveTemplateForProject(client, projectId);
+        // Silent fallback: if no template found, proceed without one
+      } catch (error) {
+        // Template lookup failed, proceed without template
+        console.warn(`Template lookup failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    }
 
     // Build GraphQL input - map field names to Linear API format
     const mutationInput: {
@@ -241,6 +268,7 @@ export const createIssue = {
       labelIds?: string[];
       dueDate?: string;
       parentId?: string;
+      templateId?: string;
     } = {
       title: createParams.title,
       teamId: createParams.team, // team → teamId
@@ -273,6 +301,9 @@ export const createIssue = {
     }
     if (createParams.parentId) {
       mutationInput.parentId = createParams.parentId;
+    }
+    if (resolvedTemplateId) {
+      mutationInput.templateId = resolvedTemplateId;
     }
 
     // Execute GraphQL mutation

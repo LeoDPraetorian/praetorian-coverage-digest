@@ -18,6 +18,7 @@
  * - type: enum (optional) - Filter by template type: 'project' (default), 'issue', or 'all'
  * - limit: number (optional) - Max templates to return (1-250, default 50, client-side limit)
  * - fullDescription: boolean (optional) - Return full description without truncation
+ * - projectId: string (optional) - Filter templates by associated project ID
  *
  * OUTPUT (after filtering):
  * - templates: array of template objects
@@ -25,6 +26,8 @@
  *   - name: string - Template display name
  *   - description: string (optional) - Template description (truncated to 200 chars by default)
  *   - type: string - Template type ('project' or 'issue')
+ *   - projectId: string (optional) - Associated project ID from templateData
+ *   - teamId: string (optional) - Associated team ID from templateData
  *   - createdAt: string (optional) - ISO timestamp
  *   - updatedAt: string (optional) - ISO timestamp
  * - totalTemplates: number - Count of returned templates
@@ -56,6 +59,7 @@ import { createLinearClient } from './client.js';
 import { executeGraphQL } from './graphql-helpers.js';
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
+import { validateNoControlChars } from '../config/lib/sanitize.js';
 
 /**
  * GraphQL query for listing templates
@@ -69,6 +73,7 @@ const LIST_TEMPLATES_QUERY = `
       name
       description
       type
+      templateData
       createdAt
       updatedAt
     }
@@ -98,7 +103,13 @@ export const listProjectTemplatesParams = z.object({
   fullDescription: z.boolean()
     .default(false)
     .optional()
-    .describe('Return full description without truncation (default: false for token efficiency)')
+    .describe('Return full description without truncation (default: false for token efficiency)'),
+
+  // Project ID filter for template-project associations
+  projectId: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .optional()
+    .describe('Filter templates by associated project ID from templateData')
 });
 
 export type ListProjectTemplatesInput = z.infer<typeof listProjectTemplatesParams>;
@@ -112,6 +123,8 @@ export const listProjectTemplatesOutput = z.object({
     name: z.string(),
     description: z.string().optional(),
     type: z.string(),
+    projectId: z.string().optional(),
+    teamId: z.string().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional()
   })),
@@ -131,9 +144,39 @@ interface TemplatesResponse {
     name: string;
     description?: string | null;
     type?: string | null;
+    templateData?: unknown;
     createdAt?: string | null;
     updatedAt?: string | null;
   }> | null;
+}
+
+interface ParsedTemplateData {
+  projectId?: string;
+  teamId?: string;
+  [key: string]: unknown;
+}
+
+/**
+ * Parse templateData field which can be JSON string or object
+ */
+function parseTemplateData(raw: unknown): ParsedTemplateData | null {
+  if (!raw) return null;
+
+  // Handle JSON string
+  if (typeof raw === 'string') {
+    try {
+      return JSON.parse(raw) as ParsedTemplateData;
+    } catch {
+      return null;
+    }
+  }
+
+  // Handle object
+  if (typeof raw === 'object') {
+    return raw as ParsedTemplateData;
+  }
+
+  return null;
 }
 
 /**
@@ -184,26 +227,44 @@ export const listProjectTemplates = {
       templates = templates.filter(t => t.type === typeFilter);
     }
 
+    // Parse templateData and extract projectId/teamId
+    const templatesWithParsedData = templates.map(template => {
+      const parsedData = parseTemplateData(template.templateData);
+      return {
+        ...template,
+        projectId: parsedData?.projectId,
+        teamId: parsedData?.teamId
+      };
+    });
+
+    // Apply projectId filter if specified
+    const projectIdFilter = validated.projectId;
+    const filteredTemplates = projectIdFilter
+      ? templatesWithParsedData.filter(t => t.projectId === projectIdFilter)
+      : templatesWithParsedData;
+
     // Apply client-side limit
     const limit = validated.limit ?? 50;
-    templates = templates.slice(0, limit);
+    const limitedTemplates = filteredTemplates.slice(0, limit);
 
     // Apply defaults
     const fullDescription = validated.fullDescription ?? false;
 
     // Filter to essential fields
     const baseData = {
-      templates: templates.map((template) => ({
+      templates: limitedTemplates.map((template) => ({
         id: template.id,
         name: template.name,
         description: fullDescription
           ? template.description || undefined
           : template.description?.substring(0, 200) || undefined,
         type: template.type || 'unknown',
+        projectId: template.projectId || undefined,
+        teamId: template.teamId || undefined,
         createdAt: template.createdAt || undefined,
         updatedAt: template.updatedAt || undefined
       })),
-      totalTemplates: templates.length
+      totalTemplates: limitedTemplates.length
     };
 
     const filtered = {

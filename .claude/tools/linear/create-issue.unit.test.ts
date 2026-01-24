@@ -29,10 +29,17 @@ vi.mock('./lib/resolve-ids.js', () => ({
   resolveTeamId: vi.fn().mockResolvedValue('team-uuid'),
 }));
 
+// Mock resolve-template for template lookup
+vi.mock('./lib/resolve-template.js', () => ({
+  resolveTemplateForProject: vi.fn(),
+}));
+
 // Import the wrapper to test
 import { createIssue } from './create-issue';
 import { createLinearClient } from './client.js';
 import { executeGraphQL } from './graphql-helpers.js';
+import { resolveTemplateForProject } from './lib/resolve-template.js';
+import { resolveProjectId } from './lib/resolve-ids.js';
 
 describe('createIssue - Unit Tests', () => {
   const mockClient = {};
@@ -423,6 +430,186 @@ describe('createIssue - Unit Tests', () => {
       });
 
       expect(executeGraphQL).toHaveBeenCalled();
+    });
+  });
+
+  describe('Template Support', () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      vi.mocked(createLinearClient).mockResolvedValue(mockClient as any);
+      vi.mocked(executeGraphQL).mockResolvedValue(sampleGraphQLResponse as any);
+      vi.mocked(resolveProjectId).mockResolvedValue('project-uuid');
+      vi.mocked(resolveTemplateForProject).mockReset();
+    });
+
+    it('should pass templateId to GraphQL mutation when provided', async () => {
+      const templateId = 'template-uuid-123';
+
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        templateId,
+      });
+
+      // Verify GraphQL mutation was called with templateId in input
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('issueCreate'),
+        expect.objectContaining({
+          input: expect.objectContaining({
+            templateId,
+          }),
+        })
+      );
+    });
+
+    it('should not include templateId in mutation when not provided', async () => {
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+      });
+
+      // Verify mutation input does not have templateId
+      const callArgs = vi.mocked(executeGraphQL).mock.calls[0];
+      const variables = callArgs[2] as any;
+      expect(variables.input.templateId).toBeUndefined();
+    });
+
+    it('should lookup template when autoApplyProjectTemplate is true and project provided', async () => {
+      const projectId = 'project-uuid';
+      const templateId = 'resolved-template-uuid';
+
+      vi.mocked(resolveTemplateForProject).mockResolvedValueOnce(templateId);
+
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        project: 'My Project',
+        autoApplyProjectTemplate: true,
+      });
+
+      // Verify resolveTemplateForProject was called with resolved project ID
+      expect(resolveTemplateForProject).toHaveBeenCalledWith(mockClient, projectId);
+
+      // Verify templateId was included in mutation
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('issueCreate'),
+        expect.objectContaining({
+          input: expect.objectContaining({
+            templateId,
+          }),
+        })
+      );
+    });
+
+    it('should not lookup template when autoApplyProjectTemplate is false', async () => {
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        project: 'My Project',
+        autoApplyProjectTemplate: false,
+      });
+
+      // Verify resolveTemplateForProject was NOT called
+      expect(resolveTemplateForProject).not.toHaveBeenCalled();
+    });
+
+    it('should use provided templateId over auto-lookup', async () => {
+      const explicitTemplateId = 'explicit-template-uuid';
+      const autoTemplateId = 'auto-template-uuid';
+
+      vi.mocked(resolveTemplateForProject).mockResolvedValueOnce(autoTemplateId);
+
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        project: 'My Project',
+        templateId: explicitTemplateId,
+        autoApplyProjectTemplate: true,
+      });
+
+      // Verify resolveTemplateForProject was NOT called (explicit ID takes precedence)
+      expect(resolveTemplateForProject).not.toHaveBeenCalled();
+
+      // Verify explicit templateId was used
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('issueCreate'),
+        expect.objectContaining({
+          input: expect.objectContaining({
+            templateId: explicitTemplateId,
+          }),
+        })
+      );
+    });
+
+    it('should proceed without template if auto-lookup finds nothing', async () => {
+      // Clear previous mocks and set up this test's mocks
+      vi.clearAllMocks();
+      vi.mocked(createLinearClient).mockResolvedValue(mockClient as any);
+      vi.mocked(executeGraphQL).mockResolvedValue(sampleGraphQLResponse as any);
+      vi.mocked(resolveProjectId).mockResolvedValue('project-uuid');
+
+      // Mock resolveTemplateForProject returning undefined
+      vi.mocked(resolveTemplateForProject).mockResolvedValueOnce(undefined);
+
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        project: 'My Project',
+        autoApplyProjectTemplate: true,
+      });
+
+      // Verify issue was still created
+      expect(executeGraphQL).toHaveBeenCalled();
+
+      // Verify templateId was NOT included in mutation
+      const callArgs = vi.mocked(executeGraphQL).mock.calls[0];
+      const variables = callArgs[2] as any;
+      expect(variables.input.templateId).toBeUndefined();
+    });
+
+    it('should proceed without template if auto-lookup throws error', async () => {
+      // Clear previous mocks and set up this test's mocks
+      vi.clearAllMocks();
+      vi.mocked(createLinearClient).mockResolvedValue(mockClient as any);
+      vi.mocked(executeGraphQL).mockResolvedValue(sampleGraphQLResponse as any);
+      vi.mocked(resolveProjectId).mockResolvedValue('project-uuid');
+
+      const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+      // Mock resolveTemplateForProject throwing error
+      vi.mocked(resolveTemplateForProject).mockRejectedValueOnce(new Error('Template lookup failed'));
+
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        project: 'My Project',
+        autoApplyProjectTemplate: true,
+      });
+
+      // Verify issue was still created
+      expect(executeGraphQL).toHaveBeenCalled();
+
+      // Verify warning was logged
+      expect(consoleWarnSpy).toHaveBeenCalledWith(
+        expect.stringContaining('Template lookup failed')
+      );
+
+      consoleWarnSpy.mockRestore();
+    });
+
+    it('should not auto-lookup template when project is not provided', async () => {
+      await createIssue.execute({
+        title: 'Test Issue',
+        team: 'Engineering',
+        autoApplyProjectTemplate: true,
+        // No project provided
+      });
+
+      // Verify resolveTemplateForProject was NOT called
+      expect(resolveTemplateForProject).not.toHaveBeenCalled();
     });
   });
 });

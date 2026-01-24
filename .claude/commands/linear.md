@@ -113,6 +113,30 @@ npx tsx -e "import { setDefaultTeam } from './.claude/tools/linear/lib/team-sele
 
 ---
 
+## Template Auto-Apply Rule (MANDATORY)
+
+**When creating issues for a project, ALWAYS include `autoApplyProjectTemplate: true`.**
+
+This applies when:
+- User says "create issue for project X"
+- User says "add issue to project X"
+- User says "create sub-issue in project X"
+- Any issue creation that mentions a project name/ID
+
+**Example:**
+```typescript
+await createIssue.execute({
+  title: 'Issue title',
+  team: 'Engineering',
+  project: 'Development Agentification',
+  autoApplyProjectTemplate: true  // ALWAYS when project specified
+});
+```
+
+This ensures project-specific templates (title prefix, description structure, default labels/state) are applied automatically. If no template is associated with the project, the issue is created normally.
+
+---
+
 ## Tips for Best Results
 
 - **Be specific**: "create issue for auth bug" > "make issue"
