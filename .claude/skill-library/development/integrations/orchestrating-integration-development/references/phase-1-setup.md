@@ -166,7 +166,29 @@ worktree:
 
 ---
 
-## Step 5: Initialize TodoWrite
+## Step 5: Register Orchestration Session
+
+**Register the manifest path for this session so compaction hooks can find it.**
+
+This ensures that only THIS session's compaction injects orchestration state, not unrelated sessions.
+
+Create the session mapping file:
+
+```bash
+SESSION_ID="${CLAUDE_SESSION_ID}"
+cat > .claude/hooks/orchestration-session-${SESSION_ID}.json << EOF
+{
+  "manifest_path": ".claude/.output/integrations/{workflow-id}/MANIFEST.yaml",
+  "registered_at": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+}
+EOF
+```
+
+**Cleanup:** This file is automatically cleaned up in Phase 16 (Completion).
+
+---
+
+## Step 6: Initialize TodoWrite
 
 ```
 TodoWrite([

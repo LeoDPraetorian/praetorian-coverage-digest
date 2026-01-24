@@ -311,6 +311,19 @@ Then re-ask about PR creation.
 
 ---
 
+## Orchestration Session Cleanup
+
+**Clean up the session-to-manifest mapping file created in Phase 1.**
+
+This prevents stale orchestration context from being injected into future compactions:
+
+```bash
+SESSION_ID="${CLAUDE_SESSION_ID}"
+rm -f .claude/hooks/orchestration-session-${SESSION_ID}.json
+```
+
+---
+
 ## Skip Conditions
 
 Phase 16 always runs. It is the final phase regardless of work type.

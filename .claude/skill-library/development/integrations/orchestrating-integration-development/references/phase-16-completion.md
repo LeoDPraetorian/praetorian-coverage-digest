@@ -130,6 +130,19 @@ git branch -d feature/{vendor}-integration  # if merged
 
 ---
 
+## Step 7b: Orchestration Session Cleanup
+
+**Clean up the session-to-manifest mapping file created in Phase 1.**
+
+This prevents stale orchestration context from being injected into future compactions:
+
+```bash
+SESSION_ID="${CLAUDE_SESSION_ID}"
+rm -f .claude/hooks/orchestration-session-${SESSION_ID}.json
+```
+
+---
+
 ## Step 8: Final Human Checkpoint
 
 **🛑 REQUIRED:** Obtain human approval before marking complete.

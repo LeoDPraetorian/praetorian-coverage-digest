@@ -227,6 +227,26 @@ git branch -d feature/{feature-name}
 
 ---
 
+## Orchestration Session Cleanup
+
+**Clean up the session-to-manifest mapping file created in Phase 1.**
+
+This prevents stale orchestration context from being injected into future compactions:
+
+```bash
+# Get session ID from environment
+SESSION_ID="${CLAUDE_SESSION_ID}"
+
+# Remove session mapping file
+rm -f .claude/hooks/orchestration-session-${SESSION_ID}.json
+```
+
+Alternatively, if Bash is not available, use the filesystem to delete the file.
+
+**Why this matters:** Without cleanup, compaction hooks might inject "you are in an orchestrated workflow" context into sessions that have already completed their orchestration.
+
+---
+
 ## Final MANIFEST Update
 
 ```yaml
