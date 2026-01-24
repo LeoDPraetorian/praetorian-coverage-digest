@@ -81,9 +81,15 @@ export function buildGraphQLRequest(
 export function parseGraphQLResponse<T>(response: GraphQLResponse<T>): T {
   // Check for GraphQL errors first
   if (response.errors && response.errors.length > 0) {
-    const messages = response.errors.map((e) => e.message).join('; ');
+    // Preserve full error details including path and extensions
+    const errorDetails = response.errors.map((e: any) => {
+      const path = e.path ? ` at ${e.path.join('.')}` : '';
+      const extensions = e.extensions ? ` (${JSON.stringify(e.extensions)})` : '';
+      return `${e.message}${path}${extensions}`;
+    }).join('\n');
+
     throw new GraphQLError(
-      `GraphQL errors: ${messages}`,
+      `GraphQL error:\n${errorDetails}`,
       response.errors
     );
   }

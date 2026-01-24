@@ -120,6 +120,83 @@ interface ProjectsForResolutionResponse {
   };
 }
 
+interface TeamsResponse {
+  teams: {
+    nodes: Array<{
+      id: string;
+      name: string;
+      key?: string | null;
+    }>;
+  };
+}
+
+/**
+ * GraphQL query to fetch teams for resolution
+ */
+const TEAMS_QUERY = `
+  query TeamsForResolution {
+    teams(first: 250) {
+      nodes {
+        id
+        name
+        key
+      }
+    }
+  }
+`;
+
+/**
+ * Resolve team name to team UUID
+ *
+ * @param client - GraphQL client
+ * @param teamNameOrId - Team name or UUID
+ * @returns Team UUID
+ * @throws Error if team not found, includes available teams
+ *
+ * @example
+ * ```typescript
+ * // Resolve by name
+ * const teamId = await resolveTeamId(client, 'Engineering');
+ *
+ * // UUID pass-through
+ * const teamId = await resolveTeamId(client, '550e8400-...');
+ * ```
+ */
+export async function resolveTeamId(
+  client: HTTPPort,
+  teamNameOrId: string
+): Promise<string> {
+  // If already a UUID, return as-is
+  if (isUUID(teamNameOrId)) {
+    return teamNameOrId;
+  }
+
+  // Query all teams
+  const response = await executeGraphQL<TeamsResponse>(
+    client,
+    TEAMS_QUERY,
+    {}
+  );
+
+  const teams = response.teams?.nodes || [];
+
+  // Find matching team (case-insensitive)
+  const team = teams.find(
+    (t) => t.name.toLowerCase() === teamNameOrId.toLowerCase()
+  );
+
+  if (!team) {
+    const availableTeams = teams.map(t => t.name).join(', ');
+    throw new Error(
+      `Team not found: ${teamNameOrId}\n\n` +
+      `Available teams: ${availableTeams || '(none)'}\n\n` +
+      `Tip: Team names are case-insensitive but must match exactly.`
+    );
+  }
+
+  return team.id;
+}
+
 /**
  * Resolve state name (e.g., "Done", "In Progress") to state UUID
  *

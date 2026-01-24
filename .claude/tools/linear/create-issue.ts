@@ -75,7 +75,7 @@ import {
 } from '../config/lib/sanitize.js';
 import { estimateTokens } from '../config/lib/response-utils.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
-import { resolveStateId, resolveAssigneeId, resolveProjectId } from './lib/resolve-ids.js';
+import { resolveStateId, resolveAssigneeId, resolveProjectId, resolveTeamId } from './lib/resolve-ids.js';
 import { resolveTemplateForProject } from './lib/resolve-template.js';
 
 /**
@@ -257,6 +257,9 @@ export const createIssue = {
     }
 
     // Build GraphQL input - map field names to Linear API format
+    // Resolve team name to UUID before creating mutation input
+    const teamId = await resolveTeamId(client, createParams.team);
+
     const mutationInput: {
       title: string;
       description?: string;
@@ -271,7 +274,7 @@ export const createIssue = {
       templateId?: string;
     } = {
       title: createParams.title,
-      teamId: createParams.team, // team → teamId
+      teamId: teamId, // Resolved team UUID
     };
 
     // Add optional fields if present
@@ -283,8 +286,8 @@ export const createIssue = {
       mutationInput.assigneeId = await resolveAssigneeId(client, createParams.assignee);
     }
     if (createParams.state) {
-      // Resolve state name to UUID (uses team parameter as teamId)
-      mutationInput.stateId = await resolveStateId(client, createParams.team, createParams.state);
+      // Resolve state name to UUID (uses resolved teamId)
+      mutationInput.stateId = await resolveStateId(client, teamId, createParams.state);
     }
     if (createParams.priority !== undefined) {
       mutationInput.priority = createParams.priority;
@@ -313,8 +316,17 @@ export const createIssue = {
       { input: mutationInput }
     );
 
-    if (!response.issueCreate?.success || !response.issueCreate?.issue) {
-      throw new Error('Failed to create issue');
+    if (!response.issueCreate?.success) {
+      throw new Error(
+        'Failed to create issue. Check that:\n' +
+        '- Team exists and you have access\n' +
+        '- All required fields are provided (title, team)\n' +
+        '- Optional fields (assignee, state, project) reference valid entities'
+      );
+    }
+
+    if (!response.issueCreate?.issue) {
+      throw new Error('Failed to create issue: No issue returned from API');
     }
 
     // If cycle was provided, update the issue to assign it

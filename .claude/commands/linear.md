@@ -22,12 +22,13 @@ This is the PRIMARY interface for all Linear operations. Describe what you want 
 
 When creating issues, the command needs a team. The team selector provides an intelligent flow:
 
-### Step 1: Check for Saved Default
+### Step 1: List All Teams
 
-Before prompting, check if user has a saved default team:
+Get all available teams to show options or check for defaults:
 
 ```bash
-npx tsx -e "import { getDefaultTeam } from './.claude/tools/linear/lib/team-selector.js'; import { PreferenceManager } from './.claude/tools/config/lib/preference-manager.js'; const manager = new PreferenceManager('linear'); getDefaultTeam(manager).then(r => console.log(JSON.stringify(r)))"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && \
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-teams '{}' 2>/dev/null
 ```
 
 ### Step 2: Confirm or Select Team
@@ -40,30 +41,17 @@ npx tsx -e "import { getDefaultTeam } from './.claude/tools/linear/lib/team-sele
 **If result.value === null or undefined** (no default):
 - Proceed to Step 3
 
-### Step 3: Fetch Teams with Hierarchy
+### Step 3: Present Team Options
 
-```bash
-npx tsx -e "import { fetchTeamsWithHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { listTeams } from './.claude/tools/linear/list-teams.js'; fetchTeamsWithHierarchy(() => listTeams.execute({})).then(r => console.log(JSON.stringify(r)))"
-```
+Parse the teams result and use AskUserQuestion to:
+- Show team names to user
+- Let user select their team
+- Handle parent/child team hierarchy if present
 
-### Step 4: Organize and Present Teams
-
-```bash
-npx tsx -e "import { organizeTeamHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { fetchTeamsWithHierarchy } from './.claude/tools/linear/lib/team-selector.js'; import { listTeams } from './.claude/tools/linear/list-teams.js'; (async () => { const result = await fetchTeamsWithHierarchy(() => listTeams.execute({})); if (result.ok) { const hierarchy = organizeTeamHierarchy(result.value); console.log(JSON.stringify(hierarchy)); } })();"
-```
-
-Use AskUserQuestion to:
-- Present hierarchy.parents as parent team options
-- If user selects a parent with sub-teams, use getSiblingSubTeams() to show sub-team options
-- Continue drill-down until final team selected
-
-### Step 5: Save as Default (Optional)
-
-After team selection, ask user if they want to save as default:
-
-```bash
-npx tsx -e "import { setDefaultTeam } from './.claude/tools/linear/lib/team-selector.js'; import { PreferenceManager } from './.claude/tools/config/lib/preference-manager.js'; const manager = new PreferenceManager('linear'); setDefaultTeam(manager, { id: 'TEAM_ID', name: 'TEAM_NAME' }).then(r => console.log(JSON.stringify(r)))"
-```
+The list-teams result includes:
+- `teams.nodes[]` - array of team objects with `id`, `name`, `key`
+- Use team `name` for display
+- Use team `id` or `key` for issue creation
 
 ---
 
@@ -182,21 +170,26 @@ Only proceed if:
 ### Get Issue (Direct Execution)
 
 ```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { getIssue } = await import('$ROOT/.claude/tools/linear/get-issue.ts');
-  const result = await getIssue.execute({ id: 'CHARIOT-1301' });
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>&1 | grep -v "^\[" | grep -v "^No credentials"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" get-issue '{"id":"CHARIOT-1301"}' 2>/dev/null
 ```
 
 ### List Issues (Direct Execution)
 
 ```bash
-ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
-  const { listIssues } = await import('$ROOT/.claude/tools/linear/list-issues.ts');
-  const result = await listIssues.execute({ limit: 20 });
-  console.log(JSON.stringify(result, null, 2));
-})();" 2>&1 | grep -v "^\[" | grep -v "^No credentials"
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-issues '{"limit":20}' 2>/dev/null
+```
+
+### Create Issue (Direct Execution)
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" create-issue '{
+  "title":"Fix bug",
+  "team":"Engineering",
+  "description":"Description here"
+}' 2>/dev/null
 ```
 
 ### Error Handling Notes

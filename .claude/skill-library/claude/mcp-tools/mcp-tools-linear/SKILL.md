@@ -340,6 +340,36 @@ Based on the [Linear GraphQL API](https://linear.app/developers/graphql) and [Ap
 
 ## Usage Examples
 
+### Recommended: CLI Runner
+
+For reliable execution, use the CLI runner script instead of inline tsx -e:
+
+```bash
+ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)"
+
+# Create issue
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" create-issue '{"title":"Fix bug","team":"Engineering"}'
+
+# List issues
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-issues '{"limit":10}'
+
+# Get issue
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" get-issue '{"id":"ENG-123"}'
+
+# List teams
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-teams '{}'
+
+# List projects
+npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-projects '{}'
+```
+
+**Why CLI runner?**
+- Avoids tsx -e module resolution issues
+- Provides consistent error handling
+- Enables better debugging with stack traces
+- No complex quoting/escaping for JSON params
+- Reliable execution across different shell environments
+
 ### OAuth Setup (First Time)
 
 ```bash
@@ -356,11 +386,15 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 # After approval, tokens saved automatically
 ```
 
-### Common Operations
+### Fallback: Direct Execution (Debugging Only)
+
+**Note:** The inline tsx -e pattern below may fail due to module resolution issues.
+Use the CLI runner above for production workflows.
 
 **Create Issue:**
 
 ```bash
+# Only use this for debugging or when CLI runner is unavailable
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
   const { createIssue } = await import('$ROOT/.claude/tools/linear/create-issue.ts');
   const result = await createIssue.execute({
