@@ -1,5 +1,5 @@
 ---
-description: Create new NoseyParker credential detection rules with human-in-the-loop GitHub validation - automated 11-phase workflow (~75% automated, 7 min human time)
+description: Use when creating NoseyParker credential detection rules - human-in-the-loop GitHub validation workflow
 allowed-tools: Skill, AskUserQuestion, Read, Write, Bash, WebSearch
 argument-hint: <credential-type>
 ---

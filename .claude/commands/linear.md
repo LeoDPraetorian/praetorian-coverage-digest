@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Linear - just describe what you want, no syntax to memorize!
+description: Use when managing Linear issues, projects, or workflows - just describe what you want
 argument-hint: <describe your operation naturally>
 allowed-tools: Bash, Read, Skill
 ---

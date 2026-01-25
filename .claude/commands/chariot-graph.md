@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Chariot graph queries - complex relationship queries via Neo4j
+description: Use when querying Chariot graph relationships or patterns - just describe what you want
 argument-hint: <describe your query naturally>
 allowed-tools: Bash, Read
 ---

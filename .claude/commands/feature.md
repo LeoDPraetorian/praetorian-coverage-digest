@@ -1,5 +1,5 @@
 ---
-description: Complete feature development - brainstorm, plan, architect, implement, review, test (12 phases with parallel agents)
+description: Use when building a complete feature end-to-end - brainstorm, plan, architect, implement, review, test (12 phases)
 allowed-tools: Read, TodoWrite, Task, Bash, Grep, Glob, AskUserQuestion
 argument-hint: <feature-description>
 ---

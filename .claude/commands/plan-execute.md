@@ -1,5 +1,5 @@
 ---
-description: Execute plan in batches with review checkpoints
+description: Use when executing implementation plans - batch execution with review checkpoints
 model: sonnet
 allowed-tools: Skill, Read, Write, Bash, Task
 ---

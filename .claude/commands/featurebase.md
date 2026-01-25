@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Featurebase - just describe what you want, no syntax to memorize!
+description: Use when managing feedback posts, changelog entries, or help articles - just describe what you want
 argument-hint: <describe your operation naturally>
 allowed-tools: Bash, Read, Skill
 ---

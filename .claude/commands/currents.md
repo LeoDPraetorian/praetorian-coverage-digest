@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Currents - just describe what you want, no syntax to memorize!
+description: Use when checking test runs, failures, or performance metrics - just describe what you want
 argument-hint: <describe your operation naturally>
 allowed-tools: Bash, Read, Skill
 ---

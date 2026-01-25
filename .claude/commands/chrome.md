@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Chrome DevTools - browser automation, network inspection, debugging
+description: Use when automating browser, inspecting network, or debugging frontend - just describe what you want
 argument-hint: <describe your operation naturally>
 allowed-tools: Bash, Read
 ---

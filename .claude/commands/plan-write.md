@@ -1,5 +1,5 @@
 ---
-description: Create detailed implementation plan with bite-sized tasks
+description: Use when creating implementation plans - detailed tasks for engineers with zero codebase context
 model: sonnet
 allowed-tools: Skill, Read, Write
 ---

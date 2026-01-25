@@ -1,5 +1,5 @@
 ---
-description: Complete feature development - brainstorm, plan, architect, implement, review, test (8 phases with parallel agents)
+description: Use when building security capabilities (VQL, Nuclei, scanners) - brainstorm, plan, architect, implement, review, test (8 phases)
 allowed-tools: Read, AskUserQuestion, Task, TodoWrite, Glob, Grep
 argument-hint: <feature-description>
 ---

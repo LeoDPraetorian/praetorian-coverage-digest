@@ -1,5 +1,5 @@
 ---
-description: Multi-phase threat modeling with parallel agents, human checkpoints, and structured outputs (MD + JSON + SARIF)
+description: Use when threat modeling a codebase or system - multi-phase with parallel agents and structured outputs
 argument-hint: [scope]
 allowed-tools: Skill, AskUserQuestion
 ---

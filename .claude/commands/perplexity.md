@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Perplexity AI - web search, research, reasoning, and conversational AI
+description: Use when researching topics, searching the web, or needing AI reasoning - just describe what you want
 argument-hint: <describe your query naturally>
 allowed-tools: Bash, Read
 ---

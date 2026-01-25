@@ -1,5 +1,5 @@
 ---
-description: Agent management - create, update, audit, fix, rename, test, search, or list for agents
+description: Use when managing agents (create, update, audit, fix, rename, test, search, list) - just describe what you want
 argument-hint: <create|update|audit|fix|rename|test|search|list> [agent-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion

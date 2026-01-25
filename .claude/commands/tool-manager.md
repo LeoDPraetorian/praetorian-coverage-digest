@@ -1,5 +1,5 @@
 ---
-description: Tool wrapper management - create, update, audit, fix, test, list MCP and REST API wrappers with TDD enforcement
+description: Use when managing tool wrappers (create, update, audit, fix, test, list) - MCP and REST API wrappers with TDD
 argument-hint: <create|update|audit|fix|test|list> [service] [tool]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion

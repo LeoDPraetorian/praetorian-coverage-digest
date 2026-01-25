@@ -1,5 +1,5 @@
 ---
-description: Complete feature development - brainstorm, plan, architect, implement, review, test (8 phases with parallel agents)
+description: Use when building fingerprintx plugins - brainstorm, plan, architect, implement, review, test (8 phases)
 allowed-tools: Read, AskUserQuestion
 argument-hint: <feature-description>
 ---

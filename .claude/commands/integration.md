@@ -1,5 +1,5 @@
 ---
-description: Complete integration development - brainstorm, plan, architect, implement, review, test (8 phases with parallel agents)
+description: Use when building third-party integrations - brainstorm, plan, architect, implement, review, test (8 phases)
 allowed-tools: Read, AskUserQuestion
 argument-hint: <integration-description>
 ---

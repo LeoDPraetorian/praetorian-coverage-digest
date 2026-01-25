@@ -1,5 +1,5 @@
 ---
-description: Command management - create, audit, fix, list slash commands
+description: Use when managing slash commands (create, audit, fix, list) - just describe what you want
 argument-hint: <create|audit|fix|list> [command-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion

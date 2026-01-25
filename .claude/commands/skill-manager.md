@@ -1,5 +1,5 @@
 ---
-description: Skill management - create, update, delete, audit, fix, rename, migrate, search, list, or compare skills
+description: Use when managing skills (create, update, audit, fix, delete, rename, migrate, search, list, compare) - just describe what you want
 argument-hint: <create|update|delete|audit|fix|rename|migrate|search|list|compare> [skill-name] [options]
 model: sonnet
 allowed-tools: Skill, AskUserQuestion

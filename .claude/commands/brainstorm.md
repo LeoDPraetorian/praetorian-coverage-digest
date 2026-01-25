@@ -1,5 +1,5 @@
 ---
-description: Interactive design refinement using Socratic method
+description: Use when refining ideas or designs interactively - Socratic method for collaborative exploration
 model: sonnet
 allowed-tools: Skill, Read, Write
 ---

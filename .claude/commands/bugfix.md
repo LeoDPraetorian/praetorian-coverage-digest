@@ -1,5 +1,5 @@
 ---
-description: Fix a bug with systematic debugging and TDD (lightweight, ~20-40 min)
+description: Use when fixing bugs with systematic debugging and TDD - lightweight workflow for targeted fixes
 allowed-tools: Skill, AskUserQuestion
 argument-hint: <bug-description-and-symptoms>
 ---

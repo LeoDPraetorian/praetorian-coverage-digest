@@ -1,5 +1,5 @@
 ---
-description: Sequential research across multiple sources with intent expansion, conflict detection, and synthesis
+description: Use when researching topics across multiple sources - intent expansion, conflict detection, synthesis
 argument-hint: <research query>
 allowed-tools: Task, TodoWrite, Read, Write, AskUserQuestion, Glob, Grep, Bash
 ---

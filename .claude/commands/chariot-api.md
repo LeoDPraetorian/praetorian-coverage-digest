@@ -1,5 +1,5 @@
 ---
-description: Natural language interface for Chariot API - list/get assets, jobs, risks via Praetorian CLI
+description: Use when querying Chariot assets, jobs, or risks - just describe what you want
 argument-hint: <describe your operation naturally>
 allowed-tools: Bash, Read
 ---

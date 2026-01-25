@@ -1,5 +1,5 @@
 ---
-description: Customize Nighthawk C2 profiles per-engagement with domain fronting
+description: Use when customizing Nighthawk C2 profiles per-engagement - domain fronting and red team configuration
 allowed-tools: Skill, AskUserQuestion, Read, Bash
 skills: gateway-redteam
 ---

@@ -1,5 +1,5 @@
 ---
-description: Close a rationalization loophole after observing an agent or Claude skip required behavior
+description: Use when closing rationalization loopholes - fix skills after observing agents skip required behavior
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite, AskUserQuestion, Task
 ---
 
