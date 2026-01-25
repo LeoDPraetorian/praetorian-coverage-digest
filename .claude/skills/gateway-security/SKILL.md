@@ -69,6 +69,7 @@ This gateway implements 3-tier loading:
 | "frontend security" / "React security" / "XSS"                   | → `reviewing-frontend-security`            |
 | "PlexTrac" / "finding format" / "report writing" / "VKB"         | → `formatting-plextrac-findings`           |
 | "CIS" / "benchmark" / "compliance mapping"                       | → `mapping-to-cis-benchmarks`              |
+| "M365 audit" / "M365 benchmark" / "run CIS M365"                 | → `running-cis-m365-benchmarks`            |
 | "FDA" / "medical device" / "510(k)" / "SBOM"                     | → `mapping-to-fda-cybersecurity`           |
 | "Windows internals" / "kernel" / "CreateProcess"                 | → `windows-internals`                      |
 | "Windows authentication" / "Kerberos" / "NTLM"                   | → `windows-security-internals`             |
@@ -154,10 +155,11 @@ This gateway implements 3-tier loading:
 
 ### Compliance Frameworks
 
-| Skill                        | Path                                                                     | Triggers                               |
-| ---------------------------- | ------------------------------------------------------------------------ | -------------------------------------- |
-| Mapping to CIS Benchmarks    | `.claude/skill-library/frameworks/mapping-to-cis-benchmarks/SKILL.md`    | CIS, benchmark, compliance mapping     |
-| Mapping to FDA Cybersecurity | `.claude/skill-library/frameworks/mapping-to-fda-cybersecurity/SKILL.md` | FDA, medical device, 510(k), SBOM, CVD |
+| Skill                           | Path                                                                           | Triggers                               |
+| ------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------- |
+| Mapping to CIS Benchmarks       | `.claude/skill-library/frameworks/mapping-to-cis-benchmarks/SKILL.md`          | CIS, benchmark, compliance mapping     |
+| Running CIS M365 Benchmarks     | `.claude/skill-library/security/running-cis-m365-benchmarks/SKILL.md`          | M365 audit, M365 benchmark, run CIS M365, M365 security assessment |
+| Mapping to FDA Cybersecurity    | `.claude/skill-library/frameworks/mapping-to-fda-cybersecurity/SKILL.md`       | FDA, medical device, 510(k), SBOM, CVD |
 
 ### Reconnaissance Tools
 

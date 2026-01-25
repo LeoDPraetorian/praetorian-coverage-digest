@@ -1,0 +1,61 @@
+# Changelog - running-cis-m365-benchmarks
+
+## 2026-01-21 - Initial Creation
+
+**Phase**: Creation (RED-GREEN-REFACTOR)
+
+**Category**: security (library skill)
+
+**Skill Type**: Process/Pattern
+
+**RED Phase - Failure Documentation**:
+
+**Test Scenario**: Engineer asks "I need to run a CIS M365 benchmark audit for a client. How do I get started?" (without repository access)
+
+**Failure Behavior (without skill)**:
+- Agent provided generic M365 audit guidance (ScubaGear, Microsoft 365 DSC, Maester)
+- Did NOT mention Praetorian's m365-cis-benchmark-powershell-scripts repository
+- Suggested manual PowerShell module installation instead of Docker approach
+- Provided individual connection commands instead of Azure CLI device code auth
+- Recommended manual script approach instead of automated containerized audit
+- No mention of Docker workflow or Praetorian-specific tooling
+
+**Verbatim Quote from Failure**:
+> "Open Source Alternatives: **ScubaGear** - CISA's M365 Security Configuration Baseline Assessment tool"
+> "Install Microsoft Graph modules... Install ExchangeOnlineManagement... MicrosoftTeams... SharePointOnlinePowerShell"
+> "Connect to Microsoft Graph... Connect to Exchange Online... Connect to Teams"
+
+**Gap Identified**: Engineers need to be directed to Praetorian's Docker-based M365 audit tooling instead of being given generic M365 benchmark guidance.
+
+**GREEN Phase**: ✅ Verified (Phase 8)
+- Re-tested scenario with skill loaded (agent ID: a901fa3)
+- Agent now directs to Praetorian repository instead of generic tools
+- Provides Docker workflow, device code auth, specific GitHub URL
+- Includes comparison table (Praetorian vs generic approaches)
+- Gap successfully closed: Engineer receives Praetorian-specific guidance
+- Audit completed: Passes critical phases (frontmatter, description, line count, Integration section)
+
+**REFACTOR Phase**: ✅ Completed (Phase 9)
+- Executed comprehensive pressure testing with 3 scenarios
+- **Time Pressure**: Agent resisted shortcut despite 5-hour deadline (agent ID: af6de7f)
+- **Authority Pressure**: Agent resisted senior engineer's ScubaGear recommendation (agent ID: a679bf6)
+- **Sunk Cost Pressure**: Agent recommended switching despite 2 hours invested (agent ID: ae8ec80)
+- **Result**: All 3 pressure tests PASSED - skill is highly resilient to bypass attempts
+- **Key strength**: Agent provided detailed justifications, cost-benefit analyses, and professional framing
+- **No updates needed**: Skill guidance is sufficient to resist common rationalizations
+
+**Research**: Skipped per user request (Phase 6.1)
+- Content populated from repository documentation (README.md, Dockerfile, docker-compose.yml)
+- Created essential reference files:
+  - prerequisites-detailed.md (licensing, consent, timing)
+  - troubleshooting.md (authentication, Docker, audit execution issues)
+- Remaining reference files deferred (can research and populate later if needed)
+
+**Gateway Update** (Phase 7):
+- Added to gateway-security routing table
+- Intent Detection triggers: "M365 audit", "M365 benchmark", "run CIS M365", "M365 security assessment"
+- Located in Compliance Frameworks section alongside mapping-to-cis-benchmarks
+
+**Created By**: Claude Code skill creation workflow
+**Repository**: https://github.com/praetorian-inc/m365-cis-benchmark-powershell-scripts
+**Documentation**: README.md, Dockerfile, docker-compose.yml examined
