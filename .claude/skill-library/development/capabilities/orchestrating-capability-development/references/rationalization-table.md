@@ -32,10 +32,20 @@ If you detect ANY of these phrases in your thinking, STOP. Return to the phase c
 
 ### Phase 4: Skill Discovery
 
-| Rationalization                 | Why It's Wrong                                | Response                               |
-| ------------------------------- | --------------------------------------------- | -------------------------------------- |
-| "I know which skills to use"    | Gateway discovery ensures completeness        | DENIED. Discover gateways dynamically. |
-| "Capability skills are obvious" | Skill manifest enables prompt injection later | DENIED. Write skill-manifest.yaml.     |
+| Rationalization                            | Why It's Wrong                                                      | Response                                            |
+| ------------------------------------------ | ------------------------------------------------------------------- | --------------------------------------------------- |
+| "I know which skills to use"               | Gateway discovery ensures completeness                              | DENIED. Discover gateways dynamically.              |
+| "Capability skills are obvious"            | Skill manifest enables prompt injection later                       | DENIED. Write skill-manifest.yaml.                  |
+| "Skill inventory takes too long, skip it"  | Gap detection requires knowing what skills exist                    | DENIED. Run Glob for core + library skills.         |
+| "No skill gaps, these patterns are common" | Formalized skills prevent hallucination from training data          | DENIED. Verify gaps via inventory comparison.       |
+| "Research can wait until implementation"   | Background research runs parallel without consuming context         | DENIED. Launch research agents in background NOW.   |
+| "Context window is fine, research inline"  | Inline research wastes 15-20 min of current window                  | DENIED. Use run_in_background: true.                |
+| "We can create skills later if needed"     | Skills created on-demand miss Phase 8 implementation window         | DENIED. Gap detection + background research is NOW. |
+| "Fallback strategies aren't necessary"     | Phase 8 agents need explicit guidance when skills unavailable       | DENIED. Document fallback for each gap.             |
+| "Just document gaps, don't research"       | Gaps without research = guaranteed hallucination in Phase 8         | DENIED. Background research OR explicit fallback.   |
+| "Skills will be ready by Phase 8"         | Research agents may not complete in 15-20 min, need tri-state       | DENIED. Track "available/researching/unavailable".  |
+| "One missing skill won't matter"           | Each missing skill = increased hallucination risk                   | DENIED. Systematic gap detection for ALL patterns.  |
+| "Existing skills are good enough"          | Partial coverage (e.g., client-only) leaves server patterns unknown | DENIED. Flag partial gaps for targeted research.    |
 
 ### Phase 6: Brainstorming (LARGE only)
 

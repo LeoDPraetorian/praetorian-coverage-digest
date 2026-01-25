@@ -54,7 +54,7 @@ Multi-phase orchestration involves coordinating multiple agents. Without externa
 | 1     | Setup                 | Worktree creation, output directory, MANIFEST.yaml  | Always      |      |
 | 2     | Triage                | Classify work type, select phases to execute        | Always      |      |
 | 3     | Codebase Discovery    | Explore codebase patterns, detect capability types  | Always      | G1   |
-| 4     | Skill Discovery       | Map technologies to skills, write manifest          | Always      |      |
+| 4     | Skill Discovery       | Map technologies to skills, detect gaps, background research | Always      |      |
 | 5     | Complexity            | Technical complexity assessment, execution strategy | Always      |      |
 | 6     | Brainstorming         | Design refinement with human-in-loop                | LARGE only  |      |
 | 7     | Architecture Plan     | Technical design AND task decomposition             | MEDIUM+     |      |
@@ -118,7 +118,7 @@ This skill uses `.claude/config/orchestration-limits.yaml`:
 - [Phase 1: Setup](references/phase-1-setup.md) - Worktree creation, output directory, MANIFEST.yaml
 - [Phase 2: Triage](references/phase-2-triage.md) - Work type classification (BUGFIX/SMALL/MEDIUM/LARGE)
 - [Phase 3: Codebase Discovery](references/phase-3-codebase-discovery.md) - Explore agent patterns, capability type detection
-- [Phase 4: Skill Discovery](references/phase-4-skill-discovery.md) - Technology-to-skill mapping, manifest writing
+- [Phase 4: Skill Discovery](references/phase-4-skill-discovery.md) - Technology-to-skill mapping, gap detection, background research orchestration
 - [Phase 5: Complexity](references/phase-5-complexity.md) - Technical assessment, execution strategy
 - [Phase 6: Brainstorming](references/phase-6-brainstorming.md) - Design refinement with human-in-loop (LARGE only)
 - [Phase 7: Architecture Plan](references/phase-7-architecture-plan.md) - Technical design AND task decomposition

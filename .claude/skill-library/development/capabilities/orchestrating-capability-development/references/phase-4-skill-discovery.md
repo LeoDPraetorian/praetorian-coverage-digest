@@ -10,8 +10,12 @@ Skill Discovery uses Phase 3's technology findings to identify which skills agen
 
 1. Discover available gateways dynamically (no hardcoded lists)
 2. Map detected technologies to relevant gateways
-3. Extract library skills from gateway routing tables
-4. Write skill manifest for later phases to consume
+3. Invoke gateways and extract routing tables
+4. Match patterns to library skills
+5. **Sophisticated skill discovery** - Inventory skills, detect gaps, launch background research
+6. Write skill manifest for later phases to consume
+7. Update MANIFEST.yaml with discovery metadata
+8. Update TodoWrite and report progress
 
 **Entry Criteria:**
 
@@ -111,7 +115,157 @@ Against gateway routing tables:
 
 ---
 
-## Step 5: Write Skill Manifest
+## Step 5: Sophisticated Skill Discovery (Gap Detection & Background Research)
+
+**Purpose:** Inventory existing skills, detect gaps, and orchestrate background research to create missing skills.
+
+**When to invoke:** Always. After pattern matching (Step 4), verify skills exist before writing manifest.
+
+### Step 5.1: Inventory Existing Skills
+
+Before mapping technologies to skills, inventory what skills actually exist:
+
+```bash
+# Discover core skills
+Glob(".claude/skills/*/skill.md")
+
+# Discover library skills (by domain)
+Glob(".claude/skill-library/**/**/SKILL.md")
+```
+
+Store results in memory for gap detection.
+
+### Step 5.2: Technology-to-Skill Gap Detection
+
+For each technology/pattern identified in Step 4 matching:
+
+1. Check if formalized skill exists in inventory
+2. If skill exists: Add to manifest (current behavior)
+3. If skill missing: Flag as GAP for research
+
+**Example scenario:**
+
+```yaml
+# From Step 4 matching
+technologies_needed:
+  - REST API patterns
+  - GraphQL API patterns
+  - gRPC patterns
+
+# Gap detection results
+skill_gaps:
+  - technology: "REST API patterns"
+    expected_skill: "implementing-rest-api-patterns"
+    exists: false
+    priority: high
+
+  - technology: "GraphQL API patterns"
+    expected_skill: "implementing-graphql-api-patterns"
+    exists: false
+    priority: high
+
+  - technology: "gRPC patterns"
+    expected_skill: "implementing-grpc-patterns"
+    exists: false
+    priority: medium
+```
+
+### Step 5.3: Launch Background Research for Missing Skills
+
+**CRITICAL:** Use background agent execution to avoid consuming current context window.
+
+For each identified gap:
+
+```typescript
+// Launch orchestrating-research-development in background
+Task(
+  subagent_type: "general-purpose",
+  description: "Research and create {skill-name}",
+  prompt: `Use /skill-manager to research and create the skill "{skill-name}".
+
+  Context: This skill is needed for {capability-name} development but doesn't exist yet.
+
+  Requirements:
+  1. Research {technology} patterns via orchestrating-research
+  2. Create comprehensive skill with examples
+  3. Include integration guidance for {capability-type} capabilities
+  4. Test the skill with a sample scenario
+
+  Expected location: .claude/skill-library/{domain}/{subdomain}/{skill-name}/
+
+  This agent is running in BACKGROUND - you will NOT see output in current window.
+  Output will be available for future workflows.`,
+  run_in_background: true
+)
+```
+
+**Why background execution:**
+
+- Prevents context window consumption in current capability development
+- Skills become available for Phase 8 implementation and future workflows
+- Parallel research across multiple missing skills
+- Creates reusable assets for the skill library
+
+### Step 5.4: Document Skill Gaps in Manifest
+
+Add skill gap section to manifest:
+
+```yaml
+# Skill gaps detected during discovery
+skill_gaps:
+  identified:
+    - skill: "implementing-rest-api-patterns"
+      technology: "REST API patterns"
+      research_agent_id: "task_12345"
+      status: "researching"
+      priority: "high"
+
+    - skill: "implementing-graphql-api-patterns"
+      technology: "GraphQL API patterns"
+      research_agent_id: "task_12346"
+      status: "researching"
+      priority: "high"
+
+  # Workaround for Phase 8
+  temporary_guidance: |
+    For Phase 8, if skills not yet complete, agent should:
+    1. Check if skill-gaps research agents completed
+    2. If yes: Read newly created skills
+    3. If no: Use core patterns (adhering-to-dry, adhering-to-yagni) with extra caution
+    4. Flag for post-implementation skill integration
+```
+
+### Step 5.5: Update TodoWrite
+
+```markdown
+## Skill Gap Detection Complete
+
+**Existing Skills Mapped:** {count}
+**Skill Gaps Identified:** {count}
+
+**Background Research Agents Launched:**
+- Task {id1}: implementing-rest-api-patterns (expected: 15 min)
+- Task {id2}: implementing-graphql-api-patterns (expected: 15 min)
+- Task {id3}: implementing-grpc-patterns (expected: 10 min)
+
+**Note:** These agents run in background. Skills will be available for:
+- Phase 8 implementation (if agents complete)
+- Future capability workflows
+- Other engineers working on similar patterns
+
+-> Proceeding to Phase 5: Complexity Assessment
+```
+
+**Benefits:**
+
+1. **Prevents hallucination** - Formalized skills provide verified patterns instead of training data
+2. **Reusable assets** - Skills created once, used by all future workflows
+3. **Context efficiency** - Background execution doesn't consume current window
+4. **Systematic skill library growth** - Library expands based on actual development needs
+
+---
+
+## Step 6: Write Skill Manifest
 
 Create `.capability-development/skill-manifest.yaml`:
 
@@ -189,7 +343,7 @@ capability_type_skills:
 
 ---
 
-## Step 6: Update MANIFEST.yaml
+## Step 7: Update MANIFEST.yaml
 
 ```yaml
 phases:
@@ -211,7 +365,7 @@ skill_discovery:
 
 ---
 
-## Step 7: Update TodoWrite & Report
+## Step 8: Update TodoWrite & Report
 
 ```markdown
 ## Skill Discovery Complete
