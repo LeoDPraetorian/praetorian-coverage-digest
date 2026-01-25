@@ -1,0 +1,23 @@
+{
+  "name": "@claude-tools/jadx-mcp-server",
+  "version": "1.0.0",
+  "description": "Android APK decompilation and reverse engineering via JADX MCP server",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  },
+  "keywords": [
+    "jadx",
+    "android",
+    "apk",
+    "decompilation",
+    "reverse-engineering",
+    "mcp",
+    "wrapper",
+    "token-reduction"
+  ],
+  "author": "Chariot Development Platform",
+  "license": "MIT"
+}
