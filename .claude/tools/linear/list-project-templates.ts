@@ -18,6 +18,7 @@
  * - type: enum (optional) - Filter by template type: 'project' (default), 'issue', or 'all'
  * - limit: number (optional) - Max templates to return (1-250, default 50, client-side limit)
  * - fullDescription: boolean (optional) - Return full description without truncation
+ * - includeContent: boolean (optional) - Include parsed template content with all fields
  * - projectId: string (optional) - Filter templates by associated project ID
  *
  * OUTPUT (after filtering):
@@ -28,6 +29,19 @@
  *   - type: string - Template type ('project' or 'issue')
  *   - projectId: string (optional) - Associated project ID from templateData
  *   - teamId: string (optional) - Associated team ID from templateData
+ *   - content: object (optional) - Parsed template content (only when includeContent: true)
+ *     - title: string (optional)
+ *     - descriptionData: object (optional) - ProseMirror format
+ *     - descriptionText: string (optional) - Plain text
+ *     - stateId: string (optional)
+ *     - statusId: string (optional)
+ *     - priority: number (optional)
+ *     - labelIds: string[] (optional)
+ *     - initiativeIds: string[] (optional)
+ *     - memberIds: string[] (optional)
+ *     - teamIds: string[] (optional)
+ *     - projectMilestones: array (optional)
+ *     - initialIssues: array (optional)
  *   - createdAt: string (optional) - ISO timestamp
  *   - updatedAt: string (optional) - ISO timestamp
  * - totalTemplates: number - Count of returned templates
@@ -48,6 +62,9 @@
  *
  * // List all templates with full descriptions
  * await listProjectTemplates.execute({ type: 'all', fullDescription: true });
+ *
+ * // List templates with full content
+ * await listProjectTemplates.execute({ type: 'issue', includeContent: true });
  *
  * // Limit results
  * await listProjectTemplates.execute({ limit: 10 });
@@ -105,6 +122,12 @@ export const listProjectTemplatesParams = z.object({
     .optional()
     .describe('Return full description without truncation (default: false for token efficiency)'),
 
+  // Include parsed template content
+  includeContent: z.boolean()
+    .default(false)
+    .optional()
+    .describe('Include parsed template content with all fields (default: false for token efficiency)'),
+
   // Project ID filter for template-project associations
   projectId: z.string()
     .refine(validateNoControlChars, 'Control characters not allowed')
@@ -126,7 +149,21 @@ export const listProjectTemplatesOutput = z.object({
     projectId: z.string().optional(),
     teamId: z.string().optional(),
     createdAt: z.string().optional(),
-    updatedAt: z.string().optional()
+    updatedAt: z.string().optional(),
+    content: z.object({
+      title: z.string().optional(),
+      descriptionData: z.unknown().optional(),
+      descriptionText: z.string().optional(),
+      stateId: z.string().optional(),
+      statusId: z.string().optional(),
+      priority: z.number().optional(),
+      labelIds: z.array(z.string()).optional(),
+      initiativeIds: z.array(z.string()).optional(),
+      memberIds: z.array(z.string()).optional(),
+      teamIds: z.array(z.string()).optional(),
+      projectMilestones: z.array(z.unknown()).optional(),
+      initialIssues: z.array(z.unknown()).optional()
+    }).optional()
   })),
   totalTemplates: z.number(),
   estimatedTokens: z.number()
@@ -153,6 +190,18 @@ interface TemplatesResponse {
 interface ParsedTemplateData {
   projectId?: string;
   teamId?: string;
+  title?: string;
+  descriptionData?: unknown;
+  descriptionText?: string;
+  stateId?: string;
+  statusId?: string;
+  priority?: number;
+  labelIds?: string[];
+  initiativeIds?: string[];
+  memberIds?: string[];
+  teamIds?: string[];
+  projectMilestones?: unknown[];
+  initialIssues?: unknown[];
   [key: string]: unknown;
 }
 
@@ -191,6 +240,9 @@ function parseTemplateData(raw: unknown): ParsedTemplateData | null {
  *
  * // List with full descriptions
  * const fullTemplates = await listProjectTemplates.execute({ fullDescription: true });
+ *
+ * // List with full content
+ * const fullContent = await listProjectTemplates.execute({ includeContent: true });
  *
  * // With test token
  * const templates2 = await listProjectTemplates.execute({}, 'Bearer test-token');
@@ -233,7 +285,8 @@ export const listProjectTemplates = {
       return {
         ...template,
         projectId: parsedData?.projectId,
-        teamId: parsedData?.teamId
+        teamId: parsedData?.teamId,
+        parsedData  // Keep for later use
       };
     });
 
@@ -249,21 +302,47 @@ export const listProjectTemplates = {
 
     // Apply defaults
     const fullDescription = validated.fullDescription ?? false;
+    const includeContent = validated.includeContent ?? false;
 
     // Filter to essential fields
     const baseData = {
-      templates: limitedTemplates.map((template) => ({
-        id: template.id,
-        name: template.name,
-        description: fullDescription
-          ? template.description || undefined
-          : template.description?.substring(0, 200) || undefined,
-        type: template.type || 'unknown',
-        projectId: template.projectId || undefined,
-        teamId: template.teamId || undefined,
-        createdAt: template.createdAt || undefined,
-        updatedAt: template.updatedAt || undefined
-      })),
+      templates: limitedTemplates.map((template) => {
+        const parsedData = template.parsedData;
+
+        // Base template fields
+        const templateObj: any = {
+          id: template.id,
+          name: template.name,
+          description: fullDescription
+            ? template.description || undefined
+            : template.description?.substring(0, 200) || undefined,
+          type: template.type || 'unknown',
+          projectId: template.projectId || undefined,
+          teamId: template.teamId || undefined,
+          createdAt: template.createdAt || undefined,
+          updatedAt: template.updatedAt || undefined
+        };
+
+        // Optionally include parsed content
+        if (includeContent && parsedData) {
+          templateObj.content = {
+            title: parsedData.title,
+            descriptionData: parsedData.descriptionData,
+            descriptionText: parsedData.descriptionText,
+            stateId: parsedData.stateId,
+            statusId: parsedData.statusId,
+            priority: parsedData.priority,
+            labelIds: parsedData.labelIds,
+            initiativeIds: parsedData.initiativeIds,
+            memberIds: parsedData.memberIds,
+            teamIds: parsedData.teamIds,
+            projectMilestones: parsedData.projectMilestones,
+            initialIssues: parsedData.initialIssues
+          };
+        }
+
+        return templateObj;
+      }),
       totalTemplates: limitedTemplates.length
     };
 

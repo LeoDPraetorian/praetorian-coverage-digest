@@ -34,6 +34,8 @@ Use this skill when:
 | Check wrapper compliance         | Wrapper file comments                         | Read "INPUT FIELDS" and "OUTPUT" docs   |
 | Find supported operations        | `.claude/tools/linear/index.ts`               | See all exported wrappers               |
 | Validate GraphQL query           | `graphql-helpers.ts` + Linear MCP             | executeGraphQL() with test query        |
+| Get single template by ID        | `get-template.ts`                             | Fetch template with full content        |
+| List templates with content      | `list-project-templates.ts` + `includeContent`| List templates with parsed content      |
 
 ---
 
@@ -315,6 +317,73 @@ if (templates.templates.length > 0) {
    - Passes `templateId` to Linear's `issueCreate` mutation
 3. Linear applies template: prefills title, description, labels, state, etc.
 4. If no template found, issue is created normally (graceful fallback)
+
+### Task: Create Templated Sub-Issues
+
+**Example:** "Create a sub-issue under ENG-123 using the Development Agentification template"
+
+**Key understanding:** Linear does NOT have separate "sub-issue templates." Sub-issues are regular issues with a `parentId`. You can apply any issue template to a sub-issue.
+
+**Workflow:**
+
+```typescript
+// Create a sub-issue with a template
+await createIssue.execute({
+  title: 'Implement feature component',
+  team: 'Engineering',
+  parentId: 'ENG-123',                    // Makes it a sub-issue
+  templateId: '0259235b-2bf0-459d-8b10-bd8039986239',  // Applies template
+});
+```
+
+**With auto-apply for project templates:**
+
+```typescript
+await createIssue.execute({
+  title: 'Sub-task',
+  team: 'Engineering',
+  parentId: 'ENG-123',
+  project: 'Development Agentification',
+  autoApplyProjectTemplate: true,  // Finds template linked to project
+});
+```
+
+**Important notes:**
+
+- `parentId` and `templateId` are independent parameters
+- Sub-issues inherit some properties from parent (like project assignment)
+- Template still applies its full configuration (description, labels, state, etc.)
+- Combining both creates a sub-issue with template-based defaults
+
+### Task: Retrieve Template Content
+
+**Example:** "Show me what the Development Agentification template contains"
+
+**Use `get-template` to fetch full template details:**
+
+```typescript
+const template = await getTemplate.execute({
+  id: '0259235b-2bf0-459d-8b10-bd8039986239'
+});
+
+// template.content contains:
+// - title: Title prefix
+// - descriptionData: ProseMirror rich text structure
+// - descriptionText: Plain text extraction
+// - stateId, priority, projectId, teamId, labelIds
+```
+
+**CLI:**
+```bash
+npx tsx .claude/tools/linear/cli.ts get-template '{"id":"0259235b-2bf0-459d-8b10-bd8039986239"}'
+```
+
+**When to use:**
+
+- Understanding what a template will apply
+- Debugging template application issues
+- Extracting template content for documentation
+- Validating template configuration before use
 
 ---
 

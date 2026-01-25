@@ -424,6 +424,167 @@ describe('listProjectTemplates - Unit Tests', () => {
   });
 
   // ==========================================================================
+  // Include Content Tests
+  // ==========================================================================
+
+  describe('Include Content', () => {
+    it('should not include content by default', async () => {
+      mockExecuteGraphQL.mockResolvedValueOnce({
+        templates: [
+          {
+            id: 'template-1',
+            name: 'Template',
+            type: 'project',
+            templateData: JSON.stringify({
+              projectId: 'proj-123',
+              teamId: 'team-456',
+              title: 'Project Title',
+              descriptionData: { type: 'doc', content: [{ type: 'paragraph', text: 'Description' }] },
+              descriptionText: 'Plain text description',
+              stateId: 'state-1',
+              priority: 1,
+              labelIds: ['label-1']
+            }),
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          },
+        ],
+      });
+
+      const result = await listProjectTemplates.execute({});
+
+      expect(result.templates[0]).not.toHaveProperty('content');
+    });
+
+    it('should include parsed content when includeContent is true', async () => {
+      const templateData = {
+        projectId: 'proj-123',
+        teamId: 'team-456',
+        title: 'Project Title',
+        descriptionData: { type: 'doc', content: [{ type: 'paragraph', text: 'Rich description' }] },
+        descriptionText: 'Plain text description',
+        stateId: 'state-1',
+        statusId: 'status-1',
+        priority: 2,
+        labelIds: ['label-1', 'label-2'],
+        initiativeIds: ['init-1'],
+        memberIds: ['member-1'],
+        teamIds: ['team-1'],
+        projectMilestones: [{ name: 'M1' }],
+        initialIssues: [{ title: 'Issue 1' }]
+      };
+
+      mockExecuteGraphQL.mockResolvedValueOnce({
+        templates: [
+          {
+            id: 'template-1',
+            name: 'Template',
+            type: 'project',
+            templateData: JSON.stringify(templateData),
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          },
+        ],
+      });
+
+      const result = await listProjectTemplates.execute({ includeContent: true });
+
+      expect(result.templates[0].content).toBeDefined();
+      expect(result.templates[0].content?.title).toBe('Project Title');
+      expect(result.templates[0].content?.descriptionData).toEqual(templateData.descriptionData);
+      expect(result.templates[0].content?.descriptionText).toBe('Plain text description');
+      expect(result.templates[0].content?.stateId).toBe('state-1');
+      expect(result.templates[0].content?.statusId).toBe('status-1');
+      expect(result.templates[0].content?.priority).toBe(2);
+      expect(result.templates[0].content?.labelIds).toEqual(['label-1', 'label-2']);
+      expect(result.templates[0].content?.initiativeIds).toEqual(['init-1']);
+      expect(result.templates[0].content?.memberIds).toEqual(['member-1']);
+      expect(result.templates[0].content?.teamIds).toEqual(['team-1']);
+      expect(result.templates[0].content?.projectMilestones).toEqual([{ name: 'M1' }]);
+      expect(result.templates[0].content?.initialIssues).toEqual([{ title: 'Issue 1' }]);
+    });
+
+    it('should handle templateData as object (not stringified)', async () => {
+      const templateData = {
+        projectId: 'proj-123',
+        title: 'Project Title',
+        descriptionText: 'Plain text'
+      };
+
+      mockExecuteGraphQL.mockResolvedValueOnce({
+        templates: [
+          {
+            id: 'template-1',
+            name: 'Template',
+            type: 'project',
+            templateData: templateData, // Object, not string
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          },
+        ],
+      });
+
+      const result = await listProjectTemplates.execute({ includeContent: true });
+
+      expect(result.templates[0].content?.title).toBe('Project Title');
+      expect(result.templates[0].content?.descriptionText).toBe('Plain text');
+    });
+
+    it('should handle missing content fields gracefully', async () => {
+      mockExecuteGraphQL.mockResolvedValueOnce({
+        templates: [
+          {
+            id: 'template-1',
+            name: 'Template',
+            type: 'project',
+            templateData: JSON.stringify({
+              projectId: 'proj-123'
+              // No content fields
+            }),
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          },
+        ],
+      });
+
+      const result = await listProjectTemplates.execute({ includeContent: true });
+
+      expect(result.templates[0].content).toBeDefined();
+      expect(result.templates[0].content?.title).toBeUndefined();
+      expect(result.templates[0].content?.descriptionText).toBeUndefined();
+    });
+
+    it('should handle null templateData when includeContent is true', async () => {
+      mockExecuteGraphQL.mockResolvedValueOnce({
+        templates: [
+          {
+            id: 'template-1',
+            name: 'Template',
+            type: 'project',
+            templateData: null,
+            createdAt: '2025-01-01T00:00:00Z',
+            updatedAt: '2025-01-01T00:00:00Z',
+          },
+        ],
+      });
+
+      const result = await listProjectTemplates.execute({ includeContent: true });
+
+      expect(result.templates[0].content).toBeUndefined();
+    });
+
+    it('should accept includeContent parameter in schema', () => {
+      const result = listProjectTemplatesParams.parse({ includeContent: true });
+      expect(result.includeContent).toBe(true);
+    });
+
+    it('should default includeContent to false', () => {
+      const result = listProjectTemplatesParams.parse({});
+      expect(result.includeContent).toBeUndefined();
+    });
+  });
+
+  // ==========================================================================
   // Wrapper Metadata Tests
   // ==========================================================================
 

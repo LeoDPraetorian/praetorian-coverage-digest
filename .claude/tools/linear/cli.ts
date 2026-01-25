@@ -35,6 +35,7 @@ export interface OperationRegistry {
   listTeams?: (params: unknown) => Promise<unknown>;
   listProjects?: (params: unknown) => Promise<unknown>;
   listProjectTemplates?: (params: unknown) => Promise<unknown>;
+  getTemplate?: (params: unknown) => Promise<unknown>;
 }
 
 // Available operations (kebab-case to camelCase mapping)
@@ -47,6 +48,7 @@ const OPERATIONS: Record<string, keyof OperationRegistry> = {
   'list-teams': 'listTeams',
   'list-projects': 'listProjects',
   'list-project-templates': 'listProjectTemplates',
+  'get-template': 'getTemplate',
 };
 
 /**
@@ -138,6 +140,7 @@ ${Object.keys(OPERATIONS).map(op => `  - ${op}`).join('\n')}`,
         listTeams: './list-teams.js',
         listProjects: './list-projects.js',
         listProjectTemplates: './list-project-templates.js',
+        getTemplate: './get-template.js',
       };
 
       const modulePath = wrapperMap[camelCase];

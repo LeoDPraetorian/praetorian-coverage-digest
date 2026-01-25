@@ -53,6 +53,7 @@ export { getProject, type GetProjectInput, type GetProjectOutput } from './get-p
 export { createProject, type CreateProjectInput, type CreateProjectOutput } from './create-project';
 export { updateProject, type UpdateProjectInput, type UpdateProjectOutput } from './update-project';
 export { listProjectTemplates, type ListProjectTemplatesInput, type ListProjectTemplatesOutput } from './list-project-templates';
+export { getTemplate, type GetTemplateInput, type GetTemplateOutput } from './get-template';
 export { createProjectFromTemplate, type CreateProjectFromTemplateInput, type CreateProjectFromTemplateOutput } from './create-project-from-template';
 export { deleteProject, type DeleteProjectInput, type DeleteProjectOutput } from './delete-project';
 
