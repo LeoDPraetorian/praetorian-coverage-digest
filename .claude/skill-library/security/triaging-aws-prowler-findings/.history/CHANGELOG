@@ -1,0 +1,56 @@
+# Changelog
+
+All notable changes to this skill will be documented in this file.
+
+## [2026-01-23] - Phase 3 Compliance Fix
+
+### Changed
+
+- **SKILL.md**: Reduced from 522 lines to 413 lines (Phase 3 compliance)
+  - Extracted "Complete Resource List Requirement" section to verification-workflow.md
+  - Extracted "Verification Workflow Summary" section to verification-workflow.md
+  - Replaced verbose sections with concise reference to verification-commands.md
+  - Method: Claude-Automated (progressive disclosure extraction)
+
+- **references/verification-commands.md**: Split from 788 lines to 65-line index
+  - Created verification-commands.md (index file, 65 lines)
+  - Created verification-core.md (Prerequisites, S3, EC2, Route53, 302 lines)
+  - Created verification-iam-lambda.md (IAM, Lambda, CFN, RDS, 265 lines)
+  - Created verification-automation.md (Batch scripts, error handling, 118 lines)
+  - Created verification-workflow.md (Resource lists, templates, 106 lines)
+  - Method: Claude-Automated (service-based splitting)
+
+### Result
+
+- ✅ Phase 3 compliance achieved: SKILL.md 413 lines (< 500)
+- ✅ All reference files < 400 lines (largest: verification-core.md at 302)
+- ✅ All markdown links verified and resolve correctly
+- ✅ Progressive disclosure maintained with master index pattern
+
+## [2026-01-23] - Secret Verification Enhancement
+
+### Added
+
+- **references/secret-classification.md**: Complete secret classification framework (339 lines)
+  - Deduplication extraction commands for Lambda and CloudWatch secrets
+  - Pattern-based classification heuristics (variable name + value analysis)
+  - 3 classification categories: FALSE POSITIVE, TRUE POSITIVE, KMS ENCRYPTED
+  - 5 detailed classification examples with real-world patterns
+  - Quick decision tree for rapid classification
+  - Report format grouped by classification (not by function)
+  - Integration with Phase 4 verification workflow
+
+### Changed
+
+- **SKILL.md Phase 4**: Added secret verification section
+  - Replaced verbose Lambda/CloudWatch verification with concise summary
+  - Added classification quick reference table
+  - Referenced secret-classification.md for complete framework
+  - Highlighted Prowler's ~40-60% false positive rate for secrets
+  - Method: Claude-Automated (content extraction + framework creation)
+
+### Context
+
+- User requirement: "Full deduplicated list of secrets, educated guesses on false positive vs actual credential vs KMS encrypted"
+- Implementation: Created comprehensive classification methodology with extraction commands, heuristics, and examples
+- Compliance: Removed client name references from all documentation per user requirement

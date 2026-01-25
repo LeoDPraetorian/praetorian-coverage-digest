@@ -74,6 +74,7 @@ This gateway implements 3-tier loading:
 | "Windows authentication" / "Kerberos" / "NTLM"                   | → `windows-security-internals`             |
 | "EDR" / "EDR evasion" / "function hooking" / "ETW"               | → `evading-edr`                            |
 | "browser extension" / "hypercube" / "Chrome"                     | → `hypercube-browser-extension`            |
+| "Prowler" / "AWS findings" / "triage Prowler"                    | → `triaging-aws-prowler-findings`          |
 | "Shodan" / "host search" / "recon"                               | → use `gateway-mcp-tools`                  |
 | "testing" (general)                                              | → also invoke `gateway-testing`            |
 
@@ -136,6 +137,12 @@ This gateway implements 3-tier loading:
 | Frontend Security Review    | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`   | frontend security, React security, XSS        |
 | PlexTrac Finding Formatting | `.claude/skill-library/reporting/formatting-plextrac-findings/SKILL.md` | PlexTrac, finding format, report writing, VKB |
 | Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md`   | browser extension, hypercube, Chrome          |
+
+### Security Assessment & Triage
+
+| Skill                         | Path                                                                     | Triggers                                  |
+| ----------------------------- | ------------------------------------------------------------------------ | ----------------------------------------- |
+| Triaging AWS Prowler Findings | `.claude/skill-library/security/triaging-aws-prowler-findings/SKILL.md` | Prowler, AWS findings, triage, exploitability, business risk |
 
 ### Windows Security References
 
