@@ -1,0 +1,33 @@
+# Changelog - debugging-react-infinite-loops
+
+## 2026-01-24 - Initial Creation
+
+**RED Failure**: Agent diagnosed React infinite loop using codebase-specific investigation rather than systematic pattern classification. Missing:
+- Classification framework for 5 root causes (ranked by frequency)
+- why-did-you-render tool setup
+- Systematic debugging protocol
+- Fix pattern library with before/after examples
+- Decision tree for diagnosis
+
+**Category**: development/frontend
+**Skill Type**: Process/Pattern
+**Location**: Library (.claude/skill-library/)
+
+**Created**: 2026-01-24
+
+**Research**: Skipped orchestrating-research - used existing web research from conversation start (7 sources: dmitripavlutin.com, logrocket.com, alexsidorenko.com, GitHub welldone-software, typeofnan.dev, maxrozen.com)
+
+**Reference Files Created** (9 files, all < 400 lines):
+- phase1-isolation.md (126 lines) - Binary elimination, stack trace analysis, render counter
+- phase2-dependency-analysis.md (217 lines) - Console logging, deep comparison, isolation
+- phase3-classification.md (247 lines) - 5 root cause categories ranked by frequency
+- fix-object-deps.md (326 lines) - 6 fix patterns for object/array dependencies
+- fix-self-referential.md (171 lines) - Functional updaters, conditional guards
+- fix-function-deps.md (164 lines) - useCallback, hoisting, moving inside effect
+- fix-missing-deps.md (95 lines) - Empty array vs specific dependencies
+- fix-inline-handlers.md (123 lines) - Arrow functions, function references
+- why-did-you-render-setup.md (308 lines) - Installation, configuration, interpretation
+
+**GREEN Verification** (Phase 8): Agent spawned with skill loaded showed systematic classification approach vs codebase-specific investigation (RED phase). Agent followed 5-phase methodology, classified pattern as "Object/Array Dependencies", applied Fix Pattern 1 (remove redundant raw deps), and explicitly referenced skill sections. Behavioral change confirmed - skill works as intended.
+
+**Gateway Update** (Phase 7): Added to `gateway-frontend` routing table with triggers: "debug loop", "too many re-renders", "maximum update depth". Positioned alongside existing `preventing-react-hook-infinite-loops` skill (prevention patterns vs debugging methodology).

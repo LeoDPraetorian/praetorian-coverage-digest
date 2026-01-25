@@ -48,7 +48,8 @@ This gateway implements 3-tier loading:
 | ------------------------------------------------------------- | ---------------------------------------- |
 | "React 19" / "conventions" / "best practice"                  | → `enforcing-react-19-conventions`       |
 | "modern patterns" / "hooks" / "composition"                   | → `using-modern-react-patterns`          |
-| "infinite loop" / "useEffect" / "dependency"                  | → `preventing-react-hook-infinite-loops` |
+| "infinite loop" / "useEffect" / "dependency" (prevention)     | → `preventing-react-hook-infinite-loops` |
+| "debug loop" / "too many re-renders" / "maximum update depth" | → `debugging-react-infinite-loops`       |
 | "TanStack Query" / "server state" / "cache"                   | → `using-tanstack-query`                 |
 | "TanStack Table" / "data table" / "grid"                      | → `using-tanstack-table`                 |
 | "TanStack Router" / "routing" / "navigation"                  | → `using-tanstack-router`                |
@@ -97,7 +98,8 @@ This gateway implements 3-tier loading:
 | ------------------------------ | -------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
 | React 19 Conventions           | `.claude/skill-library/development/frontend/enforcing-react-19-conventions/SKILL.md`               | React 19, conventions, RSC                                                       |
 | Modern React Patterns          | `.claude/skill-library/development/frontend/using-modern-react-patterns/SKILL.md`                  | hooks, composition, patterns                                                     |
-| React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md`         | infinite loop, useEffect, dependency                                             |
+| React Hook Infinite Loops      | `.claude/skill-library/development/frontend/preventing-react-hook-infinite-loops/SKILL.md`         | infinite loop, useEffect, dependency (prevention)                                |
+| Debugging React Infinite Loops | `.claude/skill-library/development/frontend/debugging-react-infinite-loops/SKILL.md`               | debug loop, too many re-renders, maximum update depth, systematic diagnosis      |
 | React Performance              | `.claude/skill-library/development/frontend/optimizing-react-performance/SKILL.md`                 | performance, optimize, slow                                                      |
 | Prefetching React Routes       | `.claude/skill-library/development/frontend/prefetching-react-routes/SKILL.md`                     | prefetch, route loading, navigation delay, React Router                          |
 | Preloading React Resources     | `.claude/skill-library/development/frontend/preloading-react-resources/SKILL.md`                   | preload, resource, font, script, CDN, prefetchDNS, preconnect                    |
