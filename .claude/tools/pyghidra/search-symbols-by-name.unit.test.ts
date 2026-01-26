@@ -20,11 +20,11 @@
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 
 // Mock MCP client before any imports
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 
 // Test data helpers
 interface RawSymbol {
@@ -231,7 +231,7 @@ describe('search_symbols_by_name', () => {
         limit: 25,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('search_symbols_by_name', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'search_symbols_by_name', {
         binary_name: 'kernel32.dll',
         query: 'CreateFile',
         offset: 0,
@@ -250,7 +250,7 @@ describe('search_symbols_by_name', () => {
         limit: 50,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('search_symbols_by_name', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'search_symbols_by_name', {
         binary_name: 'kernel32.dll',
         query: 'malloc',
         offset: 100,
@@ -398,7 +398,7 @@ describe('search_symbols_by_name', () => {
         searchSymbolsByName.execute({
           binary_name: 'kernel32.dll',
           query: 'malloc',
-          offset: _1,
+          offset: -1,
           limit: 25,
         })
       ).rejects.toThrow(/offset.*must.*be.*non.*negative/i);
@@ -498,7 +498,7 @@ describe('search_symbols_by_name', () => {
       });
 
       // Verify MCP handles case sensitivity (wrapper passes query as_is)
-      expect(mockCallMCPTool).toHaveBeenCalledWith('search_symbols_by_name', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'search_symbols_by_name', {
         binary_name: 'kernel32.dll',
         query: 'CreateFileA',
         offset: 0,

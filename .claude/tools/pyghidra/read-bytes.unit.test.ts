@@ -15,11 +15,11 @@
 import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vitest';
 
 // Mock MCP client before any imports
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 
 // Mock helpers for standard responses
 const mockCallMCPTool = callMCPTool as MockedFunction<typeof callMCPTool>;
@@ -62,7 +62,7 @@ describe('read_bytes', () => {
           address: '0x00401000',
           size: 32,
         })
-      ).rejects.toThrow(/invalid.*binary.*name/i);
+      ).rejects.toThrow(/path.*traversal|invalid.*binary.*name/i);
     });
 
     it('1.3: rejects binary_name with control characters', async () => {
@@ -127,7 +127,7 @@ describe('read_bytes', () => {
       if (result.ok) {
         expect(result.data.hex_data).toBe('48656c6c6f');
       }
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0x00abcdef', // Normalized to lowercase
         size: 5,
@@ -146,7 +146,7 @@ describe('read_bytes', () => {
         size: 5,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0x00401000', // Prefix added
         size: 5,
@@ -163,7 +163,7 @@ describe('read_bytes', () => {
         size: 5,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0x00401000', // Unchanged
         size: 5,
@@ -180,7 +180,7 @@ describe('read_bytes', () => {
         size: 5,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0xdeadbeef', // Normalized to lowercase
         size: 5,
@@ -208,7 +208,7 @@ describe('read_bytes', () => {
         readBytes.execute({
           binary_name: 'test.exe',
           address: '0x00401000',
-          size: _100,
+          size: -100,
         })
       ).rejects.toThrow(/size.*must.*positive/i);
     });
@@ -255,7 +255,7 @@ describe('read_bytes', () => {
         size: 5,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0xdeadbeef', // Normalized
         size: 5,
@@ -290,7 +290,7 @@ describe('read_bytes', () => {
         // size omitted
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0x00401000',
         size: 32, // Default from schema
@@ -343,7 +343,7 @@ describe('read_bytes', () => {
         size: 4,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0x0',
         size: 4,
@@ -360,7 +360,7 @@ describe('read_bytes', () => {
         size: 4,
       });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('read_bytes', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'read_bytes', {
         binary_name: 'test.exe',
         address: '0xffffffffffffffff',
         size: 4,

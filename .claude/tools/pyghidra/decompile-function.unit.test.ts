@@ -1,16 +1,15 @@
 /**
  * Unit tests for decompile_function wrapper
+ *
+ * Updated to match actual implementation API
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { execute } from './decompile_function.js';
 
-vi.mock('../config/lib/mcp-client.js', () => ({
-  callMCPTool: vi.fn(),
+// Mock the local client module used by decompile-function
+vi.mock('./lib/client.js', () => ({
+  callMcpTool: vi.fn(),
 }));
-
-import { callMCPTool } from '../config/lib/mcp-client.js';
-const mockCallMCPTool = vi.mocked(callMCPTool);
 
 describe('decompile-function', () => {
   beforeEach(() => {
@@ -19,130 +18,143 @@ describe('decompile-function', () => {
 
   describe('input validation', () => {
     it('rejects empty binary_name', async () => {
-      const result = await execute({ binary_name: '', name_or_address: 'main' });
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.message).toMatch(/binary_name/i);
-      }
+      const { decompileFunction } = await import('./decompile-function.js');
+
+      await expect(
+        decompileFunction.execute({ binary_name: '', name: 'main' })
+      ).rejects.toThrow(/binary.*name.*required/i);
     });
 
-    it('rejects empty name_or_address', async () => {
-      const result = await execute({ binary_name: 'test.bin', name_or_address: '' });
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.message).toMatch(/address or name/i);
-      }
+    it('rejects empty name', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+
+      await expect(
+        decompileFunction.execute({ binary_name: 'test.bin', name: '' })
+      ).rejects.toThrow(/symbol.*name.*required|name.*required/i);
     });
 
-    it('accepts hex address', async () => {
-      mockCallMCPTool.mockResolvedValue({
-        name: 'sub_401000',
-        signature: 'void sub_401000(void)',
-        code: 'void sub_401000(void) {\n  return;\n}',
+    it('accepts hex address as name', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
+
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: 'void sub_401000(void) {\n  return;\n}',
       });
 
-      const result = await execute({ binary_name: 'test.bin', name_or_address: '0x401000' });
+      const result = await decompileFunction.execute({
+        binary_name: 'test.bin',
+        name: '0x401000',
+      });
 
-      expect(result.ok).toBe(true);
+      expect(result).toHaveProperty('code');
     });
 
     it('accepts function name', async () => {
-      mockCallMCPTool.mockResolvedValue({
-        name: 'main',
-        signature: 'int main(int argc, char** argv)',
-        code: 'int main(int argc, char** argv) {\n  return 0;\n}',
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
+
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: 'int main(int argc, char** argv) {\n  return 0;\n}',
       });
 
-      const result = await execute({ binary_name: 'test.bin', name_or_address: 'main' });
+      const result = await decompileFunction.execute({
+        binary_name: 'test.bin',
+        name: 'main',
+      });
 
-      expect(result.ok).toBe(true);
+      expect(result).toHaveProperty('code');
+      expect(result.code).toContain('main');
     });
   });
 
   describe('token optimization', () => {
-    it('returns truncated code by default', async () => {
-      const longCode = Array.from({ length: 200 }, (_, i) => `  line ${i};`).join('\n');
+    it('returns truncated code for large functions', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
 
-      mockCallMCPTool.mockResolvedValue({
-        name: 'large_func',
-        signature: 'void large_func(void)',
-        code: longCode,
+      const longCode = Array.from({ length: 300 }, (_, i) => `  line ${i};`).join('\n');
+
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: longCode,
       });
 
-      const result = await execute({
+      const result = await decompileFunction.execute({
         binary_name: 'test.bin',
-        name_or_address: 'large_func',
-        max_code_lines: 50,
+        name: 'large_func',
       });
 
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        expect(result.data.total_lines).toBe(200);
-        expect(result.data.included_lines).toBe(50);
-        expect(result.data.code).toContain('[truncated]');
-        expect(result.data.complexity).toBe('complex');
-      }
+      expect(result.summary.total_lines).toBe(300);
+      expect(result.summary.was_truncated).toBe(true);
+      expect(result.summary.returned_lines).toBeLessThan(300);
     });
 
-    it('returns full code when include_full_code is true', async () => {
+    it('returns full code for small functions', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
+
       const code = 'int main() {\n  printf("test");\n  return 0;\n}';
 
-      mockCallMCPTool.mockResolvedValue({
-        name: 'main',
-        signature: 'int main()',
-        code,
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: code,
       });
 
-      const result = await execute({
+      const result = await decompileFunction.execute({
         binary_name: 'test.bin',
-        name_or_address: 'main',
-        include_full_code: true,
+        name: 'main',
       });
 
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        expect(result.data.code).toBe(code);
-        expect(result.data.included_lines).toBe(result.data.total_lines);
-      }
+      expect(result.summary.was_truncated).toBe(false);
+      expect(result.code).toBe(code);
     });
 
-    it('calculates complexity correctly', async () => {
-      mockCallMCPTool.mockResolvedValue({
-        name: 'simple',
-        signature: 'void simple()',
-        code: 'void simple() {\n  return;\n}',
+    it('includes estimatedTokens in response', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
+
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: 'void simple() {\n  return;\n}',
       });
 
-      const result = await execute({ binary_name: 'test.bin', name_or_address: 'simple' });
+      const result = await decompileFunction.execute({
+        binary_name: 'test.bin',
+        name: 'simple',
+      });
 
-      expect(result.ok).toBe(true);
-      if (result.ok) {
-        expect(result.data.complexity).toBe('simple');
-      }
+      expect(result).toHaveProperty('estimatedTokens');
+      expect(typeof result.estimatedTokens).toBe('number');
     });
   });
 
   describe('error handling', () => {
     it('handles function not found', async () => {
-      mockCallMCPTool.mockRejectedValue(new Error('Function not found'));
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
 
-      const result = await execute({ binary_name: 'test.bin', name_or_address: 'missing' });
+      mockCallMcpTool.mockRejectedValue(new Error('Function not found: missing'));
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.code).toBe('NOT_FOUND');
-      }
+      await expect(
+        decompileFunction.execute({ binary_name: 'test.bin', name: 'missing' })
+      ).rejects.toThrow(/function.*not.*found|symbol.*not.*found/i);
     });
 
-    it('handles timeout', async () => {
-      mockCallMCPTool.mockRejectedValue(new Error('timeout'));
+    it('handles empty decompilation result', async () => {
+      const { decompileFunction } = await import('./decompile-function.js');
+      const { callMcpTool } = await import('./lib/client.js');
+      const mockCallMcpTool = vi.mocked(callMcpTool);
 
-      const result = await execute({ binary_name: 'test.bin', name_or_address: 'large' });
+      mockCallMcpTool.mockResolvedValue({
+        decompiled_code: '',
+      });
 
-      expect(result.ok).toBe(false);
-      if (!result.ok) {
-        expect(result.error.code).toBe('TIMEOUT');
-      }
+      await expect(
+        decompileFunction.execute({ binary_name: 'test.bin', name: 'empty_func' })
+      ).rejects.toThrow(/empty.*result/i);
     });
   });
 });

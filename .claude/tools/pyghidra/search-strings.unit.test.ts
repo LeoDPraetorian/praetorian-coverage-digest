@@ -18,11 +18,11 @@ import { describe, it, expect, vi, beforeEach, type MockedFunction } from 'vites
 import { z } from 'zod';
 
 // Mock MCP client before any imports
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 
 // Test data helpers
 interface RawStringResult {
@@ -183,7 +183,7 @@ describe('search_strings _ Input Validation', () => {
       binary_name: 'test.bin',
       query: 'test',
       limit: 100,
-      offset: _10,
+      offset: -10,
     });
 
     expect(result.ok).toBe(false);

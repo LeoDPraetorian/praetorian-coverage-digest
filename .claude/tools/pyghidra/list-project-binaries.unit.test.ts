@@ -10,14 +10,14 @@
  */
 
 import { describe, test, expect, vi, beforeEach, afterEach, type MockedFunction } from 'vitest';
-import { execute } from './list_project_binaries.js';
+import { execute } from './list-project-binaries.js';
 
 // Mock MCP client at module level (BEFORE imports)
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 const mockCallMCPTool = vi.mocked(callMCPTool) as MockedFunction<typeof callMCPTool>;
 
 describe('list_project_binaries', () => {

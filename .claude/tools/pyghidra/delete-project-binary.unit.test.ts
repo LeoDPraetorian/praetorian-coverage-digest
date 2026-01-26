@@ -14,13 +14,13 @@
  */
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { execute } from './delete_project_binary.js';
+import { execute } from './delete-project-binary.js';
 
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 const mockCallMCPTool = vi.mocked(callMCPTool);
 
 describe('delete_project_binary', () => {
@@ -90,7 +90,7 @@ describe('delete_project_binary', () => {
       await execute({ binary_name: 'test.bin' });
 
       expect(consoleErrorSpy).toHaveBeenCalledWith(
-        expect.stringMatching(/\d{4}_\d{2}_\d{2}T\d{2}:\d{2}:\d{2}/)
+        expect.stringMatching(/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/)
       );
     });
   });

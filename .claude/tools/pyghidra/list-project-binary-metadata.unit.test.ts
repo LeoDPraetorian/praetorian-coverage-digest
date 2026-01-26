@@ -16,14 +16,14 @@
  */
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { execute } from './list_project_binary_metadata.js';
+import { execute } from './list-project-binary-metadata.js';
 
 // Mock MCP client
-vi.mock('../config/lib/mcp_client.js', () => ({
+vi.mock('../config/lib/mcp-client.js', () => ({
   callMCPTool: vi.fn(),
 }));
 
-import { callMCPTool } from '../config/lib/mcp_client.js';
+import { callMCPTool } from '../config/lib/mcp-client.js';
 const mockCallMCPTool = vi.mocked(callMCPTool);
 
 // ==========================
@@ -129,12 +129,14 @@ describe('list_project_binary_metadata', () => {
       expect(result.ok).toBe(true);
     });
 
-    it('rejects binary_name with path separator (forward slash)', async () => {
-      const result = await execute({ binary_name: 'kernel32/evil.dll' });
+    it('rejects binary_name with path traversal (..)', async () => {
+      // Note: Single path separators (/) are intentionally allowed because
+      // PyGhidra uses paths like "/binary-name-hash" as internal identifiers
+      const result = await execute({ binary_name: '../etc/passwd' });
 
       expect(result.ok).toBe(false);
       if (!result.ok) {
-        expect(result.error.message).toContain('Invalid binary name');
+        expect(result.error.message).toMatch(/path.*traversal|invalid/i);
         expect(result.error.code).toBe('VALIDATION_ERROR');
       }
     });
@@ -162,7 +164,7 @@ describe('list_project_binary_metadata', () => {
 
       await execute({ binary_name: 'kernel32.dll' });
 
-      expect(mockCallMCPTool).toHaveBeenCalledWith('list_project_binary_metadata', {
+      expect(mockCallMCPTool).toHaveBeenCalledWith('pyghidra', 'list_project_binary_metadata', {
         binary_name: 'kernel32.dll',
       });
     });
@@ -179,7 +181,9 @@ describe('list_project_binary_metadata', () => {
 
       await execute({ binary_name: 'test.bin' });
 
-      const toolName = mockCallMCPTool.mock.calls[0]?.[0];
+      // With 3-arg pattern: (serverName, toolName, params)
+      // calls[0][0] is server name, calls[0][1] is tool name
+      const toolName = mockCallMCPTool.mock.calls[0]?.[1];
       expect(toolName).toBe('list_project_binary_metadata');
     });
 
