@@ -68,6 +68,7 @@ This gateway implements 3-tier loading:
 | "security review" / "OWASP" / "Go security"                      | → `reviewing-backend-security`             |
 | "frontend security" / "React security" / "XSS"                   | → `reviewing-frontend-security`            |
 | "PlexTrac" / "finding format" / "report writing" / "VKB"         | → `formatting-plextrac-findings`           |
+| "test case" / "testing instructions" / "test documentation" / "test plan generation" | → `generating-security-test-instructions` |
 | "CIS" / "benchmark" / "compliance mapping"                       | → `mapping-to-cis-benchmarks`              |
 | "M365 audit" / "M365 benchmark" / "run CIS M365"                 | → `running-cis-m365-benchmarks`            |
 | "FDA" / "medical device" / "510(k)" / "SBOM"                     | → `mapping-to-fda-cybersecurity`           |
@@ -132,12 +133,13 @@ This gateway implements 3-tier loading:
 
 ### Security Review
 
-| Skill                       | Path                                                                    | Triggers                                      |
-| --------------------------- | ----------------------------------------------------------------------- | --------------------------------------------- |
-| Backend Security Review     | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`    | security review, OWASP, Go security           |
-| Frontend Security Review    | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`   | frontend security, React security, XSS        |
-| PlexTrac Finding Formatting | `.claude/skill-library/reporting/formatting-plextrac-findings/SKILL.md` | PlexTrac, finding format, report writing, VKB |
-| Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md`   | browser extension, hypercube, Chrome          |
+| Skill                       | Path                                                                                | Triggers                                      |
+| --------------------------- | ----------------------------------------------------------------------------------- | --------------------------------------------- |
+| Backend Security Review     | `.claude/skill-library/security/reviewing-backend-security/SKILL.md`                | security review, OWASP, Go security           |
+| Frontend Security Review    | `.claude/skill-library/security/reviewing-frontend-security/SKILL.md`               | frontend security, React security, XSS        |
+| PlexTrac Finding Formatting | `.claude/skill-library/reporting/formatting-plextrac-findings/SKILL.md`             | PlexTrac, finding format, report writing, VKB |
+| Security Test Instructions  | `.claude/skill-library/reporting/generating-security-test-instructions/SKILL.md`    | test case, testing instructions, test documentation |
+| Hypercube Browser Extension | `.claude/skill-library/security/hypercube-browser-extension/SKILL.md`               | browser extension, hypercube, Chrome          |
 
 ### Security Assessment & Triage
 

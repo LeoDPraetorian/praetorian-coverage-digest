@@ -1,0 +1,108 @@
+# Changelog
+
+## 2026-01-16 - Initial Creation
+
+**Type:** New skill creation via TDD methodology
+
+**Category:** Library skill - reporting
+
+**Skill Type:** Process/Pattern (methodology for generating test case documentation)
+
+**Location:** `.claude/skill-library/reporting/generating-security-test-instructions/`
+
+### RED Phase Documentation
+
+**Problem Statement:**
+Creating comprehensive security test case instructions requires manual back-and-forth conversation with no systematic scoping questions, no reusable structure, and inconsistent output quality.
+
+**Test Scenario:**
+Generate testing instructions for 3 API security test cases without any skill guidance.
+
+**Observed Failure (Agent Task Output):**
+- Agent created 132KB of documentation without asking scoping questions
+- Assumed tools (JWT, Go backend patterns) from CLAUDE.md instead of asking user
+- No structured intake process (accepted freeform test case list)
+- Created verbose output (132KB) when user's original request suggested more focused documentation
+- Made assumptions about timeframe, severity thresholds, and output format
+- No verification of tool availability or assessment constraints
+
+**Specific Gaps Identified:**
+1. No systematic scoping questions (tools, timeframe, assessment type, format preferences)
+2. No structured test case input template
+3. Assumptions instead of explicit questions
+4. Output detail level not calibrated to assessment duration
+5. No reusability - every request requires full regeneration
+
+### GREEN Target
+
+Skill that:
+- Uses AskUserQuestion for systematic scoping (Phase 2)
+- Asks about tools available (Burp, Postman, curl)
+- Asks about timeframe (1-2 days, 3-5 days, 1+ week)
+- Asks about assessment type (pentest, audit, compliance)
+- Asks about output format preferences
+- Generates practitioner-focused markdown files calibrated to timeframe
+- Includes finding templates with severity guidelines
+- Creates master README with workflow guidance
+- Outputs to `.claude/.output/{project-name}-testing/`
+
+### Changes
+
+**Files Created:**
+- `SKILL.md` (433 lines) - Main skill workflow
+- `.history/CHANGELOG` (this file)
+
+**Directory Structure:**
+```
+.claude/skill-library/reporting/generating-security-test-instructions/
+├── SKILL.md
+├── .history/
+│   └── CHANGELOG
+├── references/  (to be populated in Phase 6)
+└── examples/    (to be populated in Phase 6)
+```
+
+**Progressive Disclosure:**
+- Moved template library to references/template-selection.md
+- Moved README structure to references/readme-structure.md
+- Moved anti-patterns to references/anti-patterns.md
+- Kept core workflow in SKILL.md (<500 lines)
+
+**Next Steps:**
+- Phase 6: Research & populate references/
+- Phase 7: Update gateway-reporting (if exists)
+- Phase 8: GREEN verification with agent spawn
+- Phase 9: REFACTOR pressure testing
+
+---
+
+## 2026-01-16 - GREEN Phase Verification
+
+**Phase 8 Complete:** Skill successfully verified via agent spawn.
+
+### RED vs GREEN Comparison
+
+**RED (Without Skill):**
+- No scoping questions asked
+- Assumed tools from CLAUDE.md  
+- Created 132KB documentation
+- Made environment assumptions
+
+**GREEN (With Skill):**
+- ✅ Asked 5 systematic scoping questions
+- ✅ Tool commands matched user's actual tools (Burp Community + curl)
+- ✅ Detail level matched timeframe (1-2 days = concise, 1,782 lines)
+- ✅ Format matched preferences (simple markdown)
+- ✅ No automation scripts (timeframe criterion not met)
+
+**Gap Status:** CLOSED
+
+### Compliance Audit
+
+- Line count: 433 (✅ < 500)
+- Frontmatter: Valid (✅)
+- Changelog: Present (✅)
+- References: 3 files (✅)
+- Gateway: Added to gateway-security (✅)
+
+---
