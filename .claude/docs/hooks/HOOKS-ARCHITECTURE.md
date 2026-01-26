@@ -9,17 +9,19 @@
 3. [Hook Types](#hook-types)
 4. [Three-Level Loop System](#three-level-loop-system)
 5. [Multi-Agent Feedback Loop](#multi-agent-feedback-loop)
-6. [State Management](#state-management)
-7. [Hook Anatomy](#hook-anatomy)
-8. [Execution Model](#execution-model)
-9. [Configuration](#configuration)
-10. [Composition Patterns](#composition-patterns)
-11. [Context Engineering Principles](#context-engineering-principles)
-12. [Directory Structure Reference](#directory-structure-reference)
-13. [Troubleshooting](#troubleshooting)
-14. [FAQ](#faq)
-15. [References](#references)
-16. [TODO List](#todo-list)
+6. [Context Compaction Gates](#context-compaction-gates)
+7. [Output Location Enforcement](#output-location-enforcement)
+8. [State Management](#state-management)
+9. [Hook Anatomy](#hook-anatomy)
+10. [Execution Model](#execution-model)
+11. [Configuration](#configuration)
+12. [Composition Patterns](#composition-patterns)
+13. [Context Engineering Principles](#context-engineering-principles)
+14. [Directory Structure Reference](#directory-structure-reference)
+15. [Troubleshooting](#troubleshooting)
+16. [FAQ](#faq)
+17. [References](#references)
+18. [TODO List](#todo-list)
 
 ---
 
@@ -126,7 +128,8 @@ All Stop hooks run in parallel. Any exit code 2 blocks the stop.
 
 **When:** Subagent finishing | **Matcher:** No
 | Hook | Matcher | Description |
-| --------------------------- | ------- | -------------------------------------------------- |
+| --------------------------------- | ------- | ---------------------------------------------------------- |
+| `output-location-enforcement.sh` | \* | Block if untracked .md files exist outside .claude/.output |
 | (prompt-based) | \* | Lightweight check that subagent completed task |
 
 ### SessionStart
@@ -180,6 +183,23 @@ All hooks receive JSON via stdin:
   "hook_event_name": "Stop"
 }
 ```
+
+**SubagentStop receives additional fields:**
+
+```json
+{
+  "session_id": "abc123",
+  "transcript_path": "~/.claude/projects/.../session.jsonl",
+  "cwd": "/path/to/project",
+  "permission_mode": "default",
+  "hook_event_name": "SubagentStop",
+  "stop_hook_active": false,
+  "agent_id": "def456",
+  "agent_transcript_path": "~/.claude/projects/.../subagents/agent-def456.jsonl"
+}
+```
+
+The `agent_transcript_path` is the subagent's JSONL transcript which can be parsed to find tool uses (Edit/Write with file_path).
 
 ### Exit Code Behavior
 
@@ -243,7 +263,17 @@ All hooks receive JSON via stdin:
 {"ok": false, "reason": "Why subagent should continue"}
 ```
 
-Note: Prompt-based hooks use `{"ok": boolean}`, command-based use `{"decision": "approve|block"}`.
+**SubagentStop hooks (command-based):**
+
+```json
+// Block subagent completion
+{"decision": "block", "reason": "Explanation shown to subagent"}
+
+// Allow subagent completion (return empty object or omit decision)
+{}
+```
+
+Note: Prompt-based hooks use `{"ok": boolean}`, command-based use `{"decision": "block"}` or empty object to allow.
 
 ---
 
@@ -455,6 +485,137 @@ Hook only blocks when ALL of:
 Ad-hoc agent work (no MANIFEST.yaml) is not affected.
 
 **Note:** Skill guidance recommends compacting at 75% (SHOULD) and 80% (MUST). The 85% hook enforcement is the safety net for when guidance is rationalized away.
+
+---
+
+## Output Location Enforcement
+
+### The Problem
+
+Agents are supposed to write output files to `.claude/.output/` following the `persisting-agent-outputs` skill. However, agents can rationalize skipping this skill, resulting in:
+
+1. **Files at repo root** - Clutters the project, may be committed accidentally
+2. **Skill compliance failure** - If they skip `persisting-agent-outputs`, they likely skipped other Step 1 skills too
+3. **Invalid output** - Work done without proper skill compliance may be incorrect
+
+### Three-Layer Enforcement
+
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LAYER 1: PostToolUse (Task) - FEEDBACK                                     │
+│  task-skill-enforcement.sh                                                  │
+│  • Warns if agent didn't invoke persisting-agent-outputs                    │
+│  • Warns if feature_directory is wrong in metadata                          │
+│  • Exit 2 → feedback to Claude (non-blocking)                               │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  LAYER 2: SubagentStop - BLOCKING                                           │
+│  output-location-enforcement.sh                                             │
+│  • Uses git to find untracked .md files outside .claude/.output/            │
+│  • Works in main repo OR worktrees                                          │
+│  • Detects cross-worktree leaks (worktree agent → main repo)                │
+│  • Parses agent transcript for modified files                               │
+│  • Determines safe vs unsafe reverts based on prior git state               │
+│  • {"decision": "block"} → BLOCKS subagent completion                       │
+├─────────────────────────────────────────────────────────────────────────────┤
+│  LAYER 3: Stop - DEFENSE IN DEPTH                                           │
+│  quality-gate-stop.sh                                                       │
+│  • Same git-based check as SubagentStop                                     │
+│  • Catches files that slipped through SubagentStop                          │
+│  • {"decision": "block"} → BLOCKS main agent completion                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
+
+### Detection Logic
+
+The hook uses git to detect wrong-location files:
+
+```bash
+# Find untracked .md files outside allowed locations
+git ls-files --others --exclude-standard | \
+    grep -E '\.md$' | \
+    grep -vE '^\.claude/\.output/' | \
+    grep -vE '^modules/' | \
+    grep -vE '^docs/' | \
+    grep -vE '^(README|CLAUDE|CHANGELOG)'
+```
+
+### Skill Compliance Check
+
+For each wrong-location file, the hook reads it to check:
+
+```bash
+# Check if persisting-agent-outputs was invoked
+if grep -q "persisting-agent-outputs" "$file_path"; then
+    # Invoked skill but didn't follow discovery protocol
+    # Just needs moving
+else
+    # Didn't invoke skill at all - full compliance failure
+    # Mark for deletion, check for code reverts
+fi
+```
+
+### Code Revert Analysis
+
+When an agent fails compliance, the hook analyzes what code changes should be reverted:
+
+1. **Parse agent transcript** (`agent_transcript_path`) to find Edit/Write tool uses
+2. **Extract modified files** from `"file_path"` fields in transcript
+3. **Compare against git diff** to check for prior uncommitted changes
+4. **Classify each file**:
+   - **Safe to revert**: Only modified by rogue agent (no prior changes)
+   - **Manual review**: Has prior uncommitted changes from other agents
+
+**Path normalization**: Agent transcripts use absolute paths, git diff uses relative paths. The hook normalizes with `${mod_file#${current_git_root}/}`.
+
+### Example Block Message
+
+```
+SKILL COMPLIANCE FAILURE DETECTED
+
+The agent wrote output to wrong location(s) AND failed skill compliance checks.
+This indicates the agent skipped Step 1 mandatory skills.
+
+- agent-output.md: Missing persisting-agent-outputs in skills_invoked
+
+=== REQUIRED ACTIONS ===
+
+1. DELETE INVALID OUTPUT FILES:
+   rm "/path/to/agent-output.md"
+
+2. REVERT NON-COMPLIANT CODE CHANGES (safe - no prior changes):
+   git checkout -- "/path/to/new-file.ts"
+
+3. MANUAL REVIEW REQUIRED (has prior uncommitted changes):
+- /path/to/shared-file.ts: HAS PRIOR UNCOMMITTED CHANGES - manual review required
+
+4. RE-DO WITH PROPER COMPLIANCE:
+   - Invoke ALL Step 1 mandatory skills (especially persisting-agent-outputs)
+   - Follow the discovery protocol to find/create output directory
+   - Write output to .claude/.output/agents/{timestamp}-{slug}/
+```
+
+### Worktree Support
+
+The hook handles git worktrees correctly:
+
+| Scenario | Detection |
+|----------|-----------|
+| Main repo, file at root | ✅ Detected via `ls-files` |
+| Worktree, file at worktree root | ✅ Detected via `ls-files` |
+| Worktree, file leaked to main repo | ✅ Detected via `--git-common-dir` check |
+
+### Skip Conditions
+
+The SubagentStop hook skips agents that don't produce file output:
+
+```bash
+case "$subagent_type" in
+    Explore|Bash|general-purpose|claude-code-guide)
+        echo '{}'  # Allow completion
+        exit 0
+        ;;
+esac
+```
 
 ---
 
@@ -1006,10 +1167,11 @@ fi
 ├── precompact-context.sh           # PreCompact - preserve workflow state across compaction
 ├── track-modifications.sh          # PostToolUse (Edit/Write) - track modified files
 ├── capture-agent-result.sh         # PostToolUse (Task) - capture PASS/FAIL
-├── task-skill-enforcement.sh       # PostToolUse (Task) - check skill compliance
+├── task-skill-enforcement.sh       # PostToolUse (Task) - check skill compliance + output location
+├── output-location-enforcement.sh  # SubagentStop - block if files outside .claude/.output/
 ├── feedback-loop-stop.sh           # Stop - enforce Implementation→Review→Test
 ├── iteration-limit-stop.sh         # Stop - enforce intra-task limits
-├── quality-gate-stop.sh            # Stop - safety net for ad-hoc changes
+├── quality-gate-stop.sh            # Stop - safety net + output location defense-in-depth
 ├── escalation-advisor.sh           # Stop - external LLM analysis
 ├── sound-notification.sh           # Notification - audio alerts (core logic)
 ├── sound.sh                        # CLI wrapper - /sound slash command interface
@@ -1082,6 +1244,22 @@ echo '{}' | CLAUDE_PROJECT_DIR="$(pwd)" .claude/hooks/your-hook.sh
 - Check if another Stop hook is returning `{"decision": "approve"}`
 - All Stop hooks run in parallel; any approve may override block
 - Have backup hooks (quality-gate-stop.sh) also return block when state is active
+
+### Output Location Hook Not Blocking
+
+1. **Check debug log:** `cat /tmp/subagent-stop-debug.log`
+2. **Verify hook is called:** Log should show "SubagentStop hook called"
+3. **Check WRONG_FILES:** Empty means no untracked .md files detected
+4. **Check path normalization:** Absolute vs relative path comparison
+5. **Test manually:**
+   ```bash
+   touch test-file.md
+   export CLAUDE_PROJECT_DIR="$(pwd)"
+   echo '{"subagent_type": "tool-reviewer"}' | bash .claude/hooks/output-location-enforcement.sh
+   rm test-file.md
+   ```
+
+**Note:** Settings changes require a new Claude session to take effect (hooks are snapshotted at startup).
 
 ### Escalation Advisor Not Working
 
@@ -1221,9 +1399,10 @@ Set timeouts based on expected execution time with buffer.
       Current escalation messages are templates. Could add intelligent analysis
       of WHY the loop is stuck (partially implemented in `escalation-advisor.sh`).
 
-- [ ] **SubagentStop enforcement**
-      Current SubagentStop is lightweight prompt check. If subagents need iteration
-      limits, add `iteration-limit-stop.sh` logic for SubagentStop event.
+- [x] **SubagentStop enforcement** _(COMPLETED 2026-01-25)_
+      Implemented `output-location-enforcement.sh` for SubagentStop event.
+      Detects wrong-location files, checks skill compliance, analyzes code changes
+      for safe revert vs manual review. See "Output Location Enforcement" section.
 
 - [ ] **Permission-aware blocking**
       Add PermissionRequest hook to auto-approve safe operations (`go test`, `npm test`)

@@ -21,6 +21,45 @@ input=$(cat)
 transcript_path=$(echo "$input" | jq -r '.transcript_path // ""')
 session_id=$(echo "$input" | jq -r '.session_id // "default"')
 
+# =============================================================================
+# Step 0a: Check for untracked agent output files outside .claude/.output/
+# =============================================================================
+# Defense-in-depth: catch files that leaked to wrong locations
+
+get_wrong_location_files() {
+    local git_dir="$1"
+    git -C "$git_dir" ls-files --others --exclude-standard 2>/dev/null | \
+        grep -E '\.md$' | \
+        grep -vE '^\.claude/\.output/' | \
+        grep -vE '^\.claude/docs/' | \
+        grep -vE '^\.feature-development/' | \
+        grep -vE '^\.worktrees/' | \
+        grep -vE '^modules/' | \
+        grep -vE '^docs/' | \
+        grep -vE '^(README|CLAUDE|CHANGELOG|CONTRIBUTING|LICENSE)' || true
+}
+
+current_git_root=$(git -C "${CLAUDE_PROJECT_DIR}" rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR}")
+wrong_files=$(get_wrong_location_files "$current_git_root")
+
+# Also check main repo if we're in a worktree
+git_common_dir=$(git -C "$current_git_root" rev-parse --git-common-dir 2>/dev/null || echo "")
+if [[ -n "$git_common_dir" ]]; then
+    main_worktree=$(cd "$current_git_root" && cd "$(dirname "$git_common_dir")" 2>/dev/null && pwd || echo "")
+    if [[ -n "$main_worktree" && "$main_worktree" != "$current_git_root" && -d "$main_worktree" ]]; then
+        main_wrong=$(get_wrong_location_files "$main_worktree")
+        if [[ -n "$main_wrong" ]]; then
+            wrong_files="${wrong_files}
+MAIN: ${main_wrong}"
+        fi
+    fi
+fi
+
+if [[ -n "$wrong_files" ]]; then
+    file_list=$(echo "$wrong_files" | head -5 | tr '\n' ', ' | sed 's/,$//')
+    block_with_reason "UNTRACKED AGENT OUTPUT: Found .md files outside .claude/.output/: [$file_list]. Move them to .claude/.output/agents/{timestamp}-{slug}/ before completing."
+fi
+
 # State file for tracked modifications (session-specific to avoid cross-terminal conflicts)
 STATE_FILE="${CLAUDE_PROJECT_DIR}/.claude/hooks/modification-state-${session_id}.json"
 

@@ -151,6 +151,16 @@
         "matcher": "*",
         "hooks": [
           {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/output-location-enforcement.sh",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        "matcher": "*",
+        "hooks": [
+          {
             "type": "prompt",
             "prompt": "You are verifying a subagent completed its assigned task. This is a lightweight check - the main Stop hook handles the full review/test cycle.\n\n## Verify Task Completion\n\nCheck if the subagent accomplished what it was asked to do:\n- Did it make the requested changes?\n- Did it encounter errors that prevent completion?\n- Is the work in a returnable state?\n\n## Decision\n\nIf subagent completed its assigned task (even partially) → return {\"ok\": true}\nLet the main agent's Stop hook enforce review/test requirements.\n\nOnly block if the subagent clearly failed or left work in broken state:\n{\"ok\": false, \"reason\": \"Subagent task incomplete: [specific issue]. Fix before returning.\"}\n\nRespond with ONLY the JSON object.",
             "timeout": 30
