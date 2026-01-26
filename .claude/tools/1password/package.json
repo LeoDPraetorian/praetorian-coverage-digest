@@ -1,0 +1,22 @@
+{
+  "name": "@claude-tools/1password",
+  "version": "1.0.0",
+  "description": "Secure credential access via biometric-authenticated 1Password CLI",
+  "type": "module",
+  "main": "index.ts",
+  "exports": {
+    ".": "./index.ts",
+    "./*": "./*.ts"
+  },
+  "keywords": [
+    "1password",
+    "credentials",
+    "secrets",
+    "biometric",
+    "mcp",
+    "wrapper",
+    "security"
+  ],
+  "author": "Chariot Development Platform",
+  "license": "MIT"
+}

@@ -981,12 +981,13 @@ const response = await fetch("https://api.github.com/user", {
 
 **Available Tools:**
 
-| Tool              | Purpose                                           |
-| ----------------- | -------------------------------------------------- |
-| `read-secret`     | Retrieve single secret value                       |
-| `list-items`      | List items in vault (for discovery)                |
-| `get-item`        | Get full item details with all fields              |
-| `run-with-secrets`| Execute command with secrets injected via env file |
+| Tool                  | Purpose                                                                    |
+| --------------------- | -------------------------------------------------------------------------- |
+| `read-secret`         | Retrieve single secret value                                               |
+| `list-items`          | List items in vault (for discovery)                                        |
+| `get-item`            | Get full item details with all fields                                      |
+| `run-with-secrets`    | Execute command with secrets injected via env file                         |
+| `get-aws-credentials` | Retrieve AWS credentials for credential_process (supports MFA)             |
 
 **Security Benefits:**
 
@@ -994,6 +995,70 @@ const response = await fetch("https://api.github.com/user", {
 - **User approval** - Touch ID/YubiKey confirmation for each access
 - **Vault scoping** - Dedicated vault limits what Claude can access
 - **Audit trail** - 1Password logs all secret access
+
+### AWS CLI Integration
+
+The `get-aws-credentials` wrapper enables secure AWS CLI authentication via 1Password, eliminating plaintext credential files.
+
+**How it works:**
+
+1. AWS CLI calls `credential_process` script
+2. Script invokes `get-aws-credentials` wrapper
+3. Wrapper reads credentials from 1Password (Touch ID required)
+4. If MFA configured, automatically fetches session token via STS
+5. Returns credentials in AWS credential_process JSON format
+
+**Setup:**
+
+1. Store credentials in 1Password item with fields:
+   - `AccessKeyId` or `aws_access_key_id`
+   - `SecretAccessKey` or `aws_secret_access_key`
+   - (Optional) `mfa serial` or `mfa_serial` - MFA device ARN
+   - (Optional) `one-time password` - TOTP field for MFA
+
+2. Create credential helper script (`~/.aws/credential-helper.sh`):
+   ```bash
+   #!/bin/bash
+   cd ~/chariot-development-platform2
+   npx tsx -e "
+   (async () => {
+     const { getAwsCredentials } = await import('./.claude/tools/1password/get-aws-credentials.js');
+     const result = await getAwsCredentials.execute({ item: 'AWS Secret Keys' });
+     console.log(JSON.stringify(result));
+   })();
+   " 2>/dev/null
+   ```
+
+3. Configure AWS CLI (`~/.aws/config`):
+   ```ini
+   [default]
+   credential_process = ~/.aws/credential-helper.sh
+   region = us-east-1
+   ```
+
+4. Remove plaintext credentials: `rm ~/.aws/credentials`
+
+**MFA Support:**
+
+When the 1Password item contains an `mfa serial` field, the wrapper automatically:
+- Reads the current TOTP code from the `one-time password` field
+- Calls `aws sts get-session-token` with MFA
+- Returns temporary session credentials (default: 1 hour)
+
+**Output Format** (AWS credential_process):
+```json
+{
+  "Version": 1,
+  "AccessKeyId": "AKIA...",
+  "SecretAccessKey": "...",
+  "SessionToken": "...",   // Only with MFA
+  "Expiration": "..."      // Only with MFA
+}
+```
+
+**References:**
+- [AWS credential_process docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sourcing-external.html)
+- [1Password Shell Plugins](https://developer.1password.com/docs/cli/shell-plugins/aws/)
 
 See `.claude/skill-library/claude/mcp-tools/mcp-tools-1password/SKILL.md` for full documentation.
 
