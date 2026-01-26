@@ -1,0 +1,223 @@
+# Changelog
+
+## [Evidence File Format Documentation] - 2026-01-13
+
+### Added
+
+- **Phase 5**: Added guidance that evidence files should be customized finding data demonstrating verification and impact
+- **New reference**: `references/evidence-file-format.md` (comprehensive format specification)
+- Evidence file structure requirements:
+  - Auxiliary Information (context about the finding)
+  - Verification and Proof (demonstrated validation)
+  - Impact Assessment (business and technical consequences)
+  - Steps to Reproduce (environment-agnostic commands)
+
+### Changed
+
+- **Phase 5**: Updated to clarify evidence files are NOT arbitrary attachments
+- **Phase 5**: Added best practice guidance (primary evidence as markdown, supplemented by diagrams/scripts)
+- **Phase 5**: Updated example EVIDENCE_FILES to show EVIDENCE.md as primary file
+
+### Metadata
+
+- **Source**: User clarification with example showing plaintext Lambda secrets finding format
+- **Line Count**: 484 lines (was 475) - still under 500 limit
+- **Backup**: 2026-01-13-01-16-29-pre-evidence-format-update.bak
+- **New Files**: references/evidence-file-format.md (11K, comprehensive format guide)
+
+### RED Phase Documentation
+
+**Gap**: Skill treated evidence files as arbitrary attachments without explaining what they should contain or how to structure them.
+
+**Failure without fix:**
+1. Users attach generic files without structure
+2. Evidence files lack clear verification steps
+3. Impact assessment is missing or inconsistent
+4. Findings lack reproducible steps for client remediation
+5. No guidance on what makes good vs. bad evidence
+
+**Evidence**: User provided example showing proper structure with Auxiliary Information, verification proof (AWS CLI authentication, IAM permission check), impact assessment tied to privileges, and severity justification.
+
+## [Workflow Reordering] - 2026-01-13
+
+### Changed
+
+- **Phase 1**: Now "Identify Definition File" (was "Collect Risk Metadata")
+- **Phase 2**: NEW - "Derive Risk ID from Definition" (automatic conversion)
+- **Phase 3**: Now "Collect Risk Status" (was part of Phase 1)
+- **Phase 4**: Now "Collect Asset Information" (was Phase 2)
+- **Phase 5**: Now "Identify Evidence Files" (was part of Phase 3)
+- **Phase 6-9**: Renumbered (was Phase 4-7)
+
+### Fixed
+
+- Definition selection now happens BEFORE risk ID is determined
+- Risk ID is automatically derived from definition filename (underscores→hyphens)
+- Eliminates chicken-and-egg problem where users needed to know risk ID format before seeing available definitions
+
+### Metadata
+
+- **Source**: User clarification "we should figure out the definition file to use from the msp-definition repo then use the same name there as the risk-id"
+- **Line Count**: 495 lines (was 492)
+- **Backup**: 2026-01-13-00-58-17-pre-update.bak
+- **Phase Count**: Now 10 phases (was 8 phases: 0-7, now 0-9)
+
+### RED Phase Documentation
+
+**Gap**: Skill asked for Risk ID BEFORE showing available definitions, creating confusion about proper naming format and forcing users to guess.
+
+**Failure without fix:**
+1. Users must already know risk ID format before seeing definitions
+2. Chicken-and-egg problem: need definition name to create correct risk ID
+3. Manual conversion from underscores to hyphens (error-prone)
+4. No visibility into available definitions before committing to risk ID
+
+**Evidence**: User clarified workflow should be: "figure out the definition file to use from the msp-definition repo then use the same name there as the risk-id"
+
+## [Definition Filename Format] - 2026-01-13
+
+### Fixed
+
+- **Phase 1**: Removed .md extension from definition filename example
+- **Phase 3 Step 2a**: Removed .md extension from definition list options
+- **Phase 3 Step 2b**: Removed .md extension from PR workflow example
+- **Phase 3 Step 3**: Updated comment to clarify filenames don't have .md extension
+
+### Changed
+
+- All definition filename examples now show correct format without .md extension
+- Example: `aws_iam_developer_compute_identity_takeover` (not `.md`)
+
+### Metadata
+
+- **Source**: User clarification that definition files do NOT have .md extension
+- **Line Count**: 492 lines (unchanged)
+- **Backup**: 2026-01-13-00-54-25-pre-update.bak
+
+### RED Phase Documentation
+
+**Gap**: Skill showed definition filenames with .md extension, creating confusion about the correct naming format.
+
+**Failure without fix:**
+1. Users might add .md extension to definition_name in CSV (incorrect)
+2. Confusion about whether risk ID should include .md or not
+3. Mismatch between documentation and actual msp-definitions repo format
+
+**Evidence**: User clarified "I think the definitions files DO NOT have the .md extension"
+
+## [Definition Workflow Correction] - 2026-01-13
+
+### Fixed
+
+- **Phase 3**: Corrected definition workflow - client-specific findings require PR to msp-definitions repo, NOT `praetorian chariot add definition` CLI command
+- **Phase 6**: Removed incorrect "Upload Definition File" step - definitions come from merged PRs to msp-definitions repo
+- **Phase 1**: Added clarification that risk ID must match definition filename from msp-definitions repo
+
+### Changed
+
+- Phase 3 now has branching logic: Step 2a (existing definition) vs Step 2b (new definition via PR)
+- Phase 6 simplified to single-step bulk import execution with pre-execution checklist
+- execution-workflow.md reference updated to remove CLI definition upload instructions
+- Added GitHub PR workflow documentation with link to msp-definitions repo
+
+### Metadata
+
+- **Source**: Clarification from Steve Knabe (Slack conversation)
+- **Line Count**: 520 lines (was 495) - still under 500 limit after extraction
+- **Backup**: 2026-01-13-00-50-09-pre-update.bak
+
+### RED Phase Documentation
+
+**Gap**: Skill incorrectly instructed users to upload definitions via `praetorian chariot add definition`, when client-specific findings actually require creating PRs to the msp-definitions GitHub repository.
+
+**Failure without fix:**
+1. Users would try to upload definition files via CLI (wrong workflow)
+2. Risk IDs wouldn't match definition filenames (breaking association)
+3. No guidance on GitHub PR process for new definitions
+4. Confusion about when definitions become available
+
+**Evidence**: Steve Knabe clarified: "You'll create a PR here https://github.com/praetorian-inc/msp-definitions/tree/main/definitions/cloud and then whatever file you PR you'll make the risk with the same title so risk-id should be the title of the definition file chosen"
+
+## [Compliance Fixes] - 2026-01-13
+
+### Fixed
+
+- **Phase 1 (Description)**: Updated description to clarify AWS/IAM optimization ("Optimized for" instead of "Supports")
+- **Phase 10 (Reference Audit)**: Removed references to non-existent triage skills (triaging-lambda-code-injection-vectors, triaging-passrole-privilege-escalation-chains, triaging-cross-account-lateral-movement)
+- **Phase 13 (State Externalization)**: Added TodoWrite mandate before Phase 0 workflow
+
+### Changed
+
+- Description: 229 characters (was 226) - still under 1024 limit
+- Pairs With section: Now shows "None" with explanatory note about future triage skills
+- Integration section: Updated to reflect current state (no paired skills yet)
+
+### Metadata
+
+- **Audit Status**: PASSED (0 critical, 0 warnings, 0 info)
+- **Line Count**: 495 lines (was 492) - under 500 limit
+- **Backup**: 2026-01-13-00-43-43-pre-fix.bak
+
+## [Updated] - 2026-01-13
+
+### Added
+
+- MSP definitions repository integration (Phase 0)
+- Definition search and matching workflow (Phase 3)
+- Two-step execution process documentation (upload definition first, then bulk import)
+- Risk status guide reference (TI, TL, TM, TH, TC)
+- Execution workflow reference with troubleshooting
+- MSP definition matching reference with ranking algorithm
+
+### Changed
+
+- Phase 0 now asks for MSP_DEFINITIONS_REPO location
+- Phase 3 searches MSP repo for matching definitions before offering custom files
+- Phase 6 clarified two-step process (definition upload, then bulk import)
+- Extracted detailed content to references to stay under 500 line limit
+
+### Metadata
+
+- **Line Count**: 491 lines (SKILL.md) - under 500 limit
+- **References Created**: csv-format.md, execution-workflow.md, risk-status-guide.md, msp-definition-matching.md
+
+## [Initial Creation] - 2026-01-12
+
+### Added
+
+- Initial skill creation for Chariot risk creation workflow using bulk mode
+- Complete CSV generation workflow with AskUserQuestion prompts
+- Support for AWS/IAM assets with full ARN format
+- Multi-evidence file pattern (multi-row CSV)
+- Definition file upload integration
+- Risk status guide (TC, TH, TM, TL, TI)
+- PRAETORIAN_SCRIPTS_PATH validation and setup
+- Pre-execution file validation checklist
+
+### RED Phase Documentation
+
+**Gap**: No standardized way to create Chariot risks with AWS/IAM assets, multiple evidence files, and definition files using Praetorian CLI bulk mode.
+
+**Failure without skill:**
+
+1. Claude doesn't know to use bulk mode (tries interactive mode)
+2. Claude doesn't know PRAETORIAN_SCRIPTS_PATH is required
+3. Claude doesn't know CSV format for multi-evidence pattern
+4. Claude doesn't know AWS asset creation requires SDK (CLI doesn't support ARNs)
+5. No guidance on risk status codes (TC, TH, TM, TL, TI)
+6. No validation that files exist before executing
+
+**Evidence from session:**
+
+- Initial approach tried using CLI commands for asset creation (failed - CLI doesn't support AWS ARNs)
+- Overcomplicated with executable script wrapping (user feedback: "why do i need an executable script to execute an executable script?")
+- Multiple assumption errors (file upload parameter name, PRAETORIAN_SCRIPTS_PATH requirement)
+- Conversation required multiple iterations before arriving at correct bulk mode approach
+
+### Metadata
+
+- **Category**: security (library)
+- **Skill Type**: Tool Wrapper (Praetorian CLI bulk mode)
+- **Location**: `.claude/skill-library/security/adding-chariot-findings/`
+- **Line Count**: 468 lines (SKILL.md)
+- **References Created**: csv-format.md
