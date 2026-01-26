@@ -1,0 +1,58 @@
+# Changelog
+
+## 2026-01-26 - Offensive Tool Post Guidance
+
+**Source**: User feedback comparing AI-generated draft with manually edited version for Silbannacus tool announcement.
+
+**Added to SKILL.md**:
+- New "Domain-Specific Guidance" section
+- "Offensive Security Tool Posts" subsection with 7 principles:
+  1. Operational Model > Implementation Details
+  2. Kill "Completeness" Sections
+  3. Frame Through Attacker Lens
+  4. Memorable Examples > Generic Ones
+  5. Include Practitioner Tips
+  6. Connect to Contemporary Techniques
+  7. End Clean
+
+**Added to references/anti-patterns.md**:
+- 6 new offensive tool anti-patterns (#11-16):
+  - Implementation Over Operations
+  - Obligatory Sections
+  - Generic Framing
+  - Forgettable Examples
+  - Missing Field Knowledge
+  - Forced Closing Humor
+
+**Added to references/content-synthesis.md**:
+- "Offensive Tool Posts: Operational Framing" section
+- Attacker/Defender asymmetry articulation
+- Operational model narrative examples
+- Section necessity test
+- Contemporary technique integration
+
+**Key insight**: AI drafts tend toward "completeness" (use cases, security considerations, implementation details) that practitioners don't need. Manual edits consistently removed these sections and added operational/attacker-focused framing instead.
+
+---
+
+## 2026-01-26 - Initial Creation
+
+**RED Phase Failure**: Agent created technically accurate blog post but failed to capture author's voice. Generic professional tone instead of conversational narrative style with personality.
+
+**Category**: content
+**Skill Type**: Process/Pattern
+**Location**: Library (.claude/skill-library/content/)
+
+**Purpose**: Systematic workflow for blog post generation combining:
+- Technical accuracy through source analysis
+- Voice authenticity through reference material analysis
+- Research integration for context and attribution
+- Structured synthesis maintaining narrative flow
+
+**Key Features**:
+- Optional voice capture from author's previous work
+- orchestrating-research integration for systematic research
+- Progressive disclosure with detailed reference files
+- Output persistence with MANIFEST.yaml
+
+**Initial line count**: 270 lines (target: <500)
