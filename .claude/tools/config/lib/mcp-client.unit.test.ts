@@ -22,13 +22,18 @@ vi.mock('@modelcontextprotocol/sdk/client/stdio.js', () => ({
   StdioClientTransport: vi.fn(),
 }));
 
-vi.mock('../config-loader', () => ({
-  getToolConfig: vi.fn().mockReturnValue({}),
-}));
 
 vi.mock('../../../lib/find-project-root.js', () => ({
   resolveProjectPath: vi.fn().mockReturnValue('/mock/path'),
   findProjectRoot: vi.fn().mockReturnValue('/mock/project/root'),
+}));
+
+// Mock the secrets provider to return credentials successfully
+vi.mock('./secrets-provider.js', () => ({
+  getDefaultSecretsProvider: vi.fn(() => ({
+    name: 'mock-provider',
+    getSecret: vi.fn().mockResolvedValue({ ok: true, value: 'mock-api-key' }),
+  })),
 }));
 
 import {
@@ -42,7 +47,6 @@ import {
   MCPCallOptions
 } from './mcp-client';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
-import { getToolConfig } from '../config-loader';
 
 describe('MCP Client', () => {
   let mockClient: {
@@ -54,8 +58,6 @@ describe('MCP Client', () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
-    // Re-establish getToolConfig mock after clearAllMocks
-    vi.mocked(getToolConfig).mockReturnValue({});
 
     // Set up mock client instance
     mockClient = {

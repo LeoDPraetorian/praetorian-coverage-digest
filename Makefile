@@ -411,6 +411,8 @@ setup-mac:
 	@npm install -g typescript-language-server typescript pyright > /dev/null 2>&1 || echo "  ⚠️ Some LSP servers failed to install globally"
 	@echo "Installing Claude Agent SDK..."
 	@uv pip install --system --break-system-packages claude-agent-sdk > /dev/null 2>&1 || uv pip install --system --break-system-packages --upgrade claude-agent-sdk > /dev/null 2>&1 || echo "⚠️  Warning: Claude Agent SDK installation/upgrade failed"
+	@echo "Installing 1Password CLI (for secure credential access)..."
+	@brew install --cask 1password-cli > /dev/null 2>&1 || echo "  ℹ️  1Password CLI already installed or requires manual install"
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
@@ -425,7 +427,9 @@ update-mac:
 	@npm update -g @anthropic-ai/claude-code > /dev/null
 	@echo "Updating Claude Agent SDK..."
 	@uv pip install --system --break-system-packages --upgrade claude-agent-sdk > /dev/null 2>&1 || echo "⚠️  Warning: Claude Agent SDK update failed"
-	
+	@echo "Updating 1Password CLI..."
+	@brew upgrade --cask 1password-cli > /dev/null 2>&1 || echo "  ℹ️  1Password CLI up to date or not installed"
+
 setup-ubuntu:
 	@echo "Installing additional core packages in devcontainer..."
 # go, npm, jq, python, gh are installed in the devcontainer, upgrade them manually in devcontainer

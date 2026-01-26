@@ -58,4 +58,4 @@ export { syncToMarkdown } from './sync-to-markdown.js';
 export { syncFromMarkdown } from './sync-from-markdown.js';
 
 // Client
-export { createFeaturebaseClient, featurebaseConfig } from './client.js';
+export { createFeaturebaseClientAsync, featurebaseConfig } from './client.js';

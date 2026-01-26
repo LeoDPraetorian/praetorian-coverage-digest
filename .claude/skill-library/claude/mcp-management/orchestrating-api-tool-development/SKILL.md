@@ -79,12 +79,13 @@ Context:
 - Reference: .claude/tools/shodan/ (working patterns)
 
 Create:
-1. client.ts - Service-specific HTTP client config
-2. [endpoint].ts - Wrapper implementation
+1. client.ts - Service-specific HTTP client config with async factory
+2. [endpoint].ts - Wrapper implementation using async client
 3. index.ts - Barrel exports
 
 Requirements:
 - Zod schemas for input/output validation
+- Use createServiceClientAsync() (RECOMMENDED) for 1Password support
 - Filter response for 80-95% token reduction
 - Convert null → undefined for optional fields
 - Include estimatedTokens in output
@@ -94,6 +95,7 @@ Auth configuration:
 - baseUrl: [service-base-url]
 - auth.type: 'query' | 'header' | 'bearer'
 - auth.keyName: [param-name]
+- Register in .claude/tools/1password/lib/config.ts
 ```
 
 **Verify GREEN:** Run tests - all must pass
@@ -135,12 +137,13 @@ Check:
 ### HTTP Client Configuration
 
 ```typescript
-export const serviceConfig: HTTPServiceConfig = {
+// Service configuration
+const serviceConfig: HTTPServiceConfig = {
   baseUrl: "https://api.service.com",
   auth: {
     type: "query", // or 'header', 'bearer'
-    keyName: "key", // param/header name
-    credentialKey: "apiKey",
+    keyName: "key", // query param name or header name
+    credentialKey: "apiKey", // Key name in resolved credentials
   },
   timeout: 30_000,
   retry: {
@@ -148,20 +151,68 @@ export const serviceConfig: HTTPServiceConfig = {
     methods: ["get"],
     statusCodes: [408, 429, 500, 502, 503, 504],
   },
+  rateLimit: { requestsPerSecond: 5 },
 };
+
+// RECOMMENDED: Async client factory (uses 1Password)
+export async function createServiceClientAsync(): Promise<HTTPPort> {
+  return createHTTPClientAsync("service-name", serviceConfig);
+}
+
+// DEPRECATED: Sync client factory (uses credentials.json)
+export function createServiceClient(): HTTPPort {
+  console.warn("DEPRECATED: Use createServiceClientAsync() for 1Password support");
+  return createHTTPClient("service-name", serviceConfig);
+}
+```
+
+### 1Password Credential Setup
+
+For services requiring API keys, configure 1Password:
+
+**Step 1: Register Service**
+
+Add to `.claude/tools/1password/lib/config.ts`:
+
+```typescript
+serviceItems: {
+  'service-name': 'Service Display Name',
+}
+```
+
+**Step 2: Create 1Password Item**
+
+In vault 'Claude Code Tools', create item:
+- **Name:** Service Display Name
+- **password field:** Your API key
+
+**Step 3: Use Async Pattern**
+
+All wrappers should use the async client:
+
+```typescript
+// In wrapper execute function
+const client = await createServiceClientAsync();
+const response = await client.get("/endpoint");
 ```
 
 ### Wrapper Structure
 
 ```typescript
+import { createServiceClientAsync, type HTTPPort } from "./client.js";
+import { z } from "zod";
+
 export const wrapperName = {
   name: "service.endpoint_name",
   inputSchema: InputSchema,
   outputSchema: OutputSchema,
 
-  async execute(input, client?) {
+  async execute(
+    input: z.infer<typeof this.inputSchema>,
+    client?: HTTPPort // Optional for testing
+  ) {
     const validated = InputSchema.parse(input);
-    const httpClient = client ?? createServiceClient();
+    const httpClient = client ?? (await createServiceClientAsync()); // ASYNC
 
     const result = await httpClient.request("get", "path/to/endpoint", {
       searchParams: { ...validated },
@@ -220,8 +271,28 @@ See `.claude/tools/shodan/` for complete working example:
 
 Architecture documentation: `.claude/.output/api-wrappers/http-client-architecture.md`
 
-## Related Skills
+## Integration
 
-- `orchestrating-mcp-development` - For MCP wrapper development
-- `managing-tool-wrappers` - Lifecycle management for wrappers
-- `gateway-mcp-tools` - Routes to wrapper-related skills
+### Called By
+
+- `gateway-mcp-tools` (CORE) router - Routes REST API wrapper tasks
+- User direct invocation when creating REST API wrappers
+
+### Requires (invoke before starting)
+
+None - standalone workflow orchestrator
+
+### Calls (during execution)
+
+- **tool-tester** (AGENT) - Phase 1 (RED): Write failing tests first
+- **tool-developer** (AGENT) - Phase 2 (GREEN): Implement wrapper to pass tests
+- **tool-reviewer** (AGENT) - Phase 3 (REVIEW): Code quality validation
+
+### Pairs With (conditional)
+
+- **`orchestrating-mcp-development`** (LIBRARY) - When MCP server available
+  - Purpose: Alternative for services with MCP servers
+  - `Read(".claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md")`
+- **`managing-tool-wrappers`** (LIBRARY) - After wrapper creation
+  - Purpose: Lifecycle management (update, audit, fix, test)
+  - `Read(".claude/skill-library/claude/mcp-management/managing-tool-wrappers/SKILL.md")`

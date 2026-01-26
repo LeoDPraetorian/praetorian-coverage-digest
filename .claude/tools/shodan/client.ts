@@ -5,7 +5,12 @@
  * Shodan uses query parameter authentication with the 'key' parameter.
  */
 
-import { createHTTPClient, type HTTPServiceConfig, type HTTPPort } from '../config/lib/http-client.js';
+import {
+  createHTTPClientAsync,
+  type HTTPServiceConfig,
+  type HTTPPort
+} from '../config/lib/http-client.js';
+import type { SecretsProvider } from '../config/lib/secrets-provider.js';
 
 /**
  * Shodan API configuration
@@ -26,32 +31,27 @@ export const shodanConfig: HTTPServiceConfig = {
 };
 
 /**
- * Create a Shodan HTTP client
+ * Create a Shodan HTTP client with async credential resolution
  *
- * @param credentials - Optional credentials for testing (uses config-loader if not provided)
+ * Uses SecretsProvider for credential lookup:
+ * - 1Password with biometric auth (if configured)
+ * - Falls back to environment variables
+ *
+ * @param provider - Optional SecretsProvider (uses default if not provided)
  * @returns HTTPPort implementation for Shodan API
  *
  * @example
  * ```typescript
- * // Production usage (loads from credentials.json)
- * const client = createShodanClient();
+ * // Production usage (resolves credentials via default SecretsProvider)
+ * const client = await createShodanClientAsync();
  *
- * // Testing usage (inject mock credentials)
- * const client = createShodanClient({ apiKey: 'test-key' });
+ * // Testing usage (inject mock provider)
+ * const mockProvider = { name: 'test', getSecret: async () => ({ ok: true, value: 'key' }) };
+ * const client = await createShodanClientAsync(mockProvider);
+ *
+ * const result = await client.request('get', '/shodan/host/8.8.8.8');
  * ```
  */
-export function createShodanClient(credentials?: { apiKey: string }): HTTPPort {
-  return createHTTPClient('shodan', shodanConfig, credentials);
-}
-
-/**
- * Default Shodan client instance (lazy initialization)
- */
-let defaultClient: HTTPPort | null = null;
-
-export function getShodanClient(): HTTPPort {
-  if (!defaultClient) {
-    defaultClient = createShodanClient();
-  }
-  return defaultClient;
+export async function createShodanClientAsync(provider?: SecretsProvider): Promise<HTTPPort> {
+  return createHTTPClientAsync('shodan', shodanConfig, provider);
 }

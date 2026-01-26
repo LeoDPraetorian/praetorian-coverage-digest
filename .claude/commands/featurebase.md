@@ -283,17 +283,17 @@ I'll parse the JSON response and display it in a clean, readable format with:
 
 ## Authentication
 
-Featurebase tools use API key authentication configured in `$ROOT/.claude/tools/config/credentials.json`:
+Featurebase API key is stored in 1Password:
 
-```json
-{
-  "featurebase": {
-    "apiKey": "YOUR_API_KEY_HERE"
-  }
-}
-```
+- **Vault:** "Claude Code Tools"
+- **Item:** "Featurebase API Key"
+- **Field:** password
+
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
 
 **Get your API key from:** https://app.featurebase.app/settings/api
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ---
 

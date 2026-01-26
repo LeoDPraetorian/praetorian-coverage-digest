@@ -107,11 +107,12 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Authentication
 
-API key configured in `.claude/tools/config/credentials.json`:
-```json
-{
-  "perplexity": {
-    "apiKey": "YOUR_API_KEY"
-  }
-}
-```
+Perplexity API key is stored in 1Password:
+
+- **Vault:** "Claude Code Tools"
+- **Item:** "Perplexity API Key"
+- **Field:** password
+
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.

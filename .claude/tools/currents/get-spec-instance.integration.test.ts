@@ -5,7 +5,10 @@
  * Run with: RUN_INTEGRATION_TESTS=true npm run test:integration -- currents/get-spec-instance
  *
  * Prerequisites:
- * - Valid Currents API key in credentials.json or .env
+ * - Valid Currents API key in 1Password vault "Claude Code Tools" (primary)
+ *   Item: "Currents API Key", Field: password
+ * - OR: CURRENTS_API_KEY environment variable (CI environments)
+ * - DEPRECATED: credentials.json is no longer supported
  * - At least one spec instance available in Currents account
  */
 
@@ -315,7 +318,9 @@ integrationTest('getSpecInstance - Integration Tests (Real MCP)', () => {
  * To run these integration tests:
  *
  * 1. Set up Currents API credentials:
- *    - Add CURRENTS_API_KEY to .env or credentials.json
+ *    - Primary: Store API key in 1Password vault "Claude Code Tools"
+ *      Item: "Currents API Key", Field: password
+ *    - Alternative: Set CURRENTS_API_KEY environment variable
  *    - Get an API key from https://currents.dev/
  *
  * 2. Get a valid instance ID:

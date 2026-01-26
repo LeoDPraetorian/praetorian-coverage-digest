@@ -165,8 +165,9 @@ AskUserQuestion({
       question: "This MCP requires authentication. How is it configured?",
       multiSelect: false,
       options: [
-        { label: "API Key", description: "Requires an API key in credentials.json" },
-        { label: "OAuth", description: "Uses browser-based OAuth flow" },
+        { label: "1Password Secret (Recommended)", description: "Uses 1Password CLI for secure credential access via SecretsProvider" },
+        { label: "Environment Variable", description: "Uses environment variable (e.g., SERVICE_API_KEY)" },
+        { label: "OAuth", description: "Uses browser-based OAuth flow with tokens in ~/.claude-oauth/" },
         { label: "None", description: "No authentication required" },
         { label: "External", description: "Uses system credentials (AWS, etc.)" },
       ],
@@ -175,7 +176,15 @@ AskUserQuestion({
 });
 ```
 
-**If API Key:** Add entry to `.claude/tools/config/credentials.json` (prompt user for key or placeholder)
+**If 1Password Secret (Recommended):**
+1. Add service to `.claude/tools/1password/lib/config.ts` serviceItems map
+2. Create item in 1Password vault 'Claude Code Tools' with API key in 'password' field
+3. Use `createHTTPClientAsync()` in wrapper for async credential resolution
+4. Service will automatically resolve credentials from 1Password
+
+**If Environment Variable:**
+1. Set environment variable with API key value (e.g., `export SERVICE_API_KEY=xxx`)
+2. Reference via `process.env.SERVICE_API_KEY` in wrapper
 
 ### Step 6: Add Configuration to mcp-client.ts
 

@@ -1,38 +1,40 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { createFeaturebaseClient, featurebaseConfig } from '../client.js';
+import { describe, it, expect } from 'vitest';
+import { createFeaturebaseClientAsync, featurebaseConfig } from '../client.js';
+import type { SecretsProvider } from '../../config/lib/index.js';
 
-// Mock the config loader to control credential resolution
-vi.mock('../../config/config-loader.js', () => ({
-  getToolConfig: vi.fn(),
-}));
+describe('createFeaturebaseClientAsync', () => {
+  it('creates HTTPPort with X-API-Key auth', async () => {
+    const mockProvider: SecretsProvider = {
+      name: 'test',
+      getSecret: async () => ({ ok: true, value: 'test-key' })
+    };
 
-import { getToolConfig } from '../../config/config-loader.js';
-const mockedGetToolConfig = vi.mocked(getToolConfig);
-
-describe('createFeaturebaseClient', () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it('creates HTTPPort with X-API-Key auth', () => {
-    const client = createFeaturebaseClient({ apiKey: 'test-key' });
+    const client = await createFeaturebaseClientAsync(mockProvider);
 
     expect(client).toBeDefined();
     expect(client.request).toBeInstanceOf(Function);
   });
 
-  it('throws error if credentials missing', () => {
-    mockedGetToolConfig.mockImplementation(() => {
-      throw new Error('Environment variable FEATUREBASE_API_KEY not set.');
-    });
-    expect(() => createFeaturebaseClient()).toThrow('FEATUREBASE_API_KEY');
+  it('throws error if credentials missing', async () => {
+    const failProvider: SecretsProvider = {
+      name: 'test',
+      getSecret: async () => ({
+        ok: false,
+        error: {
+          type: 'NOT_CONFIGURED',
+          message: 'Environment variable FEATUREBASE_API_KEY not set.'
+        }
+      })
+    };
+
+    await expect(createFeaturebaseClientAsync(failProvider)).rejects.toThrow(/Failed to get credentials/);
   });
 
-  it('falls back to getToolConfig when no credentials provided', () => {
-    mockedGetToolConfig.mockReturnValue({ apiKey: 'fallback-key' });
-    const client = createFeaturebaseClient();
-    expect(mockedGetToolConfig).toHaveBeenCalledWith('featurebase');
-    expect(client).toBeDefined();
+  it('uses default provider when none provided', async () => {
+    // This tests the fallback behavior - default provider reads from env
+    // In a real environment with FEATUREBASE_API_KEY set, this would succeed
+    // In tests without the env var, it should error appropriately
+    await expect(createFeaturebaseClientAsync()).rejects.toThrow();
   });
 });
 

@@ -33,15 +33,10 @@ Enable Linear operations through direct GraphQL HTTP calls with OAuth 2.0 authen
    - Redirect URI: `http://localhost:3847/callback`
    - Copy the Client ID
 
-2. **Add to credentials.json:**
-
-   ```json
-   {
-     "linear": {
-       "clientId": "your-oauth-client-id"
-     }
-   }
-   ```
+2. **Store OAuth clientId:**
+   - **Current:** OAuth tokens are automatically saved to `~/.claude-oauth/linear.json`
+   - **Future (Phase 4):** ClientId customization via 1Password vault "Claude Code Tools", item "Linear OAuth Client ID"
+   - **No credentials.json needed** for Linear OAuth flow
 
 3. **First API call triggers browser authorization**
    - Browser opens automatically
@@ -373,8 +368,8 @@ npx tsx "$ROOT/.claude/tools/linear/cli.ts" list-projects '{}'
 ### OAuth Setup (First Time)
 
 ```bash
-# 1. Add clientId to credentials.json
-# 2. Run any Linear command:
+# OAuth clientId is auto-configured (or customize via 1Password in Phase 4)
+# Run any Linear command to trigger browser authorization:
 
 ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1)" && npx tsx -e "(async () => {
   const { listIssues } = await import('$ROOT/.claude/tools/linear/list-issues.ts');
@@ -526,8 +521,9 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 **"No credentials configured" error:**
 
 ```bash
-# Check credentials.json has clientId OR apiKey
-cat ~/.claude/tools/config/credentials.json
+# Check OAuth token file exists
+ls -la ~/.claude-oauth/linear.json
+# If missing, next API call will trigger browser authorization
 ```
 
 **Token refresh fails:**
@@ -543,8 +539,8 @@ rm ~/.claude-oauth/linear.json
 **"Invalid API key" error:**
 
 ```bash
-# Regenerate at https://linear.app/settings/api
-# Update credentials.json with new key
+# If using API key (fallback), regenerate at https://linear.app/settings/api
+# Note: OAuth is the primary method; API keys are legacy fallback
 ```
 
 ## Rate Limits

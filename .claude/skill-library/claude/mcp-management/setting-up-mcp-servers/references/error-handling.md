@@ -206,6 +206,47 @@ Please add this config manually:
 // Please fix manually, then re-run skill
 ```
 
+## 1Password Credential Errors
+
+### Error: 'not_configured' from SecretsProvider
+
+**Cause:** Service not found in 1Password serviceItems or item doesn't exist in vault.
+
+**Fix:**
+
+1. Verify service is in `.claude/tools/1password/lib/config.ts` serviceItems
+2. Verify item exists in 1Password vault 'Claude Code Tools'
+3. Verify item name matches exactly
+
+**Example:**
+
+```
+Error: Service 'new-service' not configured in 1Password
+
+Steps to fix:
+1. Check .claude/tools/1password/lib/config.ts contains:
+   serviceItems: {
+     'new-service': 'New Service API Key'
+   }
+2. Open 1Password and verify item 'New Service API Key' exists in vault 'Claude Code Tools'
+3. Verify the item has a 'password' field with the API key
+```
+
+### Error: 'auth_required' from 1Password
+
+**Cause:** 1Password CLI requires biometric authentication.
+
+**Fix:** User will be prompted for biometric auth. This is expected on first access.
+
+**Example:**
+
+```
+Error: 1Password requires authentication
+
+This is normal behavior. 1Password will prompt for biometric authentication (Touch ID/Face ID).
+Authenticate when prompted, then retry the operation.
+```
+
 ## User Interruptions
 
 ### User Selects "Skip Setup"

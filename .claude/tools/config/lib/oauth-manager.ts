@@ -313,7 +313,7 @@ export class OAuthTokenManager {
  */
 export const LinearOAuthConfig: OAuthConfig = {
   provider: 'linear',
-  clientId: '', // Will be set via credentials.json or environment variable
+  clientId: 'c22fe7e6dfa9be091c5ea19f6121307f', // Praetorian public OAuth client (override via 1Password or LINEAR_CLIENT_ID env var)
   authorizationUrl: 'https://linear.app/oauth/authorize',
   tokenUrl: 'https://api.linear.app/oauth/token',
   scopes: ['read', 'write', 'issues:create'],

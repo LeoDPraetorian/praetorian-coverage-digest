@@ -13,20 +13,20 @@ MCP wrappers for FeatureBase API with bidirectional sync between GitHub and Feat
 
 ## Installation
 
-Credentials are managed via `.claude/tools/config/credentials.json`:
+Featurebase API key is stored in 1Password:
 
-```json
-{
-  "featurebase": {
-    "apiKey": "${FEATUREBASE_API_KEY}"
-  }
-}
-```
+- **Vault:** "Claude Code Tools"
+- **Item:** "Featurebase API Key"
+- **Field:** password
 
-Set environment variable:
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
+
+Alternatively, set environment variable:
 ```bash
 export FEATUREBASE_API_KEY="sk_live_..."
 ```
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ## Usage
 

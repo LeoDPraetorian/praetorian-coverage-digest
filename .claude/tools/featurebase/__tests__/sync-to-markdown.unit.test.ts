@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, beforeAll, afterAll } from 'vitest';
 import { syncToMarkdown } from '../sync-to-markdown.js';
-import { createFeaturebaseClient } from '../client.js';
+import { createFeaturebaseClientAsync } from '../client.js';
+import type { SecretsProvider, HTTPPort } from '../../config/lib/index.js';
 import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import fs from 'fs/promises';
@@ -69,13 +70,23 @@ const handlers = [
 ];
 
 const server = setupServer(...handlers);
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+
+const mockProvider: SecretsProvider = {
+  name: 'test',
+  getSecret: async () => ({ ok: true, value: 'test-key' }),
+};
+
+let testClient: HTTPPort;
+
+beforeAll(async () => {
+  server.listen({ onUnhandledRequest: 'error' });
+  testClient = await createFeaturebaseClientAsync(mockProvider);
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 
 describe('syncToMarkdown', () => {
   const testDir = '/tmp/featurebase-test-sync';
-  const testClient = createFeaturebaseClient({ apiKey: 'test-key' });
 
   beforeEach(async () => {
     await fs.mkdir(testDir, { recursive: true });

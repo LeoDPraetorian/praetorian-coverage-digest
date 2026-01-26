@@ -2,6 +2,41 @@
 
 **Complete examples of MCP server configurations with context.**
 
+## 1Password Configuration (Recommended)
+
+### Step 1: Add to 1Password serviceItems
+
+```typescript
+// .claude/tools/1password/lib/config.ts
+serviceItems: {
+  // ... existing services
+  'new-service': 'New Service API Key',  // Item name in 1Password
+}
+```
+
+### Step 2: Create 1Password Item
+
+Create item in vault 'Claude Code Tools':
+- Item Name: 'New Service API Key'
+- Field 'password': Your API key value
+
+### Step 3: Use Async Client Pattern
+
+```typescript
+// In your wrapper
+import { createHTTPClientAsync } from '../config/lib/http-client.js';
+
+export async function createNewServiceClientAsync() {
+  return createHTTPClientAsync('new-service', serviceConfig);
+}
+```
+
+### Migration from credentials.json
+
+The deprecated `credentials.json` pattern has been replaced with 1Password.
+- Old: `getToolConfig('service')` (sync, deprecated)
+- New: `createHTTPClientAsync('service', config)` (async, recommended)
+
 ## Example 1: Currents (npm with stderr suppression)
 
 **Context:** Currents is an npm package that writes warnings to stderr. We suppress stderr to avoid noise in MCP logs.

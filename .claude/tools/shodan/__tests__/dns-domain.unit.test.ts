@@ -10,15 +10,24 @@ import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { dnsDomain } from '../dns-domain.js';
 import { shodanHandlers } from './msw-handlers.js';
-import { createShodanClient } from '../client.js';
+import { createShodanClientAsync } from '../client.js';
+import type { SecretsProvider, HTTPPort } from '../../config/lib/index.js';
 
 // Setup MSW server
 const server = setupServer(...shodanHandlers);
 
-// Create test client with mock credentials
-const testClient = createShodanClient({ apiKey: 'test-api-key' });
+// Create test client with mock credentials (async pattern)
+const mockProvider: SecretsProvider = {
+  name: 'test',
+  getSecret: async () => ({ ok: true, value: 'test-api-key' })
+};
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+let testClient: HTTPPort;
+
+beforeAll(async () => {
+  server.listen({ onUnhandledRequest: 'error' });
+  testClient = await createShodanClientAsync(mockProvider);
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 

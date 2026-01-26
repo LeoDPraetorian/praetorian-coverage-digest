@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { createShodanClient, type HTTPPort } from './client.js';
+import { createShodanClientAsync, type HTTPPort } from './client.js';
 import { estimateTokens, nullToUndefined, ensureArray } from '../config/lib/response-utils.js';
 
 // =============================================================================
@@ -83,7 +83,7 @@ export const hostInfo = {
     const validated = InputSchema.parse(input);
 
     // Create client if not provided
-    const httpClient = client ?? createShodanClient();
+    const httpClient = client ?? await createShodanClientAsync();
 
     // Build query parameters
     const searchParams: Record<string, boolean> = {};

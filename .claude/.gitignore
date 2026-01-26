@@ -1,5 +1,3 @@
-# API credentials (never commit!)
-tools/config/credentials.json
 
 # Threat modeling session outputs (generated artifacts)
 .threat-model/

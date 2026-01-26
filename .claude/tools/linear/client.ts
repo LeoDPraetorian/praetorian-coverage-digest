@@ -18,13 +18,10 @@
  * @see https://linear.app/developers/oauth-2-0-authentication
  */
 
-import { createHTTPClient, type HTTPServiceConfig, type HTTPPort } from '../config/lib/http-client.js';
-import {
-  OAuthTokenManager,
-  LinearOAuthConfig,
-} from '../config/lib/oauth-manager.js';
+import { createHTTPClientWithCredentials, type HTTPServiceConfig, type HTTPPort } from '../config/lib/http-client.js';
+import { OAuthTokenManager } from '../config/lib/oauth-manager.js';
 import { startOAuthFlow } from '../config/lib/oauth-browser-flow.js';
-import { getToolConfig, hasToolConfig } from '../config/config-loader.js';
+import { LINEAR_OAUTH_CONFIG } from './config.js';
 
 /**
  * OAuth configuration error - thrown when clientId not configured
@@ -47,28 +44,14 @@ export class OAuthAuthenticationError extends Error {
 }
 
 /**
- * Linear OAuth configuration
+ * Get Linear OAuth configuration
  *
- * Loads clientId from credentials.json or LINEAR_CLIENT_ID env var.
- * Does NOT support API key fallback.
- *
- * Requires clientId to be set in credentials.json:
- * {
- *   "linear": {
- *     "clientId": "your-oauth-app-client-id"
- *   }
- * }
+ * Uses config from ./config.ts which supports LINEAR_CLIENT_ID env override.
+ * 1Password is NOT used - clientId is a PUBLIC value, not a secret.
  */
-const getLinearOAuthConfig = () => {
-  const creds = hasToolConfig('linear') ? getToolConfig<{
-    clientId?: string;
-  }>('linear') : {};
-
-  return {
-    ...LinearOAuthConfig,
-    clientId: creds.clientId || process.env.LINEAR_CLIENT_ID || LinearOAuthConfig.clientId,
-  };
-};
+export function getLinearOAuthConfig(): typeof LINEAR_OAUTH_CONFIG {
+  return LINEAR_OAUTH_CONFIG;
+}
 
 /**
  * Linear GraphQL API configuration
@@ -168,12 +151,12 @@ export async function createLinearClient(
   // For testing only - can be raw token or Bearer-prefixed
   if (testToken) {
     const token = testToken.startsWith('Bearer ') ? testToken.substring(7) : testToken;
-    return createHTTPClient('linear', linearConfig, { apiKey: token });
+    return createHTTPClientWithCredentials('linear', linearConfig, { apiKey: token });
   }
 
   // Production: OAuth only (token returned without Bearer prefix)
   const { token } = await getOAuthCredentials();
-  return createHTTPClient('linear', linearConfig, { apiKey: token });
+  return createHTTPClientWithCredentials('linear', linearConfig, { apiKey: token });
 }
 
 /**

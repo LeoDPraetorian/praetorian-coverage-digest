@@ -13,16 +13,69 @@
 import * as path from 'path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
-import { getToolConfig } from '../config-loader';
 import { resolveProjectPath, findProjectRoot } from '../../../lib/find-project-root.js';
 import { routeToSerena } from '../../serena/semantic-router.js';
 import { createSerenaHTTPClient } from './serena-http-client.js';
 import { createPyghidraHTTPClient } from './pyghidra-http-client.js';
 import { serenaLog, mcpLog, isDebugEnabled } from './debug.js';
+import {
+  getDefaultSecretsProvider,
+  type SecretsProvider,
+  type SecretErrorCode,
+} from './secrets-provider.js';
+import { getItemName } from '../../1password/lib/config.js';
 
 // Global type declarations for Serena semantic routing state
 declare global {
   var __serenaCurrentModule: string | null;
+}
+
+/**
+ * Result of credential resolution attempt
+ *
+ * Discriminated union for explicit handling of each outcome:
+ * - 'success': Credentials retrieved, use them
+ * - 'not_configured': Service not in 1Password, continue without auth
+ * - 'auth_failed': 1Password error, surface to user (do NOT proceed)
+ */
+export type CredentialResult =
+  | { status: 'success'; credentials: Record<string, string> }
+  | { status: 'not_configured'; reason: string }
+  | { status: 'auth_failed'; error: string; code: SecretErrorCode };
+
+/**
+ * Error thrown when credential retrieval fails for a service that requires auth
+ */
+export class CredentialError extends Error {
+  constructor(
+    public mcpName: string,
+    public originalError: string,
+    public code: SecretErrorCode
+  ) {
+    super(CredentialError.formatMessage(mcpName, originalError, code));
+    this.name = 'CredentialError';
+  }
+
+  static formatMessage(mcpName: string, error: string, code: SecretErrorCode): string {
+    const action = CredentialError.getActionForCode(code);
+    return `Failed to get credentials for ${mcpName}\n\nError: ${error}\nCode: ${code}\n\nAction: ${action}`;
+  }
+
+  static getActionForCode(code: SecretErrorCode): string {
+    switch (code) {
+      case 'AUTH_REQUIRED':
+        return 'Please complete Touch ID authentication and try again.';
+      case 'NOT_SIGNED_IN':
+        return 'Please connect 1Password CLI to the desktop app (Settings > Developer > CLI Integration).';
+      case 'NOT_FOUND':
+        return 'Create the missing item in your 1Password vault.';
+      case 'NOT_CONFIGURED':
+        return 'Add this service to DEFAULT_CONFIG.serviceItems in .claude/tools/1password/lib/config.ts';
+      case 'PROVIDER_ERROR':
+      default:
+        return 'Check 1Password CLI is installed and configured correctly.';
+    }
+  }
 }
 
 /**
@@ -201,7 +254,7 @@ function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServe
     'github': {
       command: 'npx',
       args: ['-y', '@modelcontextprotocol/server-github'],
-      envVars: { 'GITHUB_TOKEN': 'apiKey' }
+      envVars: { 'GITHUB_TOKEN': 'apiKey' } // Expected in process.env (set via ~/.zshrc or ~/.bashrc)
     },
     'praetorian-cli': {
       command: 'praetorian',
@@ -254,6 +307,49 @@ function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServe
 export const DEFAULT_MAX_RETRIES = 3;
 export const DEFAULT_RETRY_DELAY_MS = 1000;
 export const DEFAULT_RETRYABLE_ERRORS = ['ETIMEDOUT', 'ECONNREFUSED', 'ECONNRESET', 'timed out'];
+
+/**
+ * Resolve credentials for an MCP service
+ *
+ * Returns a CredentialResult discriminated union for explicit handling.
+ * DOES NOT THROW - callers must handle all status values.
+ *
+ * @param mcpName - Service name (e.g., 'perplexity', 'currents')
+ * @param provider - SecretsProvider instance
+ * @returns CredentialResult with status: 'success' | 'not_configured' | 'auth_failed'
+ */
+async function resolveCredentialsAsync(
+  mcpName: string,
+  provider: SecretsProvider = getDefaultSecretsProvider()
+): Promise<CredentialResult> {
+  // Check if service is configured in 1Password
+  try {
+    getItemName(mcpName);
+  } catch {
+    // Service not configured - this is OK, continue without auth
+    return {
+      status: 'not_configured',
+      reason: `Service '${mcpName}' not configured in 1Password`
+    };
+  }
+
+  // Service IS configured - credentials are REQUIRED
+  const result = await provider.getSecret(mcpName, 'apiKey');
+
+  if (result.ok) {
+    return {
+      status: 'success',
+      credentials: { apiKey: result.value }
+    };
+  } else {
+    // Auth failed - return error for caller to handle
+    return {
+      status: 'auth_failed',
+      error: result.error,
+      code: result.code
+    };
+  }
+}
 
 /**
  * Default response size limit (1MB)
@@ -485,26 +581,42 @@ export async function callMCPTool<T = any>(
     'nebula',           // Uses ~/.aws/credentials
     'praetorian-cli',   // Uses ~/.praetorian/keychain.ini
     'linear-mcp',       // Uses OAuth via ~/.mcp-auth/
+    'linear',           // Uses OAuth via ~/.claude-oauth/ (clientId is PUBLIC, not in 1Password)
     'chrome-devtools',  // No auth needed (local browser)
     'chariot',          // Internal tool, no auth
     'serena',           // No auth needed (local tool)
     'pyghidra',         // Uses GHIDRA_INSTALL_DIR from environment
+    'ghydra',           // No auth needed (connects to local Ghidra instances)
+    'github',           // Uses GITHUB_TOKEN from environment
   ];
 
   // Get credentials from shared config (only once, not per retry)
-  let credentials: any = {};
+  let credentials: Record<string, string> = {};
   if (!usesExternalCredentials.includes(mcpName)) {
-    try {
-      credentials = getToolConfig(mcpName);
-      // Log credential access
-      logAuditEvent({
-        timestamp: new Date().toISOString(),
-        event: 'credential_access',
-        mcpName,
-      });
-    } catch (error) {
-      // Some MCPs don't require credentials (e.g., local servers)
-      mcpLog.info(`No credentials found for ${mcpName}, continuing without auth`);
+    const credResult = await resolveCredentialsAsync(mcpName);
+
+    switch (credResult.status) {
+      case 'success':
+        credentials = credResult.credentials;
+        logAuditEvent({
+          timestamp: new Date().toISOString(),
+          event: 'credential_access',
+          mcpName,
+        });
+        break;
+
+      case 'not_configured':
+        // Service doesn't use 1Password - this is OK
+        mcpLog.info(`${mcpName}: ${credResult.reason}`);
+        break;
+
+      case 'auth_failed':
+        // Credential retrieval FAILED - surface to user (DO NOT PROCEED)
+        throw new CredentialError(
+          mcpName,
+          credResult.error,
+          credResult.code
+        );
     }
   }
 
@@ -540,15 +652,27 @@ export async function callMCPTool<T = any>(
     env.GOWORK = 'off';
   }
 
-  // Add credentials from credentials.json OR use literal values
-  if (serverConfig.envVars) {
-    for (const [envVar, credentialKeyOrValue] of Object.entries(serverConfig.envVars)) {
-      if (credentials[credentialKeyOrValue]) {
-        // Value is a key in credentials.json
-        env[envVar] = credentials[credentialKeyOrValue];
-      } else if (!credentialKeyOrValue.startsWith('$')) {
-        // Value is a literal (not a variable reference)
-        env[envVar] = credentialKeyOrValue;
+  // REMOVED: Legacy credentials.json injection (2026-01-25)
+  // All credential resolution now uses resolveCredentialsAsync() → 1Password
+  // Tools without 1Password config must be in usesExternalCredentials list
+  //
+  // Previous code (lines 652-663):
+  // if (serverConfig.envVars) {
+  //   for (const [envVar, credentialKeyOrValue] of Object.entries(serverConfig.envVars)) {
+  //     if (credentials[credentialKeyOrValue]) {
+  //       env[envVar] = credentials[credentialKeyOrValue];
+  //     } else if (!credentialKeyOrValue.startsWith('$')) {
+  //       env[envVar] = credentialKeyOrValue;
+  //     }
+  //   }
+  // }
+
+  // Inject resolved credentials into MCP server environment
+  // Maps credential keys (e.g., 'apiKey') to env vars (e.g., 'CURRENTS_API_KEY')
+  if (serverConfig.envVars && Object.keys(credentials).length > 0) {
+    for (const [envVar, credentialKey] of Object.entries(serverConfig.envVars)) {
+      if (credentials[credentialKey]) {
+        env[envVar] = credentials[credentialKey];
       }
     }
   }

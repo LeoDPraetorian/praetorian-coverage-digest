@@ -21,4 +21,4 @@
 export { hostSearch, type HostSearchInput, type HostSearchOutput } from './host-search.js';
 export { hostInfo, type HostInfoInput, type HostInfoOutput } from './host-info.js';
 export { dnsDomain, type DNSDomainInput, type DNSDomainOutput } from './dns-domain.js';
-export { createShodanClient, getShodanClient, shodanConfig } from './client.js';
+export { createShodanClientAsync, shodanConfig } from './client.js';

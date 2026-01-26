@@ -3,11 +3,22 @@ import { setupServer } from 'msw/node';
 import { http, HttpResponse } from 'msw';
 import { featurebaseHandlers } from './msw-handlers.js';
 import { updateChangelog } from '../update-changelog.js';
-import { createFeaturebaseClient } from '../client.js';
-const server = setupServer(...featurebaseHandlers);
-const testClient = createFeaturebaseClient({ apiKey: 'test-api-key' });
+import { createFeaturebaseClientAsync } from '../client.js';
+import type { SecretsProvider, HTTPPort } from '../../config/lib/index.js';
 
-beforeAll(() => server.listen({ onUnhandledRequest: 'error' }));
+const server = setupServer(...featurebaseHandlers);
+
+const mockProvider: SecretsProvider = {
+  name: 'test',
+  getSecret: async () => ({ ok: true, value: 'test-api-key' }),
+};
+
+let testClient: HTTPPort;
+
+beforeAll(async () => {
+  server.listen({ onUnhandledRequest: 'error' });
+  testClient = await createFeaturebaseClientAsync(mockProvider);
+});
 afterEach(() => server.resetHandlers());
 afterAll(() => server.close());
 

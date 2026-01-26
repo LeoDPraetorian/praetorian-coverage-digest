@@ -5,7 +5,10 @@
  * Run with: RUN_INTEGRATION_TESTS=true npm run test:integration -- currents/get-runs
  *
  * Prerequisites:
- * - Valid Currents API key in credentials.json or .env
+ * - Valid Currents API key in 1Password vault "Claude Code Tools" (primary)
+ *   Item: "Currents API Key", Field: password
+ * - OR: CURRENTS_API_KEY environment variable (CI environments)
+ * - DEPRECATED: credentials.json is no longer supported
  * - At least one project with test runs in Currents account
  */
 
@@ -321,7 +324,8 @@ integrationTest('getRuns - Integration Tests (Real MCP)', () => {
  * To run these integration tests:
  *
  * 1. Set up Currents API credentials:
- *    - Add CURRENTS_API_KEY to .env or credentials.json
+ *    - Get API key from 1Password vault "Claude Code Tools" (primary)
+ *    - OR: Add CURRENTS_API_KEY to .env (CI environments)
  *    - Get an API key from https://currents.dev/
  *
  * 2. Get a valid project ID:

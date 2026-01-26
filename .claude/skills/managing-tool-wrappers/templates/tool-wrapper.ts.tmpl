@@ -129,7 +129,8 @@ export const toolName = {
 // NOTE: callMCPTool is imported from '../config/lib/mcp-client.js'
 // It handles:
 // - MCP server connection with 30-second timeout
-// - Authentication via credentials.json
+// - Authentication via 1Password (SecretsProvider)
+// - Configure in .claude/tools/1password/lib/config.ts serviceItems
 // - Error handling and resource cleanup
 
 /**

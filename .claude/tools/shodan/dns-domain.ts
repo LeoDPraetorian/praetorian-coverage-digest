@@ -6,7 +6,7 @@
  */
 
 import { z } from 'zod';
-import { createShodanClient } from './client.js';
+import { createShodanClientAsync } from './client.js';
 import type { HTTPPort } from '../config/lib/http-client.js';
 import { estimateTokens, PaginationLimits } from '../config/lib/response-utils.js';
 
@@ -100,7 +100,7 @@ export const dnsDomain = {
     const validated = InputSchema.parse(input);
 
     // Use provided client or create default Shodan client
-    const httpClient = client ?? createShodanClient();
+    const httpClient = client ?? await createShodanClientAsync();
 
     // Build query parameters
     const searchParams: Record<string, string | number | boolean> = {};

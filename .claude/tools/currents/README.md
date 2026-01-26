@@ -72,21 +72,20 @@ cd .claude/tools/currents
 npm install
 
 # 2. Configure Currents API key (REQUIRED)
-# Add to shared credentials file: .claude/tools/config/credentials.json
+# Currents API key is stored in 1Password:
+# - Vault: "Claude Code Tools"
+# - Item: "Currents API Key"
+# - Field: password
 
-{
-  "currents": {
-    "apiKey": "${CURRENTS_API_KEY}"
-  }
-}
+# First API call will prompt for biometric authentication.
+# Credentials are cached for 15 minutes.
 
-# Then set environment variable:
+# Alternatively, set environment variable:
 export CURRENTS_API_KEY="your-api-key-here"
 
-# Or add to .env file in project root:
-echo "CURRENTS_API_KEY=your-api-key-here" >> .env
-
 # Get API key from: https://app.currents.dev/settings/api-keys
+
+# Legacy (deprecated): credentials.json is no longer supported
 
 # 3. DISABLE Currents in Claude Code settings
 # Edit .claude/settings.json:
@@ -104,7 +103,7 @@ npx tsx .claude/tools/currents/index.test.ts
 **CRITICAL:**
 
 - Currents MUST be disabled in Claude Code settings for token savings
-- CURRENTS_API_KEY MUST be configured in `.claude/tools/config/credentials.json`
+- CURRENTS_API_KEY retrieved from 1Password (or environment variable)
 - Uses shared config pattern (same as Linear, future MCPs)
 - Wrappers connect to MCP server independently via SDK
 

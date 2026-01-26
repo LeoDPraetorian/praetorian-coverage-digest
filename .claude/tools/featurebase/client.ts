@@ -5,8 +5,8 @@
  * Based on verified API from .claude/tools/config/lib/http-client.ts
  */
 
-import { createHTTPClient, type HTTPPort, type HTTPServiceConfig } from '../config/lib/http-client.js';
-import { getToolConfig } from '../config/config-loader.js';
+import { createHTTPClientAsync, type HTTPPort, type HTTPServiceConfig } from '../config/lib/http-client.js';
+import type { SecretsProvider } from '../config/lib/secrets-provider.js';
 
 /**
  * FeatureBase API configuration
@@ -28,21 +28,27 @@ export const featurebaseConfig: HTTPServiceConfig = {
 };
 
 /**
- * Create FeatureBase HTTP client
+ * Create a Featurebase HTTP client with async credential resolution
  *
- * @param credentials - Optional test credentials (uses getToolConfig if not provided)
- * @returns HTTPPort instance configured for FeatureBase API
+ * Uses SecretsProvider for credential lookup:
+ * - 1Password with biometric auth (if configured)
+ * - Falls back to environment variables
  *
- * Verified API from http-client.ts lines 150-154
+ * @param provider - Optional SecretsProvider (uses default if not provided)
+ * @returns HTTPPort implementation for Featurebase API
+ *
+ * @example
+ * ```typescript
+ * // Production usage (resolves credentials via default SecretsProvider)
+ * const client = await createFeaturebaseClientAsync();
+ *
+ * // Testing usage (inject mock provider)
+ * const mockProvider = { name: 'test', getSecret: async () => ({ ok: true, value: 'key' }) };
+ * const client = await createFeaturebaseClientAsync(mockProvider);
+ *
+ * const result = await client.request('get', '/v1/articles');
+ * ```
  */
-export function createFeaturebaseClient(
-  credentials?: { apiKey: string }
-): HTTPPort {
-  if (!credentials) {
-    // Load from config (will throw if not found)
-    credentials = getToolConfig<{ apiKey: string }>('featurebase');
-  }
-
-  // Verified from http-client.ts line 150
-  return createHTTPClient('featurebase', featurebaseConfig, credentials);
+export async function createFeaturebaseClientAsync(provider?: SecretsProvider): Promise<HTTPPort> {
+  return createHTTPClientAsync('featurebase', featurebaseConfig, provider);
 }

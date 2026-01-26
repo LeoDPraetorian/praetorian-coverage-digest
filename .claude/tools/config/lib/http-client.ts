@@ -6,9 +6,10 @@
  */
 
 import ky, { type KyInstance, HTTPError as KyHTTPError } from 'ky';
-import { getToolConfig } from '../config-loader.js';
 import { estimateTokens } from './response-utils.js';
 import type { HTTPError } from './http-errors.js';
+import { getDefaultSecretsProvider, type SecretsProvider, type SecretResult } from './secrets-provider.js';
+import { createAuthErrorHint } from './auth-errors.js';
 
 // =============================================================================
 // Port Interface (Hexagonal Architecture)
@@ -130,30 +131,23 @@ export const HTTP_DEFAULTS = {
 // =============================================================================
 
 /**
- * Create an HTTP client for a specific service
- *
- * @param serviceName - Name of the service (e.g., 'shodan', 'virustotal')
- * @param config - Service configuration
- * @param credentials - Optional credentials for testing (uses getToolConfig if not provided)
- * @returns HTTPPort implementation for the service
- *
- * @example
- * ```typescript
- * const shodanClient = createHTTPClient('shodan', {
- *   baseUrl: 'https://api.shodan.io',
- *   auth: { type: 'query', keyName: 'key', credentialKey: 'apiKey' }
- * });
- *
- * const result = await shodanClient.request('get', '/shodan/host/8.8.8.8');
- * ```
+ * Create HTTP client with explicit credentials (for testing only)
+ * 
+ * This is a minimal sync function for test scenarios where credentials
+ * are already available (e.g., test tokens, mock credentials).
+ * 
+ * Production code should use createHTTPClientAsync() instead.
+ * 
+ * @param serviceName - Service name for logging
+ * @param config - HTTP service configuration
+ * @param credentials - Explicit credentials (required)
  */
-export function createHTTPClient(
+export function createHTTPClientWithCredentials(
   serviceName: string,
   config: HTTPServiceConfig,
-  credentials?: { apiKey: string }
+  credentials: { apiKey: string }
 ): HTTPPort {
-  // Load credentials (isolated per service via config-loader)
-  const creds = credentials ?? getToolConfig<{ apiKey: string }>(serviceName);
+  const creds = credentials;
 
   // Create Ky instance with service config
   const instance = ky.create({
@@ -262,7 +256,164 @@ export function createHTTPClient(
           }
         }
 
-        const httpError = classifyError(error, responseBody);
+        const httpError = classifyError(error, responseBody, serviceName);
+        return {
+          ok: false,
+          error: httpError,
+          meta: {
+            status: httpError.status ?? 0,
+            durationMs: Date.now() - startTime,
+            retries: retryCount,
+            estimatedTokens: 0,
+          },
+        };
+      }
+    },
+  };
+}
+
+/**
+ * Create HTTP client with async credential resolution
+ *
+ * Uses 1Password (or SecretsProvider) for credential resolution.
+ *
+ * @param serviceName - Service name for credential lookup (e.g., 'shodan')
+ * @param config - HTTP service configuration
+ * @param provider - Optional secrets provider (uses default if not provided)
+ * @returns HTTPPort implementation with resolved credentials
+ *
+ * @example
+ * ```typescript
+ * const client = await createHTTPClientAsync('shodan', shodanConfig);
+ * ```
+ */
+export async function createHTTPClientAsync(
+  serviceName: string,
+  config: HTTPServiceConfig,
+  provider: SecretsProvider = getDefaultSecretsProvider()
+): Promise<HTTPPort> {
+  // Resolve credentials via provider
+  const result = await provider.getSecret(serviceName, config.auth.credentialKey);
+
+  if (!result.ok) {
+    // Type narrowing: after !result.ok check, TypeScript should infer the error branch
+    const { error, code } = result as Extract<SecretResult, { ok: false }>;
+    throw new Error(
+      `Failed to get credentials for ${serviceName}: ${error}\n` +
+        `Code: ${code}`
+    );
+  }
+
+  const creds = { apiKey: result.value };
+
+  // Create Ky instance with service config
+  const instance = ky.create({
+    prefixUrl: config.baseUrl,
+    timeout: config.timeout ?? HTTP_DEFAULTS.timeout,
+    retry: {
+      limit: config.retry?.limit ?? HTTP_DEFAULTS.retry.limit,
+      methods: config.retry?.methods ?? [...HTTP_DEFAULTS.retry.methods],
+      statusCodes: config.retry?.statusCodes ?? HTTP_DEFAULTS.retry.statusCodes,
+    },
+    hooks: {
+      beforeRequest: [
+        (request) => {
+          // Inject authentication
+          if (config.auth.type === 'query') {
+            const url = new URL(request.url);
+            url.searchParams.set(config.auth.keyName, creds.apiKey);
+            return new Request(url.toString(), request);
+          }
+          if (config.auth.type === 'header') {
+            request.headers.set(config.auth.keyName, creds.apiKey);
+          }
+          if (config.auth.type === 'bearer') {
+            request.headers.set('Authorization', `Bearer ${creds.apiKey}`);
+          }
+          if (config.auth.type === 'oauth') {
+            // OAuth tokens are injected as Bearer tokens
+            request.headers.set('Authorization', `Bearer ${creds.apiKey}`);
+          }
+        },
+      ],
+      beforeRetry: [
+        ({ retryCount }) => {
+          console.log(`[HTTP] Retry ${retryCount} for ${serviceName}`);
+        },
+      ],
+    },
+  });
+
+  return {
+    async request<T>(
+      method: 'get' | 'post' | 'put' | 'delete',
+      path: string,
+      options: HTTPRequestOptions = {}
+    ): Promise<HTTPResult<T>> {
+      const startTime = Date.now();
+      let retryCount = 0;
+
+      try {
+        const response = await instance[method](path, {
+          searchParams: options.searchParams,
+          json: options.json,
+          timeout: options.timeoutMs,
+          hooks: {
+            beforeRetry: [
+              () => {
+                retryCount++;
+              },
+            ],
+          },
+        });
+
+        // Check response size
+        const text = await response.text();
+        const maxBytes = options.maxResponseBytes ?? HTTP_DEFAULTS.maxResponseBytes;
+        if (text.length > maxBytes) {
+          return {
+            ok: false,
+            error: {
+              type: 'client',
+              message: `Response size ${text.length} exceeds limit ${maxBytes}`,
+              retryable: false,
+            },
+            meta: {
+              status: response.status,
+              durationMs: Date.now() - startTime,
+              retries: retryCount,
+              estimatedTokens: 0,
+            },
+          };
+        }
+
+        // Parse JSON
+        const data = JSON.parse(text) as T;
+
+        return {
+          ok: true,
+          data,
+          meta: {
+            status: response.status,
+            durationMs: Date.now() - startTime,
+            retries: retryCount,
+            estimatedTokens: estimateTokens(data),
+          },
+        };
+      } catch (error) {
+        // Try to extract response body for better error messages (e.g., GraphQL errors)
+        let responseBody: any = null;
+        if (error instanceof KyHTTPError) {
+          try {
+            // Clone to avoid consuming the body
+            const clone = error.response.clone();
+            responseBody = await clone.json();
+          } catch {
+            // Response might not be JSON
+          }
+        }
+
+        const httpError = classifyError(error, responseBody, serviceName);
         return {
           ok: false,
           error: httpError,
@@ -281,16 +432,18 @@ export function createHTTPClient(
 /**
  * Classify errors into structured types
  */
-function classifyError(error: unknown, responseBody?: any): HTTPError {
+function classifyError(error: unknown, responseBody?: any, serviceName?: string): HTTPError {
   if (error instanceof KyHTTPError) {
     const status = error.response.status;
     let message = error.message;
 
     if (status === 401 || status === 403) {
+      // Add 1Password hint for auth errors
+      const hint = serviceName ? createAuthErrorHint(serviceName) : '';
       return {
         type: 'auth',
         status,
-        message,
+        message: hint ? `${message}\n\n${hint}` : message,
         retryable: false,
       };
     }
@@ -357,10 +510,3 @@ function classifyError(error: unknown, responseBody?: any): HTTPError {
     retryable: true,
   };
 }
-
-/**
- * Default HTTP client for dependency injection
- */
-export const defaultHTTPClient = {
-  create: createHTTPClient,
-};

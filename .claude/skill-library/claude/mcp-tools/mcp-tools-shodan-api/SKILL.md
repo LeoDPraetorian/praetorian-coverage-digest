@@ -221,15 +221,15 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 ## Setup
 
-**Required:** Shodan API key in `.claude/tools/config/credentials.json`:
+Shodan API key is stored in 1Password:
 
-```json
-{
-  "shodan": {
-    "apiKey": "your-shodan-api-key-here"
-  }
-}
-```
+- **Vault:** "Claude Code Tools"
+- **Item:** "Shodan API Key"
+- **Field:** password
+
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ## Testing
 

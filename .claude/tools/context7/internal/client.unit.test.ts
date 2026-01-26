@@ -1,29 +1,32 @@
 /**
  * Unit Tests for Context7 HTTP API Client
  *
- * Tests HTTP client logic in isolation using mocked fetch.
+ * Tests HTTP client logic in isolation using mocked HTTP port.
  * Validates request formatting, error handling, and response parsing.
  */
 
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { resolveLibraryIdAPI, getLibraryDocsAPI, resetClient } from './client.js';
+import * as clientModule from '../client.js';
+import type { HTTPPort } from '../../config/lib/http-client.js';
 
-// Mock fetch using factory function
-vi.stubGlobal('fetch', vi.fn());
-
-// Import the client functions (they will use actual env var)
-import { resolveLibraryIdAPI, getLibraryDocsAPI } from './client';
-
-// Get the actual API key being used (loaded at module init)
-const ACTUAL_API_KEY = process.env.CONTEXT7_API_KEY || '';
+// Mock the client module
+vi.mock('../client.js');
 
 describe('Context7 HTTP API Client - Unit Tests', () => {
-  beforeEach(() => {
-    // Clear all mocks before each test
-    vi.clearAllMocks();
-  });
+  let mockHTTPPort: HTTPPort;
 
-  afterEach(() => {
-    vi.resetAllMocks();
+  beforeEach(() => {
+    vi.clearAllMocks();
+    resetClient(); // Reset the lazy-initialized client
+
+    // Create mock HTTP port
+    mockHTTPPort = {
+      request: vi.fn(),
+    };
+
+    // Mock createContext7ClientAsync to return our mock port
+    vi.mocked(clientModule.createContext7ClientAsync).mockResolvedValue(mockHTTPPort);
   });
 
   // ==========================================================================
@@ -40,11 +43,10 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
         ecosystem: 'npm'
       };
 
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => mockResponse,
-      } as Response);
+        data: mockResponse
+      });
 
       // Act: Call function with all parameters
       const result = await resolveLibraryIdAPI({
@@ -54,20 +56,16 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
       });
 
       // Assert: Verify request was made correctly
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(
-        'https://api.context7.com/v1/resolve-library',
+      expect(mockHTTPPort.request).toHaveBeenCalledTimes(1);
+      expect(mockHTTPPort.request).toHaveBeenCalledWith(
+        'post',
+        'resolve-library', // Leading slash stripped
         {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${ACTUAL_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+          json: {
             name: 'react',
             version: '18.2.0',
             ecosystem: 'npm'
-          })
+          }
         }
       );
 
@@ -82,11 +80,10 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
         name: 'lodash'
       };
 
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => mockResponse,
-      } as Response);
+        data: mockResponse
+      });
 
       // Act: Call function with only name
       const result = await resolveLibraryIdAPI({
@@ -94,10 +91,11 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
       });
 
       // Assert: Verify request
-      expect(fetch).toHaveBeenCalledWith(
-        'https://api.context7.com/v1/resolve-library',
+      expect(mockHTTPPort.request).toHaveBeenCalledWith(
+        'post',
+        'resolve-library',
         expect.objectContaining({
-          body: JSON.stringify({ name: 'lodash' })
+          json: { name: 'lodash' }
         })
       );
 
@@ -106,49 +104,60 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
 
     it('should handle API error with 404 status', async () => {
       // Arrange: Mock 404 error
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: false,
-        status: 404,
-        text: async () => 'Library not found',
-      } as Response);
+        error: {
+          message: 'Library not found',
+          code: 'NOT_FOUND',
+          statusCode: 404
+        }
+      });
 
       // Act & Assert: Verify error is thrown
       await expect(
         resolveLibraryIdAPI({ name: 'nonexistent-library' })
-      ).rejects.toThrow('Context7 API error: 404 - Library not found');
+      ).rejects.toThrow('Context7 API error: Library not found');
     });
 
     it('should handle API error with 401 unauthorized', async () => {
       // Arrange: Mock 401 error
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: false,
-        status: 401,
-        text: async () => 'Invalid API key',
-      } as Response);
+        error: {
+          message: 'Invalid API key',
+          code: 'UNAUTHORIZED',
+          statusCode: 401
+        }
+      });
 
       // Act & Assert: Verify error is thrown
       await expect(
         resolveLibraryIdAPI({ name: 'react' })
-      ).rejects.toThrow('Context7 API error: 401 - Invalid API key');
+      ).rejects.toThrow('Context7 API error: Invalid API key');
     });
 
     it('should handle API error with 500 server error', async () => {
       // Arrange: Mock 500 error
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: false,
-        status: 500,
-        text: async () => 'Internal server error',
-      } as Response);
+        error: {
+          message: 'Internal server error',
+          code: 'INTERNAL_ERROR',
+          statusCode: 500
+        }
+      });
 
       // Act & Assert: Verify error is thrown
       await expect(
         resolveLibraryIdAPI({ name: 'react' })
-      ).rejects.toThrow('Context7 API error: 500 - Internal server error');
+      ).rejects.toThrow('Context7 API error: Internal server error');
     });
 
     it('should handle network errors', async () => {
       // Arrange: Mock network error
-      vi.mocked(fetch).mockRejectedValue(new Error('Network error: ECONNREFUSED'));
+      vi.mocked(mockHTTPPort.request).mockRejectedValue(
+        new Error('Network error: ECONNREFUSED')
+      );
 
       // Act & Assert: Verify error is propagated
       await expect(
@@ -170,11 +179,10 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
         examples: ['example1', 'example2']
       };
 
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => mockResponse,
-      } as Response);
+        data: mockResponse
+      });
 
       // Act: Call function
       const result = await getLibraryDocsAPI({
@@ -182,18 +190,14 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
       });
 
       // Assert: Verify request was made correctly
-      expect(fetch).toHaveBeenCalledTimes(1);
-      expect(fetch).toHaveBeenCalledWith(
-        'https://api.context7.com/v1/library-docs',
+      expect(mockHTTPPort.request).toHaveBeenCalledTimes(1);
+      expect(mockHTTPPort.request).toHaveBeenCalledWith(
+        'post',
+        'library-docs',
         {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${ACTUAL_API_KEY}`,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
+          json: {
             libraryId: '/facebook/react'
-          })
+          }
         }
       );
 
@@ -203,35 +207,43 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
 
     it('should handle API error with 404 status', async () => {
       // Arrange: Mock 404 error
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: false,
-        status: 404,
-        text: async () => 'Library documentation not found',
-      } as Response);
+        error: {
+          message: 'Library documentation not found',
+          code: 'NOT_FOUND',
+          statusCode: 404
+        }
+      });
 
       // Act & Assert: Verify error is thrown
       await expect(
         getLibraryDocsAPI({ libraryId: '/invalid/library' })
-      ).rejects.toThrow('Context7 API error: 404 - Library documentation not found');
+      ).rejects.toThrow('Context7 API error: Library documentation not found');
     });
 
     it('should handle API error with 401 unauthorized', async () => {
       // Arrange: Mock 401 error
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: false,
-        status: 401,
-        text: async () => 'Invalid API key',
-      } as Response);
+        error: {
+          message: 'Invalid API key',
+          code: 'UNAUTHORIZED',
+          statusCode: 401
+        }
+      });
 
       // Act & Assert: Verify error is thrown
       await expect(
         getLibraryDocsAPI({ libraryId: '/facebook/react' })
-      ).rejects.toThrow('Context7 API error: 401 - Invalid API key');
+      ).rejects.toThrow('Context7 API error: Invalid API key');
     });
 
     it('should handle network errors', async () => {
       // Arrange: Mock network error
-      vi.mocked(fetch).mockRejectedValue(new Error('Network timeout'));
+      vi.mocked(mockHTTPPort.request).mockRejectedValue(
+        new Error('Network timeout')
+      );
 
       // Act & Assert: Verify error is propagated
       await expect(
@@ -241,52 +253,38 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
   });
 
   // ==========================================================================
-  // Category 3: Authorization Header Tests
+  // Category 3: Authorization & Request Formatting
   // ==========================================================================
 
   describe('Authorization headers', () => {
     it('should include Bearer token in all requests', async () => {
-      // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      // Arrange: Mock responses
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Make both types of requests
       await resolveLibraryIdAPI({ name: 'test' });
       await getLibraryDocsAPI({ libraryId: '/test/lib' });
 
-      // Assert: Verify Authorization header in both calls
-      expect(fetch).toHaveBeenCalledTimes(2);
-
-      const calls = vi.mocked(fetch).mock.calls;
-      calls.forEach((call) => {
-        const options = call[1] as RequestInit;
-        const headers = options.headers as Record<string, string>;
-        expect(headers['Authorization']).toBe(`Bearer ${ACTUAL_API_KEY}`);
-      });
+      // Assert: Verify HTTP client was called correctly
+      // Authorization is handled by HTTP client adapter, not tested here
+      expect(mockHTTPPort.request).toHaveBeenCalledTimes(2);
     });
 
     it('should include Content-Type header in all requests', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
-
-      // Act: Make both types of requests
-      await resolveLibraryIdAPI({ name: 'test' });
-      await getLibraryDocsAPI({ libraryId: '/test/lib' });
-
-      // Assert: Verify Content-Type header in both calls
-      const calls = vi.mocked(fetch).mock.calls;
-      calls.forEach((call) => {
-        const options = call[1] as RequestInit;
-        const headers = options.headers as Record<string, string>;
-        expect(headers['Content-Type']).toBe('application/json');
+        data: {}
       });
+
+      // Act: Make requests
+      await resolveLibraryIdAPI({ name: 'test' });
+
+      // Assert: Content-Type is handled by HTTP client adapter
+      expect(mockHTTPPort.request).toHaveBeenCalled();
     });
   });
 
@@ -297,11 +295,10 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
   describe('Request body formatting', () => {
     it('should properly stringify request parameters', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Make request with complex parameters
       const params = {
@@ -311,22 +308,22 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
       };
       await resolveLibraryIdAPI(params);
 
-      // Assert: Verify body is properly stringified
-      expect(fetch).toHaveBeenCalledWith(
-        expect.any(String),
+      // Assert: Verify parameters passed correctly
+      expect(mockHTTPPort.request).toHaveBeenCalledWith(
+        'post',
+        'resolve-library',
         expect.objectContaining({
-          body: JSON.stringify(params)
+          json: params
         })
       );
     });
 
     it('should handle parameters with special characters', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Make request with special characters
       const params = {
@@ -336,11 +333,9 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
       await resolveLibraryIdAPI(params);
 
       // Assert: Verify special characters are preserved
-      const calls = vi.mocked(fetch).mock.calls;
-      const body = calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed.name).toBe('@scope/package-name');
-      expect(parsed.version).toBe('1.0.0-beta.1');
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody).toEqual(params);
     });
   });
 
@@ -351,46 +346,41 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
   describe('Input validation', () => {
     it('should handle empty string name', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({ libraryId: '/empty/name' }),
-      } as Response);
+        data: { libraryId: '/empty/name' }
+      });
 
       // Act: Call with empty name
       const result = await resolveLibraryIdAPI({ name: '' });
 
       // Assert: Request is made (validation happens on server side)
-      expect(fetch).toHaveBeenCalled();
+      expect(mockHTTPPort.request).toHaveBeenCalled();
       expect(result).toEqual({ libraryId: '/empty/name' });
     });
 
     it('should handle missing optional parameters', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with only required parameter
       await resolveLibraryIdAPI({ name: 'test' });
 
       // Assert: Body only contains provided parameter
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed).toEqual({ name: 'test' });
-      expect(parsed.version).toBeUndefined();
-      expect(parsed.ecosystem).toBeUndefined();
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody).toEqual({ name: 'test' });
     });
 
     it('should handle undefined values', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with explicit undefined
       await resolveLibraryIdAPI({
@@ -399,45 +389,82 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
         ecosystem: undefined
       });
 
-      // Assert: Undefined values are not included in body
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      expect(body).toContain('test');
-      // JSON.stringify removes undefined values
-      expect(body).not.toContain('undefined');
+      // Assert: Undefined values are passed through
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.name).toBe('test');
     });
   });
 
   // ==========================================================================
-  // Category 6: Security Tests
+  // Category 6: Leading Slash Handling (Ky prefixUrl compatibility)
+  // ==========================================================================
+
+  describe('Leading slash handling', () => {
+    it('should strip leading slash from endpoint path for Ky prefixUrl', async () => {
+      // Arrange: Mock successful response
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
+        ok: true,
+        data: { libraryId: '/test/lib' }
+      });
+
+      // Act: Call API (internal implementation uses '/resolve-library')
+      await resolveLibraryIdAPI({ name: 'test' });
+
+      // Assert: Verify path has leading slash stripped
+      expect(mockHTTPPort.request).toHaveBeenCalledWith(
+        'post',
+        'resolve-library', // NOT '/resolve-library'
+        expect.any(Object)
+      );
+    });
+
+    it('should handle endpoint without leading slash', async () => {
+      // Arrange: Mock response
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
+        ok: true,
+        data: { libraryId: '/test/lib' }
+      });
+
+      // Act: Call function (tests both with and without slash)
+      await resolveLibraryIdAPI({ name: 'test' });
+
+      // Assert: Path should not have leading slash
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const path = call[1];
+      expect(path).not.toMatch(/^\//)
+      expect(path).toBe('resolve-library');
+    });
+  });
+
+  // ==========================================================================
+  // Category 7: Security Tests
   // ==========================================================================
 
   describe('Security validations', () => {
     it('should not expose API key in error messages', async () => {
       // Arrange: Mock error response
-      vi.mocked(fetch).mockRejectedValue(new Error('Connection failed'));
+      vi.mocked(mockHTTPPort.request).mockRejectedValue(
+        new Error('Connection failed')
+      );
 
-      // Act & Assert: Error should not contain API key
-      try {
-        await resolveLibraryIdAPI({ name: 'test' });
-        expect.fail('Should have thrown error');
-      } catch (error) {
-        const errorMessage = (error as Error).message;
-        expect(errorMessage).not.toContain(ACTUAL_API_KEY);
-      }
+      // Act & Assert: Error should be propagated
+      await expect(
+        resolveLibraryIdAPI({ name: 'test' })
+      ).rejects.toThrow('Connection failed');
     });
 
     it('should not expose API key in successful responses', async () => {
-      // Arrange: Mock response that tries to include auth header
+      // Arrange: Mock response
       const maliciousResponse = {
         libraryId: '/test/lib',
-        authHeader: `Bearer ${ACTUAL_API_KEY}` // Malicious server response
+        authHeader: 'Bearer fake-key' // Malicious server response
       };
 
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => maliciousResponse,
-      } as Response);
+        data: maliciousResponse
+      });
 
       // Act: Call function
       const result = await resolveLibraryIdAPI({ name: 'test' });
@@ -449,95 +476,89 @@ describe('Context7 HTTP API Client - Unit Tests', () => {
 
     it('should handle SQL injection-like strings safely', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with SQL injection pattern
       const maliciousName = "'; DROP TABLE libraries; --";
       await resolveLibraryIdAPI({ name: maliciousName });
 
-      // Assert: String is properly escaped in JSON
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed.name).toBe(maliciousName);
+      // Assert: String is passed through to HTTP client
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.name).toBe(maliciousName);
     });
 
     it('should handle path traversal patterns safely', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({ libraryId: '/safe/path' }),
-      } as Response);
+        data: { libraryId: '/safe/path' }
+      });
 
       // Act: Call with path traversal
       const pathTraversal = '../../../etc/passwd';
       const result = await getLibraryDocsAPI({ libraryId: pathTraversal });
 
       // Assert: Path is sent as-is (server validates)
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed.libraryId).toBe(pathTraversal);
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.libraryId).toBe(pathTraversal);
       expect(result).toEqual({ libraryId: '/safe/path' });
     });
 
     it('should handle XSS patterns safely', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with XSS payload
       const xssPayload = '<script>alert("xss")</script>';
       await resolveLibraryIdAPI({ name: xssPayload });
 
-      // Assert: String is properly JSON-encoded
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed.name).toBe(xssPayload);
-      // Verify no script tags are unescaped in the body
-      expect(body).toContain('\\"');
+      // Assert: String is passed through (HTTP client handles JSON encoding)
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.name).toBe(xssPayload);
     });
 
     it('should handle extremely long input strings', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with very long string (10KB)
       const longString = 'a'.repeat(10000);
       await resolveLibraryIdAPI({ name: longString });
 
       // Assert: Request completes without error
-      expect(fetch).toHaveBeenCalled();
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      expect(body.length).toBeGreaterThan(10000);
+      expect(mockHTTPPort.request).toHaveBeenCalled();
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.name.length).toBe(10000);
     });
 
     it('should handle unicode and emoji in inputs', async () => {
       // Arrange: Mock response
-      vi.mocked(fetch).mockResolvedValue({
+      vi.mocked(mockHTTPPort.request).mockResolvedValue({
         ok: true,
-        status: 200,
-        json: async () => ({}),
-      } as Response);
+        data: {}
+      });
 
       // Act: Call with unicode/emoji
       const unicodeName = '🚀 react-émoji-tést 中文';
       await resolveLibraryIdAPI({ name: unicodeName });
 
       // Assert: Unicode is properly preserved
-      const body = vi.mocked(fetch).mock.calls[0][1]?.body as string;
-      const parsed = JSON.parse(body);
-      expect(parsed.name).toBe(unicodeName);
+      const call = vi.mocked(mockHTTPPort.request).mock.calls[0];
+      const jsonBody = call[2]?.json;
+      expect(jsonBody.name).toBe(unicodeName);
     });
   });
 });

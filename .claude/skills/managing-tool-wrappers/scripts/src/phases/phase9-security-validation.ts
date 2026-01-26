@@ -154,7 +154,7 @@ export async function auditPhase9(wrapperPath: string): Promise<AuditResult> {
         message: `Potential hardcoded credential detected (${name})`,
         file: wrapperPath,
         line: lineNumber,
-        suggestion: 'Move credentials to credentials.json or environment variables',
+        suggestion: 'Configure credentials in 1Password vault "Claude Code Tools"',
       });
     }
   }

@@ -931,11 +931,73 @@ const InputSchema = z.object({
 
 | Principle                  | Implementation                                                   |
 | -------------------------- | ---------------------------------------------------------------- |
-| **No credentials in code** | All credentials in `credentials.json` or OAuth tokens            |
-| **Per-service isolation**  | `getToolConfig(service)` returns ONLY that service's credentials |
+| **No credentials in code** | All credentials in 1Password, OAuth tokens, or environment variables |
+| **Per-service isolation**  | `SecretsProvider.getSecret(service, key)` returns ONLY that service's credentials |
 | **OAuth preferred**        | Linear uses OAuth; API keys only where OAuth unavailable         |
 | **Token storage**          | OAuth tokens in `~/.mcp-auth/` (outside repo)                    |
 | **Audit logging**          | Optional via `AUDIT_MCP_CALLS` environment variable              |
+| **1Password primary**      | 1Password is the primary credential method via biometric authentication |
+
+### Biometric Credential Access (1Password)
+
+For enhanced security, wrappers can retrieve credentials at runtime via 1Password CLI with biometric authentication (Touch ID/YubiKey). This eliminates credential storage entirely—no secrets on disk.
+
+**Setup:**
+
+The default 1Password account is `praetorianlabs.1password.com` (configured in `.claude/tools/1password/lib/config.ts`).
+
+```bash
+# Override the default account if needed (default: praetorianlabs.1password.com)
+export OP_ACCOUNT=yourcompany.1password.com
+
+# Vault name (default: "Claude Code Tools", configurable)
+export OP_VAULT_NAME="Claude Code Tools"
+```
+
+**Usage Pattern:**
+
+```typescript
+import { readSecret } from "./.claude/tools/1password/read-secret.ts";
+
+// Triggers biometric prompt, returns secret
+const { value } = await readSecret.execute({
+  item: "GitHub Token",
+  field: "token",
+});
+
+// Use the secret
+const response = await fetch("https://api.github.com/user", {
+  headers: { Authorization: `Bearer ${value}` },
+});
+```
+
+**When to Use:**
+
+| Pattern                  | Use Case                             | Security Level | Status      |
+| ------------------------ | ------------------------------------ | -------------- | ----------- |
+| **1Password biometric**  | Local development (PRIMARY)          | **Highest**    |  Primary    |
+| OAuth tokens             | Services with OAuth support          | High           |  Active     |
+| Environment variables    | CI environments, automation          | Medium         |  Active     |
+
+**Available Tools:**
+
+| Tool              | Purpose                                           |
+| ----------------- | -------------------------------------------------- |
+| `read-secret`     | Retrieve single secret value                       |
+| `list-items`      | List items in vault (for discovery)                |
+| `get-item`        | Get full item details with all fields              |
+| `run-with-secrets`| Execute command with secrets injected via env file |
+
+**Security Benefits:**
+
+- **No secrets on disk** - Biometric required for each session
+- **User approval** - Touch ID/YubiKey confirmation for each access
+- **Vault scoping** - Dedicated vault limits what Claude can access
+- **Audit trail** - 1Password logs all secret access
+
+See `.claude/skill-library/claude/mcp-tools/mcp-tools-1password/SKILL.md` for full documentation.
+
+---
 
 ### Code Quality
 
@@ -1124,7 +1186,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 - [x] **Phase 4: Architecture** (4 items)
   - **Sandboxing Options**: Research complete, implementation deferred (high complexity, low immediate value)
   - **Resource Limits**: IMPLEMENTED - `withTimeout`, `ResponseTooLargeError` (1MB default), exponential backoff retries
-  - **Credential Binding**: IMPLEMENTED - `CredentialsFileSchema` validation, per-service isolation via `getToolConfig()`, audit logging
+  - **Credential Binding**: IMPLEMENTED - 1Password via `SecretsProvider`, per-service isolation via `getSecret(service, key)`, audit logging
   - **Lazy Loading**: Research complete, not yet implemented (low priority)
 
 - [x] **Phase 5: Test Fixes** (10 items)
@@ -1211,13 +1273,13 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
 
   **Why OAuth > API Keys**:
 
-  | Aspect    | OAuth                          | API Keys                                    |
-  | --------- | ------------------------------ | ------------------------------------------- |
-  | Storage   | `~/.mcp-auth/` (outside repo)  | `credentials.json` + `.env` (repo-adjacent) |
-  | Lifetime  | 7-day tokens, auto-refresh     | Permanent until manually revoked            |
-  | Scopes    | Granular permissions           | Full account access                         |
-  | Consent   | Explicit browser authorization | Silent/implicit                             |
-  | If Leaked | Limited window, auto-expires   | Persistent access until discovered          |
+  | Aspect    | OAuth                          | 1Password                           |
+  | --------- | ------------------------------ | ----------------------------------- |
+  | Storage   | `~/.mcp-auth/` (outside repo)  | 1Password vault (biometric)         |
+  | Lifetime  | 7-day tokens, auto-refresh     | On-demand retrieval                 |
+  | Scopes    | Granular permissions           | Vault-level isolation               |
+  | Consent   | Explicit browser authorization | Touch ID/YubiKey per session        |
+  | If Leaked | Limited window, auto-expires   | No secrets on disk to leak          |
 
   **Current Status**:
 
@@ -1231,7 +1293,7 @@ See service skills in `.claude/skill-library/claude/mcp-tools/` for tool-specifi
   **Migration Pattern** (from Linear implementation):
   1. Check if service has remote MCP server with OAuth (like `mcp.linear.app`)
   2. Update `mcp-client.ts` to use `mcp-remote` with OAuth scopes
-  3. Remove API key from `credentials.json`
+  3. Ensure API key is stored in 1Password vault "Claude Code Tools"
   4. Update skill documentation with OAuth auth section
   5. Test OAuth flow end-to-end
 

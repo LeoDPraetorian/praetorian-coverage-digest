@@ -6,7 +6,7 @@
  * - application/x-www-form-urlencoded body (not JSON)
  */
 
-import { getToolConfig } from '../config/config-loader.js';
+import { getDefaultSecretsProvider } from '../config/lib/secrets-provider.js';
 
 /**
  * Make a Comments API request with correct auth/content-type
@@ -14,6 +14,7 @@ import { getToolConfig } from '../config/config-loader.js';
  * @param method - HTTP method
  * @param path - API path
  * @param body - Form data object (will be encoded as URLSearchParams)
+ * @param credentials - Optional credentials (resolves from 1Password if not provided)
  * @returns Response JSON
  */
 export async function commentsRequest<T>(
@@ -22,7 +23,21 @@ export async function commentsRequest<T>(
   body?: Record<string, string | boolean | undefined>,
   credentials?: { apiKey: string }
 ): Promise<{ ok: true; data: T } | { ok: false; error: { message: string; status?: number } }> {
-  const config = credentials ?? getToolConfig<{ apiKey: string }>('featurebase');
+  let config: { apiKey: string };
+
+  if (credentials) {
+    config = credentials;
+  } else {
+    const provider = getDefaultSecretsProvider();
+    const result = await provider.getSecret('featurebase', 'apiKey');
+    if (!result.ok) {
+      return {
+        ok: false,
+        error: { message: `Failed to get featurebase credentials: ${result.error}` },
+      };
+    }
+    config = { apiKey: result.value };
+  }
   const baseUrl = 'https://do.featurebase.app';
 
   const headers: Record<string, string> = {

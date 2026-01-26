@@ -48,42 +48,22 @@ Use this skill when:
 
 #### Check Credentials
 
-```bash
-cat .claude/tools/config/credentials.json | grep -A 2 "perplexity"
-```
+Perplexity API key is retrieved from 1Password vault "Claude Code Tools", item "Perplexity API Key".
 
-**Expected output:**
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
 
-```json
-"perplexity": {
-  "apiKey": "pplx-..."
-}
-```
-
-**Validation logic:**
-
-1. If `apiKey` missing → **FAIL** with setup instructions
-2. If `apiKey` is placeholder `${PERPLEXITY_API_KEY}` → **FAIL** with env var instructions
-3. If `apiKey` starts with `pplx-` → **PASS**, proceed
-
-**Failure message (copy verbatim):**
+**Setup instructions:**
 
 ```
-❌ Perplexity API key not configured
-
-SETUP REQUIRED:
-
 1. Get API key: https://www.perplexity.ai/account/api/group
-2. Add to .claude/tools/config/credentials.json:
-   {
-     "perplexity": {
-       "apiKey": "pplx-your-key-here"
-     }
-   }
+2. Store in 1Password:
+   - Vault: "Claude Code Tools"
+   - Item: "Perplexity API Key"
+   - Field: password (set to your pplx-... key)
 3. See .claude/tools/perplexity/README.md for details
-
-Cannot proceed without API key.
 ```
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ### Phase 2: Query Formulation
 

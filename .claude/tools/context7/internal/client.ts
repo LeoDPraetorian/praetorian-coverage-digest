@@ -1,38 +1,39 @@
-// Context7 HTTP API Client
-// Uses CONTEXT7_API_KEY from environment
+// Context7 HTTP API Client - Lazy initialization
+// No longer throws at module load time
 
-const CONTEXT7_API_KEY = process.env.CONTEXT7_API_KEY;
-const CONTEXT7_API_BASE = 'https://api.context7.com/v1'; // Adjust if different
+import { createContext7ClientAsync } from '../client.js';
+import type { HTTPPort } from '../../config/lib/http-client.js';
 
-if (!CONTEXT7_API_KEY) {
-  throw new Error('CONTEXT7_API_KEY not found in environment variables');
+let client: HTTPPort | null = null;
+
+/**
+ * Get the Context7 HTTP client (lazy initialization)
+ */
+async function getClient(): Promise<HTTPPort> {
+  if (!client) {
+    client = await createContext7ClientAsync();
+  }
+  return client;
 }
 
 /**
- * Call context7 API
+ * Call Context7 API endpoint
  */
-async function callContext7API(endpoint: string, params: any): Promise<any> {
-  const url = `${CONTEXT7_API_BASE}${endpoint}`;
+export async function callContext7API(endpoint: string, params: any): Promise<any> {
+  const httpClient = await getClient();
+  // Strip leading slash - Ky's prefixUrl doesn't expect it
+  const path = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
+  const result = await httpClient.request('post', path, { json: params });
 
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${CONTEXT7_API_KEY}`,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify(params)
-  });
-
-  if (!response.ok) {
-    const error = await response.text();
-    throw new Error(`Context7 API error: ${response.status} - ${error}`);
+  if (!result.ok) {
+    throw new Error(`Context7 API error: ${result.error.message}`);
   }
 
-  return response.json();
+  return result.data;
 }
 
 /**
- * Resolve library ID using context7 API
+ * Resolve library ID using Context7 API
  */
 export async function resolveLibraryIdAPI(params: {
   name: string;
@@ -43,10 +44,17 @@ export async function resolveLibraryIdAPI(params: {
 }
 
 /**
- * Get library documentation using context7 API
+ * Get library documentation using Context7 API
  */
 export async function getLibraryDocsAPI(params: {
   libraryId: string;
 }): Promise<any> {
   return callContext7API('/library-docs', params);
+}
+
+/**
+ * Reset client (for testing)
+ */
+export function resetClient(): void {
+  client = null;
 }

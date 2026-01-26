@@ -1,3 +1,25 @@
+## 2026-01-25 - Update for 1Password Migration
+
+**RED Phase:**
+- Gap: Skill documented sync credentials.json pattern, but codebase migrated to 1Password
+- Test scenario: Developer follows skill to create REST API wrapper → uses deprecated sync createServiceClient() instead of async createServiceClientAsync()
+- Failure: No documentation of async pattern, 1Password setup, or deprecation warnings
+
+**Changes:**
+1. HTTP Client Configuration section updated to show BOTH sync (deprecated) and async (recommended) patterns
+2. Added "1Password Credential Setup" section with 3-step registration process
+3. Updated Wrapper Structure template to show async client creation
+4. Updated Phase 2 GREEN instructions to mention async pattern and 1Password registration
+5. Marked sync pattern with deprecation warning and console.warn
+
+**Verification:**
+- Line count: 227 → 278 (well under 500-line limit)
+- Only credentials.json mention is in deprecation comment (appropriate)
+- Async pattern clearly marked as RECOMMENDED
+- 1Password setup fully documented
+
+---
+
 ## 2026-01-04 - Initial Creation
 
 **RED Phase:**

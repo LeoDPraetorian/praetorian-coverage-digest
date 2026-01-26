@@ -87,7 +87,7 @@ const FIXERS: FixerConfig[] = [
   { num: 8, name: 'Test Quality', autoFixable: false, fn: () => ({ fixed: false, changes: ['MANUAL: Add factory mocks, response format tests, edge cases'] }) },
   { num: 9, name: 'Security Validation', autoFixable: false, fn: () => ({ fixed: false, changes: [
     'MANUAL: Remove eval() or new Function() if present',
-    'MANUAL: Move hardcoded credentials to credentials.json or environment variables',
+    'MANUAL: Configure credentials in 1Password vault "Claude Code Tools"',
     "MANUAL: Add import { validators } from '../config/lib/sanitize.js'",
     'MANUAL: Add security validation to string inputs using validators or .refine()',
   ] }) },

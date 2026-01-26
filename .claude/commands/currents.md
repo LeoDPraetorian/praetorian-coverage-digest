@@ -237,17 +237,17 @@ If you don't specify a project, I'll use this default.
 
 ## Authentication
 
-Currents tools use API key authentication configured in `$ROOT/.claude/tools/config/credentials.json`:
+Currents API key is stored in 1Password:
 
-```json
-{
-  "currents": {
-    "apiKey": "YOUR_API_KEY_HERE"
-  }
-}
-```
+- **Vault:** "Claude Code Tools"
+- **Item:** "Currents API Key"
+- **Field:** password
+
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
 
 **Get your API key from:** https://app.currents.dev/settings/api-keys
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ## What You Can Query
 
@@ -289,21 +289,15 @@ For developers or debugging, here are the underlying wrapper patterns:
 
 ### Authentication Setup
 
-API key is read from `$ROOT/.claude/tools/config/credentials.json`:
+API key is retrieved from 1Password vault "Claude Code Tools", item "Currents API Key".
 
-```json
-{
-  "currents": {
-    "apiKey": "${CURRENTS_API_KEY}"
-  }
-}
-```
-
-Or set via environment variable:
+Alternatively, set via environment variable:
 
 ```bash
 export CURRENTS_API_KEY="your-api-key"
 ```
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ### Error Handling
 

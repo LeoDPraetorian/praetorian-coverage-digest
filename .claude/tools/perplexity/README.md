@@ -32,17 +32,17 @@ npx -y @perplexity-ai/mcp-server
 
 ### 2. Configure Credentials
 
-Add your Perplexity API key to `.claude/tools/config/credentials.json`:
+Perplexity API key is stored in 1Password:
 
-```json
-{
-  "perplexity": {
-    "apiKey": "pplx-your-api-key-here"
-  }
-}
-```
+- **Vault:** "Claude Code Tools"
+- **Item:** "Perplexity API Key"
+- **Field:** password
+
+The first API call will prompt for biometric authentication. Credentials are cached for 15 minutes.
 
 Get your API key from: https://www.perplexity.ai/account/api/group
+
+**Legacy (deprecated):** credentials.json is no longer supported. Migrate to 1Password.
 
 ### 3. MCP Client Configuration
 
@@ -305,7 +305,7 @@ All wrappers automatically truncate responses to prevent excessive token usage:
 ### "Authentication failed"
 
 **Cause:** Invalid or missing API key
-**Fix:** Verify `PERPLEXITY_API_KEY` in credentials.json
+**Fix:** Verify API key is stored in 1Password vault "Claude Code Tools", item "Perplexity API Key"
 
 ### "Rate limit exceeded"
 

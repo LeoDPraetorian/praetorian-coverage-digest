@@ -1,38 +1,28 @@
 # Changelog
 
-## 2026-01-02 - Initial Creation
+## 2026-01-25 - Migrate from credentials.json to 1Password
 
-**RED Phase Documentation:**
+### Changed
+- Updated Step 5 credential options to prioritize 1Password (Recommended) over deprecated credentials.json
+- Replaced "API Key" option with "1Password Secret (Recommended)" and "Environment Variable" options
+- Updated OAuth description to clarify token storage location (~/.claude-oauth/)
+- Updated Step 6 credential configuration instructions to provide 1Password and environment variable patterns
+- Removed credentials.json instructions
 
-Gap: Currently, when developers want to create MCP wrappers (via `orchestrating-mcp-development`), there's no systematic way to:
-1. Detect if an MCP server is already configured in `.claude/tools/config/lib/mcp-client.ts`
-2. Guide users through installation from various sources (npm, PyPI, GitHub, local)
-3. Automatically configure the MCP server with the correct command/args/envVars
-4. Verify the MCP server is working before proceeding to schema discovery
+### Added
+- references/example-configurations.md: New "1Password Configuration (Recommended)" section at top with:
+  - Step-by-step 1Password serviceItems configuration
+  - 1Password vault item creation instructions
+  - Async client pattern usage example
+  - Migration guide from credentials.json to 1Password
+- references/error-handling.md: New "1Password Credential Errors" section with:
+  - 'not_configured' error handling
+  - 'auth_required' error handling (biometric authentication)
 
-Failure Scenario: The `orchestrating-mcp-development` skill would fail at Phase 1 (schema discovery) because the MCP isn't configured. The developer would need to manually search for the MCP package, determine if it's npm/PyPI/local, figure out the correct command syntax, edit `mcp-client.ts`, and test if it works.
-
-**Category:** claude/mcp-tools (library skill)
-
-**Skill Type:** Process/Pattern (MCP server setup workflow and configuration patterns)
-
-**Content Source:** User-provided comprehensive workflow with 8 steps, 4 detailed examples, error handling patterns, and integration guidance. Research phase skipped per user request - content derived from original specification.
-
-**Files Created:**
-- SKILL.md (325 lines - within 500 line limit)
-- references/command-configurations.md (patterns for npm, Python/uvx, Go, OAuth)
-- references/example-configurations.md (6 complete examples with context)
-- references/error-handling.md (recovery strategies, validation patterns)
-
-**Integration Points:**
-- Invoked at Phase 0.5 by `orchestrating-mcp-development`
-- Modifies `.claude/tools/config/lib/mcp-client.ts`
-- Optionally modifies `.claude/tools/config/credentials.json`
-
-**Changes:**
-- Initial skill structure created
-- Progressive disclosure architecture with references/
-- 8-step workflow for MCP server setup
-- Support for npm (npx), Python (uvx), Go, and OAuth MCPs
-- Comprehensive error handling patterns
-- 6 real-world configuration examples
+### Verification
+- ✅ SKILL.md: 359 lines (< 500 limit)
+- ✅ command-configurations.md: 143 lines (< 400 limit)
+- ✅ error-handling.md: 308 lines (< 400 limit)
+- ✅ example-configurations.md: 252 lines (< 400 limit)
+- ✅ No remaining references to credentials.json as primary pattern
+- ✅ 1Password shown as recommended option
