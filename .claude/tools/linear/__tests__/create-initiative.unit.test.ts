@@ -222,7 +222,7 @@ describe('createInitiative (GraphQL)', () => {
 
       await expect(
         createInitiative.execute({ name: 'Duplicate Initiative' }, 'test-api-key')
-      ).rejects.toThrow(/GraphQL errors/);
+      ).rejects.toThrow(/GraphQL error/);
     });
 
     it('should throw when HTTP request fails', async () => {

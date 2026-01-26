@@ -255,7 +255,7 @@ describe('createIssueRelation (GraphQL)', () => {
           relatedIssueId: 'ISSUE-456',
           type: 'blocks'
         }, 'test-key')
-      ).rejects.toThrow(/GraphQL errors/);
+      ).rejects.toThrow(/GraphQL error/);
     });
 
     it('throws error when issueRelation is missing', async () => {

@@ -229,7 +229,7 @@ describe('createCycle (GraphQL)', () => {
 
       await expect(
         createCycle.execute({ name: 'Cycle', team: 'NonExistent' }, 'test-token')
-      ).rejects.toThrow(/GraphQL errors/);
+      ).rejects.toThrow(/GraphQL error/);
     });
 
     it('should throw when HTTP request fails', async () => {

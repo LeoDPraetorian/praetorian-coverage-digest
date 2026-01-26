@@ -17,6 +17,7 @@
  * - state: string - State name or ID
  * - project: string - Project name or ID
  * - label: string - Label name or ID
+ * - parent: string - Parent issue ID or identifier to filter children/sub-issues
  * - query: string - Search for content in title or description
  * - limit: number - Number of results (1-250, default 50)
  * - includeArchived: boolean - Include archived issues (default true)
@@ -54,6 +55,9 @@
  *
  * // Search issues
  * const searchResults = await listIssues.execute({ query: 'authentication' });
+ *
+ * // List sub-issues (children) of a parent issue
+ * const subIssues = await listIssues.execute({ parent: 'ART-8' });
  * ```
  */
 
@@ -151,6 +155,12 @@ export const listIssuesParams = z.object({
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
     .describe('Label name or ID'),
+  parent: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoPathTraversal, 'Path traversal not allowed')
+    .refine(validateNoCommandInjection, 'Invalid characters detected')
+    .optional()
+    .describe('Parent issue ID or identifier to filter children/sub-issues'),
   query: z.string()
     .refine(validateNoControlChars, 'Control characters not allowed')
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
@@ -171,6 +181,7 @@ export type ListIssuesInput = {
   orderBy?: 'createdAt' | 'updatedAt';
   project?: string;
   label?: string;
+  parent?: string;
   limit?: number;
 };
 

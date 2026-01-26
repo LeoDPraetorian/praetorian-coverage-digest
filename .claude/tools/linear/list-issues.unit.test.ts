@@ -512,7 +512,104 @@ describe('listIssues - Unit Tests', () => {
   });
 
   // ==========================================================================
-  // Category 5: Input Validation Tests
+  // Category 5: Parent Filter Tests
+  // ==========================================================================
+
+  describe('Parent filter', () => {
+    it('should build filter with UUID parent', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [mockIssueNode],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({ parent: '550e8400-e29b-41d4-a716-446655440000' });
+
+      // Verify executeGraphQL was called with parent filter
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            parent: { id: { eq: '550e8400-e29b-41d4-a716-446655440000' } }
+          })
+        })
+      );
+    });
+
+    it('should build filter with identifier parent', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [mockIssueNode],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({ parent: 'ART-8' });
+
+      // Verify executeGraphQL was called with parent filter
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            parent: { id: { eq: 'ART-8' } }
+          })
+        })
+      );
+    });
+
+    it('should return sub-issues for parent', async () => {
+      // Mock response with sub-issues
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [
+            { ...mockIssueNode, id: 'child-1', identifier: 'ART-9', title: 'Sub-issue 1' },
+            { ...mockIssueNode, id: 'child-2', identifier: 'ART-10', title: 'Sub-issue 2' },
+          ],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      const result = await listIssues.execute({ parent: 'ART-8' });
+
+      expect(result.issues).toHaveLength(2);
+      expect(result.issues[0].identifier).toBe('ART-9');
+      expect(result.issues[1].identifier).toBe('ART-10');
+    });
+
+    it('should combine parent filter with other filters', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({
+        parent: 'ART-8',
+        state: 'In Progress',
+        assignee: 'me'
+      });
+
+      // Verify all filters passed
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            parent: expect.any(Object),
+            state: expect.any(Object),
+            assignee: expect.any(Object)
+          })
+        })
+      );
+    });
+  });
+
+  // ==========================================================================
+  // Category 6: Input Validation Tests
   // ==========================================================================
 
   describe('Input validation', () => {

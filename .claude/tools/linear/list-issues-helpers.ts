@@ -98,6 +98,16 @@ export function buildIssueFilterWithIdDetection(input: ListIssuesInput): Record<
     }
   }
 
+  // Parent filter (for sub-issues)
+  if (input.parent) {
+    if (isLinearId(input.parent)) {
+      filter.parent = { id: { eq: input.parent } };
+    } else {
+      // For identifiers like ART-8, use identifier filter
+      filter.parent = { id: { eq: input.parent } };
+    }
+  }
+
   // Query filter (unchanged - searches both title and description)
   if (input.query) {
     filter.or = [

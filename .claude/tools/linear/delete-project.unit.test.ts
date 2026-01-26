@@ -167,7 +167,7 @@ describe('deleteProject (GraphQL)', () => {
 
       await expect(
         deleteProject.execute(input, 'test-token')
-      ).rejects.toThrow(/GraphQL errors/);
+      ).rejects.toThrow(/GraphQL error/);
     });
 
     it('should throw when HTTP request fails', async () => {
