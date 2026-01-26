@@ -41,7 +41,7 @@ const AddressSchema = z
     return hexPart.length >= 1 && hexPart.length <= 16;
   }, 'Invalid hex address format');
 
-const DirectionSchema = z.enum(['CALLING', 'CALLED']).default('CALLING');
+const DirectionSchema = z.enum(['calling', 'called']).default('calling');
 const DisplayTypeSchema = z.enum(['TB', 'LR', 'BT', 'RL']).default('TB');
 const MaxDepthSchema = z.coerce
   .number()
@@ -65,7 +65,7 @@ const LayerSchema = z.coerce.number().int().min(0).max(10).optional();
 
 export const genCallgraphInputSchema = z.object({
   binary_name: BinaryNameSchema,
-  function_name_or_address: z.union([SymbolNameSchema, AddressSchema]),
+  function_name: z.union([SymbolNameSchema, AddressSchema]),
   direction: DirectionSchema,
   display_type: DisplayTypeSchema,
   include_refs: z.boolean().default(false),
@@ -91,7 +91,7 @@ interface CallgraphMetrics {
 
 interface GenCallgraphOutput {
   function_name: string;
-  direction: 'CALLING' | 'CALLED';
+  direction: 'calling' | 'called';
   mermaid_url: string;
   metrics: CallgraphMetrics;
   graph?: string;
@@ -166,7 +166,7 @@ function classifyError(error: Error, input?: GenCallgraphInput): PyghidraError {
         code: 'BINARY_NOT_FOUND',
       };
     }
-    const functionName = input?.function_name_or_address || 'unknown';
+    const functionName = input?.function_name || 'unknown';
     const binaryName = input?.binary_name || '';
     return {
       message: `Symbol "${functionName}" not found in "${binaryName}".\nUse search_symbols_by_name to find valid symbols.`,
@@ -213,7 +213,7 @@ export async function execute(rawInput: unknown): Promise<GenCallgraphResponse> 
       'gen_callgraph',
       {
         binary_name: input.binary_name,
-        function_name_or_address: input.function_name_or_address,
+        function_name: input.function_name,
         direction: input.direction,
         display_type: input.display_type,
         include_refs: input.include_refs,
@@ -230,7 +230,7 @@ export async function execute(rawInput: unknown): Promise<GenCallgraphResponse> 
 
     // Build output
     const output: GenCallgraphOutput = {
-      function_name: input.function_name_or_address,
+      function_name: input.function_name,
       direction: input.direction,
       mermaid_url: rawResponse.mermaid_url,
       metrics,
@@ -238,7 +238,7 @@ export async function execute(rawInput: unknown): Promise<GenCallgraphResponse> 
 
     // Add warning for orphan functions
     if (metrics.edge_count === 0 && metrics.node_count === 1) {
-      output.warning = `No ${input.direction} relationships found. Try direction: ${input.direction === 'CALLING' ? 'CALLED' : 'CALLING'}.`;
+      output.warning = `No ${input.direction} relationships found. Try direction: ${input.direction === 'calling' ? 'called' : 'calling'}.`;
     }
 
     // Include graph only if requested

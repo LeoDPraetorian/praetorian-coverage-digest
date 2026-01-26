@@ -9,6 +9,9 @@
 # - Imported binaries
 # - Recent log activity
 #
+# Options:
+#   --quiet, -q: Output only essential info (for scripting)
+#
 
 set -euo pipefail
 
@@ -16,19 +19,48 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 SERVER_PID_FILE="${SCRIPT_DIR}/.server-pid"
 SERVER_LOG_FILE="${SCRIPT_DIR}/.server.log"
+QUIET=false
 
-# Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
+# Parse arguments
+for arg in "$@"; do
+  case $arg in
+    --quiet|-q)
+      QUIET=true
+      shift
+      ;;
+    *)
+      # Unknown option
+      ;;
+  esac
+done
 
-echo "=== PyGhidra HTTP Server Status ==="
-echo ""
+# Colors (disabled in quiet mode)
+if [ "$QUIET" = true ]; then
+  RED=''
+  GREEN=''
+  YELLOW=''
+  BLUE=''
+  NC=''
+else
+  RED='\033[0;31m'
+  GREEN='\033[0;32m'
+  YELLOW='\033[1;33m'
+  BLUE='\033[0;34m'
+  NC='\033[0m'
+fi
+
+if [ "$QUIET" = false ]; then
+  echo "=== PyGhidra HTTP Server Status ==="
+  echo ""
+fi
 
 # Check for PID file
 if [ ! -f "$SERVER_PID_FILE" ]; then
+  if [ "$QUIET" = true ]; then
+    echo "not_running"
+    exit 1
+  fi
+
   echo -e "${RED}❌ Server not running${NC}"
   echo "  No .server-pid file found"
   echo ""
@@ -39,9 +71,18 @@ if [ ! -f "$SERVER_PID_FILE" ]; then
     echo -e "${YELLOW}⚠️  Found orphaned PyGhidra processes:${NC}"
     ps -p "$PIDS" -o pid,etime,command || true
     echo ""
-    echo "Run ./stop-server.sh to clean up"
+    echo "Recovery steps:"
+    echo "  1. Run ./stop-server.sh to clean up orphaned processes"
+    echo "  2. Then run ./start-server.sh to start fresh"
   else
-    echo "Start server with: ./start-server.sh"
+    echo "Recovery steps:"
+    echo "  1. Run ./start-server.sh to start the server"
+    echo "  2. Verify with ./server-status.sh"
+    echo ""
+    echo "If server fails to start:"
+    echo "  - Check port 8001 is not in use: lsof -i :8001"
+    echo "  - Review logs: tail -f ${SERVER_LOG_FILE}"
+    echo "  - Ensure uvx is installed: uvx --version"
   fi
   exit 1
 fi
@@ -60,17 +101,34 @@ fi
 
 # Check if process is running
 if ! ps -p "$PID" > /dev/null 2>&1; then
+  if [ "$QUIET" = true ]; then
+    echo "dead"
+    exit 1
+  fi
+
   echo -e "${RED}❌ Server process not running${NC}"
   echo "  PID $PID from .server-pid file is dead"
   echo ""
   echo "Server info (stale):"
   cat "$SERVER_PID_FILE" | jq '.'
   echo ""
-  echo "Cleanup with: ./stop-server.sh"
+  echo "Recovery steps:"
+  echo "  1. Run ./stop-server.sh to clean up stale PID file"
+  echo "  2. Run ./start-server.sh to start fresh server"
+  echo ""
+  echo "If problem persists:"
+  echo "  - Check for crashed process: tail -100 ${SERVER_LOG_FILE}"
+  echo "  - Check system resources: df -h && free -h"
+  echo "  - Try manual cleanup: rm ${SERVER_PID_FILE}"
   exit 1
 fi
 
 # Server is running - get process info
+if [ "$QUIET" = true ]; then
+  echo "running"
+  exit 0
+fi
+
 echo -e "${GREEN}✓ Server running${NC}"
 echo ""
 echo "Process Info:"

@@ -63,6 +63,23 @@ export class ImportError extends PyghidraError {
   }
 }
 
+export class ServerUnavailableError extends PyghidraError {
+  constructor(
+    port: number,
+    public readonly recoverySuggestions: string[]
+  ) {
+    const suggestions = recoverySuggestions.length > 0
+      ? `\n\nRecovery suggestions:\n${recoverySuggestions.map((s, i) => `${i + 1}. ${s}`).join('\n')}`
+      : '';
+    super(
+      `PyGhidra server is not available on port ${port}.${suggestions}`,
+      'SERVER_UNAVAILABLE',
+      { port, recoverySuggestions }
+    );
+    this.name = 'ServerUnavailableError';
+  }
+}
+
 export function parseMcpError(error: unknown): PyghidraError {
   const message = error instanceof Error ? error.message : String(error);
 
