@@ -39,6 +39,10 @@ get_wrong_location_files() {
         grep -E '\.md$' | \
         grep -vE '^\.claude/\.output/' | \
         grep -vE '^\.claude/docs/' | \
+        grep -vE '^\.claude/skills/' | \
+        grep -vE '^\.claude/skill-library/' | \
+        grep -vE '^\.claude/agents/' | \
+        grep -vE '^\.claude/agent-library/' | \
         grep -vE '^\.feature-development/' | \
         grep -vE '^\.worktrees/' | \
         grep -vE '^modules/' | \
