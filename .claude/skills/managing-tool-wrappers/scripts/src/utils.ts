@@ -73,9 +73,10 @@ export function findWrapperFiles(name: string): string[] {
   // Check if name is a service directory
   const serviceDir = path.join(toolsDir, normalized);
   if (fs.existsSync(serviceDir) && fs.statSync(serviceDir).isDirectory()) {
-    // Return all wrappers in service (exclude test files, index, directories like internal/)
+    // Return all wrappers in service (exclude test files, index, utility files)
+    const utilityFiles = ['errors.ts', 'types.ts', 'constants.ts', 'utils.ts', 'helpers.ts'];
     return fs.readdirSync(serviceDir, { withFileTypes: true })
-      .filter(d => d.isFile() && d.name.endsWith('.ts') && !d.name.includes('test') && !d.name.includes('index'))
+      .filter(d => d.isFile() && d.name.endsWith('.ts') && !d.name.includes('test') && !d.name.includes('index') && !utilityFiles.includes(d.name))
       .map(d => path.join(serviceDir, d.name));
   }
 

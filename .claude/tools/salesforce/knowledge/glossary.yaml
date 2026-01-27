@@ -1,0 +1,514 @@
+version: 1.0.0
+lastUpdated: 2026-01-21T22:30:00.000Z
+updatedBy: juanbocanegra
+terms:
+  bookings:
+    description: Closed won opportunities
+    condition: StageName = 'Closed Won'
+    objects:
+      - Opportunity
+    fields: []
+  pipeline:
+    description: Open opportunities
+    condition: IsClosed = false
+    objects:
+      - Opportunity
+    fields: []
+  enterprise:
+    description: Enterprise accounts
+    condition: Type = 'Enterprise'
+    objects:
+      - Account
+      - Opportunity
+    fields: []
+  open:
+    description: Open/not closed items
+    condition: IsClosed = false
+    objects:
+      - Opportunity
+    fields: []
+  closed:
+    description: Closed items
+    condition: IsClosed = true
+    objects:
+      - Opportunity
+    fields: []
+  closing_this_week:
+    description: Open opportunities expected to close this week (CloseDate in current week)
+    condition: IsClosed = false AND CloseDate = THIS_WEEK
+    objects:
+      - Opportunity
+    fields: []
+  closing_this_month:
+    description: Open opportunities expected to close this month (CloseDate in current month)
+    condition: IsClosed = false AND CloseDate = THIS_MONTH
+    objects:
+      - Opportunity
+    fields: []
+  md:
+    description: Managing Director - exists on both Account and Opportunity objects with different field names
+    condition: ""
+    objects:
+      - Account
+      - Opportunity
+    fields:
+      - object: Account
+        field: Service_Delivery_Owner__r.Name
+        value: "%$value%"
+        operator: LIKE
+        note: Use this for complete account list (includes accounts with no opportunities)
+      - object: Opportunity
+        field: Account_MD_Name__c
+        value: "%$value%"
+        operator: LIKE
+        note: Use this when querying opportunities or need opportunity-level data
+    note: Account.Service_Delivery_Owner__c (label "Managing Director") is the authoritative source. Opportunity.Account_MD_Name__c may be missing for accounts without opportunities.
+  md_accounts:
+    description: All accounts assigned to a Managing Director. Uses Account.Service_Delivery_Owner__c field which is the authoritative MD assignment.
+    condition: Service_Delivery_Owner__r.Name LIKE '%$value%'
+    objects:
+      - Account
+    fields:
+      - field: Service_Delivery_Owner__r.Name
+        value: "%$value%"
+        operator: LIKE
+    queryPattern: SELECT Id, Name, Owner.Name, Service_Delivery_Owner__r.Name FROM Account WHERE Service_Delivery_Owner__r.Name LIKE '%$value%' ORDER BY Name
+    note: Returns all accounts for an MD including those with no opportunities. Use this instead of Opportunity-based queries for complete MD account lists.
+  ps_bookings:
+    description: Professional Services bookings - security services (pen tests, advisory, red team, etc.) excluding Chariot SaaS products. Tracked via OpportunityLineItem products.
+    condition: Opportunity.StageName = 'Closed Won' AND (NOT PricebookEntry.Product2.Name LIKE '%Chariot%')
+    objects:
+      - OpportunityLineItem
+    fields: []
+    aggregateField: TotalPrice
+    note: PS is determined by product line items, NOT Opportunity.Type field
+  chariot_bookings:
+    description: Chariot SaaS/subscription bookings. Tracked via OpportunityLineItem products.
+    condition: Opportunity.StageName = 'Closed Won' AND PricebookEntry.Product2.Name LIKE '%Chariot%'
+    objects:
+      - OpportunityLineItem
+    fields: []
+    aggregateField: TotalPrice
+    note: Chariot products include 'Chariot' and 'Chariot - Professional'
+  churn:
+    description: Churned accounts - had Closed Won deals historically but no wins in 2024-2025. Query groups by Account and uses HAVING MAX(CloseDate) < cutoff date.
+    condition: StageName = 'Closed Won' ... GROUP BY AccountId HAVING MAX(CloseDate) < 2024-01-01
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount) HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName = 'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING MAX(CloseDate) < 2024-01-01 ORDER BY SUM(Amount) DESC
+    note: Identifies customers who purchased before but have not renewed/repurchased recently
+  dormant:
+    description: Dormant accounts - had opportunities (including Closed Lost) but engagement has stalled. High lost pipeline value indicates significant sales effort without conversion.
+    condition: StageName = 'Closed Lost'
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id) TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName = 'Closed Lost' AND AccountId != null GROUP BY AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    note: Accounts with high lost pipeline are re-engagement targets - understand why deals were lost
+  prospect:
+    description: Prospect accounts - have open or recent opportunities but no Closed Won deals in 2024-2025. Active pipeline without conversion.
+    condition: (IsClosed = false OR CloseDate >= 2024-01-01) AND StageName != 'Closed Won'
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppClose, SUM(Amount) PipelineValue, COUNT(Id) OppCount FROM Opportunity WHERE (CloseDate >= 2024-01-01 OR IsClosed = false) AND StageName != 'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    note: Active prospects that haven't converted - focus on pipeline acceleration
+  churn_pre2023:
+    description: Churned accounts (pre-2023) - had Closed Won deals historically but no wins since 2023. Last win was in 2022 or earlier.
+    condition: StageName = 'Closed Won' ... GROUP BY AccountId HAVING MAX(CloseDate) < 2023-01-01
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount) HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName = 'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING MAX(CloseDate) < 2023-01-01 ORDER BY SUM(Amount) DESC
+    note: Long-term churned customers - 649 accounts identified with $151.7M historic revenue
+  dormant_pre2023:
+    description: Dormant accounts (pre-2023) - had Closed Lost opportunities before 2023. High lost pipeline indicates past sales effort without conversion.
+    condition: StageName = 'Closed Lost' AND CloseDate < 2023-01-01
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id) TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName = 'Closed Lost' AND CloseDate < 2023-01-01 AND AccountId != null GROUP BY AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    note: Historical lost pipeline totals $89.5M across 3,101 lost opportunities
+  all_opportunities:
+    description: All opportunities regardless of status
+    condition: ""
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT Id, Name, Amount, StageName, CloseDate, Owner.Name FROM Opportunity ORDER BY CloseDate DESC
+    note: Returns all opportunities without filtering
+  all_contacts:
+    description: All contacts regardless of status
+    condition: ""
+    objects:
+      - Contact
+    fields: []
+    queryPattern: SELECT Id, Name, Email, Title, Account.Name FROM Contact ORDER BY Name
+    note: Returns all contacts without filtering
+  qualified:
+    description: Opportunities in qualification stage
+    condition: StageName IN ('Qualified', 'Qualification', 'Discovery')
+    objects:
+      - Opportunity
+    fields: []
+    note: Early-stage opportunities being evaluated
+  forecast:
+    description: Forecasted opportunities (commit + best case)
+    condition: ForecastCategoryName IN ('Commit', 'Best Case', 'Pipeline')
+    objects:
+      - Opportunity
+    fields: []
+    note: Opportunities included in sales forecast
+  commit:
+    description: Commit deals - high confidence to close
+    condition: ForecastCategoryName = 'Commit'
+    objects:
+      - Opportunity
+    fields: []
+    note: Deals with high confidence of closing
+  new_business:
+    description: New business opportunities (not renewals)
+    condition: Type = 'New Business' OR Type = 'New Customer'
+    objects:
+      - Opportunity
+    fields: []
+    note: First-time customer acquisition deals
+  expansion:
+    description: Expansion/upsell deals with existing customers
+    condition: Type = 'Expansion' OR Type = 'Upsell' OR Type = 'Add-On'
+    objects:
+      - Opportunity
+    fields: []
+    note: Growing revenue from existing customers
+  arr:
+    description: Annual Recurring Revenue - subscription/recurring deals
+    condition: Type = 'Renewal' OR RecordType.Name = 'Subscription'
+    objects:
+      - Opportunity
+    fields: []
+    aggregateField: Amount
+    note: Recurring revenue from subscriptions and renewals
+  stale:
+    description: Stale opportunities - no activity in 30+ days
+    condition: IsClosed = false AND LastActivityDate < LAST_N_DAYS:30
+    objects:
+      - Opportunity
+    fields: []
+    note: Deals that need attention due to inactivity
+  overdue:
+    description: Overdue items - past expected close/due date
+    condition: IsClosed = false AND CloseDate < TODAY
+    objects:
+      - Opportunity
+      - Task
+    fields:
+      - object: Task
+        field: ActivityDate
+        condition: IsClosed = false AND ActivityDate < TODAY
+    note: Items that have passed their expected completion date
+  recent:
+    description: Recently created or modified items (last 7 days)
+    condition: CreatedDate >= LAST_N_DAYS:7
+    objects:
+      - Opportunity
+      - Account
+      - Contact
+      - Task
+    fields: []
+    note: Items created or updated in the last week
+  executive_contacts:
+    description: Executive-level contacts (C-suite, VP, Director)
+    condition: Title LIKE '%CEO%' OR Title LIKE '%CFO%' OR Title LIKE '%CTO%' OR Title LIKE '%CIO%' OR Title LIKE '%VP%' OR Title LIKE '%Vice President%' OR Title LIKE '%Director%'
+    objects:
+      - Contact
+    fields: []
+    queryPattern: SELECT Id, Name, Title, Email, Account.Name FROM Contact WHERE Title LIKE '%CEO%' OR Title LIKE '%CFO%' OR Title LIKE '%CTO%' OR Title LIKE '%VP%' OR Title LIKE '%Director%' ORDER BY Account.Name
+    note: Key decision makers at customer accounts
+  my:
+    description: Items owned by current user
+    condition: OwnerId = '$User.Id'
+    objects:
+      - Opportunity
+      - Account
+      - Task
+      - Contact
+    fields: []
+    note: Use with other terms like 'my open opportunities'
+  net_new_logos:
+    description: New customer logos - first-time wins for accounts
+    condition: StageName = 'Closed Won' AND IsWon = true
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT Account.Name, MIN(CloseDate) FirstWinDate, COUNT(Id) FROM Opportunity WHERE StageName = 'Closed Won' GROUP BY Account.Name HAVING COUNT(Id) = 1
+    note: Accounts where this is the first Closed Won opportunity
+  average_deal_size:
+    description: Average opportunity amount
+    condition: Amount > 0
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT AVG(Amount) AverageDealSize FROM Opportunity WHERE Amount > 0
+    aggregateField: Amount
+    note: Average value of opportunities
+  largest_deals:
+    description: Largest opportunities by amount
+    condition: ""
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT Id, Name, Amount, Account.Name, StageName FROM Opportunity WHERE Amount > 0 ORDER BY Amount DESC NULLS LAST LIMIT 10
+    note: Top 10 opportunities by deal size
+  msow:
+    description: Master Statement of Work - contract tracking
+    condition: Master_SOW_ID__c != null
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT Id, Name, Master_SOW_ID__c, MSoW_End_Date__c, Account.Name FROM Opportunity WHERE Master_SOW_ID__c != null ORDER BY MSoW_End_Date__c ASC
+    note: Opportunities with Master SOW contracts - uses Master_SOW_ID__c and MSoW_End_Date__c fields
+  msow_expiring:
+    description: MSOWs expiring within specified days
+    condition: Master_SOW_ID__c != null AND MSoW_End_Date__c != null AND MSoW_End_Date__c <= NEXT_N_DAYS:90
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT Id, Name, Master_SOW_ID__c, MSoW_End_Date__c, Account.Name FROM Opportunity WHERE Master_SOW_ID__c != null AND MSoW_End_Date__c != null AND MSoW_End_Date__c <= NEXT_N_DAYS:90 ORDER BY MSoW_End_Date__c ASC
+    note: MSOWs expiring in the next 90 days
+  by_owner:
+    description: Group results by owner
+    condition: ""
+    objects:
+      - Opportunity
+      - Account
+      - Task
+    fields: []
+    queryPattern: SELECT Owner.Name, COUNT(Id), SUM(Amount) FROM Opportunity GROUP BY Owner.Name ORDER BY SUM(Amount) DESC
+    note: Use to see breakdown by sales rep
+  calls:
+    description: Call activities/tasks
+    condition: Type = 'Call'
+    objects:
+      - Task
+    fields: []
+    queryPattern: SELECT Id, Subject, ActivityDate, Owner.Name FROM Task WHERE Type = 'Call' ORDER BY ActivityDate DESC
+    note: Phone call activities
+  meetings:
+    description: Meeting events
+    condition: ""
+    objects:
+      - Event
+    fields: []
+    queryPattern: SELECT Id, Subject, StartDateTime, Owner.Name FROM Event ORDER BY StartDateTime DESC
+    note: Calendar events/meetings
+  emails:
+    description: Email activities
+    condition: Type = 'Email'
+    objects:
+      - Task
+    fields: []
+    queryPattern: SELECT Id, Subject, ActivityDate, Owner.Name FROM Task WHERE Type = 'Email' ORDER BY ActivityDate DESC
+    note: Email activities
+  today:
+    description: Items from today
+    condition: ActivityDate = TODAY
+    objects:
+      - Task
+      - Event
+      - Opportunity
+      - Account
+    fields: []
+    note: Filters to current day - uses ActivityDate for Task/Event, CreatedDate for others
+  this_quarter:
+    description: Current fiscal quarter
+    condition: CloseDate = THIS_QUARTER
+    objects:
+      - Opportunity
+    fields: []
+    note: Items in current quarter
+  this_year:
+    description: Current fiscal year
+    condition: CloseDate = THIS_YEAR
+    objects:
+      - Opportunity
+    fields: []
+    note: Items in current year
+  lost:
+    description: Lost/closed lost opportunities
+    condition: StageName = 'Closed Lost'
+    objects:
+      - Opportunity
+    fields: []
+    note: Deals that were lost
+  big_deals:
+    description: Large opportunities (over 100k)
+    condition: Amount >= 100000
+    objects:
+      - Opportunity
+    fields: []
+    note: High-value opportunities
+  top:
+    description: Top N results by amount or count
+    condition: ""
+    objects:
+      - Opportunity
+      - Account
+    fields: []
+    queryPattern: ... ORDER BY Amount DESC LIMIT 10
+    note: Returns top results, typically top 10
+  it_contacts:
+    description: IT department contacts
+    condition: Department = 'IT' OR Department = 'Information Technology' OR Title LIKE '%IT%'
+    objects:
+      - Contact
+    fields: []
+    note: Technical contacts in IT department
+  marketing_contacts:
+    description: Marketing department contacts
+    condition: Department = 'Marketing' OR Title LIKE '%Marketing%'
+    objects:
+      - Contact
+    fields: []
+    note: Marketing team contacts
+  contacts_without_email:
+    description: Contacts missing email address
+    condition: Email = null OR Email = ''
+    objects:
+      - Contact
+    fields: []
+    queryPattern: SELECT Id, Name, Account.Name FROM Contact WHERE Email = null
+    note: Contacts that need email addresses added
+  sales_cycle:
+    description: Sales cycle duration metrics
+    condition: IsWon = true
+    objects:
+      - Opportunity
+    fields: []
+    queryPattern: SELECT AVG(Days_Open__c) FROM Opportunity WHERE IsWon = true
+    aggregateField: Days_Open__c
+    note: Average time from creation to close
+  activities_by_type:
+    description: Activities grouped by type
+    condition: ""
+    objects:
+      - Task
+    fields: []
+    queryPattern: SELECT Type, COUNT(Id) FROM Task GROUP BY Type
+    note: Breakdown of activities by category
+  over_100k:
+    description: Opportunities over $100,000
+    condition: Amount >= 100000
+    objects:
+      - Opportunity
+    fields: []
+    note: High-value deal filter
+  over_500k:
+    description: Opportunities over $500,000
+    condition: Amount >= 500000
+    objects:
+      - Opportunity
+    fields: []
+    note: Enterprise-level deal filter
+  new:
+    description: New/recently created items
+    condition: CreatedDate = THIS_MONTH
+    objects:
+      - Account
+      - Contact
+      - Opportunity
+    fields: []
+    note: Items created this month
+aliases:
+  managing_director: md
+  accounts_by_md: md_accounts
+  md_account_list: md_accounts
+  accounts_for_md: md_accounts
+  service_delivery_owner: md_accounts
+  expected_to_close_this_week: closing_this_week
+  close_this_week: closing_this_week
+  expected_to_close_this_month: closing_this_month
+  close_this_month: closing_this_month
+  ps: ps_bookings
+  professional_services: ps_bookings
+  professional_services_bookings: ps_bookings
+  saas_bookings: chariot_bookings
+  subscription_bookings: chariot_bookings
+  chariot: chariot_bookings
+  churned: churn
+  churned_accounts: churn
+  churn_accounts: churn
+  lost_customers: churn
+  dormant_accounts: dormant
+  stale_accounts: dormant
+  lost_pipeline: dormant
+  prospects: prospect
+  prospect_accounts: prospect
+  unconverted: prospect
+  active_prospects: prospect
+  pre2023_churn: churn_pre2023
+  churn_before_2023: churn_pre2023
+  churned_pre2023: churn_pre2023
+  old_churn: churn_pre2023
+  legacy_churn: churn_pre2023
+  pre2023_dormant: dormant_pre2023
+  dormant_before_2023: dormant_pre2023
+  old_dormant: dormant_pre2023
+  legacy_dormant: dormant_pre2023
+  show_opportunities: all_opportunities
+  opportunities: all_opportunities
+  contacts: all_contacts
+  show_contacts: all_contacts
+  won: bookings
+  won_deals: bookings
+  closed_won: bookings
+  commit_deals: commit
+  forecasted: forecast
+  expansion_deals: expansion
+  upsell: expansion
+  upsells: expansion
+  annual_recurring_revenue: arr
+  recurring_revenue: arr
+  stalled: stale
+  stalled_deals: stale
+  inactive_deals: stale
+  executives: executive_contacts
+  decision_makers: executive_contacts
+  c_suite: executive_contacts
+  new_logos: net_new_logos
+  first_time_wins: net_new_logos
+  biggest_deals: largest_deals
+  top_deals: largest_deals
+  avg_deal_size: average_deal_size
+  msows: msow
+  master_sow: msow
+  msows_expiring: msow_expiring
+  expiring_msows: msow_expiring
+  q1: this_quarter
+  q2: this_quarter
+  q3: this_quarter
+  q4: this_quarter
+  current_quarter: this_quarter
+  current_year: this_year
+  ytd: this_year
+  year_to_date: this_year
+  lost_deals: lost
+  closed_lost: lost
+  large_deals: big_deals
+  big_opportunities: big_deals
+  top_10: top
+  top_results: top
+  information_technology: it_contacts
+  tech_contacts: it_contacts
+  average_sales_cycle: sales_cycle
+  deal_cycle: sales_cycle
+  activity_breakdown: activities_by_type
+  no_email: contacts_without_email
+  missing_email: contacts_without_email
+  newly_created: new
+  new_this_month: new

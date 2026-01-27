@@ -75,6 +75,15 @@
             "timeout": 10
           }
         ]
+      },
+      {
+        "matcher": "mcp__salesforce__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "${CLAUDE_PROJECT_DIR}/.claude/hooks/enforce-salesforce-wrappers.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [

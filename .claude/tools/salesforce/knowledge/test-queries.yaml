@@ -1,0 +1,1081 @@
+# Salesforce Knowledge Layer - Query Test Plan
+#
+# 100 common queries for testing natural language resolution
+# against Account, Opportunity, Contact, and Activity fields
+#
+# Usage:
+#   1. Set up glossary terms with teach.ts
+#   2. Run queries through run-soql-query-enhanced
+#   3. Verify resolution source and confidence
+#
+# Categories:
+#   - Account: Basic, Filtering, Relationships, Geography, Industry
+#   - Opportunity: Basic, Pipeline, Revenue, Stages, Ownership
+#   - Business Terms: Bookings, Pipeline, Forecast, ARR
+#   - Temporal: Fiscal periods, Date ranges, Relative dates
+#   - Ownership: By rep, team, territory
+#   - Aggregations: Counts, sums, rankings
+#   - Contact: Basic, Roles, Relationships
+#   - Activity: Tasks, Events, Calls
+#   - Combined: Multi-field queries
+
+version: "2.0.0"
+lastUpdated: "2026-01-22"
+
+# ============================================
+# ACCOUNT QUERIES (15 queries)
+# ============================================
+accountQueries:
+  # Basic Account Queries
+  - id: ACC-001
+    naturalLanguage: "all accounts"
+    expectedSoql: "SELECT Id, Name FROM Account"
+    expectedSource: pattern_cache
+    category: basic
+    fields: [Account.Id, Account.Name]
+
+  - id: ACC-002
+    naturalLanguage: "show me accounts"
+    expectedSoql: "SELECT Id, Name FROM Account"
+    expectedSource: pattern_cache
+    category: basic
+    fields: [Account.Id, Account.Name]
+
+  - id: ACC-003
+    naturalLanguage: "list account names"
+    expectedSoql: "SELECT Id, Name FROM Account"
+    expectedSource: schema
+    category: basic
+    fields: [Account.Name]
+
+  # Filtered Account Queries
+  - id: ACC-004
+    naturalLanguage: "enterprise accounts"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Type = 'Enterprise'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [enterprise]
+    fields: [Account.Type]
+
+  - id: ACC-005
+    naturalLanguage: "accounts in technology industry"
+    expectedSoql: "SELECT Id, Name, Industry FROM Account WHERE Industry = 'Technology'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [technology]
+    fields: [Account.Industry]
+
+  - id: ACC-006
+    naturalLanguage: "large accounts"
+    expectedSoql: "SELECT Id, Name, AnnualRevenue FROM Account WHERE AnnualRevenue > 10000000"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [large_accounts]
+    fields: [Account.AnnualRevenue]
+
+  - id: ACC-007
+    naturalLanguage: "accounts with more than 1000 employees"
+    expectedSoql: "SELECT Id, Name, NumberOfEmployees FROM Account WHERE NumberOfEmployees > 1000"
+    expectedSource: schema
+    category: filtering
+    fields: [Account.NumberOfEmployees]
+
+  - id: ACC-008
+    naturalLanguage: "active accounts"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Rating = 'Hot' OR Rating = 'Warm'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [active]
+    fields: [Account.Rating]
+
+  - id: ACC-009
+    naturalLanguage: "accounts in California"
+    expectedSoql: "SELECT Id, Name, BillingState FROM Account WHERE BillingState = 'CA'"
+    expectedSource: schema
+    category: filtering
+    fields: [Account.BillingState]
+
+  - id: ACC-010
+    naturalLanguage: "customer accounts"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Type = 'Customer'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [customer]
+    fields: [Account.Type]
+
+  # Account with Revenue/Size
+  - id: ACC-011
+    naturalLanguage: "accounts by revenue"
+    expectedSoql: "SELECT Id, Name, AnnualRevenue FROM Account ORDER BY AnnualRevenue DESC"
+    expectedSource: schema
+    category: sorting
+    fields: [Account.AnnualRevenue]
+
+  - id: ACC-012
+    naturalLanguage: "top accounts"
+    expectedSoql: "SELECT Id, Name, AnnualRevenue FROM Account ORDER BY AnnualRevenue DESC LIMIT 10"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [top_accounts]
+    fields: [Account.AnnualRevenue]
+
+  - id: ACC-013
+    naturalLanguage: "new accounts"
+    expectedSoql: "SELECT Id, Name, CreatedDate FROM Account WHERE CreatedDate = THIS_MONTH"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [new]
+    fields: [Account.CreatedDate]
+
+  - id: ACC-014
+    naturalLanguage: "accounts without opportunities"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Id NOT IN (SELECT AccountId FROM Opportunity)"
+    expectedSource: glossary
+    category: relationships
+    glossaryTerms: [without_opportunities]
+    fields: [Account.Id]
+
+  - id: ACC-015
+    naturalLanguage: "partner accounts"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Type = 'Partner'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [partner]
+    fields: [Account.Type]
+
+# ============================================
+# OPPORTUNITY QUERIES (20 queries)
+# ============================================
+opportunityQueries:
+  # Basic Opportunity Queries
+  - id: OPP-001
+    naturalLanguage: "all opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity"
+    expectedSource: pattern_cache
+    category: basic
+    fields: [Opportunity.Id, Opportunity.Name, Opportunity.Amount]
+
+  - id: OPP-002
+    naturalLanguage: "show opportunities"
+    expectedSoql: "SELECT Id, Name, Amount, StageName FROM Opportunity"
+    expectedSource: pattern_cache
+    category: basic
+    fields: [Opportunity.Id, Opportunity.Name, Opportunity.Amount, Opportunity.StageName]
+
+  - id: OPP-003
+    naturalLanguage: "open opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false"
+    expectedSource: glossary
+    category: pipeline
+    glossaryTerms: [open]
+    fields: [Opportunity.IsClosed]
+
+  - id: OPP-004
+    naturalLanguage: "closed opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = true"
+    expectedSource: glossary
+    category: pipeline
+    glossaryTerms: [closed]
+    fields: [Opportunity.IsClosed]
+
+  # Stage-based Queries
+  - id: OPP-005
+    naturalLanguage: "deals in negotiation"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Negotiation'"
+    expectedSource: glossary
+    category: stages
+    glossaryTerms: [negotiation]
+    fields: [Opportunity.StageName]
+
+  - id: OPP-006
+    naturalLanguage: "prospecting opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Prospecting'"
+    expectedSource: glossary
+    category: stages
+    glossaryTerms: [prospecting]
+    fields: [Opportunity.StageName]
+
+  - id: OPP-007
+    naturalLanguage: "qualified opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Qualification'"
+    expectedSource: glossary
+    category: stages
+    glossaryTerms: [qualified]
+    fields: [Opportunity.StageName]
+
+  # Revenue/Bookings Queries
+  - id: OPP-008
+    naturalLanguage: "bookings"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won'"
+    expectedSource: glossary
+    category: revenue
+    glossaryTerms: [bookings]
+    fields: [Opportunity.StageName, Opportunity.Amount]
+
+  - id: OPP-009
+    naturalLanguage: "won deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE IsWon = true"
+    expectedSource: glossary
+    category: revenue
+    glossaryTerms: [won]
+    fields: [Opportunity.IsWon]
+
+  - id: OPP-010
+    naturalLanguage: "lost deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = true AND IsWon = false"
+    expectedSource: glossary
+    category: revenue
+    glossaryTerms: [lost]
+    fields: [Opportunity.IsClosed, Opportunity.IsWon]
+
+  - id: OPP-011
+    naturalLanguage: "big deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Amount > 100000"
+    expectedSource: glossary
+    category: revenue
+    glossaryTerms: [big_deals]
+    fields: [Opportunity.Amount]
+
+  - id: OPP-012
+    naturalLanguage: "opportunities over 500k"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Amount > 500000"
+    expectedSource: schema
+    category: revenue
+    fields: [Opportunity.Amount]
+
+  # Pipeline Queries
+  - id: OPP-013
+    naturalLanguage: "pipeline"
+    expectedSoql: "SELECT Id, Name, Amount, StageName FROM Opportunity WHERE IsClosed = false"
+    expectedSource: glossary
+    category: pipeline
+    glossaryTerms: [pipeline]
+    fields: [Opportunity.IsClosed, Opportunity.Amount]
+
+  - id: OPP-014
+    naturalLanguage: "forecast"
+    expectedSoql: "SELECT Id, Name, Amount, ForecastCategory FROM Opportunity WHERE ForecastCategory IN ('Pipeline', 'Best Case', 'Commit')"
+    expectedSource: glossary
+    category: pipeline
+    glossaryTerms: [forecast]
+    fields: [Opportunity.ForecastCategory]
+
+  - id: OPP-015
+    naturalLanguage: "commit deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE ForecastCategory = 'Commit'"
+    expectedSource: glossary
+    category: pipeline
+    glossaryTerms: [commit]
+    fields: [Opportunity.ForecastCategory]
+
+  # Temporal Queries
+  - id: OPP-016
+    naturalLanguage: "opportunities closing this month"
+    expectedSoql: "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE CloseDate = THIS_MONTH"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [this_month]
+    fields: [Opportunity.CloseDate]
+
+  - id: OPP-017
+    naturalLanguage: "opportunities closing this quarter"
+    expectedSoql: "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE CloseDate = THIS_QUARTER"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [this_quarter]
+    fields: [Opportunity.CloseDate]
+
+  - id: OPP-018
+    naturalLanguage: "recent opportunities"
+    expectedSoql: "SELECT Id, Name, Amount, CreatedDate FROM Opportunity WHERE CreatedDate = LAST_N_DAYS:30"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [recent]
+    fields: [Opportunity.CreatedDate]
+
+  - id: OPP-019
+    naturalLanguage: "stale opportunities"
+    expectedSoql: "SELECT Id, Name, Amount, LastActivityDate FROM Opportunity WHERE LastActivityDate < LAST_N_DAYS:90 AND IsClosed = false"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [stale]
+    fields: [Opportunity.LastActivityDate, Opportunity.IsClosed]
+
+  - id: OPP-020
+    naturalLanguage: "overdue opportunities"
+    expectedSoql: "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE CloseDate < TODAY AND IsClosed = false"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [overdue]
+    fields: [Opportunity.CloseDate, Opportunity.IsClosed]
+
+# ============================================
+# BUSINESS TERM QUERIES (10 queries)
+# ============================================
+businessTermQueries:
+  - id: BIZ-001
+    naturalLanguage: "Q1 bookings"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate >= 2026-01-01 AND CloseDate <= 2026-03-31"
+    expectedSource: pattern_cache
+    category: fiscal
+    glossaryTerms: [q1, bookings]
+    fields: [Opportunity.StageName, Opportunity.CloseDate, Opportunity.Amount]
+
+  - id: BIZ-002
+    naturalLanguage: "Q1 PS bookings"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won' AND Type = 'PS' AND CloseDate >= 2026-01-01 AND CloseDate <= 2026-03-31"
+    expectedSource: pattern_cache
+    category: fiscal
+    glossaryTerms: [q1, ps_bookings, bookings]
+    fields: [Opportunity.StageName, Opportunity.Type, Opportunity.CloseDate]
+
+  - id: BIZ-003
+    naturalLanguage: "new business"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'New Business'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [new_business]
+    fields: [Opportunity.Type]
+
+  - id: BIZ-004
+    naturalLanguage: "renewals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'Renewal'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [renewals]
+    fields: [Opportunity.Type]
+
+  - id: BIZ-005
+    naturalLanguage: "expansion deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'Expansion' OR Type = 'Upsell'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [expansion]
+    fields: [Opportunity.Type]
+
+  - id: BIZ-006
+    naturalLanguage: "professional services opportunities"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'PS' OR Type = 'Professional Services'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [ps, professional_services]
+    fields: [Opportunity.Type]
+
+  - id: BIZ-007
+    naturalLanguage: "enterprise deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Account.Type = 'Enterprise'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [enterprise]
+    fields: [Account.Type]
+
+  - id: BIZ-008
+    naturalLanguage: "ARR"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'Subscription' AND StageName = 'Closed Won'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [arr, annual_recurring_revenue]
+    fields: [Opportunity.Type, Opportunity.StageName]
+
+  - id: BIZ-009
+    naturalLanguage: "churn risk"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'Renewal' AND StageName NOT IN ('Closed Won', 'Closed Lost')"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [churn_risk]
+    fields: [Opportunity.Type, Opportunity.StageName]
+
+  - id: BIZ-010
+    naturalLanguage: "net new logos"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE Type = 'New Business' AND StageName = 'Closed Won'"
+    expectedSource: glossary
+    category: business
+    glossaryTerms: [new_logos, new_business, bookings]
+    fields: [Opportunity.Type, Opportunity.StageName]
+
+# ============================================
+# COMBINED/COMPLEX QUERIES (5 queries)
+# ============================================
+combinedQueries:
+  - id: CMB-001
+    naturalLanguage: "Q1 bookings for enterprise accounts"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate >= 2026-01-01 AND CloseDate <= 2026-03-31 AND Account.Type = 'Enterprise'"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [q1, bookings, enterprise]
+    fields: [Opportunity.StageName, Opportunity.CloseDate, Account.Type]
+
+  - id: CMB-002
+    naturalLanguage: "pipeline by stage"
+    expectedSoql: "SELECT StageName, COUNT(Id), SUM(Amount) FROM Opportunity WHERE IsClosed = false GROUP BY StageName"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [pipeline]
+    fields: [Opportunity.StageName, Opportunity.IsClosed, Opportunity.Amount]
+
+  - id: CMB-003
+    naturalLanguage: "top 10 deals closing this quarter"
+    expectedSoql: "SELECT Id, Name, Amount, CloseDate FROM Opportunity WHERE CloseDate = THIS_QUARTER AND IsClosed = false ORDER BY Amount DESC LIMIT 10"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [top, this_quarter]
+    fields: [Opportunity.CloseDate, Opportunity.Amount, Opportunity.IsClosed]
+
+  - id: CMB-004
+    naturalLanguage: "accounts with open opportunities over 100k"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Id IN (SELECT AccountId FROM Opportunity WHERE IsClosed = false AND Amount > 100000)"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [open]
+    fields: [Account.Id, Opportunity.IsClosed, Opportunity.Amount]
+
+  - id: CMB-005
+    naturalLanguage: "win rate by lead source"
+    expectedSoql: "SELECT LeadSource, COUNT(Id) total, SUM(CASE WHEN IsWon = true THEN 1 ELSE 0 END) wins FROM Opportunity WHERE IsClosed = true GROUP BY LeadSource"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [win_rate]
+    fields: [Opportunity.LeadSource, Opportunity.IsClosed, Opportunity.IsWon]
+
+# ============================================
+# GLOSSARY TERMS TO SET UP
+# ============================================
+requiredGlossaryTerms:
+  # Account terms
+  - term: enterprise
+    condition: "Type = 'Enterprise'"
+    objects: [Account, Opportunity]
+
+  - term: customer
+    condition: "Type = 'Customer'"
+    objects: [Account]
+
+  - term: partner
+    condition: "Type = 'Partner'"
+    objects: [Account]
+
+  - term: large_accounts
+    condition: "AnnualRevenue > 10000000"
+    objects: [Account]
+
+  - term: top_accounts
+    condition: "ORDER BY AnnualRevenue DESC LIMIT 10"
+    objects: [Account]
+
+  - term: active
+    condition: "Rating IN ('Hot', 'Warm')"
+    objects: [Account]
+
+  - term: technology
+    condition: "Industry = 'Technology'"
+    objects: [Account]
+
+  # Opportunity stage terms
+  - term: open
+    condition: "IsClosed = false"
+    objects: [Opportunity]
+
+  - term: closed
+    condition: "IsClosed = true"
+    objects: [Opportunity]
+
+  - term: won
+    condition: "IsWon = true"
+    objects: [Opportunity]
+
+  - term: lost
+    condition: "IsClosed = true AND IsWon = false"
+    objects: [Opportunity]
+
+  - term: bookings
+    condition: "StageName = 'Closed Won'"
+    objects: [Opportunity]
+
+  - term: prospecting
+    condition: "StageName = 'Prospecting'"
+    objects: [Opportunity]
+
+  - term: qualified
+    condition: "StageName = 'Qualification'"
+    objects: [Opportunity]
+
+  - term: negotiation
+    condition: "StageName = 'Negotiation'"
+    objects: [Opportunity]
+
+  # Pipeline/Forecast terms
+  - term: pipeline
+    condition: "IsClosed = false"
+    objects: [Opportunity]
+
+  - term: forecast
+    condition: "ForecastCategory IN ('Pipeline', 'Best Case', 'Commit')"
+    objects: [Opportunity]
+
+  - term: commit
+    condition: "ForecastCategory = 'Commit'"
+    objects: [Opportunity]
+
+  # Revenue terms
+  - term: big_deals
+    condition: "Amount > 100000"
+    objects: [Opportunity]
+
+  # Business type terms
+  - term: new_business
+    condition: "Type = 'New Business'"
+    objects: [Opportunity]
+
+  - term: renewals
+    condition: "Type = 'Renewal'"
+    objects: [Opportunity]
+
+  - term: expansion
+    condition: "Type IN ('Expansion', 'Upsell')"
+    objects: [Opportunity]
+
+  - term: ps
+    condition: "Type = 'PS'"
+    objects: [Opportunity]
+    aliases: [professional_services]
+
+  - term: arr
+    condition: "Type = 'Subscription' AND StageName = 'Closed Won'"
+    objects: [Opportunity]
+    aliases: [annual_recurring_revenue]
+
+  # Temporal terms
+  - term: this_month
+    condition: "CloseDate = THIS_MONTH"
+    objects: [Opportunity]
+
+  - term: this_quarter
+    condition: "CloseDate = THIS_QUARTER"
+    objects: [Opportunity]
+
+  - term: recent
+    condition: "CreatedDate = LAST_N_DAYS:30"
+    objects: [Opportunity, Account]
+
+  - term: stale
+    condition: "LastActivityDate < LAST_N_DAYS:90 AND IsClosed = false"
+    objects: [Opportunity]
+
+  - term: overdue
+    condition: "CloseDate < TODAY AND IsClosed = false"
+    objects: [Opportunity]
+
+  - term: new
+    condition: "CreatedDate = THIS_MONTH"
+    objects: [Account, Opportunity]
+
+  # Fiscal period terms
+  - term: q1
+    fields:
+      - field: CloseDate
+        range:
+          start: "2026-01-01"
+          end: "2026-03-31"
+    fiscalPeriod: true
+
+  - term: q2
+    fields:
+      - field: CloseDate
+        range:
+          start: "2026-04-01"
+          end: "2026-06-30"
+    fiscalPeriod: true
+
+  - term: q3
+    fields:
+      - field: CloseDate
+        range:
+          start: "2026-07-01"
+          end: "2026-09-30"
+    fiscalPeriod: true
+
+  - term: q4
+    fields:
+      - field: CloseDate
+        range:
+          start: "2026-10-01"
+          end: "2026-12-31"
+    fiscalPeriod: true
+
+# ============================================
+# OWNERSHIP QUERIES (10 queries)
+# ============================================
+ownershipQueries:
+  - id: OWN-001
+    naturalLanguage: "my opportunities"
+    expectedSoql: "SELECT Id, Name, Amount, StageName FROM Opportunity WHERE OwnerId = [current_user]"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [my]
+    fields: [Opportunity.OwnerId]
+
+  - id: OWN-002
+    naturalLanguage: "opportunities owned by Rhett"
+    expectedSoql: "SELECT Id, Name, Amount, StageName FROM Opportunity WHERE Owner.Name LIKE '%Rhett%'"
+    expectedSource: schema
+    category: ownership
+    fields: [Opportunity.Owner.Name]
+
+  - id: OWN-003
+    naturalLanguage: "accounts owned by John"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE Owner.Name LIKE '%John%'"
+    expectedSource: schema
+    category: ownership
+    fields: [Account.Owner.Name]
+
+  - id: OWN-004
+    naturalLanguage: "opportunities by owner"
+    expectedSoql: "SELECT Owner.Name, COUNT(Id), SUM(Amount) FROM Opportunity GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [by_owner]
+    fields: [Opportunity.Owner.Name]
+
+  - id: OWN-005
+    naturalLanguage: "stack rank owners by open opportunities"
+    expectedSoql: "SELECT Owner.Name, COUNT(Id) cnt, SUM(Amount) total FROM Opportunity WHERE IsClosed = false GROUP BY Owner.Name ORDER BY COUNT(Id) DESC"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [stack_rank, open, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.IsClosed]
+
+  - id: OWN-006
+    naturalLanguage: "top reps by bookings"
+    expectedSoql: "SELECT Owner.Name, SUM(Amount) FROM Opportunity WHERE StageName = 'Closed Won' GROUP BY Owner.Name ORDER BY SUM(Amount) DESC LIMIT 10"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [top, bookings, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.StageName, Opportunity.Amount]
+
+  - id: OWN-007
+    naturalLanguage: "unassigned accounts"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE OwnerId = null"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [unassigned]
+    fields: [Account.OwnerId]
+
+  - id: OWN-008
+    naturalLanguage: "pipeline by rep"
+    expectedSoql: "SELECT Owner.Name, SUM(Amount) FROM Opportunity WHERE IsClosed = false GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [pipeline, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.IsClosed, Opportunity.Amount]
+
+  - id: OWN-009
+    naturalLanguage: "bookings by sales rep this quarter"
+    expectedSoql: "SELECT Owner.Name, SUM(Amount) FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate = THIS_QUARTER GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [bookings, by_owner, this_quarter]
+    fields: [Opportunity.Owner.Name, Opportunity.StageName, Opportunity.CloseDate]
+
+  - id: OWN-010
+    naturalLanguage: "win rate by owner"
+    expectedSoql: "SELECT Owner.Name, COUNT(Id) total, SUM(CASE WHEN IsWon THEN 1 ELSE 0 END) wins FROM Opportunity WHERE IsClosed = true GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [win_rate, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.IsClosed, Opportunity.IsWon]
+
+# ============================================
+# AGGREGATION QUERIES (10 queries)
+# ============================================
+aggregationQueries:
+  - id: AGG-001
+    naturalLanguage: "total pipeline"
+    expectedSoql: "SELECT SUM(Amount) FROM Opportunity WHERE IsClosed = false"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [total, pipeline]
+    fields: [Opportunity.Amount, Opportunity.IsClosed]
+
+  - id: AGG-002
+    naturalLanguage: "total bookings year to date"
+    expectedSoql: "SELECT SUM(Amount) FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate = THIS_YEAR"
+    expectedSource: pattern_cache
+    category: aggregation
+    glossaryTerms: [total, bookings, ytd]
+    fields: [Opportunity.Amount, Opportunity.StageName, Opportunity.CloseDate]
+
+  - id: AGG-003
+    naturalLanguage: "count of open opportunities"
+    expectedSoql: "SELECT COUNT(Id) FROM Opportunity WHERE IsClosed = false"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [count, open]
+    fields: [Opportunity.IsClosed]
+
+  - id: AGG-004
+    naturalLanguage: "average deal size"
+    expectedSoql: "SELECT AVG(Amount) FROM Opportunity WHERE IsWon = true"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [average, deal_size]
+    fields: [Opportunity.Amount, Opportunity.IsWon]
+
+  - id: AGG-005
+    naturalLanguage: "opportunities by month in 2026"
+    expectedSoql: "SELECT CALENDAR_MONTH(CloseDate) month, COUNT(Id) cnt, SUM(Amount) total FROM Opportunity WHERE IsClosed = false AND CloseDate >= 2026-01-01 AND CloseDate <= 2026-12-31 GROUP BY CALENDAR_MONTH(CloseDate) ORDER BY CALENDAR_MONTH(CloseDate)"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [by_month]
+    fields: [Opportunity.CloseDate, Opportunity.Amount]
+
+  - id: AGG-006
+    naturalLanguage: "accounts by industry"
+    expectedSoql: "SELECT Industry, COUNT(Id) FROM Account GROUP BY Industry"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [by_industry]
+    fields: [Account.Industry]
+
+  - id: AGG-007
+    naturalLanguage: "pipeline by stage"
+    expectedSoql: "SELECT StageName, COUNT(Id), SUM(Amount) FROM Opportunity WHERE IsClosed = false GROUP BY StageName"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [pipeline, by_stage]
+    fields: [Opportunity.StageName, Opportunity.IsClosed, Opportunity.Amount]
+
+  - id: AGG-008
+    naturalLanguage: "bookings by quarter"
+    expectedSoql: "SELECT CALENDAR_QUARTER(CloseDate), SUM(Amount) FROM Opportunity WHERE StageName = 'Closed Won' AND CloseDate = THIS_YEAR GROUP BY CALENDAR_QUARTER(CloseDate)"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [bookings, by_quarter]
+    fields: [Opportunity.CloseDate, Opportunity.StageName, Opportunity.Amount]
+
+  - id: AGG-009
+    naturalLanguage: "largest deals"
+    expectedSoql: "SELECT Id, Name, Amount FROM Opportunity ORDER BY Amount DESC LIMIT 10"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [largest, deals]
+    fields: [Opportunity.Amount]
+
+  - id: AGG-010
+    naturalLanguage: "revenue by account"
+    expectedSoql: "SELECT Account.Name, SUM(Amount) FROM Opportunity WHERE IsWon = true GROUP BY Account.Name ORDER BY SUM(Amount) DESC"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [revenue, by_account]
+    fields: [Opportunity.Account.Name, Opportunity.Amount, Opportunity.IsWon]
+
+# ============================================
+# CONTACT QUERIES (10 queries)
+# ============================================
+contactQueries:
+  - id: CON-001
+    naturalLanguage: "all contacts"
+    expectedSoql: "SELECT Id, Name, Email, Phone, Account.Name FROM Contact"
+    expectedSource: pattern_cache
+    category: basic
+    fields: [Contact.Id, Contact.Name, Contact.Email, Contact.Phone]
+
+  - id: CON-002
+    naturalLanguage: "contacts at Acme"
+    expectedSoql: "SELECT Id, Name, Email, Phone FROM Contact WHERE Account.Name LIKE '%Acme%'"
+    expectedSource: schema
+    category: filtering
+    fields: [Contact.Account.Name]
+
+  - id: CON-003
+    naturalLanguage: "decision makers"
+    expectedSoql: "SELECT Id, Name, Title, Account.Name FROM Contact WHERE Title LIKE '%VP%' OR Title LIKE '%Director%' OR Title LIKE '%Chief%' OR Title LIKE '%President%'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [decision_makers]
+    fields: [Contact.Title]
+
+  - id: CON-004
+    naturalLanguage: "executive contacts"
+    expectedSoql: "SELECT Id, Name, Title, Account.Name FROM Contact WHERE Title LIKE '%CEO%' OR Title LIKE '%CTO%' OR Title LIKE '%CFO%' OR Title LIKE '%CIO%'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [executives]
+    fields: [Contact.Title]
+
+  - id: CON-005
+    naturalLanguage: "contacts by account"
+    expectedSoql: "SELECT Account.Name, COUNT(Id) FROM Contact GROUP BY Account.Name"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [by_account]
+    fields: [Contact.Account.Name]
+
+  - id: CON-006
+    naturalLanguage: "contacts without email"
+    expectedSoql: "SELECT Id, Name, Account.Name FROM Contact WHERE Email = null"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [without_email]
+    fields: [Contact.Email]
+
+  - id: CON-007
+    naturalLanguage: "new contacts this month"
+    expectedSoql: "SELECT Id, Name, Email, CreatedDate FROM Contact WHERE CreatedDate = THIS_MONTH"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [new, this_month]
+    fields: [Contact.CreatedDate]
+
+  - id: CON-008
+    naturalLanguage: "IT contacts"
+    expectedSoql: "SELECT Id, Name, Title, Account.Name FROM Contact WHERE Department = 'IT' OR Department = 'Information Technology'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [it_department]
+    fields: [Contact.Department]
+
+  - id: CON-009
+    naturalLanguage: "marketing contacts"
+    expectedSoql: "SELECT Id, Name, Title, Account.Name FROM Contact WHERE Department = 'Marketing'"
+    expectedSource: glossary
+    category: filtering
+    glossaryTerms: [marketing_department]
+    fields: [Contact.Department]
+
+  - id: CON-010
+    naturalLanguage: "contacts with recent activity"
+    expectedSoql: "SELECT Id, Name, LastActivityDate FROM Contact WHERE LastActivityDate = LAST_N_DAYS:30"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [recent_activity]
+    fields: [Contact.LastActivityDate]
+
+# ============================================
+# ACTIVITY QUERIES (10 queries)
+# ============================================
+activityQueries:
+  - id: ACT-001
+    naturalLanguage: "overdue tasks"
+    expectedSoql: "SELECT Id, Subject, ActivityDate, Owner.Name FROM Task WHERE IsClosed = false AND ActivityDate < TODAY"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [overdue]
+    fields: [Task.IsClosed, Task.ActivityDate]
+
+  - id: ACT-002
+    naturalLanguage: "my open tasks"
+    expectedSoql: "SELECT Id, Subject, ActivityDate FROM Task WHERE OwnerId = [current_user] AND IsClosed = false"
+    expectedSource: glossary
+    category: ownership
+    glossaryTerms: [my, open]
+    fields: [Task.OwnerId, Task.IsClosed]
+
+  - id: ACT-003
+    naturalLanguage: "tasks due this week"
+    expectedSoql: "SELECT Id, Subject, ActivityDate, Owner.Name FROM Task WHERE ActivityDate = THIS_WEEK AND IsClosed = false"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [this_week]
+    fields: [Task.ActivityDate, Task.IsClosed]
+
+  - id: ACT-004
+    naturalLanguage: "calls logged today"
+    expectedSoql: "SELECT Id, Subject, ActivityDate FROM Task WHERE Type = 'Call' AND ActivityDate = TODAY"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [calls, today]
+    fields: [Task.Type, Task.ActivityDate]
+
+  - id: ACT-005
+    naturalLanguage: "meetings this week"
+    expectedSoql: "SELECT Id, Subject, StartDateTime FROM Event WHERE StartDateTime = THIS_WEEK"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [meetings, this_week]
+    fields: [Event.StartDateTime]
+
+  - id: ACT-006
+    naturalLanguage: "activities by type"
+    expectedSoql: "SELECT Type, COUNT(Id) FROM Task GROUP BY Type"
+    expectedSource: glossary
+    category: aggregation
+    glossaryTerms: [by_type]
+    fields: [Task.Type]
+
+  - id: ACT-007
+    naturalLanguage: "completed tasks this month"
+    expectedSoql: "SELECT Id, Subject, CompletedDateTime FROM Task WHERE IsClosed = true AND CompletedDateTime = THIS_MONTH"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [completed, this_month]
+    fields: [Task.IsClosed, Task.CompletedDateTime]
+
+  - id: ACT-008
+    naturalLanguage: "recent activities"
+    expectedSoql: "SELECT Id, Subject, ActivityDate FROM Task WHERE ActivityDate = LAST_N_DAYS:7 ORDER BY ActivityDate DESC"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [recent]
+    fields: [Task.ActivityDate]
+
+  - id: ACT-009
+    naturalLanguage: "activities for opportunity"
+    expectedSoql: "SELECT Id, Subject, ActivityDate FROM Task WHERE WhatId = [opportunity_id]"
+    expectedSource: schema
+    category: relationships
+    fields: [Task.WhatId]
+
+  - id: ACT-010
+    naturalLanguage: "emails sent this week"
+    expectedSoql: "SELECT Id, Subject, ActivityDate FROM Task WHERE Type = 'Email' AND ActivityDate = THIS_WEEK"
+    expectedSource: glossary
+    category: temporal
+    glossaryTerms: [emails, this_week]
+    fields: [Task.Type, Task.ActivityDate]
+
+# ============================================
+# ADDITIONAL COMBINED QUERIES (10 queries)
+# ============================================
+additionalCombinedQueries:
+  - id: CMB-006
+    naturalLanguage: "opportunities closing this week by owner"
+    expectedSoql: "SELECT Owner.Name, COUNT(Id), SUM(Amount) FROM Opportunity WHERE IsClosed = false AND CloseDate = THIS_WEEK GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [this_week, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.CloseDate, Opportunity.IsClosed]
+
+  - id: CMB-007
+    naturalLanguage: "MSOWs expiring in 90 days"
+    expectedSoql: "SELECT Id, Name, Master_SOW_ID__c, MSoW_End_Date__c, Account.Name FROM Opportunity WHERE Master_SOW_ID__c != null AND MSoW_End_Date__c != null AND MSoW_End_Date__c <= NEXT_N_DAYS:90 ORDER BY MSoW_End_Date__c ASC"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [msow, expiring]
+    fields: [Opportunity.Master_SOW_ID__c, Opportunity.MSoW_End_Date__c]
+
+  - id: CMB-008
+    naturalLanguage: "stalled deals over 100k"
+    expectedSoql: "SELECT Id, Name, Amount, Days_Since_Last_Activity__c FROM Opportunity WHERE IsClosed = false AND Amount > 100000 AND Days_Since_Last_Activity__c > 30"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [stalled, big_deals]
+    fields: [Opportunity.IsClosed, Opportunity.Amount, Opportunity.Days_Since_Last_Activity__c]
+
+  - id: CMB-009
+    naturalLanguage: "accounts with no activity in 90 days"
+    expectedSoql: "SELECT Id, Name, LastActivityDate FROM Account WHERE LastActivityDate < LAST_N_DAYS:90 OR LastActivityDate = null"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [no_activity]
+    fields: [Account.LastActivityDate]
+
+  - id: CMB-010
+    naturalLanguage: "top 10 accounts by opportunity count"
+    expectedSoql: "SELECT Account.Name, COUNT(Id) FROM Opportunity GROUP BY Account.Name ORDER BY COUNT(Id) DESC LIMIT 10"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [top, by_account]
+    fields: [Opportunity.Account.Name]
+
+  - id: CMB-011
+    naturalLanguage: "lost deals this quarter by reason"
+    expectedSoql: "SELECT Loss_Reason__c, COUNT(Id), SUM(Amount) FROM Opportunity WHERE StageName = 'Closed Lost' AND CloseDate = THIS_QUARTER GROUP BY Loss_Reason__c"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [lost, this_quarter]
+    fields: [Opportunity.StageName, Opportunity.CloseDate, Opportunity.Loss_Reason__c]
+
+  - id: CMB-012
+    naturalLanguage: "enterprise pipeline by stage"
+    expectedSoql: "SELECT StageName, COUNT(Id), SUM(Amount) FROM Opportunity WHERE Account.Type = 'Enterprise' AND IsClosed = false GROUP BY StageName"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [enterprise, pipeline, by_stage]
+    fields: [Opportunity.Account.Type, Opportunity.IsClosed, Opportunity.StageName]
+
+  - id: CMB-013
+    naturalLanguage: "new accounts with opportunities"
+    expectedSoql: "SELECT Id, Name FROM Account WHERE CreatedDate = THIS_MONTH AND Id IN (SELECT AccountId FROM Opportunity)"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [new, with_opportunities]
+    fields: [Account.CreatedDate]
+
+  - id: CMB-014
+    naturalLanguage: "average sales cycle by rep"
+    expectedSoql: "SELECT Owner.Name, AVG(Days_Open__c) FROM Opportunity WHERE IsWon = true GROUP BY Owner.Name"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [sales_cycle, by_owner]
+    fields: [Opportunity.Owner.Name, Opportunity.Days_Open__c, Opportunity.IsWon]
+
+  - id: CMB-015
+    naturalLanguage: "forecast vs actual by month"
+    expectedSoql: "SELECT CALENDAR_MONTH(CloseDate), SUM(Amount), SUM(ForecastAmount__c) FROM Opportunity WHERE CloseDate = THIS_YEAR GROUP BY CALENDAR_MONTH(CloseDate)"
+    expectedSource: glossary
+    category: combined
+    glossaryTerms: [forecast, actual, by_month]
+    fields: [Opportunity.CloseDate, Opportunity.Amount, Opportunity.ForecastAmount__c]
+
+# ============================================
+# SETUP COMMANDS
+# ============================================
+setupCommands:
+  - description: "Set up bookings term"
+    command: "npx tsx scripts/teach.ts add --term bookings --description 'Closed won opportunities' --condition \"StageName = 'Closed Won'\" --objects Opportunity"
+
+  - description: "Set up pipeline term"
+    command: "npx tsx scripts/teach.ts add --term pipeline --description 'Open opportunities' --condition \"IsClosed = false\" --objects Opportunity"
+
+  - description: "Set up Q1 fiscal period"
+    command: "npx tsx scripts/teach.ts add --term q1 --description 'Q1 fiscal period' --fields CloseDate:range:2026-01-01:2026-03-31 --fiscal-period"
+
+  - description: "Set up enterprise term"
+    command: "npx tsx scripts/teach.ts add --term enterprise --description 'Enterprise accounts' --condition \"Type = 'Enterprise'\" --objects Account,Opportunity"
+
+  - description: "Add deals alias for bookings"
+    command: "npx tsx scripts/teach.ts alias --alias deals --term bookings"
+
+  - description: "Add won alias for bookings"
+    command: "npx tsx scripts/teach.ts alias --alias won --term bookings"
+
+# ============================================
+# TEST EXECUTION PLAN
+# ============================================
+testExecution:
+  phases:
+    - name: "Phase 1: Pattern Cache"
+      description: "Test pattern cache hits for pre-loaded patterns"
+      queries: [ACC-001, ACC-002, OPP-001, OPP-002, BIZ-001, BIZ-002]
+      expectedSource: pattern_cache
+      setup:
+        - "Ensure patterns.yaml has base patterns loaded"
+
+    - name: "Phase 2: Glossary Resolution"
+      description: "Test glossary term expansion"
+      queries: [ACC-004, ACC-005, ACC-010, OPP-003, OPP-008, OPP-013, BIZ-003, BIZ-004]
+      expectedSource: glossary
+      setup:
+        - "Run setup commands to populate glossary"
+
+    - name: "Phase 3: Schema Lookup"
+      description: "Test schema field resolution"
+      queries: [ACC-003, ACC-007, ACC-009, OPP-012]
+      expectedSource: schema
+      setup:
+        - "Run sync-schema to populate schema.yaml"
+
+    - name: "Phase 4: Combined Queries"
+      description: "Test complex multi-term queries"
+      queries: [CMB-001, CMB-002, CMB-003, CMB-004, CMB-005]
+      expectedSource: glossary
+      setup:
+        - "Ensure all glossary terms configured"
+
+  successCriteria:
+    - "All 50 queries resolve without error"
+    - "Pattern cache queries return confidence >= 0.85"
+    - "Glossary queries return confidence >= 0.80"
+    - "Schema queries return confidence >= 0.50"
+    - "No SOQL injection patterns in generated queries"
+    - "Response tokens < 200 per query average"

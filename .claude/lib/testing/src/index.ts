@@ -49,6 +49,7 @@ export {
   LinearResponses,
   CurrentsResponses,
   SerenaResponses,
+  SalesforceResponses,
   GenericResponses,
   TestData,
 } from './mocks/response-builders';

@@ -373,6 +373,269 @@ export const SerenaResponses = {
 };
 
 /**
+ * Salesforce-specific response builders
+ *
+ * Salesforce MCP returns JSON objects with structured data.
+ * These builders generate realistic Salesforce API responses.
+ */
+export const SalesforceResponses = {
+  /**
+   * run_soql_query response - returns records with totalSize
+   */
+  soqlQuery: (records: Record<string, unknown>[], totalSize?: number) => ({
+    records,
+    totalSize: totalSize ?? records.length,
+    done: true,
+  }),
+
+  /**
+   * Empty SOQL query result
+   */
+  emptySoqlQuery: () => ({
+    records: [],
+    totalSize: 0,
+    done: true,
+  }),
+
+  /**
+   * SOQL query with nested result (some API versions wrap in result)
+   */
+  soqlQueryWrapped: (records: Record<string, unknown>[]) => ({
+    result: {
+      records,
+      totalSize: records.length,
+      done: true,
+    },
+  }),
+
+  /**
+   * list_all_orgs response - returns org categories
+   */
+  listOrgs: (config?: {
+    scratchOrgs?: Array<{ username: string; alias?: string; orgId?: string }>;
+    nonScratchOrgs?: Array<{ username: string; alias?: string; orgId?: string }>;
+    sandboxes?: Array<{ username: string; alias?: string; orgId?: string }>;
+  }) => ({
+    scratchOrgs: config?.scratchOrgs ?? [],
+    nonScratchOrgs: config?.nonScratchOrgs ?? [],
+    sandboxes: config?.sandboxes ?? [],
+  }),
+
+  /**
+   * Single org info
+   */
+  orgInfo: (username: string, config?: {
+    alias?: string;
+    orgId?: string;
+    instanceUrl?: string;
+    isDefaultUsername?: boolean;
+    connectedStatus?: string;
+  }) => ({
+    username,
+    alias: config?.alias,
+    orgId: config?.orgId ?? '00D000000000001',
+    instanceUrl: config?.instanceUrl ?? 'https://example.salesforce.com',
+    isDefaultUsername: config?.isDefaultUsername ?? false,
+    connectedStatus: config?.connectedStatus ?? 'Connected',
+  }),
+
+  /**
+   * get_username response
+   */
+  getUsername: (username: string, orgId?: string) => ({
+    username,
+    orgId: orgId ?? '00D000000000001',
+  }),
+
+  /**
+   * create_scratch_org response
+   */
+  createScratchOrg: (username: string, config?: {
+    orgId?: string;
+    instanceUrl?: string;
+    expirationDate?: string;
+  }) => ({
+    username,
+    orgId: config?.orgId ?? '00D000000000001',
+    instanceUrl: config?.instanceUrl ?? 'https://scratch.salesforce.com',
+    expirationDate: config?.expirationDate ?? new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+    status: 'Active',
+  }),
+
+  /**
+   * delete_org response
+   */
+  deleteOrg: (username: string) => ({
+    username,
+    success: true,
+    message: `Successfully deleted org: ${username}`,
+  }),
+
+  /**
+   * org_open response
+   */
+  orgOpen: (url: string) => ({
+    url,
+    orgId: '00D000000000001',
+    username: 'test@example.com',
+  }),
+
+  /**
+   * deploy_metadata response
+   */
+  deployMetadata: (config?: {
+    id?: string;
+    status?: string;
+    numberComponentsDeployed?: number;
+    numberComponentErrors?: number;
+  }) => ({
+    id: config?.id ?? '0Af000000000001',
+    status: config?.status ?? 'Succeeded',
+    numberComponentsDeployed: config?.numberComponentsDeployed ?? 10,
+    numberComponentErrors: config?.numberComponentErrors ?? 0,
+    numberComponentsTotal: (config?.numberComponentsDeployed ?? 10) + (config?.numberComponentErrors ?? 0),
+    done: true,
+  }),
+
+  /**
+   * retrieve_metadata response
+   */
+  retrieveMetadata: (config?: {
+    id?: string;
+    status?: string;
+    fileProperties?: Array<{ fileName: string; type: string }>;
+  }) => ({
+    id: config?.id ?? '09S000000000001',
+    status: config?.status ?? 'Succeeded',
+    done: true,
+    fileProperties: config?.fileProperties ?? [
+      { fileName: 'classes/TestClass.cls', type: 'ApexClass' },
+      { fileName: 'objects/Account.object', type: 'CustomObject' },
+    ],
+  }),
+
+  /**
+   * run_apex_test response
+   */
+  runApexTest: (config?: {
+    outcome?: string;
+    testsRan?: number;
+    passing?: number;
+    failing?: number;
+    testRunId?: string;
+  }) => ({
+    testRunId: config?.testRunId ?? '707000000000001',
+    outcome: config?.outcome ?? 'Pass',
+    testsRan: config?.testsRan ?? 10,
+    passing: config?.passing ?? 10,
+    failing: config?.failing ?? 0,
+    skipped: 0,
+    passRate: config?.passing && config?.testsRan
+      ? `${Math.round((config.passing / config.testsRan) * 100)}%`
+      : '100%',
+    failRate: '0%',
+    testTime: 1234,
+    testExecutionTimeInMs: 1234,
+  }),
+
+  /**
+   * run_agent_test response
+   */
+  runAgentTest: (config?: {
+    outcome?: string;
+    testsRan?: number;
+    passing?: number;
+    testRunId?: string;
+  }) => ({
+    testRunId: config?.testRunId ?? '707000000000001',
+    outcome: config?.outcome ?? 'Pass',
+    testsRan: config?.testsRan ?? 5,
+    passing: config?.passing ?? 5,
+    failing: 0,
+  }),
+
+  /**
+   * resume_tool_operation response
+   */
+  resumeOperation: (config?: {
+    operationId?: string;
+    status?: string;
+    result?: unknown;
+  }) => ({
+    operationId: config?.operationId ?? 'op_000000001',
+    status: config?.status ?? 'Completed',
+    result: config?.result ?? { success: true },
+  }),
+
+  /**
+   * assign_permission_set response
+   */
+  assignPermissionSet: (config?: {
+    permissionSetName?: string;
+    username?: string;
+  }) => ({
+    permissionSetName: config?.permissionSetName ?? 'TestPermissionSet',
+    username: config?.username ?? 'test@example.com',
+    success: true,
+  }),
+
+  /**
+   * create_org_snapshot response
+   */
+  createOrgSnapshot: (config?: {
+    snapshotName?: string;
+    sourceOrg?: string;
+    status?: string;
+  }) => ({
+    snapshotName: config?.snapshotName ?? 'TestSnapshot',
+    sourceOrg: config?.sourceOrg ?? 'test@example.com',
+    status: config?.status ?? 'Active',
+    createdDate: new Date().toISOString(),
+  }),
+
+  /**
+   * Sample Account records for SOQL tests
+   */
+  accountRecords: (count: number = 3) =>
+    Array.from({ length: count }, (_, i) => ({
+      Id: `001xx000000000${i + 1}`,
+      Name: `Test Account ${i + 1}`,
+      Industry: i % 2 === 0 ? 'Technology' : 'Finance',
+      AnnualRevenue: (i + 1) * 100000,
+    })),
+
+  /**
+   * Sample User records for SOQL tests
+   */
+  userRecords: (count: number = 2) =>
+    Array.from({ length: count }, (_, i) => ({
+      Id: `005xx000000000${i + 1}`,
+      Name: `Test User ${i + 1}`,
+      Email: `user${i + 1}@example.com`,
+      IsActive: true,
+    })),
+
+  /**
+   * Async operation in progress (for polling tests)
+   */
+  asyncInProgress: (operationId: string) => ({
+    id: operationId,
+    status: 'InProgress',
+    done: false,
+  }),
+
+  /**
+   * Async operation completed
+   */
+  asyncCompleted: (operationId: string, result?: unknown) => ({
+    id: operationId,
+    status: 'Completed',
+    done: true,
+    result: result ?? { success: true },
+  }),
+};
+
+/**
  * Test data generators
  */
 export const TestData = {

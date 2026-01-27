@@ -1,0 +1,62 @@
+# Changelog
+
+## 2026-01-20 - Added Gateway Routing Enforcement
+
+**What changed:**
+- Added "Access Protocol" section (lines 15-29) after skill header
+- Explicit "DO NOT bypass the gateway" warning for native MCP tools
+- Step-by-step gateway routing flow documentation
+- Benefits explanation: token optimization (150 vs 5,000-10,000), knowledge layer
+- Fallback check instruction if skill accessed without gateway routing
+
+**Why:**
+- Agents were bypassing gateway-mcp-tools and calling native `mcp__salesforce__*` tools directly
+- No reminder in skill that it's a library skill accessed via gateway
+- Gateway routing was added to gateway-mcp-tools but skill itself had no enforcement
+
+**Impact:**
+- Agents will see prominent warnings against bypassing gateway when accessing skill
+- Clear understanding that this is a library skill with gateway routing
+- Reinforces token optimization benefits of using wrappers vs native tools
+
+**Files changed:**
+- SKILL.md: 186 lines → 202 lines (+16 lines for Access Protocol section)
+
+**Testing:**
+- ✅ RED: Documented gateway bypass behavior
+- ✅ GREEN: Access Protocol section added with explicit enforcement
+- ✅ Compliance: 202 lines (under 500 limit)
+- ✅ REFACTOR: Pressure tested against time/authority/sunk-cost rationalizations
+
+## 2026-01-20 - Added Knowledge Layer Documentation
+
+**What changed:**
+- Added `run-soql-query-enhanced` as 12th wrapper with ⭐ RECOMMENDED tag
+- Added "Natural Language Query Support" section with architecture diagram
+- Added "When to Use Which Tool" decision table
+- Added Natural Language execution example
+- Added Pre-defined Business Terms table (glossary.yaml reference)
+- Added "Knowledge Layer Management" section with 4 CLI scripts
+- Updated tool count from 11 to 12 in frontmatter and Available Tools section
+- Updated `run-soql-query` description to clarify it bypasses knowledge layer
+
+**Why:**
+- Knowledge layer implementation was complete but undocumented
+- Agents couldn't discover run-soql-query-enhanced for NL queries
+- No guidance on when to use enhanced vs regular SOQL wrapper
+- CLI scripts for knowledge management were not documented
+
+**Impact:**
+- Agents can now discover and use natural language query capabilities
+- Clear decision path for choosing between wrappers
+- Knowledge layer management is self-service via documented CLI scripts
+- Token savings documented (~150 tokens vs ~5,000-10,000 without knowledge layer)
+
+**Files changed:**
+- SKILL.md: 98 lines → 186 lines (+88 lines of documentation)
+
+**Testing:**
+- ✅ RED: Documented gaps in current skill
+- ✅ GREEN: Agent can now find run-soql-query-enhanced and understand knowledge layer
+- ✅ Compliance: 186 lines (under 500 limit), markdown linting passed, 12 tools verified
+- ✅ REFACTOR: Pressure tested for clarity and edge cases

@@ -1,0 +1,10 @@
+{
+  "orgName": "Claude MCP Integration Tests",
+  "edition": "Developer",
+  "features": [],
+  "settings": {
+    "lightningExperienceSettings": {
+      "enableS1DesktopEnabled": true
+    }
+  }
+}

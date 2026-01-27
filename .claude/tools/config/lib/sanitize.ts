@@ -27,6 +27,15 @@ const PATH_TRAVERSAL_PATTERNS = [
 ];
 
 /**
+ * Absolute path patterns to detect
+ */
+const ABSOLUTE_PATH_PATTERNS = [
+  /^\//,                 // Unix absolute path /
+  /^[A-Za-z]:\\/,        // Windows absolute path C:\
+  /^[A-Za-z]:\//,        // Windows absolute path with forward slash C:/
+];
+
+/**
  * Command injection patterns to detect
  */
 const COMMAND_INJECTION_PATTERNS = [
@@ -78,6 +87,21 @@ const DANGEROUS_CONTROL_CHAR_PATTERN = /[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/;
  */
 export function validateNoPathTraversal(input: string): boolean {
   return !PATH_TRAVERSAL_PATTERNS.some(pattern => pattern.test(input));
+}
+
+/**
+ * Validate that a string is not an absolute path
+ *
+ * @param input - String to validate
+ * @returns true if safe (relative path), false if absolute path detected
+ *
+ * @example
+ * ```typescript
+ * const schema = z.string().refine(validateNoAbsolutePath, 'Absolute paths not allowed');
+ * ```
+ */
+export function validateNoAbsolutePath(input: string): boolean {
+  return !ABSOLUTE_PATH_PATTERNS.some(pattern => pattern.test(input));
 }
 
 /**

@@ -13,6 +13,7 @@
 import * as path from 'path';
 import { Client } from '@modelcontextprotocol/sdk/client/index.js';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
+import { execFileSync } from 'child_process';
 import { resolveProjectPath, findProjectRoot } from '../../../lib/find-project-root.js';
 import { routeToSerena } from '../../serena/semantic-router.js';
 import { createSerenaHTTPClient } from './serena-http-client.js';
@@ -204,13 +205,103 @@ function getSerenaArgs(semanticContext?: string): string[] {
 }
 
 /**
+ * Resolve Salesforce org username from multiple sources with priority
+ *
+ * Priority (highest to lowest):
+ * 1. SALESFORCE_ORG_USERNAME environment variable
+ * 2. SF CLI default org (sf config get target-org --json)
+ * 3. orgUsername from credentials.json
+ * 4. DEFAULT_TARGET_ORG (fallback)
+ *
+ * @param credentials - Credentials object (may contain orgUsername)
+ * @returns Resolved org username
+ */
+function resolveSalesforceOrg(credentials: any): string {
+  // Priority 1: Environment variable
+  if (process.env.SALESFORCE_ORG_USERNAME) {
+    return process.env.SALESFORCE_ORG_USERNAME;
+  }
+
+  // Priority 2: SF CLI default org
+  try {
+    const stdout = execFileSync('sf', ['config', 'get', 'target-org', '--json'], {
+      encoding: 'utf-8',
+      timeout: 5000, // 5 second timeout
+    }) as string;
+
+    const result = JSON.parse(stdout);
+    if (result?.result?.[0]?.value) {
+      return result.result[0].value;
+    }
+  } catch (error) {
+    // SF CLI not installed, no default org, or other error - continue to next priority
+  }
+
+  // Priority 3: credentials.json orgUsername
+  if (credentials.orgUsername) {
+    return credentials.orgUsername;
+  }
+
+  // Priority 4: Fallback to DEFAULT_TARGET_ORG
+  return 'DEFAULT_TARGET_ORG';
+}
+
+/**
+ * Get Salesforce MCP args dynamically based on available credentials
+ *
+ * Scenarios:
+ * 1. No credentials → DEFAULT_TARGET_ORG (uses SF CLI session)
+ * 2. orgUsername only → Use that username
+ * 3. Full JWT (orgUsername + clientId + jwtKeyFile) → Add JWT flags
+ *
+ * Uses multi-source org resolution:
+ * - SALESFORCE_ORG_USERNAME env var (highest priority)
+ * - SF CLI default org (sf config get target-org)
+ * - credentials.json orgUsername
+ * - DEFAULT_TARGET_ORG fallback
+ *
+ * @param credentials - Credentials from credentials.json
+ * @returns Array of args for Salesforce MCP
+ */
+function getSalesforceArgs(credentials: any): string[] {
+  const baseArgs = ['-y', '@salesforce/mcp'];
+
+  // Resolve org username from multiple sources
+  const orgUsername = resolveSalesforceOrg(credentials);
+
+  // Scenario 3: Full JWT authentication (all required fields present)
+  if (credentials.orgUsername && credentials.clientId && credentials.jwtKeyFile) {
+    return [
+      ...baseArgs,
+      '-o',
+      orgUsername, // Use resolved org (may differ from credentials.orgUsername)
+      '--toolsets',
+      'all',
+      '--client-id',
+      credentials.clientId,
+      '--jwt-key-file',
+      credentials.jwtKeyFile,
+    ];
+  }
+
+  // Scenario 2 & 1: Org username only or no credentials
+  // (orgUsername is already resolved to the correct value)
+  return [...baseArgs, '-o', orgUsername, '--toolsets', 'all'];
+}
+
+/**
  * Get MCP server configuration from .mcp.json
  *
  * @param mcpName - Name of MCP server (e.g., 'currents', 'linear', 'github')
  * @param semanticContext - Optional context for semantic routing (Serena only)
+ * @param credentials - Optional credentials (injected for testing, loaded internally if not provided)
  * @returns Server configuration with command, args, and env vars
  */
-function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServerConfig {
+export function getMCPServerConfig(
+  mcpName: string,
+  semanticContext?: string,
+  credentials?: any
+): MCPServerConfig {
   // In real implementation, would read from .mcp.json
   // For now, hardcoded configs based on .mcp.json
   const configs: Record<string, MCPServerConfig> = {
@@ -286,6 +377,16 @@ function getMCPServerConfig(mcpName: string, semanticContext?: string): MCPServe
       command: 'uvx',
       args: ['pyghidra-mcp'],
       envVars: {} // Uses GHIDRA_INSTALL_DIR from environment
+    },
+    // Salesforce MCP (Official @salesforce/mcp)
+    // Supports 3 auth modes:
+    // 1. SF CLI session (DEFAULT_TARGET_ORG) - no credentials needed
+    // 2. Org username from credentials.json - uses SF CLI auth for that org
+    // 3. JWT auth - full credentials (orgUsername + clientId + jwtKeyFile)
+    'salesforce': {
+      command: 'npx',
+      args: getSalesforceArgs(credentials || {}), // Dynamic args based on credentials
+      envVars: {}
     }
   };
 
@@ -588,6 +689,8 @@ export async function callMCPTool<T = any>(
     'pyghidra',         // Uses GHIDRA_INSTALL_DIR from environment
     'ghydra',           // No auth needed (connects to local Ghidra instances)
     'github',           // Uses GITHUB_TOKEN from environment
+    // NOTE: salesforce NOT in this list - it can use credentials.json for JWT,
+    // or fall back to SF CLI auth if no credentials present
   ];
 
   // Get credentials from shared config (only once, not per retry)
@@ -631,7 +734,8 @@ export async function callMCPTool<T = any>(
 
   // Get MCP server configuration (only once, not per retry)
   // Pass semanticContext for Serena semantic routing
-  const serverConfig = getMCPServerConfig(mcpName, options.semanticContext);
+  // Pass credentials for Salesforce JWT auth
+  const serverConfig = getMCPServerConfig(mcpName, options.semanticContext, credentials);
 
   // Build environment variables for MCP server
   // Filter out undefined values from process.env

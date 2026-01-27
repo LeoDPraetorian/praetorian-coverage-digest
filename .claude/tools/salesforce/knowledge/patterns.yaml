@@ -1,0 +1,855 @@
+version: 1.0.0
+lastUpdated: 2026-01-22T16:59:15.617Z
+patterns:
+  - id: pat_001
+    naturalLanguage: Q1 PS bookings
+    normalizedQuery: q1 ps bookings
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate >= 2026-01-01 AND Opportunity.CloseDate <=
+      2026-03-31 AND (NOT PricebookEntry.Product2.Name LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - q1
+      - ps_bookings
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - OpportunityLineItem.Id
+      - Opportunity.StageName
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-15T00:00:00Z
+    lastUsed: 2026-01-22T17:22:52.590Z
+    useCount: 15
+    confidence: 0.95
+  - id: pat_002
+    naturalLanguage: All accounts
+    normalizedQuery: all accounts
+    soql: SELECT Id, Name FROM Account
+    glossaryTermsUsed: []
+    schemaFieldsUsed:
+      - Account.Id
+      - Account.Name
+    createdAt: 2026-01-14T00:00:00Z
+    lastUsed: 2026-01-22T17:22:52.584Z
+    useCount: 19
+    confidence: 0.9
+  - id: pat_003
+    naturalLanguage: opportunities with Shane as MD closing in January 2026
+    normalizedQuery: opportunities with shane as md closing in january 2026
+    soql: SELECT Id, Name, Amount FROM Opportunity
+    glossaryTermsUsed:
+      - md
+    schemaFieldsUsed: []
+    createdAt: 2026-01-21T18:46:37.663Z
+    lastUsed: 2026-01-21T19:14:07.043Z
+    useCount: 2
+    confidence: 0.85
+  - id: pat_004
+    naturalLanguage: opportunities with Daniel as the MD that are set to close in January
+    normalizedQuery: opportunities with daniel as the md that are set to close in january
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = true
+    glossaryTermsUsed:
+      - md
+      - closed
+    schemaFieldsUsed: []
+    createdAt: 2026-01-21T19:12:39.420Z
+    lastUsed: 2026-01-21T19:12:39.420Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_005
+    naturalLanguage: opportunities expected to close by end of January
+    normalizedQuery: opportunities expected to close by end of january
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = true
+    glossaryTermsUsed:
+      - closed
+    schemaFieldsUsed: []
+    createdAt: 2026-01-21T19:28:01.001Z
+    lastUsed: 2026-01-21T19:28:01.001Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_006
+    naturalLanguage: opportunities expected to close this week
+    normalizedQuery: opportunities expected to close this week
+    soql: SELECT Id, Name, Amount, CloseDate, StageName, Owner.Name FROM Opportunity
+      WHERE IsClosed = false AND CloseDate = THIS_WEEK ORDER BY CloseDate ASC
+    glossaryTermsUsed:
+      - closing_this_week
+    schemaFieldsUsed:
+      - Opportunity.Id
+      - Opportunity.Name
+      - Opportunity.Amount
+      - Opportunity.CloseDate
+      - Opportunity.StageName
+      - Opportunity.IsClosed
+      - Opportunity.Owner.Name
+    createdAt: 2026-01-21T20:10:31.049Z
+    lastUsed: 2026-01-22T15:37:39.466Z
+    useCount: 3
+    confidence: 0.95
+  - id: pat_007
+    naturalLanguage: closing this week
+    normalizedQuery: closing this week
+    soql: SELECT Id, Name, Amount, CloseDate, StageName, Owner.Name FROM Opportunity
+      WHERE IsClosed = false AND CloseDate = THIS_WEEK ORDER BY CloseDate ASC
+    glossaryTermsUsed:
+      - closing_this_week
+    schemaFieldsUsed:
+      - Opportunity.Id
+      - Opportunity.Name
+      - Opportunity.Amount
+      - Opportunity.CloseDate
+      - Opportunity.StageName
+      - Opportunity.IsClosed
+      - Opportunity.Owner.Name
+    createdAt: 2026-01-21T20:15:00.000Z
+    lastUsed: 2026-01-22T16:52:25.565Z
+    useCount: 3
+    confidence: 0.95
+  - id: pat_008
+    naturalLanguage: closing this month
+    normalizedQuery: closing this month
+    soql: SELECT Id, Name, Amount, CloseDate, StageName, Owner.Name FROM Opportunity
+      WHERE IsClosed = false AND CloseDate = THIS_MONTH ORDER BY CloseDate ASC
+    glossaryTermsUsed:
+      - closing_this_month
+    schemaFieldsUsed:
+      - Opportunity.Id
+      - Opportunity.Name
+      - Opportunity.Amount
+      - Opportunity.CloseDate
+      - Opportunity.StageName
+      - Opportunity.IsClosed
+      - Opportunity.Owner.Name
+    createdAt: 2026-01-21T20:15:00.000Z
+    lastUsed: 2026-01-21T20:15:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_009
+    naturalLanguage: opportunities closing this month
+    normalizedQuery: opportunities closing this month
+    soql: SELECT Id, Name, Amount, CloseDate, StageName, Owner.Name FROM Opportunity
+      WHERE IsClosed = false AND CloseDate = THIS_MONTH ORDER BY CloseDate ASC
+    glossaryTermsUsed:
+      - closing_this_month
+    schemaFieldsUsed:
+      - Opportunity.Id
+      - Opportunity.Name
+      - Opportunity.Amount
+      - Opportunity.CloseDate
+      - Opportunity.StageName
+      - Opportunity.IsClosed
+      - Opportunity.Owner.Name
+    createdAt: 2026-01-21T20:15:00.000Z
+    lastUsed: 2026-01-22T17:22:52.608Z
+    useCount: 9
+    confidence: 0.95
+  - id: pat_010
+    naturalLanguage: PS bookings this week
+    normalizedQuery: ps bookings this week
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = THIS_WEEK AND (NOT PricebookEntry.Product2.Name
+      LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - ps_bookings
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:42:28.319Z
+    useCount: 2
+    confidence: 0.95
+  - id: pat_011
+    naturalLanguage: PS bookings last week
+    normalizedQuery: ps bookings last week
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = LAST_WEEK AND (NOT PricebookEntry.Product2.Name
+      LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - ps_bookings
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_012
+    naturalLanguage: PS bookings YTD
+    normalizedQuery: ps bookings ytd
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = THIS_YEAR AND (NOT PricebookEntry.Product2.Name
+      LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - ps_bookings
+      - ytd
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_013
+    naturalLanguage: PS bookings this month
+    normalizedQuery: ps bookings this month
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = THIS_MONTH AND (NOT PricebookEntry.Product2.Name
+      LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - ps_bookings
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_014
+    naturalLanguage: Chariot bookings this week
+    normalizedQuery: chariot bookings this week
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = THIS_WEEK AND PricebookEntry.Product2.Name LIKE
+      '%Chariot%'
+    glossaryTermsUsed:
+      - chariot_bookings
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_015
+    naturalLanguage: Chariot bookings YTD
+    normalizedQuery: chariot bookings ytd
+    soql: SELECT SUM(TotalPrice) TotalBookings, COUNT(Id) LineItemCount FROM
+      OpportunityLineItem WHERE Opportunity.StageName = 'Closed Won' AND
+      Opportunity.CloseDate = THIS_YEAR AND PricebookEntry.Product2.Name LIKE
+      '%Chariot%'
+    glossaryTermsUsed:
+      - chariot_bookings
+      - ytd
+    schemaFieldsUsed:
+      - OpportunityLineItem.TotalPrice
+      - Opportunity.CloseDate
+      - PricebookEntry.Product2.Name
+    createdAt: 2026-01-21T20:30:00.000Z
+    lastUsed: 2026-01-21T20:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_016
+    naturalLanguage: churned accounts
+    normalizedQuery: churned accounts
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount)
+      HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName =
+      'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING
+      MAX(CloseDate) < 2024-01-01 ORDER BY SUM(Amount) DESC
+    glossaryTermsUsed:
+      - churn
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:00:00.000Z
+    lastUsed: 2026-01-21T20:57:14.053Z
+    useCount: 2
+    confidence: 0.95
+  - id: pat_017
+    naturalLanguage: churn analysis
+    normalizedQuery: churn analysis
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount)
+      HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName =
+      'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING
+      MAX(CloseDate) < 2024-01-01 ORDER BY SUM(Amount) DESC LIMIT 50
+    glossaryTermsUsed:
+      - churn
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+    createdAt: 2026-01-21T21:00:00.000Z
+    lastUsed: 2026-01-21T21:00:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_018
+    naturalLanguage: dormant accounts
+    normalizedQuery: dormant accounts
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id)
+      TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName
+      = 'Closed Lost' AND AccountId != null GROUP BY AccountId, Account.Name
+      ORDER BY SUM(Amount) DESC NULLS LAST
+    glossaryTermsUsed:
+      - dormant
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:00:00.000Z
+    lastUsed: 2026-01-21T21:00:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_019
+    naturalLanguage: lost pipeline by account
+    normalizedQuery: lost pipeline by account
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id)
+      TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName
+      = 'Closed Lost' AND AccountId != null GROUP BY AccountId, Account.Name
+      ORDER BY SUM(Amount) DESC NULLS LAST LIMIT 50
+    glossaryTermsUsed:
+      - dormant
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+    createdAt: 2026-01-21T21:00:00.000Z
+    lastUsed: 2026-01-21T21:00:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_020
+    naturalLanguage: prospect accounts
+    normalizedQuery: prospect accounts
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppClose, SUM(Amount)
+      PipelineValue, COUNT(Id) OppCount FROM Opportunity WHERE (CloseDate >=
+      2024-01-01 OR IsClosed = false) AND StageName != 'Closed Won' AND
+      AccountId != null GROUP BY AccountId, Account.Name ORDER BY SUM(Amount)
+      DESC NULLS LAST
+    glossaryTermsUsed:
+      - prospect
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.IsClosed
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:00:00.000Z
+    lastUsed: 2026-01-21T21:00:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_021
+    naturalLanguage: churned accounts pre-2023
+    normalizedQuery: churned accounts pre-2023
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount)
+      HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName =
+      'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING
+      MAX(CloseDate) < 2023-01-01 ORDER BY SUM(Amount) DESC
+    glossaryTermsUsed:
+      - churn_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_022
+    naturalLanguage: pre-2023 churn
+    normalizedQuery: pre-2023 churn
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount)
+      HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName =
+      'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING
+      MAX(CloseDate) < 2023-01-01 ORDER BY SUM(Amount) DESC
+    glossaryTermsUsed:
+      - churn_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_023
+    naturalLanguage: legacy churn
+    normalizedQuery: legacy churn
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastWonDate, SUM(Amount)
+      HistoricRevenue, COUNT(Id) WonDeals FROM Opportunity WHERE StageName =
+      'Closed Won' AND AccountId != null GROUP BY AccountId, Account.Name HAVING
+      MAX(CloseDate) < 2023-01-01 ORDER BY SUM(Amount) DESC
+    glossaryTermsUsed:
+      - churn_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_024
+    naturalLanguage: dormant accounts pre-2023
+    normalizedQuery: dormant accounts pre-2023
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id)
+      TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName
+      = 'Closed Lost' AND CloseDate < 2023-01-01 AND AccountId != null GROUP BY
+      AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    glossaryTermsUsed:
+      - dormant_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_025
+    naturalLanguage: pre-2023 dormant
+    normalizedQuery: pre-2023 dormant
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id)
+      TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName
+      = 'Closed Lost' AND CloseDate < 2023-01-01 AND AccountId != null GROUP BY
+      AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    glossaryTermsUsed:
+      - dormant_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_026
+    naturalLanguage: legacy dormant
+    normalizedQuery: legacy dormant
+    soql: SELECT AccountId, Account.Name, MAX(CloseDate) LastOppDate, COUNT(Id)
+      TotalOpps, SUM(Amount) LostPipelineValue FROM Opportunity WHERE StageName
+      = 'Closed Lost' AND CloseDate < 2023-01-01 AND AccountId != null GROUP BY
+      AccountId, Account.Name ORDER BY SUM(Amount) DESC NULLS LAST
+    glossaryTermsUsed:
+      - dormant_pre2023
+    schemaFieldsUsed:
+      - Opportunity.AccountId
+      - Account.Name
+      - Opportunity.CloseDate
+      - Opportunity.Amount
+      - Opportunity.StageName
+    createdAt: 2026-01-21T21:30:00.000Z
+    lastUsed: 2026-01-21T21:30:00.000Z
+    useCount: 1
+    confidence: 0.95
+  - id: pat_027
+    naturalLanguage: MSOWs expiring soon
+    normalizedQuery: msows expiring soon
+    soql: SELECT Id, Name, Amount FROM OpportunityLineItem WHERE
+      Opportunity.StageName = 'Closed Won' AND (NOT PricebookEntry.Product2.Name
+      LIKE '%Chariot%')
+    glossaryTermsUsed:
+      - ps_bookings
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T15:33:15.330Z
+    lastUsed: 2026-01-22T15:33:15.330Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_028
+    naturalLanguage: opportunities expected to close in 2026 grouped by month
+    normalizedQuery: opportunities expected to close in 2026 grouped by month
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = true AND
+      IsClosed = false AND CloseDate = THIS_MONTH
+    glossaryTermsUsed:
+      - closed
+      - closing_this_month
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T15:39:54.828Z
+    lastUsed: 2026-01-22T15:39:54.828Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_029
+    naturalLanguage: stack rank opportunity owners by open opportunities count
+    normalizedQuery: stack rank opportunity owners by open opportunities count
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false AND
+      Service_Delivery_Owner__r.Name LIKE '%$value%'
+    glossaryTermsUsed:
+      - open
+      - md_accounts
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:09:55.981Z
+    lastUsed: 2026-01-22T16:09:55.981Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_030
+    naturalLanguage: open opportunities
+    normalizedQuery: open opportunities
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false
+    glossaryTermsUsed:
+      - open
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:50:56.620Z
+    lastUsed: 2026-01-22T17:22:52.605Z
+    useCount: 11
+    confidence: 0.85
+  - id: pat_031
+    naturalLanguage: bookings
+    normalizedQuery: bookings
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won'
+    glossaryTermsUsed:
+      - bookings
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:52:08.736Z
+    lastUsed: 2026-01-22T17:22:52.598Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_032
+    naturalLanguage: Q1 bookings
+    normalizedQuery: q1 bookings
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won'
+    glossaryTermsUsed:
+      - bookings
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:52:14.297Z
+    lastUsed: 2026-01-22T17:22:52.587Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_033
+    naturalLanguage: enterprise accounts
+    normalizedQuery: enterprise accounts
+    soql: SELECT Id, Name, Amount FROM Account WHERE Type = 'Enterprise' AND
+      Service_Delivery_Owner__r.Name LIKE '%$value%'
+    glossaryTermsUsed:
+      - enterprise
+      - md_accounts
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:52:20.231Z
+    lastUsed: 2026-01-22T17:22:52.593Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_034
+    naturalLanguage: top reps by bookings
+    normalizedQuery: top reps by bookings
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won'
+    glossaryTermsUsed:
+      - bookings
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:54:28.754Z
+    lastUsed: 2026-01-22T17:22:52.612Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_035
+    naturalLanguage: pipeline by stage
+    normalizedQuery: pipeline by stage
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false
+    glossaryTermsUsed:
+      - pipeline
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:54:34.042Z
+    lastUsed: 2026-01-22T17:22:52.618Z
+    useCount: 11
+    confidence: 0.85
+  - id: pat_036
+    naturalLanguage: total bookings year to date
+    normalizedQuery: total bookings year to date
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Won'
+      AND StageName = 'Closed Lost' AND CloseDate < 2023-01-01
+    glossaryTermsUsed:
+      - bookings
+      - dormant_pre2023
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:54:39.274Z
+    lastUsed: 2026-01-22T17:22:52.615Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_037
+    naturalLanguage: win rate
+    normalizedQuery: win rate
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE StageName = 'Closed Lost'
+      AND CloseDate < 2023-01-01
+    glossaryTermsUsed:
+      - dormant_pre2023
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:54:45.453Z
+    lastUsed: 2026-01-22T16:54:45.453Z
+    useCount: 1
+    confidence: 0.85
+  - id: pat_038
+    naturalLanguage: contacts by account
+    normalizedQuery: contacts by account
+    soql: SELECT Id, Name, Amount FROM Account WHERE Service_Delivery_Owner__r.Name
+      LIKE '%$value%'
+    glossaryTermsUsed:
+      - md_accounts
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:56:38.804Z
+    lastUsed: 2026-01-22T17:22:52.621Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_039
+    naturalLanguage: my open tasks
+    normalizedQuery: my open tasks
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false
+    glossaryTermsUsed:
+      - open
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:56:44.428Z
+    lastUsed: 2026-01-22T17:22:52.624Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_040
+    naturalLanguage: meetings this week
+    normalizedQuery: meetings this week
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false AND
+      CloseDate = THIS_WEEK
+    glossaryTermsUsed:
+      - closing_this_week
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:56:49.883Z
+    lastUsed: 2026-01-22T17:22:52.626Z
+    useCount: 6
+    confidence: 0.85
+  - id: pat_041
+    naturalLanguage: lost deals this quarter
+    normalizedQuery: lost deals this quarter
+    soql: SELECT Id, Name, Amount FROM Opportunity WHERE IsClosed = false AND
+      CloseDate = THIS_WEEK
+    glossaryTermsUsed:
+      - closing_this_week
+    schemaFieldsUsed: []
+    createdAt: 2026-01-22T16:59:15.617Z
+    lastUsed: 2026-01-22T17:22:52.629Z
+    useCount: 6
+    confidence: 0.85
+queryIndex:
+  "2026":
+    - pat_003
+    - pat_028
+  q1:
+    - pat_001
+    - pat_032
+  ps:
+    - pat_001
+    - pat_010
+    - pat_011
+    - pat_012
+    - pat_013
+  bookings:
+    - pat_001
+    - pat_010
+    - pat_011
+    - pat_012
+    - pat_013
+    - pat_014
+    - pat_015
+    - pat_031
+    - pat_032
+    - pat_034
+    - pat_036
+  accounts:
+    - pat_002
+    - pat_016
+    - pat_017
+    - pat_018
+    - pat_019
+    - pat_020
+    - pat_033
+  opportunities:
+    - pat_003
+    - pat_004
+    - pat_005
+    - pat_006
+    - pat_009
+    - pat_028
+    - pat_029
+    - pat_030
+  shane:
+    - pat_003
+  md:
+    - pat_003
+    - pat_004
+  closing:
+    - pat_003
+    - pat_007
+    - pat_008
+    - pat_009
+  january:
+    - pat_003
+    - pat_004
+    - pat_005
+  daniel:
+    - pat_004
+  set:
+    - pat_004
+  close:
+    - pat_004
+    - pat_005
+    - pat_006
+    - pat_028
+  expected:
+    - pat_005
+    - pat_006
+    - pat_028
+  end:
+    - pat_005
+  week:
+    - pat_006
+    - pat_007
+    - pat_010
+    - pat_014
+    - pat_040
+  month:
+    - pat_008
+    - pat_009
+    - pat_013
+    - pat_028
+  this_week:
+    - pat_006
+    - pat_007
+    - pat_010
+    - pat_014
+  this_month:
+    - pat_008
+    - pat_009
+    - pat_013
+  last_week:
+    - pat_011
+  ytd:
+    - pat_012
+    - pat_015
+  chariot:
+    - pat_014
+    - pat_015
+  professional_services:
+    - pat_001
+    - pat_010
+    - pat_011
+    - pat_012
+    - pat_013
+  churn:
+    - pat_016
+    - pat_017
+  churned:
+    - pat_016
+    - pat_017
+  churned_accounts:
+    - pat_016
+    - pat_017
+  dormant:
+    - pat_018
+    - pat_019
+  dormant_accounts:
+    - pat_018
+  lost_pipeline:
+    - pat_018
+    - pat_019
+  prospect:
+    - pat_020
+  prospects:
+    - pat_020
+  prospect_accounts:
+    - pat_020
+  pre2023:
+    - pat_021
+    - pat_022
+    - pat_023
+    - pat_024
+    - pat_025
+    - pat_026
+  pre-2023:
+    - pat_021
+    - pat_022
+    - pat_023
+    - pat_024
+    - pat_025
+    - pat_026
+  churn_pre2023:
+    - pat_021
+    - pat_022
+    - pat_023
+  legacy_churn:
+    - pat_023
+  dormant_pre2023:
+    - pat_024
+    - pat_025
+    - pat_026
+  legacy_dormant:
+    - pat_026
+  old_churn:
+    - pat_021
+    - pat_022
+    - pat_023
+  old_dormant:
+    - pat_024
+    - pat_025
+    - pat_026
+  msows:
+    - pat_027
+  expiring:
+    - pat_027
+  soon:
+    - pat_027
+  grouped:
+    - pat_028
+  stack:
+    - pat_029
+  rank:
+    - pat_029
+  opportunity:
+    - pat_029
+  owners:
+    - pat_029
+  open:
+    - pat_029
+    - pat_030
+    - pat_039
+  count:
+    - pat_029
+  enterprise:
+    - pat_033
+  top:
+    - pat_034
+  reps:
+    - pat_034
+  pipeline:
+    - pat_035
+  stage:
+    - pat_035
+  total:
+    - pat_036
+  year:
+    - pat_036
+  date:
+    - pat_036
+  win:
+    - pat_037
+  rate:
+    - pat_037
+  contacts:
+    - pat_038
+  account:
+    - pat_038
+  tasks:
+    - pat_039
+  meetings:
+    - pat_040
+  lost:
+    - pat_041
+  deals:
+    - pat_041
+  quarter:
+    - pat_041

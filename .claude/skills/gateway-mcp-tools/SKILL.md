@@ -59,6 +59,7 @@ This gateway implements 3-tier loading:
 | "cloud security" / "Nebula" / "AWS scan"      | → `mcp-tools-nebula`                       |
 | "semantic code" / "Serena" / "LSP"            | → `mcp-tools-serena`                       |
 | "Shodan" / "host search" / "recon"            | → `mcp-tools-shodan-api`                   |
+| "Salesforce" / "SOQL" / "Apex" / "scratch org" | → `mcp-tools-salesforce`                   |
 | "tool discovery" / "MCP registry"             | → `mcp-tools-registry`                     |
 | "list tools" / "what MCP tools" / "available" | → `listing-tools`                          |
 | "wrapper architecture" / "token optimization" | → `designing-progressive-loading-wrappers` |
@@ -138,6 +139,12 @@ This gateway implements 3-tier loading:
 | Skill      | Path                                                                   | Triggers                              |
 | ---------- | ---------------------------------------------------------------------- | ------------------------------------- |
 | Shodan API | `.claude/skill-library/claude/mcp-tools/mcp-tools-shodan-api/SKILL.md` | Shodan, host search, recon, IP lookup |
+
+### CRM
+
+| Skill      | Path                                                                   | Triggers                                 |
+| ---------- | ---------------------------------------------------------------------- | ---------------------------------------- |
+| Salesforce | `.claude/skill-library/claude/mcp-tools/mcp-tools-salesforce/SKILL.md` | Salesforce, SOQL, Apex, scratch org, org |
 
 ### Code Analysis
 
