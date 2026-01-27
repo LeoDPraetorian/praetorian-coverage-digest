@@ -42,8 +42,9 @@ __pycache__/
 .tmp/
 **/.tmp/
 
-# Node modules (never commit)
+# Node modules and lock files (never commit)
 **/node_modules/
+**/package-lock.json
 
 # Local development files
 **/.local/
