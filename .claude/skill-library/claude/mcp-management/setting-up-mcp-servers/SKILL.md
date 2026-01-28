@@ -338,8 +338,10 @@ This skill is invoked early in the MCP wrapper creation workflow, before schema 
 The orchestrator should invoke this skill with:
 
 ```typescript
-Skill('setting-up-mcp-servers', args: '{mcpName}')
+Read('.claude/skill-library/claude/mcp-management/setting-up-mcp-servers/SKILL.md')
 ```
+
+This is a LIBRARY skill, not a CORE skill - use `Read()`, not `Skill()`.
 
 And check the returned status before proceeding to schema discovery.
 

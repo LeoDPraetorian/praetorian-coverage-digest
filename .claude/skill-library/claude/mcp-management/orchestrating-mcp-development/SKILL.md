@@ -207,7 +207,7 @@ Violations in either stage trigger 🛑 Human Checkpoint. Both stages must pass 
 
 | Skill                                    | Purpose                                                                                                                          |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
-| setting-up-mcp-servers                   | Phase 1: MCP detection and setup                                                                                                 |
+| setting-up-mcp-servers (LIBRARY)         | Phase 1: MCP detection and setup - `Read('.claude/skill-library/claude/mcp-management/setting-up-mcp-servers/SKILL.md')`         |
 | finishing-a-development-branch (LIBRARY) | Phase 13: Commit wrappers, create PR, cleanup - `Read('.claude/skill-library/workflow/finishing-a-development-branch/SKILL.md')` |
 | managing-tool-wrappers                   | Phases 11-12: CLI audit and generation                                                                                           |
 | orchestrating-multi-agent-workflows      | Agent coordination, delegation protocol, P0 compliance validation, orchestration guards, gated verification                      |
@@ -239,7 +239,7 @@ Violations in either stage trigger 🛑 Human Checkpoint. Both stages must pass 
 | Phase | Required Sub-Skills                                           | Conditional Sub-Skills                             |
 | ----- | ------------------------------------------------------------- | -------------------------------------------------- |
 | All   | persisting-agent-outputs, orchestrating-multi-agent-workflows | context-monitoring (if >15 tools)                  |
-| 1     | using-git-worktrees, setting-up-mcp-servers                   | -                                                  |
+| 1     | using-git-worktrees (LIBRARY), setting-up-mcp-servers (LIBRARY) | -                                                |
 | 2     | brainstorming                                                 | -                                                  |
 | 4     | writing-plans                                                 | -                                                  |
 | 5-9   | -                                                             | developing-with-subagents (if >10 tools)           |
