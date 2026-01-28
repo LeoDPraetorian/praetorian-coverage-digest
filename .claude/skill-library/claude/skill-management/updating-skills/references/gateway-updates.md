@@ -243,7 +243,7 @@ After ANY gateway update:
 
 - **Gateway template:** `.claude/skills/managing-skills/templates/gateway-template.md`
 - **Gateway structure:** `docs/GATEWAY-PATTERNS.md`
-- **Audit phases:** `.claude/skill-library/claude/skill-management/auditing-skills/references/audit-phases.md`
+- **Audit phases:** `.claude/skill-library/claude/skill-management/auditing-skills/references/phase-details.md`
 
 ---
 

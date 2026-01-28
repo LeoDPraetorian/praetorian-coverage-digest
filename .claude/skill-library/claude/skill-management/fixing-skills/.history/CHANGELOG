@@ -1,3 +1,105 @@
+# Changelog
+
+All notable changes to fixing-skills will be documented in this file.
+
+
+## [2026-01-20] - Witness + Validator Pattern for Operation Verification
+
+### Problem
+
+The previous Step 5 verification had the same issue as TDD skills - the agent that executed verification also judged success:
+1. Verification agent runs audit and determines if all issues are fixed
+2. Agent knows what it fixed, creating confirmation bias
+3. "Find problems" framing helps but doesn't eliminate self-judgment bias
+
+This is like asking a student to grade their own exam.
+
+### Changes
+
+**Step 5 (Verify Fixes)**: Separated into Witness + Validator roles
+- 5.1 Audit Witness: Executes audit, reports issue counts (no verdict) - Added EXTREMELY-IMPORTANT block mandating Task agent spawning
+- 5.2 Validator: Reads audit results with CONTEXT about what was fixed, returns ALL_RESOLVED/ISSUES_REMAIN/REGRESSIONS_FOUND
+- 5.3 Loop-Breaking: Fresh fixer agent if issues remain (already existed, now explicit)
+- 5.4 Verification Checklist: Explicit checklist to prevent mock file shortcuts
+
+**Workflow Overview**: Updated to show Step 5 sub-steps (5.1/5.2/5.3/5.4)
+
+**References**: Added tdd-validator-pattern.md link
+
+### Impact
+- Self-judgment bias: ELIMINATED (Witness doesn't know what was fixed)
+- Informed judgment: Validator has full context to make evidence-based decisions
+- Regression detection: Validator explicitly checks for new issues and regressions
+- Context cost: Similar (~300 tokens vs ~400 tokens)
+- Agent spawns: +1 agent (Witness + Validator instead of single self-judging agent)
+
+### Source
+Implements TDD-VERIFICATION-AGENT-ROLES.md proposal (Operation Verification section)
+
+---
+
+## [2026-01-20] - Agent-Based Verification and Context Reduction
+
+### Changed - Step 1 (Audit)
+
+**Method**: TDD update (RED-GREEN-REFACTOR)
+**Issue**: Duplicate audit when handed off from auditing-skills, no file-based protocol
+**Resolution**: Added file-based handoff pattern
+- If invoked with `{OUTPUT_DIR}/audit-results.json`, read file (avoid duplicate audit)
+- If invoked directly, spawn audit agent to write results to file
+- Main context receives only summary (issue count by severity)
+**Result**: Eliminates duplicate audit overhead, reduces context by ~1,500 tokens
+
+### Changed - Step 5 (Verification)
+
+**Method**: TDD update (RED-GREEN-REFACTOR)
+**Issue**: Same-context verification (agent verifies its own fixes), context accumulation across loops
+**Resolution**: Spawn fresh verification agent
+- Verification agent runs audit without knowing what was fixed (unbiased)
+- Writes full results to `{OUTPUT_DIR}/verify-audit.json`
+- Main context receives only verdict + counts
+- If issues remain, spawn fresh fixer agent (breaks accumulation loop)
+**Result**: Eliminates confirmation bias, prevents loop accumulation (~1,500-3,000 tokens per iteration)
+
+### Added - allowed-tools
+
+**Method**: TDD update requirement
+**Issue**: Missing Task tool for agent spawning
+**Resolution**: Added `Task` to allowed-tools frontmatter
+**Result**: Enables fresh agent verification pattern
+
+### Added - Step 0 (OUTPUT_DIR)
+
+**Method**: TDD update requirement
+**Issue**: No output directory for agent results
+**Resolution**: Added OUTPUT_DIR creation in Step 0
+```bash
+OUTPUT_DIR="$ROOT/.claude/.output/skill-fix/$(date +%Y%m%d-%H%M%S)-{skill-name}"
+mkdir -p "$OUTPUT_DIR"
+```
+**Result**: Supports file-based agent output pattern
+
+### Updated - Integration Section
+
+**Method**: Maintenance
+**Issue**: Integration section doesn't reflect new agent invocation patterns
+**Resolution**: Updated Calls table
+- Added: `auditing-skills` via Task agent (Step 1, 5)
+- Added: `fixing-skills` (self) via Task agent (Step 5 loop)
+- Added "Via" column to clarify invocation method
+**Result**: Accurate workflow documentation
+
+### Impact
+
+- **Context reduction**: ~3,000-6,000 tokens per fixing workflow (audit + verification)
+- **Verification accuracy**: Fresh agents eliminate confirmation bias
+- **Loop handling**: Each iteration starts fresh instead of accumulating
+- **Handoff efficiency**: File-based protocol avoids duplicate audits
+
+### Source
+
+Based on proposal: `.claude/docs/issues/SKILL-MANAGER-VERIFICATION-ACCURACY.md`
+
 ## 2026-01-20 19:54
 
 - **Phase 28 Enhancement**: Updated Integration section template to bullet list format, consolidated Phase 30 into Phase 28, made Related Skills removal mandatory
@@ -190,3 +292,50 @@ TDD verification completed:
 - RED: Agent spawned without updated skill, demonstrated missing CORE/LIBRARY validation
 - GREEN: Agent spawned with updated skill, confirmed validation enforcement
 - Compliance: Line count 408 < 450 (safe), Phase 30 violations resolved
+
+
+---
+
+## [2026-01-15] - Compliance Fixes
+
+### Fixed - Phase 3 (Line Count)
+
+**Method**: Claude-Automated extraction
+**Issue**: 586 lines exceeded 500 line hard limit
+**Resolution**: Extracted detailed procedures to references/
+- Created `references/phase-26-procedure.md` (Phase 26 research-based stub population)
+- Created `references/phase-28-procedure.md` (Phase 28 Integration section generation)
+- Created `references/common-scenarios.md` (Common fix scenarios)
+- Updated SKILL.md to reference detailed procedures
+**Result**: Reduced to 434 lines (26% reduction)
+
+### Fixed - Phase 28 (Integration Section)
+
+**Method**: Claude-Automated generation
+**Issue**: Missing Integration section (had Related Skills but no structured Integration)
+**Resolution**: Generated Integration section from skill analysis
+- Called By: managing-skills, /skill-manager, creating-skills, updating-skills
+- Requires: auditing-skills (Step 1 - identify issues)
+- Calls: auditing-skills (Step 1, 5), orchestrating-research (Phase 26)
+- Pairs With: syncing-gateways (Phase 23 coverage gaps)
+**Result**: Integration section inserted before Related Skills
+
+### Fixed - Description Quality (Semantic)
+
+**Method**: Claude-Automated enhancement
+**Issue**: Missing key capability mentions in description
+**Resolution**: Enhanced description from 107 to 219 characters
+- Added: "three-tier fix orchestration (deterministic/hybrid/Claude-automated)"
+- Added: "Phase 26 research-based stub population"
+- Added: "Phase 28 Integration section generation"
+- Added: "line count extraction"
+**Result**: Improved discoverability and completeness
+
+### Verification
+
+Re-ran audit after fixes:
+- Phase 3: ✅ PASS (434 lines < 500 limit)
+- Phase 28: ✅ PASS (Integration section present)
+- Description: ✅ IMPROVED (comprehensive capabilities listed)
+
+All critical issues resolved. Skill now COMPLIANT.

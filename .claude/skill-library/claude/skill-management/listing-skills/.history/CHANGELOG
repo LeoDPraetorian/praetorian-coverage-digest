@@ -1,3 +1,19 @@
+# Changelog
+
+## 2026-01-20
+
+### Added
+
+- Integration section (Phase 28 compliance fix - Claude-Automated)
+  - Called By: managing-skills, /skill-manager command
+  - Requires: None (standalone skill)
+  - Calls: None (terminal skill)
+  - Pairs With: searching-skills, auditing-skills
+
+### Fix Method
+
+- Phase 28: Claude-Automated - Generated Integration section based on skill content analysis
+
 # Changelog - listing-skills
 
 ## 2026-01-19 - Add (LIBRARY) Annotations to Library Skill References

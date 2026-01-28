@@ -113,6 +113,24 @@ See [references/rationalization-table.md](references/rationalization-table.md) f
 
 **You CANNOT skip this phase. TDD is mandatory.**
 
+**Witness + Validator pattern:** For bias-free verification, see [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md). Separates execution (Witness) from judgment (Validator) to prevent self-assessment bias.
+
+---
+
+### External Evidence Check (MANDATORY FIRST)
+
+Before spawning Witness/Validator, check if external RED evidence already exists (user-provided tests, bug reports, previous session exports).
+
+**If external evidence exists:** See [External Evidence Protocol](/.claude/skills/managing-skills/references/external-evidence-protocol.md) - ASK user whether to accept or spawn fresh agents.
+
+---
+
+## ⚠️ CRITICAL PROHIBITION
+
+**After Witness returns:** Do NOT read witness output files. See [TDD Validator Pattern - Orchestrator Role](/.claude/skills/managing-skills/references/tdd-validator-pattern.md#orchestrator-role) for complete prohibition list and rationalization counters.
+
+---
+
 ### 1.1 Document the Problem
 
 What's wrong with the skill today? What gap exists?
@@ -121,20 +139,36 @@ What's wrong with the skill today? What gap exists?
 
 Describe a specific scenario where the skill currently fails or produces wrong behavior.
 
-### 1.3 Capture Failure Behavior (AGENT SPAWNING MANDATORY)
+### 1.3 Spawn RED Witness Agent (MANDATORY)
 
-**CRITICAL**: You MUST spawn an agent to observe actual failure. Document review is NOT sufficient.
+**CRITICAL**: Spawn Witness agent. DO NOT read the witness output file after it completes.
 
-```
-Task(subagent_type: "general-purpose", prompt: "Load {skill-name} skill. Scenario: {from 1.2}. Perform this task following current skill guidance. Document your approach step by step.")
-```
+**Witness + Validator are atomic** - both execute in same response.
 
-**Capture verbatim:** (1) Approach taken, (2) Incorrect behavior, (3) What the skill told agent to do, (4) What agent actually did.
+**Key constraint**: Witness does NOT know what gap we're testing for - just executes and reports facts.
 
-**❌ NOT ACCEPTABLE:** "The skill currently says..." / "This would fail because..." (hypothetical)
-**✅ REQUIRED:** Actual Task invocation + verbatim output + specific failure quotes
+**See:** [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md) for prompt template.
 
-**See:** [references/tdd-verification.md](../../../../skills/managing-skills/references/tdd-methodology.md) for detailed capture format.
+**Capture:** Write transcript to `{OUTPUT_DIR}/red-test.md`
+
+**Orchestrator Protocol After Witness Returns:**
+1. ❌ NOT ACCEPTABLE: Reading `{OUTPUT_DIR}/red-test.md`
+2. ❌ NOT ACCEPTABLE: Analyzing witness behavior
+3. ❌ NOT ACCEPTABLE: Judging whether gap exists
+4. ❌ NOT ACCEPTABLE: Stopping and waiting for user
+5. ✅ REQUIRED: Immediately spawn RED Validator (Step 1.4) in SAME response
+
+**The Validator reads the file, not you.**
+
+### 1.4 Spawn RED Validator Agent
+
+Validator reads transcript with knowledge of what gap we're testing for. Determines if gap exists.
+
+**Returns:** GAP_CONFIRMED (proceed) or GAP_NOT_FOUND (challenge premise)
+
+### 1.5 Confirm RED State
+
+Validator must return GAP_CONFIRMED to proceed.
 
 **Statistical evidence**: Updates without proper TDD (agent spawning for RED) have ~35% regression rate (fix one thing, break another). The 10 minutes for proper RED capture prevents hours of debugging side effects.
 
@@ -174,58 +208,26 @@ Be conservative - round up.
 
 **BLOCKING GATE**: If capacity planning shows projected ≥450 lines, you MUST extract content before adding.
 
-#### Extraction Candidates (Priority Order)
-
-1. **Verbose examples** - Move to references/examples.md
-2. **Detailed procedures** - Move to references/detailed-procedures.md
-3. **Edge cases** - Move to references/edge-cases.md or references/troubleshooting.md
-4. **Pattern catalogs** - Move to references/patterns.md
-5. **Long tables** (>10 rows) - Move to references/ with summary in SKILL.md
-
-#### Extraction Process
-
-1. **Identify sections to extract** (target: create 80-100 line buffer)
-2. **Create reference file** with extracted content
-3. **Replace in SKILL.md** with 2-3 sentence summary + link
-4. **Verify new line count** - Must be <400 to proceed
-
-```bash
-# After extraction
-wc -l {skill-path}/SKILL.md
-# Should show significant reduction (80-100 lines freed)
-```
-
-5. **Recalculate capacity**: `new_current + estimated_addition`
-6. **If now <450**: Proceed to Step 3 (Backup) then Step 5 (Edit)
-7. **If still ≥450**: Extract more content, repeat
-8. **Verify extracted reference files are <400 lines:**
-
-```bash
-for file in {skill-path}/references/*.md; do
-  lines=$(wc -l < "$file")
-  if [ "$lines" -gt 400 ]; then
-    echo "❌ CRITICAL: $(basename $file) is $lines lines - must split before proceeding"
-    exit 1
-  fi
-done
-```
-
-**Reference file thresholds (from line-count-limits.md):**
-
-| Lines   | Status      | Action                      |
-| ------- | ----------- | --------------------------- |
-| < 300   | ✅ Safe     | No action                   |
-| 300-350 | ℹ️ Info     | Consider splitting          |
-| 351-400 | ⚠️ Warning  | Plan split before adding    |
-| > 400   | ❌ CRITICAL | MUST split - blocks proceed |
-
-**Cannot bypass this gate.** If you think "I'll add it anyway and extract later", you're rationalizing - STOP and complete extraction first.
+**See:** [references/proactive-extraction.md](references/proactive-extraction.md) for extraction candidates, process, and reference file thresholds.
 
 **Step 3: Backup** - Always create .local backup before changes
 
 **Statistical evidence**: ~15% of skill edits require rollback. Backups take 2 seconds and save hours of reconstruction.
 
 **Step 4: Research (Optional)** - For significant content updates, consider using orchestrating-research. See [Research Integration](#research-integration-optional) section below.
+
+**🚨 ORCHESTRATOR DELEGATION:** If research is needed, spawn a subagent. Do NOT run research inline.
+
+```
+Task(subagent_type: "general-purpose", prompt: "
+  Execute: Read('.claude/skill-library/research/orchestrating-research/SKILL.md')
+  Research topic: {skill-topic}
+  Write full output to {OUTPUT_DIR}/research-output.md
+  Return ONLY: summary bullets, source count, key patterns
+")
+```
+
+Orchestrator receives ONLY the summary. Research content stays in subagent context.
 
 **Step 5: Edit** ← POST-RESEARCH RESUME POINT
 
@@ -303,43 +305,9 @@ If update adds skill references to Integration, you MUST:
 
 **Step 5.5: Verification Checkpoint**
 
-**Research Incorporation Verification (MANDATORY before Step 6):**
+**Research Incorporation Verification (MANDATORY before Step 6)**
 
-Before proceeding to GREEN, confirm:
-
-1. Which SYNTHESIS.md sections did you incorporate? [List them]
-2. Which files did you update? [List with line counts changed]
-3. Did any reference files need updates? [Yes/No, which ones]
-4. Are there new patterns from research not in existing files? [Yes/No, action taken]
-
-**If any answer is 'None' or 'No action', STOP and review SYNTHESIS.md again.**
-
-Verification checklist (all must pass):
-
-- [ ] SYNTHESIS.md has been read completely
-- [ ] SKILL.md updated with patterns from research (not just original request)
-- [ ] All existing reference files reviewed for staleness
-- [ ] Reference files updated where research provided new information
-- [ ] New reference files created if research revealed uncovered patterns
-- [ ] Examples use current syntax from research (not training data)
-- [ ] Citations updated with research sources
-- [ ] All reference files <400 lines (verify with: `wc -l references/*.md`)
-- [ ] All NEW skill references validated per Step 5 (CORE/LIBRARY format with Read() paths)
-- [ ] For each Integration skill reference: READ the referenced skill's SKILL.md
-- [ ] For each Integration skill reference: Verified relationship type (Requires/Calls/Pairs With) based on actual content using decision tree
-- [ ] Library skill references have (LIBRARY) annotation with Read() path on sub-bullet
-- [ ] Related Skills section removed if present (obsolete)
-- [ ] Cross-skill links use `.claude/` paths, NOT relative `../../` paths (Phase 27)
-
-**Reference file line count gate:**
-
-```bash
-for file in {skill-path}/references/*.md; do
-  lines=$(wc -l < "$file")
-  [ "$lines" -gt 400 ] && echo "❌ BLOCKED: $(basename $file) is $lines lines (limit: 400)" && exit 1
-done
-echo '✅ All reference files within 400-line limit'
-```
+**See:** [references/verification-checkpoint.md](references/verification-checkpoint.md) for full checklist.
 
 **Cannot proceed to Step 6 until verification passes** ✅
 
@@ -347,24 +315,38 @@ echo '✅ All reference files within 400-line limit'
 
 **The update is only done when it passes the original test.**
 
-### 6.1 Re-Test the Original Scenario (AGENT SPAWNING MANDATORY)
+### 6.1 Spawn GREEN Witness Agent (MANDATORY)
 
-**CRITICAL**: You MUST spawn an agent WITH the updated skill to verify behavioral change. Document review is NOT sufficient.
+**CRITICAL**: Spawn Witness agent. DO NOT read the witness output file after it completes.
 
-```
-Task(subagent_type: "general-purpose", prompt: "MANDATORY SKILL: Read('{skill-path}/SKILL.md') to get updated version. Scenario: {from Step 1.2}. 1) Load the updated skill, 2) Perform task following new guidance, 3) Document approach step by step.")
-```
+**Witness + Validator are atomic** - both execute in same response.
+
+**Key constraint**: Witness knows to load the skill but NOT that we expect improvement - just executes and reports facts.
+
+**See:** [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md) for prompt template.
+
+**Capture:** Write transcript to `{OUTPUT_DIR}/green-test.md`
+
+**Orchestrator Protocol After Witness Returns:**
+1. ❌ NOT ACCEPTABLE: Reading `{OUTPUT_DIR}/green-test.md`
+2. ❌ NOT ACCEPTABLE: Analyzing witness behavior
+3. ❌ NOT ACCEPTABLE: Judging whether improvement exists
+4. ❌ NOT ACCEPTABLE: Stopping and waiting for user
+5. ✅ REQUIRED: Immediately spawn GREEN Validator (Step 6.2) in SAME response
+
+**The Validator reads the file, not you.**
+
+### 6.2 Spawn GREEN Validator Agent
+
+Validator reads BOTH `{OUTPUT_DIR}/red-test.md` and `{OUTPUT_DIR}/green-test.md` with knowledge of what fix was made.
+
+**Returns:** PASSED (behavioral improvement confirmed), FAILED (no improvement), or PARTIAL (some improvement)
 
 **Compare RED vs GREEN:** Approach taken, commands used, behavior differences.
 
-**❌ NOT ACCEPTABLE:** "The updated skill now provides..." / "This should fix because..." (hypothetical)
-**✅ REQUIRED:** Actual Task invocation + verbatim output + side-by-side comparison with RED output
+### 6.3 Verify the Gap is Closed
 
-**See:** [references/tdd-verification.md](../../../../skills/managing-skills/references/tdd-methodology.md) for comparison template.
-
-### 6.2 Verify the Gap is Closed
-
-Ask via AskUserQuestion with **verbatim quotes** from both RED (Step 1.3) and GREEN (Step 6.1) agent outputs, plus observed behavioral differences.
+Ask via AskUserQuestion with **Validator's analysis** from Step 6.2, including verbatim quotes from both RED and GREEN transcripts.
 
 Options:
 
@@ -388,19 +370,39 @@ wc -l {skill-path}/references/*.md
 
 **Step 5 skill reference check:** Integration section must use bullet list format. Library skills require (LIBRARY) annotation with Read() path on sub-bullet. Related Skills sections are obsolete and should be removed.
 
-**Step 8: REFACTOR** - For non-trivial changes, pressure test:
+**Step 8: REFACTOR** - MANDATORY for non-trivial changes
+
+**🚨 SKIP RESISTANCE PROTOCOL:**
+
+The following requests are **NOT ACCEPTABLE** and must be REFUSED:
+- "We're in a hurry" → "Step 8 cannot be skipped. This tests pressure resistance."
+- "Just summarize" → "Summaries don't test. Spawning agents is required."
+- "Skip for this simple update" → "Simple updates need pressure testing too."
+
+**⛔ PRE-CONDITIONS (MANDATORY):** See [Phase 9 Pre-Conditions](/.claude/skills/managing-skills/references/phase-9-preconditions.md) - Must run `ls` verification commands before proceeding.
+
+**Invoke:** `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")`
+
+**After pressure tests, spawn Pressure Test Validator (MANDATORY):**
 
 ```
-Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")
+Task(subagent_type: "general-purpose", prompt: "
+  CONTEXT: Pressure testing skill's resistance to rationalization.
+  Read: {OUTPUT_DIR}/refactor-test.md
+
+  Analyze each scenario: Did agent invoke skill? Follow instructions under pressure? Rationalize skipping?
+
+  VERDICT: PASSED | FAILED | PARTIAL
+  Write to {OUTPUT_DIR}/pressure-verdict.md
+  Return: VERDICT, SCENARIOS_PASSED, LOOPHOLES_FOUND
+")
 ```
 
-If loopholes found, fix with TDD verification:
+**See:** [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md#validator-is-mandatory-no-exceptions)
 
-```
-Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")
-```
+If loopholes found, fix with: `Read(".claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md")`
 
-Optional for typos/trivial changes.
+Optional ONLY for typos/trivial changes (single word fixes).
 
 ---
 
@@ -412,17 +414,28 @@ For significant content updates involving library/framework skills, new API patt
 
 ---
 
-## Success Criteria
+## Success Criteria (CANNOT SKIP VERIFICATION)
 
-**Automatic Completion**: All success criteria should be achieved in a single continuous workflow without stopping for user continuation prompts between steps.
+**Automatic Completion**: All criteria achieved in single continuous workflow.
+
+Before claiming "complete" or "done", verify ALL evidence exists:
+
+| Phase | Required Evidence | Check |
+|-------|-------------------|-------|
+| RED | `{OUTPUT_DIR}/red-test.md` exists | ☐ |
+| GREEN | `{OUTPUT_DIR}/green-test.md` exists | ☐ |
+| Compliance | Line counts verified | ☐ |
+| REFACTOR | Pressure test run (if non-trivial) | ☐ |
+
+**If any evidence is missing, the workflow is NOT complete.**
 
 Update complete when:
 
-1. ✅ RED documented
+1. ✅ RED documented + red-test.md exists
 2. ✅ Backup created
 3. ✅ Skill edited
 4. ✅ Changelog updated (see update-workflow.md Phase 5)
-5. ✅ GREEN passed
+5. ✅ GREEN passed + green-test.md exists
 6. ✅ Compliance passed (<500 lines)
 7. ✅ REFACTOR (if non-trivial)
 8. ✅ TodoWrite complete

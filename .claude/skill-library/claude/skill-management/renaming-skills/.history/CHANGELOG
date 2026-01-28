@@ -1,5 +1,46 @@
 # Changelog
 
+## 2026-01-21 - Witness + Validator Pattern for Operation Verification
+
+### Problem
+
+The previous Step 9 verification had the same issue as other operation skills - the agent that executed the rename also judged success:
+1. Verification searches for stale references and determines if rename is complete
+2. Agent makes subjective judgments about "historical" vs "functional" references
+3. Uncertain pass/fail criteria creates ambiguity about completion
+
+This is like asking a student to grade their own exam.
+
+### Changes
+
+**Step 9 (Verify Integrity)**: Replaced Grep-based verification with Validator agent
+- Added EXTREMELY-IMPORTANT block mandating Task agent spawning
+- Validator receives CONTEXT about what was renamed (OLD_NAME, NEW_NAME, SKILL_PATH)
+- Uses "find problems" framing: "Your job is to FIND PROBLEMS, not confirm success"
+- Investigates: stale references, new skill validity, gateway routing, skill invocation
+- Returns VERDICT (COMPLETE/STALE_REFERENCES/INVOCATION_FAILED) with evidence
+
+**Quick Reference**: Updated Step 9 tool from "Grep" to "Task (Validator)"
+
+**allowed-tools**: Added Task tool for agent spawning
+
+**References**: Added tdd-validator-pattern.md link
+
+### Impact
+- Self-judgment bias: ELIMINATED (Validator has context but makes informed judgment)
+- Informed judgment: Validator knows what was renamed and actively seeks problems
+- Clear pass/fail: COMPLETE/STALE_REFERENCES/INVOCATION_FAILED verdicts remove ambiguity
+- Context cost: Similar (~300 tokens vs direct grep)
+- Agent spawns: +1 agent (Validator instead of same-context grep)
+
+### Source
+Implements TDD-VERIFICATION-AGENT-ROLES.md proposal (Operation Verification section - renaming-skills)
+
+---
+
+
+# Changelog
+
 ## 2026-01-19
 
 ### Fixed
@@ -19,3 +60,39 @@
   - Updated TodoWrite checklist to include Step 1 as first step
   - Updated all cross-references in detailed-workflow.md to match new numbering
   - Final line count: 180 lines (within 500-line limit)
+
+## 2025-12-29
+
+### Fixed (Audit Compliance)
+
+**Issues resolved:**
+- Phase 3 (Line Count): Reduced from 590 to 130 lines (Claude-Automated)
+- Phase 14a (Table Formatting): Applied Prettier formatting (CLI)
+- Phase 7 (Output Directory): Created .local/.gitignore (CLI)
+- Semantic (Description Quality): Added discoverable terms (Claude-Automated)
+
+**Changes applied:**
+
+1. **Description Enhancement** (Claude-Automated)
+   - Updated description to include key search terms
+   - Now mentions: frontmatter, directory path, references
+   - Improves discoverability in skill search
+
+2. **Progressive Disclosure** (Claude-Automated)
+   - Extracted detailed step-by-step instructions to `references/detailed-workflow.md` (460 lines)
+   - Extracted common scenarios to `references/common-scenarios.md`
+   - Extracted rollback procedures to `references/rollback-procedures.md`
+   - Main SKILL.md now references detailed documentation
+   - Result: 130 lines (well under 500-line limit)
+
+3. **Table Formatting** (CLI via Phase 14a)
+   - Applied Prettier formatting to all markdown tables
+   - Ensures consistent table structure
+
+4. **Output Directory** (CLI via Phase 7)
+   - Created .local/.gitignore
+   - Ensures proper gitignore for temporary files
+
+**Method:** Mixed (CLI deterministic + Claude-automated semantic fixes)
+
+**Verification:** Re-audit passed all 22 phases + semantic review

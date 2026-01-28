@@ -199,6 +199,79 @@ Before completing the REFACTOR phase:
 
 ---
 
+## Phase 9 Verification Script
+
+Run this command to verify Phase 9 (REFACTOR) completion:
+
+```bash
+# Basic checks
+test -f {OUTPUT_DIR}/refactor-test.md || { echo "FAIL: No refactor-test.md"; exit 1; }
+
+SCENARIO_COUNT=$(grep -c "# Pressure Scenario" {OUTPUT_DIR}/refactor-test.md)
+[ "$SCENARIO_COUNT" -ge 3 ] || { echo "FAIL: Only $SCENARIO_COUNT scenarios"; exit 1; }
+
+# Substance checks (verify actual agent testing occurred)
+grep -q "Task(" {OUTPUT_DIR}/refactor-test.md || { echo "FAIL: No Task tool calls documented"; exit 1; }
+
+TRANSCRIPT_COUNT=$(grep -c "APPROACH:" {OUTPUT_DIR}/refactor-test.md)
+[ "$TRANSCRIPT_COUNT" -ge 3 ] || { echo "FAIL: Only $TRANSCRIPT_COUNT agent transcripts (need ≥3)"; exit 1; }
+
+echo "PASS: ≥3 pressure scenarios with agent tests verified"
+```
+
+**Expected:** All checks pass, command returns "PASS" message
+
+**What this verifies:**
+- ✅ refactor-test.md file exists
+- ✅ At least 3 "# Pressure Scenario" headers
+- ✅ Task() invocations documented (evidence of agent spawning)
+- ✅ At least 3 APPROACH: sections (evidence of agent transcripts)
+
+**What this cannot verify:**
+- ❌ Whether Task() was actually executed vs. documented as text
+- ❌ Whether transcripts are real vs. fabricated
+
+**Mitigation:** Combine automated verification with manual spot-checks for high-stakes skills.
+
+---
+
+## Required Format for refactor-test.md
+
+Each scenario in the refactor-test.md file should follow this structure:
+
+```markdown
+# Pressure Scenario 1: Time + Authority Pressure
+
+**Scenario Description:**
+[Realistic task without skill mentions]
+
+**Task Invocation:**
+```
+Task(subagent_type: "general-purpose", prompt: "...")
+```
+
+**Agent Transcript:**
+
+**APPROACH:**
+[What agent did]
+
+**OUTCOME:**
+[What agent produced]
+
+**UNCERTAINTIES:**
+[What uncertainties agent encountered]
+
+**Compliance Analysis:**
+- ✅/❌ Invoked required skills
+- ✅/❌ Followed skill instructions
+- ✅/❌ Resisted pressure to bypass
+
+**Rationalizations Detected:**
+- "[Quote exact rationalization]"
+```
+
+---
+
 ## Related Resources
 
 - `calibrating-time-estimates` skill - Proves time pressure is usually false

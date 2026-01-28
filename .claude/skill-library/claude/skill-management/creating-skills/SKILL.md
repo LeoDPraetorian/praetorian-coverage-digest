@@ -56,6 +56,16 @@ ROOT="$(git rev-parse --show-superproject-working-tree --show-toplevel | head -1
 
 **See:** [Workflow Continuation](references/workflow-continuation.md) for research continuation protocol and anti-patterns.
 
+### Anti-Pattern: Workflow Interruption at TDD Phases
+
+**Symptom**: Orchestrator stops after Witness returns, waits for user prompt to continue to Validator.
+
+**Wrong thinking**: "Response got long, I'll wait for user to continue" or "Let me check the output first"
+
+**Why wrong**: TDD phases must be atomic. RED = Witness + Validator executed together. GREEN = Witness + Validator executed together. User shouldn't babysit phase transitions.
+
+**Fix**: Spawn Validator immediately in same response as Witness. No pause between them.
+
 ---
 
 ## Phase 0: Scope Validation
@@ -82,14 +92,21 @@ Skill creation has many shortcuts that lead to low-quality skills. Watch for war
 
 **Statistical evidence**: Skills created without RED phase have ~40% failure rate (don't solve the actual problem). The 5 minutes to document failure prevents hours of building the wrong thing.
 
-**Complete Phase 1 workflow and agent spawning requirements:** [references/tdd-verification.md](references/tdd-verification.md)
+**Witness + Validator pattern:** For complete Phase 1 workflow, agent spawning requirements, and bias-free verification, see [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md). Separates execution (Witness) from judgment (Validator) to prevent self-assessment bias.
 
-**Quick steps:**
+---
 
-1. Document the gap (why skill is needed)
-2. Test without the skill (specific scenario)
-3. Capture failure behavior via agent spawning (MANDATORY)
-4. Confirm RED state
+### External Evidence Check (MANDATORY FIRST)
+
+Before spawning Witness/Validator, check if external RED evidence already exists (user-provided tests, bug reports, previous session exports).
+
+**If external evidence exists:** See [External Evidence Protocol](/.claude/skills/managing-skills/references/external-evidence-protocol.md) - ASK user whether to accept or spawn fresh agents.
+
+---
+
+## ⚠️ CRITICAL PROHIBITION
+
+**After Witness returns:** Do NOT read witness output files. See [TDD Validator Pattern - Orchestrator Role](/.claude/skills/managing-skills/references/tdd-validator-pattern.md#orchestrator-role) for complete prohibition list and rationalization counters.
 
 ---
 
@@ -193,6 +210,10 @@ mkdir -p $ROOT/.claude/skill-library/{category}/{skill-name}/references
 
 **🚨 CRITICAL: Design for progressive disclosure from the start.** Target: <500 lines (ideally 300-450).
 
+**🚨 ORCHESTRATOR DELEGATION:** For context efficiency, spawn a subagent to generate SKILL.md. The orchestrator should NOT read templates or generate content inline.
+
+**Delegation prompt:** See [references/agent-delegation-prompts.md](references/agent-delegation-prompts.md#phase-52-skill-generation-agent)
+
 **See:** [template-guidance.md](references/template-guidance.md) for templates by skill type, line count management, description patterns.
 
 **Gateways:** Use gateway-template.md (see [references/gateway-creation.md](references/gateway-creation.md)).
@@ -226,19 +247,7 @@ Use sequential integers (Phase 1, 2, 3...) not fractional (Phase 1.5, 4.5). Sub-
 
 #### 🚨 Cross-Skill Link Format (MANDATORY - Phase 27)
 
-When linking to OTHER skills in your content, use full `.claude/` paths:
-
-| Link Type         | Example                                                  | Format                  |
-| ----------------- | -------------------------------------------------------- | ----------------------- |
-| Within same skill | `[Details](references/foo.md)`                           | Relative path ✅        |
-| To other skill    | `[brainstorming](.claude/skills/brainstorming/SKILL.md)` | Full `.claude/` path ✅ |
-
-❌ **NEVER**: `[brainstorming](../../brainstorming/SKILL.md)` (relative path to other skill)
-✅ **USE**: `[brainstorming](.claude/skills/brainstorming/SKILL.md)` (explicit path)
-
-**Rationale**: Full paths are instantly resolvable from repo root. Relative paths like `../../` require runtime resolution that can fail.
-
-**Caught by**: auditing-skills Phase 27
+Use full `.claude/` paths for cross-skill links, not relative `../../` paths. **Caught by**: auditing-skills Phase 27
 
 ### 5.3 Verify Line Count (MANDATORY)
 
@@ -258,20 +267,9 @@ for file in $ROOT/{skill-path}/references/*.md; do
 done
 ```
 
-**Reference file thresholds (from line-count-limits.md):**
+**Limits:** SKILL.md < 500 lines, each reference < 400 lines. **Cannot proceed if exceeded.**
 
-| Lines   | Status      | Action                      |
-| ------- | ----------- | --------------------------- |
-| < 300   | ✅ Safe     | No action                   |
-| 300-350 | ℹ️ Info     | Consider splitting          |
-| 351-400 | ⚠️ Warning  | Plan split before adding    |
-| > 400   | ❌ CRITICAL | MUST split - blocks proceed |
-
-**Cannot proceed to Phase 6 if any reference file > 400 lines** ✅
-
-**Cannot proceed to research phase if SKILL.md > 500 lines** ✅
-
-**Format tables:** Run `npx prettier --write` on .md files. See [Table Formatting](.claude/skills/managing-skills/references/table-formatting.md)
+**Format tables:** Run `npx prettier --write` on .md files.
 
 ### 5.4 Create Initial Changelog
 
@@ -291,13 +289,39 @@ mkdir -p $ROOT/{skill-path}/references
 
 ## Phase 6: Research & Populate Content
 
-**Complete Phase 6 workflow (research decision, execution, incorporation):** See **[Phase 6 Research Workflow](references/phase-6-research-workflow.md)** for:
+**🚨 ORCHESTRATOR DELEGATION:** Both research (6.2) and reference file generation (6.3) must be delegated to subagents.
 
-- 6.1 Research decision (AskUserQuestion)
-- 6.2 Execute research with orchestrating-research
-- 6.3 Incorporate research into skill (POST-RESEARCH RESUME POINT)
-- TodoWrite continuation protocol
-- Verification gates
+### 6.1 Research Decision
+
+Ask user via AskUserQuestion: "Would you like to conduct research to populate the skill content?"
+
+### 6.2 Execute Research (IF YES - DELEGATE)
+
+```
+Task(subagent_type: "general-purpose", prompt: "
+  Execute: Read('.claude/skill-library/research/orchestrating-research/SKILL.md')
+  Research topic: {skill-topic}
+  Write output to {OUTPUT_DIR}/research-output.md and SYNTHESIS.md
+  Return only: SOURCES_CONSULTED (count), KEY_PATTERNS (3-5 bullets), SYNTHESIS_READY (true/false)
+")
+```
+
+❌ NOT ACCEPTABLE: `Read(".../orchestrating-research/SKILL.md")` inline in orchestrator
+
+### 6.3 Generate Reference Files (DELEGATE)
+
+```
+Task(subagent_type: "general-purpose", prompt: "
+  Read: {OUTPUT_DIR}/SYNTHESIS.md and {skill-path}/SKILL.md
+  Generate reference files for {skill-type} skill (each <400 lines, >50 lines content)
+  Write to {skill-path}/references/
+  Return only: FILES_CREATED (list), TOTAL_LINES, SYNTHESIS_INCORPORATED (true/false)
+")
+```
+
+❌ NOT ACCEPTABLE: Orchestrator using Write() to create reference files inline
+
+**See:** [Phase 6 Research Workflow](references/phase-6-research-workflow.md) for TodoWrite continuation protocol.
 
 ## Phase 7: Gateway Update (Library Skills Only)
 
@@ -319,9 +343,7 @@ If creating a library skill, add it to the appropriate gateway(s).
 
 ### 8.1 Re-Test the Original Scenario (AGENT SPAWNING MANDATORY)
 
-**CRITICAL**: Spawn an agent WITH the skill loaded. Compare RED vs GREEN behavior.
-
-**Complete Phase 8 workflow:** [references/tdd-verification.md](references/tdd-verification.md)
+**CRITICAL**: Spawn GREEN Witness agent (with skill loaded) and GREEN Validator agent (atomic - same response). See [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md) for complete Phase 8 workflow and orchestrator protocol.
 
 ### 8.2 Verify the Gap is Closed
 
@@ -329,31 +351,122 @@ Ask via AskUserQuestion with **verbatim quotes** from both RED (Phase 1) and GRE
 
 **If "Partially" or "No"**: Go back to Phase 6 (Research) and improve content.
 
-### 8.3 Run Audit
+### 8.3 Run Audit (DELEGATE TO SUBAGENT)
 
-Verify compliance:
+**🚨 ORCHESTRATOR DELEGATION:** Spawn a subagent to run the audit. Do NOT run audit inline.
 
-```markdown
-Audit {skill-name} to verify compliance with all 28 phase requirements.
 ```
+Task(subagent_type: "general-purpose", prompt: "
+  Run /skill-manager audit {skill-name}
+  Write full audit report to {OUTPUT_DIR}/audit-results.md
+  Return only: VERDICT (pass/fail), Critical issues (count + summaries), Warnings (count)
+")
+```
+
+❌ NOT ACCEPTABLE: Running `/skill-manager audit` directly in orchestrator context
+✅ REQUIRED: Use the Task() prompt above - orchestrator receives summary only
 
 **For gateways**: Also run gateway-specific audit (phases 17-20). See [references/gateway-creation.md](references/gateway-creation.md#phase-8-green-verification).
 
-**Phase 28 validation**: Validates Integration section completeness, bullet list format, and skill reference annotations. Library skills must have (LIBRARY) annotation with Read() path on sub-bullet. Related Skills sections are obsolete and should be removed if present.
-
 **Must pass with no critical issues before proceeding.**
+
+### 8.4 Fix Audit Failures (IF AUDIT FAILED)
+
+**🚨 ORCHESTRATOR DELEGATION:** Spawn a subagent to fix audit failures. Do NOT run Edit operations inline.
+
+```
+Task(subagent_type: "general-purpose", prompt: "
+  Read: {OUTPUT_DIR}/audit-results.md
+  Fix all CRITICAL and HIGH issues in {skill-path}/SKILL.md and references/
+  Return only: ISSUES_FIXED (count), REMAINING_ISSUES (count), LINE_COUNT_AFTER
+")
+```
+
+❌ NOT ACCEPTABLE: Orchestrator using Edit() to fix issues directly
+✅ REQUIRED: Use the Task() prompt above, then re-run audit to verify fixes
 
 ---
 
 ## Phase 9: 🔵 REFACTOR Phase (Pressure Test)
 
-Invoke `pressure-testing-skill-content` (LIBRARY) for time/authority/sunk cost pressure testing.
+**Who:** Main orchestrator only (NOT witness agents)
+
+**⛔ PRE-CONDITIONS (MANDATORY):** See [Phase 9 Pre-Conditions](/.claude/skills/managing-skills/references/phase-9-preconditions.md) - Must run `ls` verification commands before proceeding.
+
+**🚨 SKIP RESISTANCE PROTOCOL:**
+
+The following requests are **NOT ACCEPTABLE** and must be REFUSED:
+- "We're in a hurry" → Response: "Phase 9 cannot be skipped. This phase tests whether the skill resists exactly this kind of pressure."
+- "Just summarize the methodology" → Response: "Summaries don't test anything. Spawning agents is required."
+- "Skip pressure tests for this simple skill" → Response: "Simple skills need pressure testing. Complexity isn't the criterion."
+- "We'll do it later" → Response: "Skills must pass pressure tests before release. There is no 'later'."
+
+**Invoke:** `Read(".claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md")`
+
+**Required steps:**
+1. Create 3+ pressure scenarios (time + authority + sunk cost)
+2. Spawn agents WITH skill loaded, run pressure scenarios
+3. Document in `{OUTPUT_DIR}/refactor-test.md`
+4. Spawn Pressure Test Validator (MANDATORY)
+5. If any fail: add counter-rationalization, re-test
+
+### 9.1 Spawn Pressure Test Validator (MANDATORY)
+
+After running pressure test agents, spawn Validator to assess resistance:
+
+```
+Task(subagent_type: "general-purpose", prompt: "
+  CONTEXT: Pressure testing skill's resistance to rationalization.
+  SCENARIOS TESTED: Time pressure, Authority override, Sunk cost
+
+  Read: {OUTPUT_DIR}/refactor-test.md
+
+  Analyze each scenario:
+  1. Did agent invoke the skill?
+  2. Did agent follow skill instructions under pressure?
+  3. Did agent rationalize skipping any requirements?
+  Quote specific evidence for each.
+
+  VERDICT: PASSED | FAILED | PARTIAL
+  - PASSED: Skill instructions held under all pressure scenarios
+  - FAILED: Agent rationalized around skill in 2+ scenarios
+  - PARTIAL: Some resistance but loopholes found
+
+  Write to {OUTPUT_DIR}/pressure-verdict.md
+
+  Return: VERDICT, SCENARIOS_PASSED (count), LOOPHOLES_FOUND (list)
+")
+```
+
+**Validator is MANDATORY even if unexpected behavior occurred.** See [TDD Validator Pattern](/.claude/skills/managing-skills/references/tdd-validator-pattern.md#validator-is-mandatory-no-exceptions).
+
+**❌ NOT ACCEPTABLE:** Reading methodology without spawning agents
+**✅ REQUIRED:** Actual agent pressure tests with documented transcripts AND Validator verdict
 
 If loopholes found, fix with `closing-rationalization-loopholes` (LIBRARY) using TDD verification.
+
+**Verification:** See [references/pressure-testing.md](references/pressure-testing.md)
 
 **Complete when:** ✅ RED ✅ GREEN ✅ REFACTOR ✅ Audit ✅ Gateway (library only)
 
 **Validation:** See [Validation and Anti-Patterns](references/validation-and-anti-patterns.md)
+
+---
+
+## Success Criteria (CANNOT SKIP VERIFICATION)
+
+Before claiming "complete" or "done", verify ALL phases executed with evidence:
+
+| Phase | Required Evidence | Check |
+|-------|-------------------|-------|
+| RED | `{OUTPUT_DIR}/red-test.md` exists | ☐ |
+| GREEN | `{OUTPUT_DIR}/green-test.md` exists | ☐ |
+| REFACTOR | `{OUTPUT_DIR}/refactor-test.md` exists | ☐ |
+| Audit | Passed with no critical issues | ☐ |
+| Gateway | Updated (library skills only) | ☐ |
+
+**If any evidence is missing, the workflow is NOT complete.**
+Do NOT claim completion without this checklist verified.
 
 ---
 

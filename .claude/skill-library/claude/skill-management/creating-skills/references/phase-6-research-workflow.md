@@ -20,7 +20,9 @@ Options:
 
 ## Sub-Phase 6.2: Execute Research
 
-**BEFORE invoking orchestrating-research, set up continuation state:**
+**🚨 ORCHESTRATOR DELEGATION:** Spawn a subagent to execute research. Do NOT run research inline.
+
+**BEFORE spawning research agent, set up continuation state:**
 
 1. Write remaining phases to TodoWrite (these persist across the research context switch):
 
@@ -34,13 +36,20 @@ Options:
    ])
    ```
 
-2. Then invoke orchestrating-research:
+2. **Spawn research agent (NOT inline Read):**
 
-   ```
-   Read(".claude/skill-library/research/orchestrating-research/SKILL.md")
-   ```
+   **See:** [agent-delegation-prompts.md#phase-62-research-agent](agent-delegation-prompts.md#phase-62-research-agent) for complete prompt template.
 
-**IMMEDIATELY after orchestrating-research returns:**
+❌ NOT ACCEPTABLE:
+- `Read(".claude/skill-library/research/orchestrating-research/SKILL.md")` (inline)
+- Running research commands directly in orchestrator context
+- Loading research output into orchestrator context
+
+✅ REQUIRED:
+- `Task(subagent_type: "general-purpose", ...)` with delegation prompt
+- Orchestrator receives ONLY: sources count, key patterns, synthesis ready
+
+**IMMEDIATELY after research agent returns:**
 
 YOU MUST execute these steps in sequence WITHOUT stopping:
 
@@ -67,13 +76,23 @@ The orchestrating-research skill provides intent expansion, parallel research ac
 
 **POST-RESEARCH RESUME POINT - This phase executes IMMEDIATELY after Sub-Phase 6.2 returns.**
 
-Read SYNTHESIS.md from `.claude/.output/research/{timestamp}-{topic}/` (orchestrating-research creates OUTPUT_DIR with SYNTHESIS.md and source files), update SKILL.md with patterns/docs/practices, populate references/, replace placeholders with real examples.
+**🚨 ORCHESTRATOR DELEGATION:** Spawn a subagent to generate reference files. Do NOT write reference files inline.
 
-**After reading SYNTHESIS.md:**
+**See:** [agent-delegation-prompts.md#phase-63-reference-file-generation-agent](agent-delegation-prompts.md#phase-63-reference-file-generation-agent) for complete prompt template.
 
-1. **Expand TodoWrite** - Create per-file items for required references (see [research-integration.md](research-integration.md) for skill type → reference file mapping)
-2. **Map content** - Route SYNTHESIS.md sections to reference files using mapping table
-3. **Create files** - Write each reference file with >50 lines from research sources (not placeholders)
+❌ NOT ACCEPTABLE:
+- Orchestrator using Write() to create reference files
+- Reading SYNTHESIS.md into orchestrator context
+- Inline Edit() operations on reference files
+
+✅ REQUIRED:
+- `Task(subagent_type: "general-purpose", ...)` with delegation prompt
+- Orchestrator receives ONLY: files created, total lines, synthesis incorporated
+
+**After reference generation agent returns:**
+
+1. **Verify TodoWrite** - Mark 6.3 complete, check next pending phase
+2. **Verify file creation** - Agent should have returned FILES_CREATED list
    3b. **Verify reference file line counts:**
 
 ```bash

@@ -1,8 +1,10 @@
-# Gateway-Specific Fixes (Phases 17-20)
+# Gateway-Specific Fixes (Phases 20-23)
 
 **Gateway skills** (names starting with `gateway-`) have additional validation phases for routing table integrity and progressive disclosure documentation.
 
-## Phase 17: Gateway Structure (Manual)
+> **Note:** These phases correspond to the main audit phases 20-23 in auditing-skills.
+
+## Phase 20: Gateway Structure (Manual)
 
 **What it validates:**
 
@@ -35,7 +37,7 @@
 
 **Template location:** `.claude/skills/managing-skills/templates/gateway-template.md`
 
-## Phase 18: Routing Table Format (Auto)
+## Phase 21: Routing Table Format (Auto)
 
 **What it validates:**
 
@@ -61,7 +63,7 @@
 3. Update table entry to show full path
 4. Add Triggers column with keywords matching Intent Detection
 
-## Phase 19: Broken Paths (Auto)
+## Phase 22: Broken Paths (Auto)
 
 **What it validates:**
 
@@ -84,7 +86,7 @@
 3. If fails, remove that table row
 4. Document removed skills
 
-## Phase 20: Coverage Gaps (Manual)
+## Phase 23: Coverage Gaps (Manual)
 
 **What it validates:**
 
@@ -112,7 +114,7 @@ The syncing-gateways workflow will guide you through:
 3. **Comparison**: Identify skills missing from gateway routing tables
 4. **Application**: Add missing skills using Edit tool
 
-**Why defer to syncing-gateways:** Phase 20 requires checking ALL gateways and ALL library skills - beyond the scope of single-skill fixing.
+**Why defer to syncing-gateways:** Phase 23 requires checking ALL gateways and ALL library skills - beyond the scope of single-skill fixing.
 
 ## Related
 
