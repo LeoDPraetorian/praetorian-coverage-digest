@@ -29,22 +29,36 @@ Capabilities that have been migrated live in a separate super-repo (`capabilitie
 
 **Migrated capabilities include:** nebula, fingerprintx, nuclei-templates, trajan, augustus, diocletian, noseyparker, noseyparker-explorer, noseyparkerplusplus, brutus, capability-sdk
 
-### Internal Chariot Modules (Pending Migration)
+### Internal Modules (Not Yet Migrated)
 
-Capabilities not yet migrated remain in chariot-development-platform:
+Capabilities not yet migrated remain in praetorian-development-platform super-repo:
 
 ```
 modules/{module}/
 ```
 
-**Not yet migrated:** chariot-aegis-capabilities, msp-definitions, and any other modules in `modules/` that capability-developer may need
+**Internal module locations include:**
+
+- **chariot** or **guard** - Core platform with Guard backend (`modules/chariot/backend/` or `modules/guard/backend/`)
+  - Guard backend capabilities: `backend/pkg/tasks/capabilities/`
+- **tabularium** - Shared data models and schemas (`modules/tabularium/`)
+- **janus** - Security tool orchestration framework (`modules/janus/`)
+- **chariot-aegis-capabilities** - VQL-based security capabilities (`modules/chariot-aegis-capabilities/`)
+- **msp-definitions** - MSP vulnerability content (`modules/msp-definitions/`)
+- **praetorian-cli** - Python CLI and SDK (`modules/praetorian-cli/`)
+- Any other `modules/` subdirectories
 
 ### Path Resolution
 
 During Phase 3 (Codebase Discovery), determine which location applies:
 
-1. Check if capability exists in `{CAPABILITIES_ROOT}/modules/`
-2. If not found, check `modules/` in chariot-development-platform
+1. Check if capability exists in `{CAPABILITIES_ROOT}/modules/` (external repo)
+2. If not found, check internal modules in praetorian-development-platform:
+   - `modules/chariot/backend/pkg/tasks/capabilities/` or `modules/guard/backend/pkg/tasks/capabilities/` (Guard backend)
+   - `modules/chariot-aegis-capabilities/` (VQL capabilities)
+   - `modules/tabularium/` (data models)
+   - `modules/janus/` (tool orchestration)
+   - Other `modules/` subdirectories
 3. Document resolved path in MANIFEST.yaml
 
 ---
@@ -54,11 +68,13 @@ During Phase 3 (Codebase Discovery), determine which location applies:
 Resolve `{CAPABILITIES_ROOT}` in this order:
 
 1. **Environment variable** (highest priority):
+
    ```bash
    export CAPABILITIES_ROOT="/path/to/capabilities"
    ```
 
 2. **Config file** (`.claude/config.local.json`, gitignored):
+
    ```json
    {
      "external_repos": {
@@ -92,35 +108,44 @@ ls modules/
 
 All capabilities follow a unified pattern. The `{resolved_path}` is determined during Phase 3 (Codebase Discovery) based on where the capability lives.
 
-| Agent Type           | File Scope                  | Access Mode | Phase |
-| -------------------- | --------------------------- | ----------- | ----- |
-| Explore              | Both repos (discovery)      | READ-ONLY   | 3     |
-| capability-lead      | Output directory only       | WRITE       | 7     |
-| capability-developer | `{resolved_path}/`          | READ-WRITE  | 8     |
-| capability-reviewer  | `{resolved_path}/`          | READ-ONLY   | 11    |
-| capability-tester    | `{resolved_path}/`          | READ-WRITE  | 13    |
+| Agent Type           | File Scope             | Access Mode | Phase |
+| -------------------- | ---------------------- | ----------- | ----- |
+| Explore              | Both repos (discovery) | READ-ONLY   | 3     |
+| capability-lead      | Output directory only  | WRITE       | 7     |
+| capability-developer | `{resolved_path}/`     | READ-WRITE  | 8     |
+| capability-reviewer  | `{resolved_path}/`     | READ-ONLY   | 11    |
+| capability-tester    | `{resolved_path}/`     | READ-WRITE  | 13    |
 
 ### Examples
 
-| User Request | Location | Resolved Path |
-|--------------|----------|---------------|
-| "Add MySQL fingerprint" | External | `{CAPABILITIES_ROOT}/modules/fingerprintx/` |
-| "Create CVE template" | External | `{CAPABILITIES_ROOT}/modules/nuclei-templates/` |
-| "Improve secret scanning" | External | `{CAPABILITIES_ROOT}/modules/noseyparker/` |
-| "Add AWS capability" | External | `{CAPABILITIES_ROOT}/modules/diocletian/` |
-| "CI/CD security check" | External | `{CAPABILITIES_ROOT}/modules/trajan/` |
-| "VQL artifact" | Internal | `modules/chariot-aegis-capabilities/` |
-| "MSP definition" | Internal | `modules/msp-definitions/` |
+| User Request                     | Location | Resolved Path                                                                                        |
+| -------------------------------- | -------- | ---------------------------------------------------------------------------------------------------- |
+| "Add MySQL fingerprint"          | External | `{CAPABILITIES_ROOT}/modules/fingerprintx/`                                                          |
+| "Create CVE template"            | External | `{CAPABILITIES_ROOT}/modules/nuclei-templates/`                                                      |
+| "Improve secret scanning"        | External | `{CAPABILITIES_ROOT}/modules/noseyparker/`                                                           |
+| "Add AWS capability"             | External | `{CAPABILITIES_ROOT}/modules/diocletian/`                                                            |
+| "CI/CD security check"           | External | `{CAPABILITIES_ROOT}/modules/trajan/`                                                                |
+| "VQL artifact"                   | Internal | `modules/chariot-aegis-capabilities/`                                                                |
+| "MSP definition"                 | Internal | `modules/msp-definitions/`                                                                           |
+| "S3 bucket detection capability" | Internal | `modules/chariot/backend/pkg/tasks/capabilities/` or `modules/guard/backend/pkg/tasks/capabilities/` |
+| "Tabularium schema update"       | Internal | `modules/tabularium/`                                                                                |
+| "Janus tool chain"               | Internal | `modules/janus/`                                                                                     |
 
 ### Path Resolution in MANIFEST
 
 ```yaml
 capability_location:
-  type: "external"  # or "internal"
+  type: "external" # or "internal"
   resolved_path: "{CAPABILITIES_ROOT}/modules/fingerprintx/"
   # OR for internal:
   # type: "internal"
   # resolved_path: "modules/chariot-aegis-capabilities/"
+  # OR for Guard backend capabilities:
+  # type: "internal"
+  # resolved_path: "modules/chariot/backend/pkg/tasks/capabilities/" or "modules/guard/backend/pkg/tasks/capabilities/"
+  # OR for Tabularium:
+  # type: "internal"
+  # resolved_path: "modules/tabularium/"
 ```
 
 ---
@@ -129,12 +154,12 @@ capability_location:
 
 Within each capability module, certain files may be shared registration points:
 
-| Pattern | Risk | Mitigation |
-|---------|------|------------|
+| Pattern          | Risk                     | Mitigation            |
+| ---------------- | ------------------------ | --------------------- |
 | `**/registry.go` | Tool/plugin registration | Lock before modifying |
-| `**/types.go` | Type constant additions | Lock before modifying |
-| `**/plugins.go` | Plugin imports | Sequential edits only |
-| `README.md` | Index/documentation | Sequential edits only |
+| `**/types.go`    | Type constant additions  | Lock before modifying |
+| `**/plugins.go`  | Plugin imports           | Sequential edits only |
+| `README.md`      | Index/documentation      | Sequential edits only |
 
 **Note**: Specific shared files vary by capability. Identify them during Phase 3 (Codebase Discovery).
 

@@ -257,7 +257,14 @@ When spawning parallel agents:
 
 **Path locations:**
 - External (migrated): `{CAPABILITIES_ROOT}/modules/{capability}/`
-- Internal (not yet migrated): `modules/{module}/` (e.g., chariot-aegis-capabilities, msp-definitions)
+- Internal (not yet migrated): `modules/{module}/` (all modules in the super-repo, including chariot, janus, tabularium, chariot-aegis-capabilities, msp-definitions, praetorian-cli, etc.)
+
+**Internal module scope includes:**
+- `modules/chariot/backend/` - Guard backend capabilities, handlers, and tasks
+- `modules/tabularium/` - Shared data models and schemas
+- `modules/janus/` - Security tool orchestration
+- `modules/chariot-aegis-capabilities/` - VQL capabilities
+- Any other `modules/` subdirectories required for capability development
 
 See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict detection protocol.
 
