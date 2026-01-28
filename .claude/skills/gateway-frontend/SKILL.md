@@ -60,6 +60,7 @@ This gateway implements 3-tier loading:
 | "performance" / "optimize" / "slow render"                    | → `optimizing-react-performance`         |
 | "prefetch" / "route loading" / "navigation delay"             | → `prefetching-react-routes`             |
 | "preload" / "resource" / "font" / "script" / "CDN"            | → `preloading-react-resources`           |
+| "D3" / "d3-force" / "d3-hierarchy" / "d3-quadtree"            | → `visualizing-with-d3`                  |
 | "large data" / "1000+" / "virtualization"                     | → `optimizing-large-data-visualization`  |
 | "interference" / "competing systems" / "async conflict"       | → `coordinating-competing-systems`       |
 | "Sigma.js" / "graph viz" / "WebGL graph"                      | → `working-with-sigma-js`                |
@@ -104,6 +105,7 @@ This gateway implements 3-tier loading:
 | Prefetching React Routes       | `.claude/skill-library/development/frontend/prefetching-react-routes/SKILL.md`                     | prefetch, route loading, navigation delay, React Router                          |
 | Preloading React Resources     | `.claude/skill-library/development/frontend/preloading-react-resources/SKILL.md`                   | preload, resource, font, script, CDN, prefetchDNS, preconnect                    |
 | Vite Build Optimization        | `.claude/skill-library/development/frontend/optimizing-vite-builds/SKILL.md`                       | vite, bundle, manualChunks, vendor, build, chunk                                 |
+| D3 Visualization               | `.claude/skill-library/development/frontend/graphing/visualizing-with-d3/SKILL.md`                 | D3, d3-force, d3-hierarchy, d3-quadtree, force simulation, scales, transitions   |
 | Large Data Visualization       | `.claude/skill-library/development/frontend/graphing/optimizing-large-data-visualization/SKILL.md` | large data, 1000+, virtualization, LOD                                           |
 | Coordinating Competing Systems | `.claude/skill-library/development/frontend/graphing/coordinating-competing-systems/SKILL.md`      | interference, competing systems, async conflict, guard patterns, sequencing      |
 | Sigma.js Graph Visualization   | `.claude/skill-library/development/frontend/graphing/working-with-sigma-js/SKILL.md`               | Sigma.js, graph, WebGL, camera, layout                                           |
