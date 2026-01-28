@@ -53,7 +53,7 @@ Each orchestration skill defines its own P0 requirements. **Do NOT look here for
 | -------------------------------------------------- | -------------------------------------- | ---------------------------------- |
 | "integrate X API" / "sync from Y"                  | orchestrating-integration-development  | Load integration p0-compliance.md  |
 | "create VQL capability" / "write Nuclei template"  | orchestrating-capability-development   | Load capability p0-compliance.md   |
-| "new fingerprintx module for X protocol"           | orchestrating-nerva-development | Load fingerprintx p0-compliance.md |
+| "new nerva module for X protocol"           | orchestrating-nerva-development | Load nerva p0-compliance.md |
 | "add feature to UI" / "implement backend endpoint" | orchestrating-feature-development      | Load feature p0-compliance.md      |
 
 ### Step 2: Run ALL P0 Checks for Domain (BLOCKING)

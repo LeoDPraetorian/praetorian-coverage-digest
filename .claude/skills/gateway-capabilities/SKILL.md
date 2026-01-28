@@ -46,9 +46,9 @@ This gateway implements 3-tier loading:
 
 | Task Intent                                                                                                                                                           | Route To                                    |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
-| "orchestrate capability" / "develop capability" / "capability workflow" / "VQL development" / "Nuclei development" / "Janus development" / "Fingerprintx development" | → `orchestrating-capability-development`    |
-| "review capability" / "code review" / "VQL review" / "Nuclei review" / "Janus review" / "fingerprintx review"                                                         | → `reviewing-capability-implementations`    |
-| "YAML or Go?" / "template vs plugin" / "Nuclei vs fingerprintx" / "implementation pattern" / "decision framework"                                                     | → `selecting-plugin-implementation-pattern` |
+| "orchestrate capability" / "develop capability" / "capability workflow" / "VQL development" / "Nuclei development" / "Janus development" / "Nerva development" | → `orchestrating-capability-development`    |
+| "review capability" / "code review" / "VQL review" / "Nuclei review" / "Janus review" / "nerva review"                                                         | → `reviewing-capability-implementations`    |
+| "YAML or Go?" / "template vs plugin" / "Nuclei vs nerva" / "implementation pattern" / "decision framework"                                                     | → `selecting-plugin-implementation-pattern` |
 | "CLI" / "command-line" / "Cobra" / "Kong" / "Viper" / "Koanf" / "POSIX"                                                                                               | → `implementing-go-cli-applications`        |
 | "Go architecture" / "capability structure"                                                                                                                            | → `enforcing-go-capability-architecture`    |
 | "plugin registry" / "init() registration" / "factory pattern" / "sync.RWMutex"                                                                                        | → `implementing-go-plugin-registries`       |
@@ -59,7 +59,7 @@ This gateway implements 3-tier loading:
 | "scanner performance" / "optimize" / "throughput" / "40K items/hour"                                                                                                  | → `optimizing-go-scanner-performance`       |
 | "web crawler" / "Colly" / "Katana"                                                                                                                                    | → `building-web-crawlers`                   |
 | "Janus" / "chain" / "pipeline"                                                                                                                                        | → `capabilities-janus-chains`               |
-| "fingerprintx" / "service detection"                                                                                                                                  | → `orchestrating-nerva-development`  |
+| "nerva" / "service detection"                                                                                                                                  | → `orchestrating-nerva-development`  |
 | "SCTP" / "Diameter" / "SIGTRAN" / "S1AP" / "NGAP" / "telecom protocols" / "5G protocols"                                                                              | → `writing-nerva-sctp-modules`              |
 | "live validation" / "Shodan" / "metrics"                                                                                                                              | → `validating-live-with-shodan`             |
 | "protocol" / "banner" / "handshake"                                                                                                                                   | → `researching-protocols`                   |
@@ -95,9 +95,9 @@ This gateway implements 3-tier loading:
 
 | Skill                               | Path                                                                                              | Triggers                                                                                                                                          |
 | ----------------------------------- | ------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Capability Development Orchestrator | `.claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md`    | orchestrate capability, develop capability, capability workflow, VQL development, Nuclei development, Janus development, Fingerprintx development |
-| Reviewing Implementations           | `.claude/skill-library/development/capabilities/reviewing-capability-implementations/SKILL.md`    | review capability, code review, VQL review, Nuclei review, Janus review, fingerprintx review                                                      |
-| Plugin Implementation Pattern       | `.claude/skill-library/development/capabilities/selecting-plugin-implementation-pattern/SKILL.md` | YAML or Go, template vs plugin, Nuclei vs fingerprintx, implementation pattern, decision framework                                                |
+| Capability Development Orchestrator | `.claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md`    | orchestrate capability, develop capability, capability workflow, VQL development, Nuclei development, Janus development, Nerva development |
+| Reviewing Implementations           | `.claude/skill-library/development/capabilities/reviewing-capability-implementations/SKILL.md`    | review capability, code review, VQL review, Nuclei review, Janus review, nerva review                                                      |
+| Plugin Implementation Pattern       | `.claude/skill-library/development/capabilities/selecting-plugin-implementation-pattern/SKILL.md` | YAML or Go, template vs plugin, Nuclei vs nerva, implementation pattern, decision framework                                                |
 | Go CLI Applications                 | `.claude/skill-library/development/capabilities/implementing-go-cli-applications/SKILL.md`        | CLI, command-line, Cobra, Kong, Viper, Koanf, POSIX                                                                                               |
 | Go Capability Architecture          | `.claude/skill-library/development/capabilities/enforcing-go-capability-architecture/SKILL.md`    | Go architecture, structure                                                                                                                        |
 | Go Plugin Registries                | `.claude/skill-library/development/capabilities/implementing-go-plugin-registries/SKILL.md`       | plugin registry, init() registration, factory pattern, sync.RWMutex                                                                               |
@@ -122,13 +122,13 @@ This gateway implements 3-tier loading:
 | Detection Plugins   | `.claude/skill-library/development/capabilities/implementing-detection-plugins/SKILL.md`    | detection plugin, XSS, SQLi, SSRF, OWASP                  |
 | NoseyParker Rules   | `.claude/skill-library/development/capabilities/creating-noseyparker-rules/SKILL.md`        | NoseyParker, secret scanning, credential detection        |
 
-### Fingerprintx
+### Nerva
 
 | Skill                                 | Path                                                                                                | Triggers                                                               |
 | ------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| Fingerprintx Development Orchestrator | `.claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md`    | fingerprintx, service detection, create                                |
-| SCTP Fingerprintx Modules             | `.claude/skill-library/development/capabilities/nerva/writing-nerva-sctp-modules/SKILL.md`                | SCTP, Diameter, SIGTRAN, S1AP, NGAP, telecom, 5G, protocol over SCTP  |
-| Fingerprintx Live Validate            | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md`               | live validation, Shodan, metrics                                       |
+| Nerva Development Orchestrator | `.claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md`    | nerva, service detection, create                                |
+| SCTP Nerva Modules             | `.claude/skill-library/development/capabilities/nerva/writing-nerva-sctp-modules/SKILL.md`                | SCTP, Diameter, SIGTRAN, S1AP, NGAP, telecom, 5G, protocol over SCTP  |
+| Nerva Live Validate            | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md`               | live validation, Shodan, metrics                                       |
 | Protocol Research                     | `.claude/skill-library/research/researching-protocols/SKILL.md`                                     | protocol, banner, handshake                                            |
 | Version Markers                       | `.claude/skill-library/research/researching-version-markers/SKILL.md`                               | version marker, fingerprint                                            |
 | CISA KEV Research                     | `.claude/skill-library/research/researching-cisa-kev/SKILL.md`                                      | CISA KEV, known exploited, CVE                                         |

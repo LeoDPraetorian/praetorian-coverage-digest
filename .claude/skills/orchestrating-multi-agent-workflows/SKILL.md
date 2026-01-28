@@ -286,7 +286,7 @@ Example prompt: "Skipping requirements_verification gate. Risk: Proceeding witho
 
 **Pattern 4.7: P0/Compliance Validation**
 
-Domain-specific compliance checks that MUST pass before proceeding to code review. Each orchestration type (integration, capability, fingerprintx, feature development) has specific P0 requirements based on common failure patterns.
+Domain-specific compliance checks that MUST pass before proceeding to code review. Each orchestration type (integration, capability, nerva, feature development) has specific P0 requirements based on common failure patterns.
 
 **When**: After implementation phase, before review phase
 **Blocking**: ❌ Violations found → 🛑 Human Checkpoint → Must fix or document

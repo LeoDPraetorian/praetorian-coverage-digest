@@ -16,7 +16,7 @@ This document details how orchestrating-multi-agent-workflows integrates with ot
 | `orchestrating-feature-development`      | (LIBRARY) `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")`                   | Uses effort scaling, delegation patterns, and feedback loops for complete feature development |
 | `orchestrating-capability-development`   | (LIBRARY) `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")`   | Uses delegation patterns and parallel execution for security capability development           |
 | `orchestrating-integration-development`  | (LIBRARY) `Read(".claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md")`  | Uses multi-agent coordination for third-party API integration                                 |
-| `orchestrating-nerva-development` | (LIBRARY) `Read(".claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md")` | Uses parallel execution and blocking gates for fingerprintx module development                |
+| `orchestrating-nerva-development` | (LIBRARY) `Read(".claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md")` | Uses parallel execution and blocking gates for nerva module development                |
 | `orchestrating-research`                 | (LIBRARY) `.claude/skill-library/research/orchestrating-research/SKILL.md`                                         | Uses agent synthesis and result handling for research workflows                               |
 
 ## Requires (invoke at orchestration start)

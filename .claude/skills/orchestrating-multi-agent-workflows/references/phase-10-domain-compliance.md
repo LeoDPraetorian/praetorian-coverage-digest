@@ -22,7 +22,7 @@ Determine which P0 table applies based on work type (from Phase 2 Triage):
 | ------------------ | ------------------------ | ------------------------- |
 | Integration APIs   | Integration Development  | `validating-integrations` |
 | VQL/Nuclei/Janus   | Capability Development   | (TBD)                     |
-| fingerprintx       | Fingerprintx Development | (TBD)                     |
+| nerva       | Nerva Development | (TBD)                     |
 | React/TypeScript   | Frontend Development     | (TBD)                     |
 | Go/Lambda          | Backend Development      | (TBD)                     |
 

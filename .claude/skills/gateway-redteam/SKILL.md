@@ -113,5 +113,5 @@ Do NOT use `skill: "skill-name"` for library skills—they require Read tool.
 ## Related Gateways
 
 - `gateway-security` - Defensive security, threat modeling, security controls
-- `gateway-capabilities` - Security scanners, VQL, Nuclei, Janus, fingerprintx
+- `gateway-capabilities` - Security scanners, VQL, Nuclei, Janus, nerva
 - `gateway-testing` - Testing workflows (unit, integration, E2E, security testing)

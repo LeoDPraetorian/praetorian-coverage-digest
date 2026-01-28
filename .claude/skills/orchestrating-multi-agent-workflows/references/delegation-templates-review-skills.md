@@ -152,7 +152,7 @@ Provide guidance for orchestrators on how to map task keywords to library skills
 **Note:** Full keyword mappings are in each gateway's routing table. Orchestrator should consult the relevant gateway skill:
 
 - `gateway-backend` - Backend library skills (Go patterns, Lambda, DynamoDB)
-- `gateway-capabilities` - Security capability skills (VQL, Nuclei, Janus, fingerprintx)
+- `gateway-capabilities` - Security capability skills (VQL, Nuclei, Janus, nerva)
 - `gateway-claude` - Claude Code skills (skills, agents, MCP, hooks)
 - `gateway-frontend` - Frontend library skills (React, TanStack, state management)
 - `gateway-integrations` - Integration library skills (third-party APIs, Chariot integrations)
