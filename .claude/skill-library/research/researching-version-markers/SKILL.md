@@ -266,7 +266,7 @@ func enrichMySQL(conn net.Conn, timeout time.Duration) (string, map[string]inter
 
 ````
 
-**Output feeds directly into `writing-fingerprintx-modules` enrichment phase.**
+**Output feeds directly into `writing-nerva-tcp-udp-modules` enrichment phase.**
 
 ### Phase 8: Validation
 
@@ -296,7 +296,7 @@ func enrichMySQL(conn net.Conn, timeout time.Duration) (string, map[string]inter
 
 - **Invokes:** `researching-github` skill (for repository discovery and source analysis)
 - **Input from:** `researching-protocols` (protocol detection strategy, must exist)
-- **Output to:** `writing-fingerprintx-modules` (Version Fingerprint Matrix feeds enrichment phase)
+- **Output to:** `writing-nerva-tcp-udp-modules` (Version Fingerprint Matrix feeds enrichment phase)
 
 ## Output Artifacts
 
@@ -352,7 +352,7 @@ Walk through a concrete example:
 | Skill                            | Access Method                                                                                  | Purpose                                         |
 | -------------------------------- | ---------------------------------------------------------------------------------------------- | ----------------------------------------------- |
 | **researching-protocols**        | `Read(".claude/skill-library/research/researching-protocols/SKILL.md")`                        | Protocol detection research (BEFORE this skill) |
-| **writing-fingerprintx-modules** | `Read(".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md")` | Implementation (AFTER this skill)               |
+| **writing-nerva-tcp-udp-modules** | `Read(".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md")` | Implementation (AFTER this skill)               |
 | **researching-github**           | `Read(".claude/skill-library/claude/skill-management/researching-github/SKILL.md")`            | Repository discovery and source analysis        |
 | **gateway-capabilities**         | `skill: "gateway-capabilities"`                                                                | Routes to capability development skills         |
 

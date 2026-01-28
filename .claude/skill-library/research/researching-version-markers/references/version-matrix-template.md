@@ -197,7 +197,7 @@ func buildCPE(version string) string {
 
 ### Next Steps
 
-1. **Implement enrichment phase** in `writing-fingerprintx-modules`
+1. **Implement enrichment phase** in `writing-nerva-tcp-udp-modules`
 2. **Add CPE generation** using precise version strings
 3. **Test against Docker containers** for validation
 4. **Document fallback strategy** when markers fail

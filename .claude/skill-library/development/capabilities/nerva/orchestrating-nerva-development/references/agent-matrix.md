@@ -83,7 +83,7 @@ No parallel developer agents needed.
 ### Developer Agent
 
 - **capability-developer**: Plugin implementation, TDD approach
-- Mandatory skills: `developing-with-tdd`, `writing-fingerprintx-modules`, `verifying-before-completion`
+- Mandatory skills: `developing-with-tdd`, `writing-nerva-tcp-udp-modules`, `verifying-before-completion`
 - Output: Plugin code, unit tests
 
 ### Reviewer Agent

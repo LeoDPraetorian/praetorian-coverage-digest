@@ -426,4 +426,4 @@ Use Generation {N} because {reason}
 
 - **researching-arxiv** - Uses these analysis techniques
 - **creating-skills** - Applies extracted patterns
-- **writing-fingerprintx-modules** - Uses technical extraction
+- **writing-nerva-tcp-udp-modules** - Uses technical extraction

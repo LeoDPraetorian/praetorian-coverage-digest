@@ -143,7 +143,7 @@ skills_by_domain:
         trigger: "VQL capability type detected"
       - path: ".claude/skill-library/development/capabilities/writing-nuclei-templates/SKILL.md"
         trigger: "Nuclei capability type detected"
-      - path: ".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md"
+      - path: ".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md"
         trigger: "Fingerprintx capability type detected"
 ```
 

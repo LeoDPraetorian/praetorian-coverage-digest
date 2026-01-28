@@ -1,5 +1,5 @@
 ---
-name: orchestrating-fingerprintx-development
+name: orchestrating-nerva-development
 description: Use when creating new fingerprintx modules - coordinates brainstorming, planning, architecture, implementation, review, and testing phases with parallel agent execution and feedback loops
 allowed-tools: Skill, Task, TodoWrite, Read, Glob, Grep, AskUserQuestion, Bash
 ---
@@ -241,7 +241,7 @@ See [file-scope-boundaries.md](references/file-scope-boundaries.md) for conflict
 You MUST read rationalization-table.md BEFORE proceeding past any compaction gate (after phases 3, 8, or 13).
 
 ```
-Read(.claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/references/rationalization-table.md)
+Read(.claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/references/rationalization-table.md)
 ```
 
 This file contains anti-rationalization counters for "Protocol is simple", "Version markers aren't needed", and other compaction gate bypass patterns.
@@ -360,13 +360,16 @@ Fingerprintx development is complete when:
 
 ## Fingerprintx-Specific Skills
 
-| Skill (Library)                | Phase    | Purpose                                       |
-| ------------------------------ | -------- | --------------------------------------------- |
-| `researching-protocols`        | Phase 3  | Protocol banner patterns, detection strategy  |
-| `researching-version-markers`  | Phase 3  | Version fingerprint matrix (open-source only) |
-| `writing-fingerprintx-modules` | Phase 8  | Go plugin implementation patterns             |
-| `writing-fingerprintx-tests`   | Phase 13 | Unit, Docker, Shodan test patterns            |
-| `validating-live-with-shodan`  | Phase 14 | Real-world validation protocol                |
+| Skill (Library)                     | Phase   | Purpose                                       |
+| ----------------------------------- | ------- | --------------------------------------------- |
+| `researching-protocols`             | Phase 3 | Protocol banner patterns, detection strategy  |
+| `researching-version-markers`       | Phase 3 | Version fingerprint matrix (open-source only) |
+| `writing-nerva-tcp-udp-modules`      | Phase 8 | Go plugin implementation patterns (TCP/UDP)   |
+| `writing-nerva-sctp-modules` | Phase 8 | SCTP plugin patterns (Diameter, SIGTRAN, 5G)  |
+| `writing-nerva-tests`        | Phase 13 | Unit, Docker, Shodan test patterns           |
+| `validating-live-with-shodan`       | Phase 14 | Real-world validation protocol               |
+
+**Note:** For SCTP-based protocols (Diameter, SIGTRAN/M2PA/M2UA/M3UA, S1AP, NGAP, X2AP), use `writing-nerva-sctp-modules` instead of the standard TCP/UDP module. SCTP requires Linux kernel support.
 
 ## References
 

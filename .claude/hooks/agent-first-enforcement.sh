@@ -6,7 +6,7 @@
 #
 # Supported agents (Go routing uses priority - most specific first):
 # - integration-developer → .go files in /integrations/ paths
-# - capability-developer → .go files in janus, fingerprintx, capabilities, scanners, aegis
+# - capability-developer → .go files in janus, nerva, capabilities, scanners, aegis
 # - backend-developer → .go files in other backend/, pkg/, cmd/, modules/ paths
 # - frontend-developer → .tsx, .ts, .jsx, .js files in ui/, components/
 # - tool-developer → .ts files in .claude/tools/
@@ -89,7 +89,7 @@ if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
                 ;;
             capability-developer)
                 # Capability devs can edit .go in capability paths, .vql, nuclei .yaml
-                if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '(janus|fingerprintx|/capabilities/|/scanners/|/aegis/)'; then
+                if [[ "$extension" == "go" ]] && echo "$lower_path" | grep -qE '(janus|nerva|/capabilities/|/scanners/|/aegis/)'; then
                     exit 0
                 fi
                 if [[ "$extension" == "vql" ]]; then
@@ -126,8 +126,8 @@ if [[ "$extension" == "go" ]]; then
     if echo "$lower_path" | grep -qE '/integrations/'; then
         agent="integration-developer"
         reason="Chariot integration"
-    # 2. Capabilities (security scanning, janus, fingerprintx, etc.)
-    elif echo "$lower_path" | grep -qE '(janus|fingerprintx|/capabilities/|/scanners/|/aegis/|chariot-aegis|nebula)'; then
+    # 2. Capabilities (security scanning, janus, nerva, etc.)
+    elif echo "$lower_path" | grep -qE '(janus|nerva|/capabilities/|/scanners/|/aegis/|chariot-aegis|nebula)'; then
         agent="capability-developer"
         reason="Security capability"
     # 3. General backend (fallback for other Go backend code)

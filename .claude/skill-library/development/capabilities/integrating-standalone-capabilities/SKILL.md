@@ -450,7 +450,7 @@ For detailed implementation guidance, see:
 ## Related Skills
 
 - `gateway-capabilities` - Routes to this skill
-- `writing-fingerprintx-modules` - Plugin pattern (different from this)
+- `writing-nerva-tcp-udp-modules` - Plugin pattern (different from this)
 - `testing-capabilities` - Separate skill for mocks/harnesses
 
 ---

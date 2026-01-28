@@ -95,7 +95,7 @@ Based on codebase discovery (Phase 3) and skill discovery (Phase 4), you MUST re
 
 **Example for capability-developer:**
 
-- Path: .claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md
+- Path: .claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md
   Reason: Fingerprintx plugin development
 - Path: .claude/skill-library/development/backend/go-best-practices/SKILL.md
   Reason: Go implementation patterns
@@ -233,7 +233,7 @@ implementation:
 
   skills_injected:
     capabilities:
-      - writing-fingerprintx-modules
+      - writing-nerva-tcp-udp-modules
       - go-best-practices
 
   blockers_encountered: 0
@@ -257,7 +257,7 @@ implementation:
 
 **Skills Injected & Verified:**
 
-- Capabilities: writing-fingerprintx-modules, go-best-practices
+- Capabilities: writing-nerva-tcp-udp-modules, go-best-practices
 
 **P0 Quick Check:**
 

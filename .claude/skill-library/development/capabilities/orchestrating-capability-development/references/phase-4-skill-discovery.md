@@ -108,7 +108,7 @@ Against gateway routing tables:
 | Nuclei          | reviewing-capability-implementations | gateway-capabilities |
 | Janus           | writing-janus-tool-chains            | gateway-capabilities |
 | Janus           | go-best-practices                    | gateway-backend      |
-| Fingerprintx    | writing-fingerprintx-modules         | gateway-capabilities |
+| Fingerprintx    | writing-nerva-tcp-udp-modules         | gateway-capabilities |
 | Fingerprintx    | go-best-practices                    | gateway-backend      |
 | Scanner         | developing-integrations              | gateway-integrations |
 | Scanner         | go-best-practices                    | gateway-backend      |
@@ -334,7 +334,7 @@ capability_type_skills:
     - writing-janus-tool-chains
     - go-best-practices
   Fingerprintx:
-    - writing-fingerprintx-modules
+    - writing-nerva-tcp-udp-modules
     - go-best-practices
   Scanner:
     - developing-integrations

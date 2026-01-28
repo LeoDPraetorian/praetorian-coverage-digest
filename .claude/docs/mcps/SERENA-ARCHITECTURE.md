@@ -410,12 +410,12 @@ The connection pool now uses **absolute paths** for Serena CLI invocation instea
 
 ```typescript
 // serena-pool.ts (line 374)
-'--project', targetModule,  // Module NAME (e.g., "fingerprintx")
+'--project', targetModule,  // Module NAME (e.g., "nerva")
 ```
 
 - Pool passed module NAME to `--project` flag
 - Serena expected name in `~/.serena/serena_config.yml`
-- **Error**: `"Project 'fingerprintx' not found"`
+- **Error**: `"Project 'nerva' not found"`
 - Only worked for pre-registered projects (chariot, nebula, tabularium)
 
 #### After (fixed)
@@ -429,7 +429,7 @@ async acquire(
 ): Promise<Client>
 
 // createConnection()
-'--project', targetPath,  // Absolute PATH (e.g., "/path/to/modules/fingerprintx")
+'--project', targetPath,  // Absolute PATH (e.g., "/path/to/modules/nerva")
 ```
 
 - Pool passes absolute PATH to `--project` flag

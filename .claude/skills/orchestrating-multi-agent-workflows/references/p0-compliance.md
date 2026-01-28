@@ -27,7 +27,7 @@ Each orchestration skill defines its own P0 requirements. **Do NOT look here for
 | ------------------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | Integration Development  | `orchestrating-integration-development`  | [references/p0-compliance.md](../../orchestrating-integration-development/references/p0-compliance.md)  |
 | Capability Development   | `orchestrating-capability-development`   | [references/p0-compliance.md](../../orchestrating-capability-development/references/p0-compliance.md)   |
-| Fingerprintx Development | `orchestrating-fingerprintx-development` | [references/p0-compliance.md](../../orchestrating-fingerprintx-development/references/p0-compliance.md) |
+| Fingerprintx Development | `orchestrating-nerva-development` | [references/p0-compliance.md](../../orchestrating-nerva-development/references/p0-compliance.md) |
 | Feature Development      | `orchestrating-feature-development`      | [references/p0-compliance.md](../../orchestrating-feature-development/references/p0-compliance.md)      |
 
 **Why domain-specific?** Each domain has unique requirements:
@@ -53,7 +53,7 @@ Each orchestration skill defines its own P0 requirements. **Do NOT look here for
 | -------------------------------------------------- | -------------------------------------- | ---------------------------------- |
 | "integrate X API" / "sync from Y"                  | orchestrating-integration-development  | Load integration p0-compliance.md  |
 | "create VQL capability" / "write Nuclei template"  | orchestrating-capability-development   | Load capability p0-compliance.md   |
-| "new fingerprintx module for X protocol"           | orchestrating-fingerprintx-development | Load fingerprintx p0-compliance.md |
+| "new fingerprintx module for X protocol"           | orchestrating-nerva-development | Load fingerprintx p0-compliance.md |
 | "add feature to UI" / "implement backend endpoint" | orchestrating-feature-development      | Load feature p0-compliance.md      |
 
 ### Step 2: Run ALL P0 Checks for Domain (BLOCKING)
@@ -249,7 +249,7 @@ P0/Compliance Validation integrates into orchestration workflows at specific pha
 | ---------------------------------------- | -------- | -------------- | ----------- | -------------------------------------------------------------------------------------------- |
 | `orchestrating-integration-development`  | Phase 10 | Implementation | Code Review | [p0-compliance.md](../../orchestrating-integration-development/references/p0-compliance.md)  |
 | `orchestrating-capability-development`   | Phase 10 | Implementation | Code Review | [p0-compliance.md](../../orchestrating-capability-development/references/p0-compliance.md)   |
-| `orchestrating-fingerprintx-development` | Phase 8  | Implementation | Code Review | [p0-compliance.md](../../orchestrating-fingerprintx-development/references/p0-compliance.md) |
+| `orchestrating-nerva-development` | Phase 8  | Implementation | Code Review | [p0-compliance.md](../../orchestrating-nerva-development/references/p0-compliance.md) |
 | `orchestrating-feature-development`      | Phase 10 | Implementation | Code Review | [p0-compliance.md](../../orchestrating-feature-development/references/p0-compliance.md)      |
 
 **Workflow integration pattern:**
@@ -277,7 +277,7 @@ Phase N+2: Review/Testing
 | ------------------------------------------ | -------------------------------------------------------------------------------------------------------- | ----------------------------- |
 | **orchestrating-integration-development**  | `Read(".claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md")`  | Integration workflow with P0  |
 | **orchestrating-capability-development**   | `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")`   | Capability workflow with P0   |
-| **orchestrating-fingerprintx-development** | `Read(".claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/SKILL.md")` | Fingerprintx workflow with P0 |
+| **orchestrating-nerva-development** | `Read(".claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md")` | Fingerprintx workflow with P0 |
 | **orchestrating-feature-development**      | `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")`                   | Feature workflow with P0      |
 | **validating-integrations**                | `Read(".claude/skill-library/.../validating-integrations/SKILL.md")`                                     | Integration P0 automation     |
 | **gated-verification**                     | See references/gated-verification.md                                                                     | Multi-stage verification      |

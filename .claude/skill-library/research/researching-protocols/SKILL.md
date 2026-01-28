@@ -15,7 +15,7 @@ Use this skill when:
 - Creating a new fingerprintx module for a service/protocol
 - Researching how to detect a network service
 - Documenting API response patterns for fingerprinting
-- Before invoking `writing-fingerprintx-modules` skill
+- Before invoking `writing-nerva-tcp-udp-modules` skill
 
 **Key Principle:** You cannot implement a fingerprint module without first understanding what makes the service unique. Research BEFORE implementation.
 
@@ -358,7 +358,7 @@ This 1200+ line document demonstrates comprehensive protocol research for 5 LLM 
 
 After completing research:
 
-1. **Read:** `writing-fingerprintx-modules` skill
+1. **Read:** `writing-nerva-tcp-udp-modules` skill
 2. **Input:** Your research document
 3. **Output:** Working fingerprintx plugin
 
@@ -393,6 +393,6 @@ The research document provides all inputs needed for implementation:
 
 | Skill                          | Purpose                                 |
 | ------------------------------ | --------------------------------------- |
-| `writing-fingerprintx-modules` | Implementation after research complete  |
+| `writing-nerva-tcp-udp-modules` | Implementation after research complete  |
 | `researching-skills`           | Parent router (future)                  |
 | `gateway-capabilities`         | Routes to capability development skills |

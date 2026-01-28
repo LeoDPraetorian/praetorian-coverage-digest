@@ -177,7 +177,7 @@ From 24 failure memories:
 - `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 8 - before completion)
 - `orchestrating-capability-development` (Phase 8 - before completion)
 - `orchestrating-integration-development` (Phase 8 - before completion)
-- `orchestrating-fingerprintx-development` (Phase 8 - before completion)
+- `orchestrating-nerva-development` (Phase 8 - before completion)
 - `developing-with-subagents` (after batch completion, before moving to next batch)
 - All developer agents: `frontend-developer`, `backend-developer`, `capability-developer`, `integration-developer`, `tool-developer`, `python-developer` (Step 1 mandatory skill, before returning from Task)
 - All tester agents: `frontend-tester`, `backend-tester`, `capability-tester`, `tool-tester` (Step 1 mandatory skill, before claiming tests pass)

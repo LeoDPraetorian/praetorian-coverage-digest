@@ -434,7 +434,7 @@ No exceptions without your human partner's permission.
 - `orchestrating-capability-development` (Phase 5 - developer prompts, Phase 8.2 - tester prompts)
 - `orchestrating-integration-development` (Phase 4 - implementation, Phase 7 - testing)
 - `orchestrating-feature-development` (developer/tester agent prompts)
-- `orchestrating-fingerprintx-development` (developer/tester agent prompts)
+- `orchestrating-nerva-development` (developer/tester agent prompts)
 - `debugging-systematically` - REQUIRED SUB-SKILL (Phase 4, Step 1 - creating failing test)
 - `developing-with-subagents` - Subagents implementing tasks should follow TDD
 - All \*-developer agents (frontend-developer, backend-developer, capability-developer, integration-developer, tool-developer)

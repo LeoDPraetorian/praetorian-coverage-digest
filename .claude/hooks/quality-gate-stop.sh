@@ -145,7 +145,7 @@ fi
 
 if [[ -n "$transcript_path" && -f "$transcript_path" ]]; then
   # Check for orchestration skill invocations
-  if grep -qE '(/feature|/capability|/fingerprintx|/integration|/bugfix|orchestrating-feature|orchestrating-capability|orchestrating-fingerprintx|orchestrating-integration)' "$transcript_path" 2>/dev/null; then
+  if grep -qE '(/feature|/capability|/nerva|/integration|/bugfix|orchestrating-feature|orchestrating-capability|orchestrating-nerva|orchestrating-integration)' "$transcript_path" 2>/dev/null; then
     # Orchestration workflow handles review/test internally
     echo '{"decision": "approve"}'
     exit 0

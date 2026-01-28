@@ -144,7 +144,7 @@ A skill does **NOT** need TodoWrite if:
 
 ### NEEDS TodoWrite (Stateful Workflow)
 
-**orchestrating-fingerprintx-development:**
+**orchestrating-nerva-development:**
 
 - 8 phases with sequential gates
 - Phase 3 blocks until Phase 2 validation passes

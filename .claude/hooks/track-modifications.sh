@@ -97,8 +97,8 @@ if [[ "$file_path" == *.go ]]; then
   # 1. Integrations (third-party API integrations)
   if echo "$lower_path" | grep -qE '/integrations/'; then
     domain="integrations"
-  # 2. Capabilities (security scanning, janus, fingerprintx, etc.)
-  elif echo "$lower_path" | grep -qE '(janus|fingerprintx|/capabilities/|/scanners/|/aegis/|chariot-aegis|nebula)'; then
+  # 2. Capabilities (security scanning, janus, nerva, etc.)
+  elif echo "$lower_path" | grep -qE '(janus|nerva|/capabilities/|/scanners/|/aegis/|chariot-aegis|nebula)'; then
     domain="capabilities"
   # 3. General backend (fallback for other Go backend code)
   elif echo "$lower_path" | grep -qE '(backend|pkg|cmd|internal|modules)'; then

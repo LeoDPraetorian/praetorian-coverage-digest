@@ -321,7 +321,7 @@ Before completing plugin implementation, verify:
 | Skill                                    | Purpose                               |
 | ---------------------------------------- | ------------------------------------- |
 | `enforcing-go-capability-architecture`   | Chariot capability structure patterns |
-| `orchestrating-fingerprintx-development` | Registry and plugin patterns          |
+| `orchestrating-nerva-development` | Registry and plugin patterns          |
 | `implementing-go-plugin-registries`      | Plugin discovery and registration     |
 | `integrating-standalone-capabilities`    | Integrating with Chariot platform     |
 

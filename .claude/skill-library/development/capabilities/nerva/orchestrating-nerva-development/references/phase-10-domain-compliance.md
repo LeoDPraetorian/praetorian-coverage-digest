@@ -335,4 +335,4 @@ If user chooses "Proceed anyway":
 - [Phase 9: Design Verification](phase-9-design-verification.md) - Previous phase
 - [Phase 11: Code Quality](phase-11-code-quality.md) - Next phase
 - [Checkpoint Configuration](checkpoint-configuration.md) - Human approval
-- `writing-fingerprintx-modules` - P0 requirements source (`.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md`)
+- `writing-nerva-tcp-udp-modules` - P0 requirements source (`.claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md`)

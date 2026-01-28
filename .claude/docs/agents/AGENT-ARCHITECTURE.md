@@ -130,7 +130,7 @@ When you spawn `Task(frontend-orchestrator)`:
 | --------------- | ------------------------------------------------------------------------------------------------------ | ------------------ |
 | `/feature`      | `Skill("orchestrating-feature-development")`                                                           | Skill runs in main |
 | `/capability`   | `Read(".claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md")` | Skill runs in main |
-| `/fingerprintx` | `Skill("orchestrating-fingerprintx-development")`                                                      | Skill runs in main |
+| `/nerva`        | `Skill("orchestrating-nerva-development")`                                                      | Skill runs in main |
 | `/research`     | `Skill("orchestrating-research")`                                                                      | Skill runs in main |
 
 ---
@@ -699,7 +699,7 @@ Complex patterns use library SKILLS (not library agents) for on-demand loading:
 | ---------------------------------------- | --------------- | ----------------------------- |
 | `orchestrating-feature-development`      | `/feature`      | Complete feature workflows    |
 | `orchestrating-capability-development`   | `/capability`   | Security capability workflows |
-| `orchestrating-fingerprintx-development` | `/fingerprintx` | Fingerprintx module workflows |
+| `orchestrating-nerva-development`        | `/nerva`        | Nerva module workflows        |
 | `orchestrating-research`                 | `/research`     | Multi-source research         |
 | `developing-with-subagents`              | N/A             | Plan execution with review    |
 

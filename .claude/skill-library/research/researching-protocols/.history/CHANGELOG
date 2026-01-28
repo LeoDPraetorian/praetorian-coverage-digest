@@ -19,8 +19,8 @@
 ### Content
 - 7-phase research workflow codified from fingerprintx-detecting-llms.md
 - Reference files for probing patterns, response analysis, lab setup
-- Integration with writing-fingerprintx-modules skill
+- Integration with writing-nerva-tcp-udp-modules skill
 
 ### Integration
-- Feeds into: `writing-fingerprintx-modules` skill
+- Feeds into: `writing-nerva-tcp-udp-modules` skill
 - Future router parent: `researching-skills` (planned refactor)

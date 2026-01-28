@@ -158,11 +158,11 @@ Skills with empty or stub reference files are fundamentally incomplete. Phase 4 
 
 # ❌ WRONG: Relative path to library skill
 
-[writing-fingerprintx-modules](../../../skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md)
+[writing-nerva-tcp-udp-modules](../../../skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md)
 
 # ✅ CORRECT: Full .claude/ path
 
-[writing-fingerprintx-modules](.claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md)
+[writing-nerva-tcp-udp-modules](.claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md)
 
 # ✅ ALLOWED: Within same skill
 

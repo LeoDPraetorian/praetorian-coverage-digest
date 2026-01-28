@@ -34,7 +34,7 @@ When asked "Write unit tests for a fingerprintx plugin", Claude:
 **Integration**: Phase 4 of fingerprintx development workflow:
 1. researching-protocols - Research protocol specification
 2. researching-version-markers - Identify version detection markers
-3. writing-fingerprintx-modules - Implement the plugin
+3. writing-nerva-tcp-udp-modules - Implement the plugin
 4. writing-fingerprintx-tests - Write comprehensive tests (THIS SKILL)
 
 **Next Steps**:

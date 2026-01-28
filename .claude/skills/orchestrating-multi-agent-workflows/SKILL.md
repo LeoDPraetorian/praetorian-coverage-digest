@@ -442,7 +442,7 @@ See [references/anti-patterns.md](references/anti-patterns.md) for detection tri
 
 ### Called By
 
-- Feature/capability orchestrators (`orchestrating-feature-development`, `orchestrating-capability-development`, `orchestrating-integration-development`, `orchestrating-fingerprintx-development`)
+- Feature/capability orchestrators (`orchestrating-feature-development`, `orchestrating-capability-development`, `orchestrating-integration-development`, `orchestrating-nerva-development`)
 - Research orchestrators (`orchestrating-research`)
 
 ### Requires (invoke before starting)

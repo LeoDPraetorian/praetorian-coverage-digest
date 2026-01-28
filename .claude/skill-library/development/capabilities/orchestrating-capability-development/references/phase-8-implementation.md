@@ -100,7 +100,7 @@ Based on codebase discovery (Phase 3) and skill discovery (Phase 4), you MUST re
 
 **Example for capability-developer (Fingerprintx):**
 
-- Path: .claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md
+- Path: .claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md
   Reason: Fingerprintx module detected
 
 YOU MUST READ THESE BEFORE WRITING CODE. No exceptions.

@@ -68,7 +68,7 @@ Expected output (write to .fingerprintx-development/architecture.md):
 
 Mandatory skills to Read BEFORE starting:
 
-- .claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md
+- .claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md
 ```
 
 ---
@@ -110,7 +110,7 @@ Scope:
 Mandatory skills to invoke BEFORE starting:
 
 - Skill("developing-with-tdd")
-- Read(".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md")
+- Read(".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md")
 - Skill("verifying-before-completion")
 
 Expected output (write to .fingerprintx-development/agents/capability-developer.md):
@@ -270,7 +270,7 @@ Every agent prompt MUST include mandatory skills. Use this pattern:
 Mandatory skills to invoke BEFORE starting:
 
 - Skill("developing-with-tdd")
-- Read(".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md")
+- Read(".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md")
 - Skill("verifying-before-completion")
 ```
 

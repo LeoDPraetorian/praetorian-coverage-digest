@@ -49,7 +49,7 @@ Collect from previous phases:
 
 **Skills Available:** {from Phase 4 Skill Discovery manifest}
 
-- writing-fingerprintx-modules
+- writing-nerva-tcp-udp-modules
 - go-best-practices
 
 **Complexity Tier:** {from Phase 5 Complexity}

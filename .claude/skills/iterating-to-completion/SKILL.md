@@ -241,7 +241,7 @@ AskUserQuestion({
 
 ### Called By
 
-- Orchestration skills (`orchestrating-capability-development`, `orchestrating-fingerprintx-development`)
+- Orchestration skills (`orchestrating-capability-development`, `orchestrating-nerva-development`)
 - Main conversation when task needs iteration
 
 ### Requires (invoke before starting)

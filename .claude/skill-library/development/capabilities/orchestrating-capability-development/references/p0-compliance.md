@@ -256,5 +256,5 @@ if err != nil {
 | Capability Type Matrix | `references/phase-10-domain-compliance.md` | Type detection patterns |
 | VQL Development | `.claude/skill-library/development/capabilities/writing-vql-capabilities/` | VQL best practices |
 | Nuclei Development | `.claude/skill-library/development/capabilities/writing-nuclei-templates/` | Nuclei template patterns |
-| fingerprintx Development | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/` | fingerprintx patterns |
+| fingerprintx Development | `.claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/` | fingerprintx patterns |
 ```

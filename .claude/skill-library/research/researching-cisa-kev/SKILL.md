@@ -415,4 +415,4 @@ Before completing research:
 | `researching-github`               | Sibling skill for POC/exploit research                                                                           |
 | `writing-nuclei-signatures`        | Uses KEV research for detection development                                                                      |
 | `creating-vql-capabilities`        | Uses KEV research for capability scoping                                                                         |
-| `writing-fingerprintx-modules`     | Uses KEV research for vulnerable service versions                                                                |
+| `writing-nerva-tcp-udp-modules`     | Uses KEV research for vulnerable service versions                                                                |

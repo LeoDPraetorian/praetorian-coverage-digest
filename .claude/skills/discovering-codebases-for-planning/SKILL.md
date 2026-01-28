@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Bash, Grep, Glob, TodoWrite, Task, AskUserQuestion
 
 Invoke this skill when:
 
-- **Orchestration workflows** (`orchestrating-feature-development` (LIBRARY), `orchestrating-capability-development`, `orchestrating-fingerprintx-development`) reach Phase 2 Discovery
+- **Orchestration workflows** (`orchestrating-feature-development` (LIBRARY), `orchestrating-capability-development`, `orchestrating-nerva-development`) reach Phase 2 Discovery
 - **Planning implementation** requires understanding existing code to maximize DRY/reuse
 - **Direct invocation** when you need structured, parallelized codebase analysis before architecture/planning phases
 
@@ -173,7 +173,7 @@ THOROUGHNESS: very thorough mode
 
 - `orchestrating-feature-development` (LIBRARY) - `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` (Phase 2 Discovery)
 - `orchestrating-capability-development` (Phase 2 Discovery)
-- `orchestrating-fingerprintx-development` (Phase 2 Discovery, if applicable)
+- `orchestrating-nerva-development` (Phase 2 Discovery, if applicable)
 - Direct invocation when exhaustive discovery needed before planning
 
 ### Requires (invoke before starting)

@@ -96,7 +96,7 @@ SKILLS TO READ (from skill-manifest.yaml):
 
 **Example skills:**
 
-- .claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md
+- .claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md
 - .claude/skill-library/development/backend/go-best-practices/SKILL.md
 
 Return:

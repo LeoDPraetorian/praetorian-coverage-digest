@@ -87,7 +87,7 @@ Proceeding with implementation."
 You MUST use these skills during this task:
 
 1. **developing-with-tdd** - Write tests first, verify failure, implement
-2. **Read(".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md")** - Core implementation patterns (5-method interface)
+2. **Read(".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md")** - Core implementation patterns (5-method interface)
 3. **verifying-before-completion** - Verify plugin works before claiming done
 
 ## Your Job
@@ -135,7 +135,7 @@ You MUST use these skills during this task:
   "protocol": "[PROTOCOL_NAME]",
   "skills_invoked": [
     "developing-with-tdd",
-    "writing-fingerprintx-modules",
+    "writing-nerva-tcp-udp-modules",
     "verifying-before-completion"
   ],
   "status": "complete",

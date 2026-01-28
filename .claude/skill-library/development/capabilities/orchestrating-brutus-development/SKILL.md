@@ -472,7 +472,7 @@ Brutus plugin development is complete when:
 
 ## Related Skills
 
-- **orchestrating-fingerprintx-development** - Similar pattern for service fingerprinting
+- **orchestrating-nerva-development** - Similar pattern for service fingerprinting
 - **orchestrating-capability-development** - Similar pattern for other security capabilities
 - **orchestrating-feature-development** - Similar pattern for product features
 - **persisting-progress-across-sessions** - Cross-session persistence for long-running plugins

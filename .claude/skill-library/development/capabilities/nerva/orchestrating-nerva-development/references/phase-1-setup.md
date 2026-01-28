@@ -139,7 +139,7 @@ Create MANIFEST.yaml for cross-session persistence:
 ```yaml
 protocol_name: "{Protocol Name}"
 protocol_slug: "{protocol-id}"
-orchestration_skill: "orchestrating-fingerprintx-development"
+orchestration_skill: "orchestrating-nerva-development"
 created_at: "{ISO-8601 timestamp}"
 description: |
   {User's plugin description}

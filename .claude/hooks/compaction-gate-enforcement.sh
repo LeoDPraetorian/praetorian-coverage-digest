@@ -40,7 +40,7 @@ subagent_type=$(echo "$input" | jq -r '.tool_input.subagent_type // ""' 2>/dev/n
 
 # Find MANIFEST.yaml in output directories
 MANIFEST=""
-for type_dir in features capabilities integrations research mcp-wrappers fingerprintx; do
+for type_dir in features capabilities integrations research mcp-wrappers nerva; do
   if [[ -d "${CLAUDE_PROJECT_DIR}/.claude/.output/${type_dir}" ]]; then
     # Find most recently modified MANIFEST.yaml
     found=$(find "${CLAUDE_PROJECT_DIR}/.claude/.output/${type_dir}" -name 'MANIFEST.yaml' -mmin -1440 2>/dev/null | head -1)

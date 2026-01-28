@@ -430,7 +430,7 @@ Orchestrator:
 - `orchestrating-capability-development` (Phase 1 - provides OUTPUT_DIRECTORY)
 - `orchestrating-integration-development` (Phase 1 - provides OUTPUT_DIRECTORY)
 - `orchestrating-multi-agent-workflows` (before spawning agents)
-- `orchestrating-fingerprintx-development` (Phase 1 - provides OUTPUT_DIRECTORY)
+- `orchestrating-nerva-development` (Phase 1 - provides OUTPUT_DIRECTORY)
 
 ### Requires (invoke before starting)
 

@@ -18,7 +18,7 @@
 # Identity
 protocol_name: "MySQL"
 protocol_slug: "mysql"
-orchestration_skill: "orchestrating-fingerprintx-development"
+orchestration_skill: "orchestrating-nerva-development"
 created_at: "2026-01-20T10:00:00Z"
 description: |
   Fingerprintx plugin for MySQL database protocol detection and version extraction.
@@ -85,7 +85,7 @@ plugin_type: "open-source" # open-source | closed-source
 default_ports: [3306, 3307]
 technologies_detected: ["Go", "fingerprintx patterns"]
 skills_mapped:
-  - writing-fingerprintx-modules
+  - writing-nerva-tcp-udp-modules
   - researching-protocols
   - go-best-practices
 

@@ -87,7 +87,7 @@ Against gateway routing tables:
 | Detected Pattern        | Matched Skill                | Gateway Source       |
 | ----------------------- | ---------------------------- | -------------------- |
 | Go plugin files         | go-best-practices            | gateway-backend      |
-| fingerprintx module     | writing-fingerprintx-modules | gateway-capabilities |
+| fingerprintx module     | writing-nerva-tcp-udp-modules | gateway-capabilities |
 | Protocol banner parsing | researching-protocols        | gateway-capabilities |
 | Version extraction      | researching-version-markers  | gateway-capabilities |
 | Go test files           | implementing-golang-tests    | gateway-testing      |
@@ -123,7 +123,7 @@ skills_by_domain:
       - adhering-to-yagni
       - verifying-before-completion
     library_skills:
-      - path: ".claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md"
+      - path: ".claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md"
         trigger: "Fingerprintx plugin development"
       - path: ".claude/skill-library/development/capabilities/reviewing-capability-implementations/SKILL.md"
         trigger: "Capability review phase"
@@ -160,7 +160,7 @@ phase_skills:
     - developing-with-tdd
     - adhering-to-dry
     - adhering-to-yagni
-    - writing-fingerprintx-modules
+    - writing-nerva-tcp-udp-modules
   phase_11_code_quality:
     - verifying-before-completion
     - reviewing-capability-implementations
@@ -181,7 +181,7 @@ phases:
     completed_at: "{timestamp}"
 
 skills_mapped:
-  - writing-fingerprintx-modules
+  - writing-nerva-tcp-udp-modules
   - researching-protocols
   - researching-version-markers
   - go-best-practices
@@ -206,7 +206,7 @@ skill_discovery:
 
 **Key Skills for This Plugin:**
 
-- Capabilities: writing-fingerprintx-modules, researching-protocols
+- Capabilities: writing-nerva-tcp-udp-modules, researching-protocols
 - Backend: go-best-practices
 - Testing: implementing-golang-tests
 
@@ -248,7 +248,7 @@ These skills are almost always relevant for fingerprintx plugins:
 
 | Skill                                  | Phase | Purpose                            |
 | -------------------------------------- | ----- | ---------------------------------- |
-| `writing-fingerprintx-modules`         | 8     | Go plugin implementation patterns  |
+| `writing-nerva-tcp-udp-modules`         | 8     | Go plugin implementation patterns  |
 | `researching-protocols`                | 3     | Protocol banner detection strategy |
 | `researching-version-markers`          | 3     | Version fingerprint extraction     |
 | `go-best-practices`                    | 8     | Go coding conventions              |

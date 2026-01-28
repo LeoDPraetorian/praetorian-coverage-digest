@@ -150,4 +150,4 @@ grep -rn "panic(" {CAPABILITIES_ROOT}/modules/fingerprintx/pkg/plugins/services/
 | ---------------------- | ------------------------------------------------------------------------------ | -------------------------- |
 | Phase 10 Details       | `references/phase-10-domain-compliance.md`                                     | Full compliance checklist  |
 | Interface Requirements | `references/interface-requirements.md`                                         | 5-method interface details |
-| Writing fingerprintx   | `.claude/skill-library/development/capabilities/writing-fingerprintx-modules/` | Development patterns       |
+| Writing fingerprintx   | `.claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/` | Development patterns       |

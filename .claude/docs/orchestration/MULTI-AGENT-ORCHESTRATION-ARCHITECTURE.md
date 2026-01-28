@@ -179,7 +179,7 @@ writing-plans (creates implementation plan)
 │   orchestrating-feature-development (LIBRARY)     ← Runs IN main convo     │
 │   orchestrating-capability-development (LIBRARY)                           │
 │   orchestrating-integration-development (LIBRARY)                          │
-│   orchestrating-fingerprintx-development (LIBRARY)                         │
+│   orchestrating-nerva-development (LIBRARY)                         │
 │                                                                            │
 │   Tools: Task, TodoWrite, Read, AskUserQuestion, Glob, Grep                │
 │   Note: NO Write, Edit - orchestrators coordinate, never implement         │
@@ -1070,7 +1070,7 @@ Domain-specific compliance checks that MUST pass:
 | Orchestration    | P0 Requirements                                                       |
 | ---------------- | --------------------------------------------------------------------- |
 | integration-dev  | VMFilter, CheckAffiliation, ValidateCredentials, errgroup, pagination |
-| fingerprintx-dev | Shodan validation, protocol markers, test coverage                    |
+| nerva-dev        | Shodan validation, protocol markers, test coverage                    |
 | capability-dev   | Capability type matrix compliance                                     |
 
 ---
@@ -1246,7 +1246,7 @@ An agent can't have and not-have implementation tools simultaneously. Choose one
 - **Feature Development**: `.claude/skill-library/development/orchestrating-feature-development/SKILL.md`
 - **Capability Development**: `.claude/skill-library/development/capabilities/orchestrating-capability-development/SKILL.md`
 - **Integration Development**: `.claude/skill-library/development/integrations/orchestrating-integration-development/SKILL.md`
-- **Fingerprintx Development**: `.claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/SKILL.md`
+- **Fingerprintx Development**: `.claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md`
 - **MCP Development**: `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development/SKILL.md`
 - **API Tool Development**: `.claude/skill-library/claude/mcp-management/orchestrating-api-tool-development/SKILL.md`
 - **Research**: `.claude/skill-library/research/orchestrating-research/SKILL.md`

@@ -1,5 +1,5 @@
 ---
-name: writing-fingerprintx-modules
+name: writing-nerva-tcp-udp-modules
 description: Use when creating fingerprintx service fingerprinting plugins - guides through plugin interface, type system, wire protocols, and two-phase detection patterns
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ---
@@ -17,7 +17,7 @@ Use this skill when:
 - Understanding the fingerprintx plugin architecture
 - Implementing wire protocol parsing for service detection
 
-**Location:** `modules/fingerprintx/`
+**Location:** `modules/nerva/`
 
 ## Quick Reference
 
@@ -65,8 +65,8 @@ import (
     "net"
     "time"
 
-    "github.com/praetorian-inc/fingerprintx/pkg/plugins"
-    utils "github.com/praetorian-inc/fingerprintx/pkg/plugins/pluginutils"
+    "github.com/praetorian-inc/nerva/pkg/plugins"
+    utils "github.com/praetorian-inc/nerva/pkg/plugins/pluginutils"
 )
 
 const PROTOCOL_NAME = "{protocol}"
@@ -139,7 +139,7 @@ Add blank import (alphabetical order):
 ```go
 import (
     // ... existing imports ...
-    _ "github.com/praetorian-inc/fingerprintx/pkg/plugins/services/{protocol}"
+    _ "github.com/praetorian-inc/nerva/pkg/plugins/services/{protocol}"
     // ... existing imports ...
 )
 ```

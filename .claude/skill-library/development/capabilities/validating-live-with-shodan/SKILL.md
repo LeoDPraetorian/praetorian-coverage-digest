@@ -12,7 +12,7 @@ allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 
 Use this skill when:
 
-- Phase 7 of `orchestrating-fingerprintx-development` reaches live validation step
+- Phase 7 of `orchestrating-nerva-development` reaches live validation step
 - You need to validate a plugin against real-world service deployments
 - Docker testing passed but you want production-environment validation
 - Verifying version extraction works across diverse configurations
@@ -32,7 +32,7 @@ Use this skill when:
 
 ## Integration with Orchestrator
 
-This skill is **Phase 7.4** of `orchestrating-fingerprintx-development`:
+This skill is **Phase 7.4** of `orchestrating-nerva-development`:
 
 ```
 Phase 7: Validation  ████ BLOCKING GATE ████
@@ -215,9 +215,9 @@ This skill produces:
 | Skill                                    | Purpose               |
 | ---------------------------------------- | --------------------- |
 | `mcp-tools-shodan-api`                   | Shodan API wrappers   |
-| `orchestrating-fingerprintx-development` | Parent orchestrator   |
-| `writing-fingerprintx-tests`             | Unit test patterns    |
-| `writing-fingerprintx-modules`           | Plugin implementation |
+| `orchestrating-nerva-development` | Parent orchestrator   |
+| `writing-nerva-tests`             | Unit test patterns    |
+| `writing-nerva-tcp-udp-modules`           | Plugin implementation |
 
 ## Anti-Patterns
 

@@ -27,7 +27,7 @@
 - Marker categorization (6 categories: Capability Flags, Default Configs, New Features, Error Formats, Banner Strings, Protocol Extensions)
 - Version Fingerprint Matrix as primary deliverable
 - 4 reference documents created
-- Positioned between `researching-protocols` and `writing-fingerprintx-modules` in workflow
+- Positioned between `researching-protocols` and `writing-nerva-tcp-udp-modules` in workflow
 
 **Gateway placement:** `.claude/skills/gateway-capabilities` - FINGERPRINTX DEVELOPMENT section (optional, for open-source protocols)
 
@@ -41,7 +41,7 @@
 
 **Related skills:**
 - `researching-protocols` (prerequisite) - Protocol detection research
-- `writing-fingerprintx-modules` (consumer) - Implements enrichment phase using matrix
+- `writing-nerva-tcp-udp-modules` (consumer) - Implements enrichment phase using matrix
 - `researching-github` (invoked) - Repository discovery and source analysis
 
 **Key innovation:** Shifts from black-box probing to white-box source analysis for open-source protocols, enabling version-granular detection through systematic cross-version diff analysis.

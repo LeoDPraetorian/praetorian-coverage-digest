@@ -462,6 +462,6 @@ Capability development is complete when:
 
 - **orchestrating-feature-development** - Similar pattern for feature development
 - **orchestrating-integration-development** - Similar pattern for third-party integrations
-- **orchestrating-fingerprintx-development** - Specialized pattern for fingerprintx modules
+- **orchestrating-nerva-development** - Specialized pattern for fingerprintx modules
 - **persisting-progress-across-sessions** - Cross-session persistence for long-running capabilities
 - **developing-with-subagents** - Same-session subagent execution with code review

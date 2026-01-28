@@ -59,7 +59,8 @@ This gateway implements 3-tier loading:
 | "scanner performance" / "optimize" / "throughput" / "40K items/hour"                                                                                                  | → `optimizing-go-scanner-performance`       |
 | "web crawler" / "Colly" / "Katana"                                                                                                                                    | → `building-web-crawlers`                   |
 | "Janus" / "chain" / "pipeline"                                                                                                                                        | → `capabilities-janus-chains`               |
-| "fingerprintx" / "service detection"                                                                                                                                  | → `orchestrating-fingerprintx-development`  |
+| "fingerprintx" / "service detection"                                                                                                                                  | → `orchestrating-nerva-development`  |
+| "SCTP" / "Diameter" / "SIGTRAN" / "S1AP" / "NGAP" / "telecom protocols" / "5G protocols"                                                                              | → `writing-nerva-sctp-modules`              |
 | "live validation" / "Shodan" / "metrics"                                                                                                                              | → `validating-live-with-shodan`             |
 | "protocol" / "banner" / "handshake"                                                                                                                                   | → `researching-protocols`                   |
 | "version marker" / "fingerprint"                                                                                                                                      | → `researching-version-markers`             |
@@ -123,14 +124,15 @@ This gateway implements 3-tier loading:
 
 ### Fingerprintx
 
-| Skill                                 | Path                                                                                             | Triggers                                |
-| ------------------------------------- | ------------------------------------------------------------------------------------------------ | --------------------------------------- |
-| Fingerprintx Development Orchestrator | `.claude/skill-library/development/capabilities/orchestrating-fingerprintx-development/SKILL.md` | fingerprintx, service detection, create |
-| Fingerprintx Live Validate            | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md`            | live validation, Shodan, metrics        |
-| Protocol Research                     | `.claude/skill-library/research/researching-protocols/SKILL.md`                                  | protocol, banner, handshake             |
-| Version Markers                       | `.claude/skill-library/research/researching-version-markers/SKILL.md`                            | version marker, fingerprint             |
-| CISA KEV Research                     | `.claude/skill-library/research/researching-cisa-kev/SKILL.md`                                   | CISA KEV, known exploited, CVE          |
-| NVD Research                          | `.claude/skill-library/research/researching-nvd/SKILL.md`                                        | NVD, CVSS, CPE, CVE details             |
+| Skill                                 | Path                                                                                                | Triggers                                                               |
+| ------------------------------------- | --------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Fingerprintx Development Orchestrator | `.claude/skill-library/development/capabilities/nerva/orchestrating-nerva-development/SKILL.md`    | fingerprintx, service detection, create                                |
+| SCTP Fingerprintx Modules             | `.claude/skill-library/development/capabilities/nerva/writing-nerva-sctp-modules/SKILL.md`                | SCTP, Diameter, SIGTRAN, S1AP, NGAP, telecom, 5G, protocol over SCTP  |
+| Fingerprintx Live Validate            | `.claude/skill-library/development/capabilities/validating-live-with-shodan/SKILL.md`               | live validation, Shodan, metrics                                       |
+| Protocol Research                     | `.claude/skill-library/research/researching-protocols/SKILL.md`                                     | protocol, banner, handshake                                            |
+| Version Markers                       | `.claude/skill-library/research/researching-version-markers/SKILL.md`                               | version marker, fingerprint                                            |
+| CISA KEV Research                     | `.claude/skill-library/research/researching-cisa-kev/SKILL.md`                                      | CISA KEV, known exploited, CVE                                         |
+| NVD Research                          | `.claude/skill-library/research/researching-nvd/SKILL.md`                                           | NVD, CVSS, CPE, CVE details                                            |
 
 ### Go Porting
 

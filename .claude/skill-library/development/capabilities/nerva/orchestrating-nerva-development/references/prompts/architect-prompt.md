@@ -46,7 +46,7 @@ Write architecture.md and plan.md to this directory.
 
 You MUST use these skills during this task:
 
-1. **writing-fingerprintx-modules** - Understand the 5-method interface requirement
+1. **writing-nerva-tcp-udp-modules** - Understand the 5-method interface requirement
 2. **writing-plans** - Create detailed implementation plan
 3. **enforcing-evidence-based-analysis** - Base decisions on discovered patterns
 4. **persisting-agent-outputs** - Output file format and metadata
@@ -173,7 +173,7 @@ You MUST use these skills during this task:
   "output_type": "architecture",
   "protocol": "[PROTOCOL_NAME]",
   "skills_invoked": [
-    "writing-fingerprintx-modules",
+    "writing-nerva-tcp-udp-modules",
     "writing-plans",
     "enforcing-evidence-based-analysis",
     "persisting-agent-outputs"

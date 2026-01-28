@@ -135,7 +135,7 @@ For domain-specific workflows with detailed phase documentation, checkpoints, an
 | Features     | `orchestrating-feature-development`                                             | `Read(".claude/skill-library/development/orchestrating-feature-development/SKILL.md")` |
 | Integrations | `orchestrating-integration-development`                                         | `Skill("orchestrating-integration-development")`                                       |
 | Capabilities | `orchestrating-capability-development`                                          | `Skill("orchestrating-capability-development")`                                        |
-| Fingerprintx | `orchestrating-fingerprintx-development`                                        | `Skill("orchestrating-fingerprintx-development")`                                      |
+| Fingerprintx | `orchestrating-nerva-development`                                        | `Skill("orchestrating-nerva-development")`                                      |
 | MCP/Tools    | See `.claude/skill-library/claude/mcp-management/orchestrating-mcp-development` | `Read()` library skill                                                                 |
 
 **This skill (orchestrating-multi-agent-workflows)** provides the foundational patterns that all specialized orchestrations inherit:

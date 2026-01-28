@@ -177,7 +177,7 @@ You MUST read these skills before coding:
 
 - developing-with-tdd
 - verifying-before-completion
-- .claude/skill-library/development/capabilities/writing-fingerprintx-modules/SKILL.md
+- .claude/skill-library/development/capabilities/nerva/writing-nerva-tcp-udp-modules/SKILL.md
   {skills_by_domain.capability.library_skills from skill-manifest.yaml}
 
 ### Files to Modify/Create
@@ -210,7 +210,7 @@ For each service detection:
 'tests_written': 8,
 'detection_accuracy': 0.98,
 'false_positive_rate': 0.005,
-'skills_invoked': ['developing-with-tdd', 'writing-fingerprintx-modules', ...]
+'skills_invoked': ['developing-with-tdd', 'writing-nerva-tcp-udp-modules', ...]
 }
 
 ### Verification Before Returning

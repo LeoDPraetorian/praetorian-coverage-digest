@@ -1,5 +1,5 @@
 ---
-name: writing-fingerprintx-tests
+name: writing-nerva-tests
 description: Use when writing unit tests for fingerprintx service detection plugins - guides through table-driven tests, protocol parsing validation, response checking, message building, and mock construction following established patterns from mysql_test.go and postgresql_test.go
 allowed-tools: Read, Write, Edit, Bash, Grep, Glob, TodoWrite
 ---
@@ -37,8 +37,8 @@ This skill is **Phase 4** of the fingerprintx development workflow:
 
 1. `researching-protocols` - Research the protocol specification
 2. `researching-version-markers` - Identify version detection markers
-3. `writing-fingerprintx-modules` - Implement the plugin
-4. **`writing-fingerprintx-tests`** - Write comprehensive tests (THIS SKILL)
+3. `writing-nerva-tcp-udp-modules` - Implement the plugin
+4. **`writing-nerva-tests`** - Write comprehensive tests (THIS SKILL)
 
 ## Quick Reference
 
@@ -273,6 +273,6 @@ Examine these for established patterns:
 
 - `researching-protocols` - Research protocol specifications before writing tests
 - `researching-version-markers` - Identify version detection markers
-- `writing-fingerprintx-modules` - Implement the plugin (Phase 3)
+- `writing-nerva-tcp-udp-modules` - Implement the plugin (Phase 3)
 - `developing-with-tdd` - TDD methodology for test-first development
 - `gateway-testing` - Access broader testing patterns and tools
