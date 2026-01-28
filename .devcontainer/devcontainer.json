@@ -2,7 +2,8 @@
   "name": "Chariot Devpod Container",
   "image": "ghcr.io/praetorian-inc/chariot-devpod:latest",
   "features": {
-    "ghcr.io/devcontainers/features/desktop-lite:1": {}
+    "ghcr.io/devcontainers/features/desktop-lite:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "containerEnv": {
     "VNC_RESOLUTION": "1600x1200x16"
