@@ -47,7 +47,7 @@ get_wrong_location_files() {
         grep -vE '^\.worktrees/' | \
         grep -vE '^modules/' | \
         grep -vE '^docs/' | \
-        grep -vE '^(README|CLAUDE|CHANGELOG|CONTRIBUTING|LICENSE)' || true
+        grep -vE '(README|CLAUDE|CHANGELOG|CONTRIBUTING|LICENSE)\.md$' || true
 }
 
 is_linked_worktree() {

@@ -32,11 +32,15 @@ get_wrong_location_files() {
         grep -E '\.md$' | \
         grep -vE '^\.claude/\.output/' | \
         grep -vE '^\.claude/docs/' | \
+        grep -vE '^\.claude/skills/' | \
+        grep -vE '^\.claude/skill-library/' | \
+        grep -vE '^\.claude/agents/' | \
+        grep -vE '^\.claude/agent-library/' | \
         grep -vE '^\.feature-development/' | \
         grep -vE '^\.worktrees/' | \
         grep -vE '^modules/' | \
         grep -vE '^docs/' | \
-        grep -vE '^(README|CLAUDE|CHANGELOG|CONTRIBUTING|LICENSE)' || true
+        grep -vE '(README|CLAUDE|CHANGELOG|CONTRIBUTING|LICENSE)\.md$' || true
 }
 
 current_git_root=$(git -C "${CLAUDE_PROJECT_DIR}" rev-parse --show-toplevel 2>/dev/null || echo "${CLAUDE_PROJECT_DIR}")
