@@ -1,0 +1,23 @@
+# Changelog
+
+## 2025-01-23 - Initial Creation
+
+**RED Phase Documentation:**
+- Problem: NoseyParker AWS secret scan results contain false positives requiring manual cleanup
+- Failure without skill: Claude lacks systematic FP patterns and inconsistent categorization
+- Test scenario: Process NoseyParker JSON → filter FPs → generate triage report
+
+**Skill Details:**
+- Location: Library skill (security/)
+- Type: Process/Pattern
+- Category: security
+
+**False Positive Patterns Defined:**
+1. EXAMPLEKEY patterns
+2. AWS documentation examples (AKIAIOSFODNN7EXAMPLE)
+3. Test/mock/fake/dummy keys in context
+4. Environment variable placeholders
+5. Invalid AWS key formats
+6. Placeholder passwords ("password", "changeme")
+
+**Output:** Triage report categorizing valid vs false positive secrets with reasoning

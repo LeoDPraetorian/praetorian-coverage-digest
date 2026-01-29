@@ -50,6 +50,7 @@ This gateway implements 3-tier loading:
 | "authorization" / "RBAC" / "permissions"                         | → `authorization-testing`                  |
 | "secrets" / "credentials" / "API keys"                           | → `secrets-management`                     |
 | "secret scan" / "leak detection"                                 | → `secret-scanner`                         |
+| "NoseyParker" / "secret triage" / "false positive"               | → `triaging-noseyparker-secrets`           |
 | "encryption" / "crypto" / "hashing"                              | → `discover-cryptography`                  |
 | "defense" / "hardening" / "layers"                               | → `defense-in-depth`                       |
 | "threat model" / "attack surface"                                | → `threat-modeling`                        |
@@ -101,11 +102,12 @@ This gateway implements 3-tier loading:
 
 ### Secrets & Cryptography
 
-| Skill              | Path                                                            | Triggers                       |
-| ------------------ | --------------------------------------------------------------- | ------------------------------ |
-| Secrets Management | `.claude/skill-library/security/secrets-management/SKILL.md`    | secrets, credentials, API keys |
-| Secret Scanner     | `.claude/skill-library/security/secret-scanner/SKILL.md`        | secret scan, leak detection    |
-| Cryptography       | `.claude/skill-library/security/discover-cryptography/SKILL.md` | encryption, crypto, hashing    |
+| Skill               | Path                                                              | Triggers                            |
+| ------------------- | ----------------------------------------------------------------- | ----------------------------------- |
+| Secrets Management  | `.claude/skill-library/security/secrets-management/SKILL.md`      | secrets, credentials, API keys      |
+| Secret Scanner      | `.claude/skill-library/security/secret-scanner/SKILL.md`          | secret scan, leak detection         |
+| Triaging NoseyParker Secrets| `.claude/skill-library/security/triaging-noseyparker-secrets/SKILL.md` | NoseyParker, secret triage, false positive |
+| Cryptography        | `.claude/skill-library/security/discover-cryptography/SKILL.md`   | encryption, crypto, hashing         |
 
 ### Defense & Architecture
 
