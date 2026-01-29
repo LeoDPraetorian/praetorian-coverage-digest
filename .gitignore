@@ -37,6 +37,8 @@ __pycache__/
 .claude/config/credentials.json
 .claude/node_modules/
 .claude/coverage/
+.claude/tools/**/coverage/
+.claude/tools/**/node_modules/
 
 # Temporary and generated files
 .tmp/
