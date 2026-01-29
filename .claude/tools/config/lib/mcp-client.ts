@@ -349,7 +349,12 @@ export function getMCPServerConfig(
     },
     'praetorian-cli': {
       command: 'praetorian',
-      args: ['--profile', process.env.PRAETORIAN_PROFILE || 'demo', 'chariot', 'agent', 'mcp', 'start'],
+      args: [
+        // Account filtering (optional) - must come before 'chariot' subcommand
+        ...(process.env.PRAETORIAN_ACCOUNT ? ['--account', process.env.PRAETORIAN_ACCOUNT] : []),
+        '--profile', process.env.PRAETORIAN_PROFILE || 'demo',
+        'chariot', 'agent', 'mcp', 'start'
+      ],
       envVars: {} // Uses profile from ~/.praetorian/keychain.ini
     },
     'nebula': {

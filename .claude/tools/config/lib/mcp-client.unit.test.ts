@@ -38,6 +38,7 @@ vi.mock('./secrets-provider.js', () => ({
 
 import {
   callMCPTool,
+  getMCPServerConfig,
   DEFAULT_MCP_TIMEOUT_MS,
   DEFAULT_MAX_RETRIES,
   DEFAULT_RETRY_DELAY_MS,
@@ -780,6 +781,126 @@ describe('MCP Client', () => {
         call.some(arg => typeof arg === 'string' && /\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}/.test(arg))
       );
       expect(hasTimestamp).toBe(true);
+    });
+  });
+
+  describe('getMCPServerConfig', () => {
+    describe('praetorian-cli account parameter', () => {
+      const originalAccount = process.env.PRAETORIAN_ACCOUNT;
+      const originalProfile = process.env.PRAETORIAN_PROFILE;
+
+      afterEach(() => {
+        // Restore environment
+        if (originalAccount !== undefined) {
+          process.env.PRAETORIAN_ACCOUNT = originalAccount;
+        } else {
+          delete process.env.PRAETORIAN_ACCOUNT;
+        }
+        if (originalProfile !== undefined) {
+          process.env.PRAETORIAN_PROFILE = originalProfile;
+        } else {
+          delete process.env.PRAETORIAN_PROFILE;
+        }
+      });
+
+      it('should NOT include --account when PRAETORIAN_ACCOUNT is not set', () => {
+        delete process.env.PRAETORIAN_ACCOUNT;
+        process.env.PRAETORIAN_PROFILE = 'test-profile';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        expect(config.command).toBe('praetorian');
+        expect(config.args).not.toContain('--account');
+        expect(config.args).toContain('--profile');
+        expect(config.args).toContain('test-profile');
+        expect(config.args).toContain('chariot');
+        expect(config.args).toContain('agent');
+        expect(config.args).toContain('mcp');
+        expect(config.args).toContain('start');
+      });
+
+      it('should include --account before chariot subcommand when PRAETORIAN_ACCOUNT is set', () => {
+        process.env.PRAETORIAN_ACCOUNT = 'customer-acme';
+        process.env.PRAETORIAN_PROFILE = 'test-profile';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        expect(config.command).toBe('praetorian');
+        expect(config.args).toContain('--account');
+        expect(config.args).toContain('customer-acme');
+
+        // Verify --account comes before 'chariot' subcommand
+        const accountIndex = config.args.indexOf('--account');
+        const chariotIndex = config.args.indexOf('chariot');
+        expect(accountIndex).toBeLessThan(chariotIndex);
+        expect(accountIndex).toBeGreaterThanOrEqual(0);
+      });
+
+      it('should NOT include --account when PRAETORIAN_ACCOUNT is empty string', () => {
+        process.env.PRAETORIAN_ACCOUNT = '';
+        process.env.PRAETORIAN_PROFILE = 'test-profile';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        expect(config.args).not.toContain('--account');
+      });
+
+      it('should handle special characters in PRAETORIAN_ACCOUNT', () => {
+        process.env.PRAETORIAN_ACCOUNT = 'customer-with-dashes_and_underscores';
+        process.env.PRAETORIAN_PROFILE = 'test-profile';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        expect(config.args).toContain('--account');
+        expect(config.args).toContain('customer-with-dashes_and_underscores');
+      });
+
+      it('should use default profile when PRAETORIAN_PROFILE is not set', () => {
+        delete process.env.PRAETORIAN_ACCOUNT;
+        delete process.env.PRAETORIAN_PROFILE;
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        expect(config.args).toContain('--profile');
+        expect(config.args).toContain('demo');
+      });
+
+      it('should construct correct full command with account', () => {
+        process.env.PRAETORIAN_ACCOUNT = 'intel';
+        process.env.PRAETORIAN_PROFILE = 'production';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        // Expected: ['--account', 'intel', '--profile', 'production', 'chariot', 'agent', 'mcp', 'start']
+        expect(config.args).toEqual([
+          '--account', 'intel',
+          '--profile', 'production',
+          'chariot', 'agent', 'mcp', 'start'
+        ]);
+      });
+
+      it('should construct correct full command without account', () => {
+        delete process.env.PRAETORIAN_ACCOUNT;
+        process.env.PRAETORIAN_PROFILE = 'production';
+
+        const config = getMCPServerConfig('praetorian-cli');
+
+        // Expected: ['--profile', 'production', 'chariot', 'agent', 'mcp', 'start']
+        expect(config.args).toEqual([
+          '--profile', 'production',
+          'chariot', 'agent', 'mcp', 'start'
+        ]);
+      });
+    });
+
+    describe('error handling', () => {
+      it('should throw error for unknown MCP server', () => {
+        expect(() => getMCPServerConfig('unknown-mcp')).toThrow(/not configured/);
+      });
+
+      it('should include available servers in error message', () => {
+        expect(() => getMCPServerConfig('unknown-mcp')).toThrow(/Available:/);
+      });
     });
   });
 });
