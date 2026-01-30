@@ -50,6 +50,7 @@ This gateway implements 3-tier loading:
 | "create skill" / "update skill" / "skills"          | → `managing-skills` (core skill)                   |
 | "command" / "slash command"                         | → `managing-commands` (core skill)                 |
 | "MCP wrapper" / "tool wrapper"                      | → `managing-tool-wrappers` (core)                  |
+| "book conversion" / "OCR book" / "chapters"         | → `converting-books-to-skills` (library)           |
 | "hook" / "pre-commit" / "post-tool"                 | → `writing-claude-hooks` (library)                 |
 | "plugin" / "extension"                              | → `claude-plugin-structure` (library)              |
 | "marketplace" / "publish"                           | → `claude-marketplace-management`                  |
@@ -102,19 +103,20 @@ skill: "managing-commands"
 
 ### Skill Management
 
-| Skill                   | Path                                                                                       | Triggers                        |
-| ----------------------- | ------------------------------------------------------------------------------------------ | ------------------------------- |
-| Auditing Skills         | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                   | audit skill                     |
-| Closing Agent Loopholes | `.claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md` | loophole, rationalization       |
-| Creating Skills         | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                   | create skill                    |
-| Deleting Skills         | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                   | delete skill                    |
-| Fixing Skills           | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                     | fix skill                       |
-| Migrating Skills        | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`                  | migrate skill                   |
-| Pressure Testing Skills | `.claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md`    | pressure test, verify           |
-| Processing Large Skills | `.claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md`           | understand skill, analyze skill |
-| Renaming Skills         | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`                   | rename skill                    |
-| Syncing Gateways        | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`                  | sync gateway                    |
-| Updating Skills         | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`                   | update skill                    |
+| Skill                          | Path                                                                                       | Triggers                        |
+| ------------------------------ | ------------------------------------------------------------------------------------------ | ------------------------------- |
+| Auditing Skills                | `.claude/skill-library/claude/skill-management/auditing-skills/SKILL.md`                   | audit skill                     |
+| Closing Agent Loopholes        | `.claude/skill-library/claude/skill-management/closing-rationalization-loopholes/SKILL.md` | loophole, rationalization       |
+| Converting Books to Skills     | `.claude/skill-library/claude/skill-management/converting-books-to-skills/SKILL.md`        | book conversion, OCR, chapters  |
+| Creating Skills                | `.claude/skill-library/claude/skill-management/creating-skills/SKILL.md`                   | create skill                    |
+| Deleting Skills                | `.claude/skill-library/claude/skill-management/deleting-skills/SKILL.md`                   | delete skill                    |
+| Fixing Skills                  | `.claude/skill-library/claude/skill-management/fixing-skills/SKILL.md`                     | fix skill                       |
+| Migrating Skills               | `.claude/skill-library/claude/skill-management/migrating-skills/SKILL.md`                  | migrate skill                   |
+| Pressure Testing Skill Content | `.claude/skill-library/claude/skill-management/pressure-testing-skill-content/SKILL.md`    | pressure test, verify           |
+| Processing Large Skills        | `.claude/skill-library/claude/skill-management/processing-large-skills/SKILL.md`           | understand skill, analyze skill |
+| Renaming Skills                | `.claude/skill-library/claude/skill-management/renaming-skills/SKILL.md`                   | rename skill                    |
+| Syncing Gateways               | `.claude/skill-library/claude/skill-management/syncing-gateways/SKILL.md`                  | sync gateway                    |
+| Updating Skills                | `.claude/skill-library/claude/skill-management/updating-skills/SKILL.md`                   | update skill                    |
 
 ### Hooks & Plugins
 

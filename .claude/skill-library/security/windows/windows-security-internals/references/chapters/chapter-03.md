@@ -34,7 +34,7 @@ Most user-mode applications do not directly contain the implementation of the Wi
 
 ## Loading a New Library
 
-It's possible to access exported functions manually at runtime without needing an import table entry. You can load a new library using the LoadLibrary Win32 API, which is exposed to PowerShell using the Import-Win32Module command. To find the memory address of a function exported by a DLL, use the Win32 API GetProcAddress, exposed with the PowerShell Get-Win32 ModuleExport command (Listing 3-1).
+It' s possible to access exported functions manually at runtime without needing an import table entry. You can load a new library using the LoadLibrary Win32 API, which is exposed to PowerShell using the Import-Win32Module command. To find the memory address of a function exported by a DLL, use the Win32 API GetProcAddress, exposed with the PowerShell Get-Win32 ModuleExport command (Listing 3-1).
 
 ```bash
 > PS> $lib = Import-Win32Module -Path "kernel32.dll"~> PS> $lib
@@ -344,7 +344,7 @@ $txt = sbuf.ReadUnicodeString($lenToInt32())
         if ($txt.Length -eq 0) {
             continue
     "PID: $(sw.ProcessId) - $txt"
-}
+}  
 PID: 10064 - System tray overflow window.
 PID: 16168 - HardwareMonitorWindow
 PID: 10064 - Battery Meter
@@ -389,7 +389,7 @@ Listing 3-8: Displaying the processes in each console session using Get-NtProces
 
 Windows has only one physical console, which is connected to the keyboard, mouse, and monitor. However, it's possible to create a new remote desktop over the network by using a client that communicates using the Remote Desktop Protocol (RDP).
 
-It's also possible to switch the user logged on to the physical console; this enables support for the Fast User Switching feature in Windows. When the physical console switches to a new user, the previous user is still logged on and running in the background, but you cannot interact with that user's desktop.
+It' s also possible to switch the user logged on to the physical console; this enables support for the Fast User Switching feature in Windows. When the physical console switches to a new user, the previous user is still logged on and running in the background, but you cannot interact with that user's desktop.
 
 Each console session has its own special kernel memory region. Having duplicated resources ensures that the console sessions are separated; this acts as a security boundary. Session number 0 is special, in that it's only for privileged services and system management. It's normally not possible to use a GUI with processes running in this session.
 

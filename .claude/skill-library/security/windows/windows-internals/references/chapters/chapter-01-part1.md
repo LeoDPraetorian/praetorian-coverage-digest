@@ -1,6 +1,6 @@
 ## CHAPTER 1 Concepts and tools
 
-In this chapter, we'll introduce the key Microsoft Windows operating system (OS) concepts and terms we'll be using throughout this book, such as the Windows API, processes, threads, virtual memory, kernel mode and user mode. objects, handles, security, and the registry. We'll also introduce the tools that you can use to explore Windows internals, such as the kernel debugger, the Performance Monitor, and key tools from Windows Sysinternals (http://www.microsoft.com/technet/sysinternals). In addition, we'll explain how you can use the Windows Driver Kit (WDK) and the Windows Software Development Kit (SDK) as resources for finding further information on Windows internals.
+| n this chapter, we'll introduce the key Microsoft Windows operating system (OS) concepts and terms we'll be using throughout this book, such as the Windows API, processes, threads, virtual memory, kernel mode and user mode. objects, handles, security, and the registry. We'll also introduce the tools that you can use to explore Windows internals, such as the kernel debugger, the Performance Monitor, and key tools from Windows Sysinternals (http://www.microsoft.com/technet/sysinternals). In addition, we'll explain how you can use the Windows Driver Kit (WDK) and the Windows Software Development Kit (SDK) as resources for finding further information on Windows internals.
 
 Be sure that you understand everything in this chapter; the remainder of the book is written assuming that you do.
 
@@ -32,9 +32,9 @@ major version number as 6 and the minor version number as 2 (greater than 1) to 
 
 Note Starting with Windows 8, the GetVersionEx Windows API function returns the OS version number as 6.2 (Windows 8) by default, regardless of the actual OS. (The function is also declared as deprecated.) This is done to minimize compatibility issues but also as an indicator that checking for the OS version is not the best approach in most cases. This is because some components can be installed out of band, without coinciding with an official Windows release. Still, if you need the actual OS version, you can obtain it indirectly by using the
 
-VerifyVersionInfo function or the newer version helper APIs, such as IsWindows8OrGreater,
+VerifyVersionInfo function or the newer version helper APIs, such as Iswindows80rGreater,
 
-IsWindows8Point1OrGreater, IsWindows10OrGreater, IsWindowsServer, and similar. Also, OS compatibility can be indicated in the executable's manifest, which changes the results of this function. (See the section "Image Loader," in Chapter 3 for details.)
+Iswindows8point10rGreater, Iswindows100rGreater, IswindowsServer, and similar. Also, OS compatibility can be indicated in the executable's manifest, which changes the results of this function. (See the section "Image Loader," in Chapter 3 for details.)
 
 2 CHAPTER 1 Concepts and tools
 

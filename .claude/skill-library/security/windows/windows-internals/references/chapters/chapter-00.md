@@ -48,7 +48,7 @@ PUBLISHED BY
 
 Microsoft Press A division of Microsoft Corporation One Microsoft Way Redmond, Washington 98052-6399
 
-Copyright © 2017 by Pavel Yosifovich, Alex Ionescu, Mark E. Russinovich and David A. Solomon
+Copyright c 2017 by Pavel Yosifovich, Alex Ionescu, Mark E. Russinovich and David A. Solomon
 
 All rights reserved. No part of the contents of this book may be reproduced or transmitted in any form or by any means without the written permission of the publisher.
 
@@ -96,7 +96,7 @@ Chapter 2 System architecture......45 Requirements and design goals......45 Oper
 
 Key system components......61 Environment subsystems and subsystem DLLs......62 Other subsystems......68 Executive......72 Kernel......75 Hardware abstraction layer......79 Device drivers......82 System processes......88 Conclusion......99
 
-Chapter 3 Processes and jobs 101 Creating a process......101 CreateProcess' functions arguments......102 Creating Windows modern processes......103 Creating other kinds of processes......104 Process internals......105 Protected processes......113 Protected Process Light (PPL)......115 Third-party PPL support......119 Minimal and Pico processes......120 Minimal processes......120 Pico processes......121 Trustlets (secure processes)......123 Trustlet structure......123 Trustlet policy metadata......124 Trustlet attributes......125 System built-in Trustlets......125 Trustlet identity......126 Isolated user-mode services......127 Trustlet-accessible system calls......128 Flow of CreateProcess......129 Stage 1: Converting and validating parameters and flags......131 Stage 2: Opening the image to be executed......135 Stage 3: Creating the Windows executive process object......138 Stage 4: Creating the initial thread and its stack and context......144 Stage 5: Performing Windows subsystem-specific initialization......146 Stage 6: Starting execution of the initial thread......148 Stage 7: Performing process initialization in the context of the new process......148 Terminating a process......154 Image loader......155 Early process initialization......157 DLL name resolution and redirection......160 Loaded module database......164 Import parsing......168 Post-import process initialization......170
+Chapter 3 Processes and jobs 101 Creating a process......101 Createprocess functions arguments......102 Creating Windows modern processes......103 Creating other kinds of processes......104 Process internals......105 Protected processes......113 Protected Process Light (PPL)......115 Third-party PPL support......119 Minimal and Pico processes......120 Minimal processes......120 Pico processes......121 Trustlets (secure processes)......123 Trustlet structure......123 Trustlet policy metadata......124 Trustlet attributes......125 System built-in Trustlets......125 Trustlet identity......126 Isolated user-mode services......127 Trustlet-accessible system calls......128 Flow of CreateProcess......129 Stage 1: Converting and validating parameters and flags......131 Stage 2: Opening the image to be executed......135 Stage 3: Creating the Windows executive process object......138 Stage 4: Creating the initial thread and its stack and context......144 Stage 5: Performing Windows subsystem-specific initialization......146 Stage 6: Starting execution of the initial thread......148 Stage 7: Performing process initialization in the context of the new process......148 Terminating a process......154 Image loader......155 Early process initialization......157 DLL name resolution and redirection......160 Loaded module database......164 Import parsing......168 Post-import process initialization......170
 
 iv Contents
 
@@ -228,7 +228,7 @@ X Contents
 
 ## Introduction
 
-Windows Internals, Seventh Edition is intended for advanced computer professionals (developers, security researchers, and system administrators) who want to understand how the core components of the Microsoft Windows 10 and Windows Server 2016 operating systems work internally. With this knowledge, developers can better comprehend the rationale behind design choices when building applications specific to the Windows platform. Such knowledge can also help developers debug complex problems. System administrators can benefit from this information as well, because understanding how the operating system works "under the hood" facilitates an understanding of the performance behavior of the system and makes troubleshooting system problems much easier when things go wrong. Security researchers can figure out how software applications and the operating system can misbehave and be misused, causing undesirable behavior, while also understanding the mitigations and security features modern Windows offers against such scenarios. After reading this book, you should have a better understanding of how Windows works and why it behaves as it does.
+Windows Internals, Seventh Edition is intended for advanced computer professionals (developers, security researchers, and system administrators) who want to understand how the core components of the Microsoft Windows 10 and Windows Server 2016 operating systems work internally. With this knowledge, developers can better comprehen the rationale behind design choices when building applications specific to the Windows platform. Such knowledge can also help developers debug complex problems. System administrators can benefit from this information as well, because understanding how the operating system works "under the hood" facilitates an understanding of the performance behavior of the system and makes troubleshooting system problems much easier when things go wrong. Security researchers can figure out how software applications and the operating system can misbehave and be misused, causing undesirable behavior, while also understanding the mitigations and security features modern Windows offers against such scenarios. After reading this book, you should have a better understanding of how Windows works and why it behaves as it does.
 
 ### History of the book
 
@@ -236,7 +236,7 @@ This is the seventh edition of a book that was originally called Inside Windows 
 
 Inside Windows 2000, Third Edition (Microsoft Press, 2000) was authored by David Solomon and Mark Russinovich. It added many new topics, such as startup and shutdown, service internals, registry internals, file-system drivers, and networking. It also covered kernel changes in Windows 2000, such as the Windows Driver Model (WDM), Plug and Play, power management, Windows Management Instrumentation (WMI), encryption, the job object, and Terminal Services. Windows Internals, Fourth Edition (Microsoft Press, 2004) was the Windows XP and Windows Server 2003 update and added more content focused on helping IT professionals make use of their knowledge of Windows internals, such as using key tools from Windows Sysinternals and analyzing crash dumps.
 
-Windows Internals, Fifth Edition (Microsoft Press, 2009) was the update for Windows Vista and Windows Server 2008. It saw Marc Russinovich move on to a full-time job.
+Windows Internals, Fifth Edition (Microsoft Press, 2009) was the update for Windows Vista and Windows Server 2008. It saw March Russinovich move on to a full-time job.
 
 xi
 
@@ -286,7 +286,7 @@ Because this book describes undocumented behavior of the internal architecture a
 
 operation of the Windows operating system (such as internal kernel structures and func tions), this content is subject to change between releases.
 
-By 'subject to change,' we don't necessarily mean that details described in this book will change between releases, but you can't count on them not changing. Any software that uses these undocumented interfaces, or insider knowledge about the operating system, might not work on future releases of Windows. Even worse, software that runs in kernel mode (such as device drivers) and uses these undocumented interfaces might experience a system crash when running on a newer release of Windows, resulting in potential loss of data to users of such software.
+By subject to change,' we don't necessarily mean that details described in this book will change between releases, but you can't count on them not changing. Any software that uses these undocumented interfaces, or insider knowledge about the operating system, might not work on future releases of Windows. Even worse, software that runs in kernel mode (such as device drivers) and uses these undocumented interfaces might experience a system crash when running on a newer release of Windows, resulting in potential loss of data to users of such software.
 
 In short, you should never use any internal Windows functionality, registry key, behavior, API, or other undocumented detail mentioned in this book during the development of any kind of software designed for end-user systems, or for any other purpose other than research and documentation. Always check with the Microsoft Software Development Network (MSDN) for official documentation on a particular topic first.
 
@@ -353,7 +353,7 @@ content for this book can be downloaded from the following page:
 
 https://aka.ms/winint7ed/downloads
 
-We have also placed the source code for the tools written specifically for this book at https://github.com/zodiacoin/windowsinternals.
+We have also placed the source code for the tools written specifically for this book at https://github.com/zodiacon/windowsinternals.
 
 ## Acknowledgments
 
@@ -363,9 +363,9 @@ book was crucial to its release, and his many nights spent studying Windows deta
 
 writing about six releases' worth of changes is the reason this book exists.
 
-This book wouldn't contain the depth of technical detail or the level of accuracy it has without the review, input, and support of key members of the Microsoft Windows development team and other experts at Microsoft. Therefore, we want to thank the following people, who provided technical review and/or input to the book, or were simply a source of support and help to the authors: Akila Srinivasan, Alessandro Piotli, Andrea Allievi, Andy Luhrs, Arun Kishan, Ben Hillis, Bill Messmer, Chris Kleynhans, Deepu Thomas, Eugene Bak, Jason Shirk, Jeremy Cox, Joe Bialek, John Lambert, John Lento, Jon Berry, Kai Hsu, Ken Johnson, Landy Wang, Logan Gabriel, Luke Kim, Matt Miller, Matthew Woolman, Mehmet Iyigun, Michelle Bergeron, Minsang Kim, Mohamed Mansour, Nate Warfield, Neeraj Singh, Nick Judge, Pavel Lebedynskiy, Rich Turner, Saruhan Karademir, Simon Pope, Stephen Finnigan, and Stephan Hufnagel.
+This book wouldn't contain the depth of technical detail or the level of accuracy it has without the review, input, and support of key members of the Microsoft Windows development team and other experts at Microsoft. Therefore, we want to thank the following people, who provided technical review and/or input to the book, or were simply a source of support and help to the authors: Akila Srinivasan, Alessandro Piotli, Andrea Allievi, Andy Luhrs, Arun Kishan, Ben Hillis, Bill Messmer, Chris Kleynhans, Deepu Thomas, Eugene Bak, Jason Shirk, Jeremy Cox, Joe Bialek, John Lambert, John Lento, Jon Berry, Kai Hsu, Ken Johnson, Landy Wang, Logan Gabriel, Luke Kim, Matt Miller, Matthew Woolman, Mehmet Iyigun, Michelle Bergeron, Minsang Kim, Mohamed Mansour, Nate Warfield, Neeraj Singh, Nick Judge, Pavel Lebedynskiy, Rich Turner, Saruhan Karademir, Simon Pope, Stephen Finnigan, and Stephen Hufnagel.
 
-We would like to again thank Ilifak Guilhanov of Hex-Rays (http://www.hex-rays.com)
+We would like to again thank Ilfak Guilfanov of Hex-Rays (http://www.hex-rays.com)
 
 for the IDA Pro Advanced and Hex-Rays licenses they granted to Alex Ionescu more than
 

@@ -1,0 +1,36 @@
+## 2026-01-12 - Initial Creation
+
+**RED Phase Documentation:**
+- **Gap identified**: When working with Windows security analysis, malware reverse engineering, or capability development, Claude needs authoritative reference material on advanced Windows system mechanisms, virtualization technologies, management/diagnostics, caching/file systems, and boot processes
+- **Test scenario**: "Explain how Windows VBS (Virtualization-Based Security) and Virtual Secure Mode work, including the Secure Kernel and VTL isolation"
+- **Without skill**: Claude would provide general information from training data, potentially missing implementation details, architectural specifics, or getting technical details incorrect
+- **With skill**: Claude can reference the authoritative Windows Internals 7th Edition Part 2 book, providing accurate, detailed technical information directly from Microsoft kernel engineers
+
+**Skill Details:**
+- **Name**: windows-internals-part2
+- **Location**: .claude/skill-library/security/windows/windows-internals-part2/
+- **Category**: Library skill (security/windows)
+- **Type**: Library/Framework (reference documentation)
+- **Source**: Windows Internals 7th Edition Part 2 by Allievi, Ionescu, Russinovich, Solomon (2022)
+- **Book location**: Books/Winternals7thPt2_full_repair.md (27,497 lines)
+
+**Coverage:**
+- Chapter 8: System mechanisms (side-channel mitigations, traps, interrupts, exceptions, system calls, WoW64, Object Manager, synchronization, ALPC, WNF)
+- Chapter 9: Virtualization technologies (Hyper-V, VBS, VSM, VTLs, Secure Kernel, HVCI, IUM, enclaves)
+- Chapter 10: Management, diagnostics, and tracing (registry, services, Task Scheduler, WMI, ETW, DTrace, WER, shims)
+- Chapter 11: Caching and file systems (Cache Manager, NTFS, ReFS, filter drivers)
+- Chapter 12: Startup and shutdown (UEFI, Secure Boot, boot process, kernel initialization)
+
+**Structure:**
+- SKILL.md: 285 lines (under 500-line limit) ✓
+- Provides navigation and search strategies for 27K-line book
+- Cross-references with Windows Internals Part 1
+- Integration section documents relationship with other Windows security skills
+
+**Complements existing skill:**
+- windows-internals (Part 1) already exists at security/windows/windows-internals/
+- Part 1 covers: processes, threads, memory, I/O, security basics (Chapters 1-7)
+- Part 2 covers: advanced system mechanisms, virtualization, management, file systems, boot (Chapters 8-12)
+
+**Created by**: book-to-skill conversion workflow
+**Next steps**: GREEN phase testing, gateway assignment, REFACTOR pressure testing

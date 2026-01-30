@@ -272,7 +272,7 @@ This duplication operation differs from the handle duplication we discussed in C
 
 Token object, you need to have duplicate access rights on the handle.
 
-You can then use either the #tbaq1catetoken system call or the Copy -NtToken PowerShell command to duplicate the token. For example, to create an impersonation token at the Delegation level based on an existing token, use the script in Listing 4-4:
+You can then use either the #tbaq1catetoken system call or the Copy -ttToken PowerShell command to duplicate the token. For example, to create an impersonation token at the Delegation level based on an existing token, use the script in Listing 4-4:
 
 ```bash
 PS $imp_token = Copy-NtToken -Token $token -ImpersonationLevel Delegation
@@ -1358,7 +1358,7 @@ Let's walk through some worked examples so you can see how to use the various co
 
 ### Finding UI Access Processes
 
-It's sometimes useful to enumerate all the processes you can access and check the properties of their primary tokens. This can help you find processes running as specific users or with certain properties. For example, you could identify processes with the UI access flag set. Earlier in this chapter,
+It' s sometimes useful to enumerate all the processes you can access and check the properties of their primary tokens. This can help you find processes running as specific users or with certain properties. For example, you could identify processes with the UI access flag set. Earlier in this chapter,
 
 138 Chapter 4
 

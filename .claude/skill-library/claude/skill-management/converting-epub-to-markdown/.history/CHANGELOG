@@ -1,0 +1,163 @@
+# Changelog - converting-epub-to-markdown
+
+All notable changes to this skill will be documented in this file.
+
+## [2.4.0] - 2026-01-13
+
+### Added - Image Processing Prompt with Token Estimation
+
+Added Step 3 to prompt user before processing images, with count and token estimation.
+
+**New behavior:**
+- Step 2 now calculates image count, total size, and estimated tokens
+- Step 3 prompts user with AskUserQuestion showing stats
+- Three options: process all, referenced only, or skip
+- Token estimation formula: ~1 token per 4 bytes + 100 tokens/image overhead
+
+**Changes:**
+- Expanded Step 2 to include image stats calculation
+- Added new Step 3 with AskUserQuestion prompt template
+- Renumbered Steps 3-5 → Steps 4-6
+- Added Step 6 to Quick Reference table
+
+**Rationale:** Image processing is time/cost-intensive. Users should see stats upfront:
+- Number of images
+- Total size in MB
+- Estimated tokens
+- Estimated sub-agents needed
+
+**Line count:** 399 → 465 lines
+
+## [2.3.0] - 2026-01-13
+
+### Added - Pandoc Availability Check with User Prompt
+
+Added Step 0 to check for Pandoc before starting conversion.
+
+**New behavior:**
+- Check `which pandoc` before conversion
+- If not found, prompt user with AskUserQuestion tool
+- Options: Install via `brew install pandoc` (recommended) or use native conversion (fallback)
+
+**Changes:**
+- Added `AskUserQuestion` to allowed-tools in frontmatter
+- Added "0. Check Pandoc" to Quick Reference table
+- New Step 0 section with bash check and AskUserQuestion prompt template
+
+**Rationale:** Prevents confusion when Pandoc is missing. User explicitly chooses between:
+- Best quality (Pandoc) with dependency installation
+- Native fallback with known limitations
+
+**Line count:** 345 → 399 lines
+
+## [2.2.0] - 2026-01-13
+
+### Changed - Sonnet as Default Model for Image Processing
+
+Added explicit guidance to use `model: "sonnet"` for image processing sub-agents.
+
+**Rationale:** Testing on 249-image book showed:
+- Sonnet provides equivalent quality for image description tasks
+- Significant cost savings vs Opus
+- No quality degradation observed
+
+**Line count:** 340 → 345 lines
+
+## [2.1.0] - 2026-01-13
+
+### Changed - Sub-Agent Pattern for Image Processing
+
+**Problem:** Books with 200+ images exhaust a single agent's context window when reading images for vision-based descriptions.
+
+**Solution:** Sub-agent batch processing pattern:
+- Parent agent spawns sub-agents to process images in batches
+- Each sub-agent reports last processed index when stopping
+- Parent spawns next sub-agent starting where previous left off
+- Graceful resumption until all images processed
+- Final concatenation of all batch description files
+
+**New sections:**
+- 3.1 Create Image Manifest
+- 3.2 Sub-Agent Batch Processing Pattern (with prompt template)
+- 3.3 Graceful Resumption
+- 3.4 Prioritization (Optional)
+
+**Line count:** 287 → 340 lines
+
+## [2.0.0] - 2026-01-13
+
+### Changed - Pandoc as Primary Method
+
+**Breaking change:** Restructured workflow to use Pandoc as primary conversion method.
+
+**Comparison testing revealed:**
+
+| Aspect              | Pandoc              | Native (sed/awk)         |
+| ------------------- | ------------------- | ------------------------ |
+| HTML entity decoding| Complete            | Partial (144+ unhandled) |
+| Chapter ordering    | Correct (OPF spine) | Alphabetical (wrong)     |
+| Cross-references    | Preserved as links  | Plain text               |
+| Figure references   | Image links + IDs   | Plain text               |
+
+**Workflow changes:**
+- Step 1 now uses `pandoc input.epub -t markdown -o output.md`
+- Native sed/awk approach moved to "Alternative (Fallback)" section
+- Simplified from 7 steps to 5 steps
+- Added Method Comparison table at top for quick decision
+
+**Native approach retained** for environments without Pandoc available.
+
+**Line count:** 330 → 287 lines (simplified)
+
+## [1.1.0] - 2026-01-13
+
+### Added - Vision-Based Figure Descriptions
+
+- Added Step 6: Generate Figure Descriptions using Claude's vision capability
+- New phase in Quick Reference table for figure description workflow
+- Image type classification guide (die photos, schematics, memory maps, etc.)
+- Batch processing strategy for books with 100+ images
+- Updated Quality Comparison table showing vision advantage over external tools
+
+This feature is unique to multimodal LLMs - Calibre/Pandoc cannot extract
+semantic meaning from technical diagrams, schematics, or chip photographs.
+
+**Line count:** 271 → 330 lines
+
+## [1.0.0] - 2026-01-13
+
+### Added - Initial Skill Creation
+
+**RED Phase:**
+- **Problem:** EPUB files cannot be directly used with the books-to-skills workflow
+- **Gap:** No native method to convert EPUB to markdown without external tools
+- **User insight:** "EPUB is secretly a zip archive... it must work just as well as OCRing a PDF"
+- **Impact:** Users must install Calibre/Pandoc or manually extract content
+
+**GREEN Phase:**
+- Native EPUB parsing using built-in tools (unzip, sed, awk)
+- Multi-pass HTML-to-markdown conversion:
+  - Pass 1: Semantic tag conversion (h1-h6, p, li, strong, em, code, pre)
+  - Pass 2: HTML tag removal and entity decoding
+  - Pass 3: Blank line cleanup
+- Figure and listing compression for token efficiency
+- Validation workflow with chapter detection check
+- Integration guidance with converting-books-to-skills
+
+**Tested on:**
+- MicrocontrollerExploits.epub (71MB, 46 HTML files → 9,682 lines markdown)
+- Synthetic test EPUB (basic HTML structures)
+
+**Quality:**
+- Headers, paragraphs, lists: Excellent
+- Bold/italic, code: Excellent
+- Tables: Fair (may need cleanup)
+- Figures: Compressed (references kept)
+
+**Line count:** ~280 lines (well under 500-line limit)
+
+**GREEN Verification:**
+- Native parsing works without external dependencies
+- Output compatible with books-to-skills chapter detection
+- Token estimation included for chunking decisions
+- Troubleshooting guidance for common issues

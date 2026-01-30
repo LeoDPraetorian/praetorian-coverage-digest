@@ -958,7 +958,7 @@ Next, we import the common module ❸. This ensures that the functions defined i
 
 NOTE
 
-It's a common practice to bind to only the loopback address when testing server code. This ensures that other computers on the network can't connect to your server and potentially abuse its functionality. Only bind to all network interfaces when you're confident that any code you've written is secure, or when on a network with no other participants.
+It' s a common practice to bind to only the loopback address when testing server code. This ensures that other computers on the network can't connect to your server and potentially abuse its functionality. Only bind to all network interfaces when you're confident that any code you've written is secure, or when on a network with no other participants.
 
 450 Chapter 13
 

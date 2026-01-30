@@ -12,7 +12,7 @@ We'll target a fictional company, Binford Tools, inventor of the Binford 6100 le
 
 ## The Rules of Engagement
 
-Binford's environment consists only of hosts running up-to-date versions of the Windows operating system, and all authentication is controlled through on-premises Active Directory. Each host has a generic EDR deployed and running, and we aren't allowed to disable, remove, or uninstall it at any point.
+Binford' s environment consists only of hosts running up-to-date versions of the Windows operating system, and all authentication is controlled through on-premises Active Directory. Each host has a generic EDR deployed and running, and we aren't allowed to disable, remove, or uninstall it at any point.
 
 Our point of contact has agreed to provide us with a target email address, which an employee (whom we'll refer to as the white cell ) will monitor, clicking whatever links we send to them. However, they won't add any rule explicitly allowing our payloads past their EDR. This will let us spend less time on social engineering and more time assessing technical detective and preventive measures.
 

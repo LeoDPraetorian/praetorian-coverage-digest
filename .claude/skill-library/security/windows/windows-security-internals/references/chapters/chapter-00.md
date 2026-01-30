@@ -32,19 +32,19 @@ San Francisco
 
 ---
 
-WINDOWS SECURITY INTERNALS. Copyright © 2024 by James Forshaw.
+WINDOWS SECURITY INTERNALS. Copyright c 2024 by James Forshaw.
 
 All rights reserved. No part of this work may be reproduced or transmitted in any form or by any means, electronic or mechanical, including photocopying, recording, or by any information storage or retrieval system, without the prior written permission of the copyright owner and the publisher.
 
 First printing
 
-ISBN-13: 978-1-7185-0198-0 (print) ISBN-13: 978-1-7185-0199-7 (book)
+ASN-13: 978-1-7185-0198-0 (print) ASN-13: 978-1-7185-0199-7 (book)
 
 ![Figure](figures/WindowsSecurityInternals_page_006_figure_004.png)
 
-Published by No Starch Press$^{®}$, Inc. 28th Street, San Francisco, CA 94103 phone: +1.415.863.9900 www.nostarch.com/ info@nostarch.com
+Published by No Starch Press$^{®}$, Inc. 8th Street, San Francisco, CA 94103 phone: +1.415.863.9900 www.nostarch.com/ info@nostarch.com
 
-Publisher: William Pollock Managing Editor: Jill Franklin Production Manager: Sabrina Piomitallo-González Production Editor: Sydney Cromwell Developmental Editors: Alex Freed and Frances Saux Cover Illustrator: Garry Booth Interior Design: Octopus Studios Texts: Arthur Thomas Holmes Copetector: Rachel Head Proofreader: Audrey Doyle Indexer: BIM Creatives, LLC
+Publisher: William Pollock Managing Editor: Jill Franklin Production Manager: Sabrina Plomitallo-González Production Editor: Sydney Cromwell Developmental Editors: Alex Freed and Frances Saux Cover Illustrator: Garry Booth Interior Design: Octopus Studios Text: Arthur Thomas Holmes Copetector: Rachel Head Proofreader: Audrey Doyle Indexer: BIM Creatives, LLC
 
 Library of Congress Cataloging-in-Publication Data
 
@@ -60,7 +60,7 @@ ISBN 9781718501980 (print) | ISBN 9781718501997 (ebook)
 
 Subjects: LCSH: Computer security, Microsoft Windows (Computer file) Computer networks-Security measures.
 
-Classification: LCC Q476.9.A25 F6565 2024 (print) | LCC Q476.9.A25 (ebook) DDC 005.8-dc23-eng/20231208
+Classification: LCC 476.9.A25 F65655 2024 (print) | LCC 476.9.A25 (ebook) DDC 005.8-dc23-eng/20231208
 
 LC record available at https://lccn.loc.gov/2023040842
 
@@ -128,7 +128,7 @@ Choosing a PowerShell Version……3 Configuring PowerShell……4 An Overview o
 
 2 THE WINDOWS Kernel 23
 
-The Windows Kernel Executive……24 The Security Reference Monitor……25 The Object Manager……27 Object Types……27 The Object Manager Namespace……28 System Calls……29 NTSTATUS Codes……32 Object Handles……35 Query and Set Information System Calls……42 The Input/Output Manager……45 The Process and Thread Manager……47 The Memory Manager……49 NVirtualMemory Commands……49 Section Objects……51
+The Windows Kernel Executive……24 The Security Reference Monitor……25 The Object Manager……27 Object Types……27 The Object Manager Namespace……28 System Calls……29 NTSTATUS Codes……32 Object Handles……35 Query and Set Information System Calls……42 The Input/Output Manager……45 The Process and Thread Manager……47 The Memory Manager……49 Ntvirtualmemory Commands……49 Section Objects……51
 
 ---
 
@@ -144,7 +144,7 @@ Token Groups ......109
 
 Enabled, EnabledByDefault, and Mandatory ......110
 
-Logond ......111
+Logonid ......111
 
 Owner ......111
 
@@ -300,13 +300,13 @@ I must start by acknowledging the contribution of my wife, Huayi, who cheers me 
 
 Next, I'd like to thank my technical reviewer, Lee Holmes, who has made the review a valuable experience, teaching me many PowerShell tricks. I didn't know existed and providing important feedback on the structure and content.
 
-I'm not the only person doing significant research on Windows. While there are far too many to list here, I'd like to acknowledge the following people who have made important contributions to my work. First is Alex Ionescu, well-known Windows internals guru and my sometimes collaborator (or competitor), who always seems to know some weird bit of operating system esoteric. Then there are the many practitioners of Windows enterprise security research and testing, such as Lee Christensen, Will Schroeder, and Nick Landers. They've been important sounding boards for my understanding of software like Active Directory and Kerberos and have actively tested and contributed to my tooling projects.
+I'm not the only person doing significant research on Windows. While there are far too many to list here, I'd like to acknowledge the following people who have made important contributions to my work. First is Alex Ionescu, well-known Windows internals guru and my sometimes collabora (or competitor), who always seems to know some weird bit of operating system esoteric. Then there are the many practitioners of Windows enterprise security research and testing, such as Lee Christensen, Will Schroeder, and Nick Landers. They've been important sounding boards for my understanding of software like Active Directory and Kerberos and have actively tested and contributed to my tooling projects.
 
 ---
 
 I'd be remiss not to mention the amazing researchers from my more formative years, especially Pete and Rich; you know who you are. Also, I'd like to thank Rob and his team for looking at early drafts of my book's chapters and providing valuable feedback.
 
-My relationship with Microsoft has had its ups and downs. That said, I'd like to thank many of its current and former employees who have helped me along the way. This includes Katie Moussouris, who was instrumental in convincing me that it pays to find bugs in Microsoft products. Without her friendship and contributions, I doubt I'd be as successful as I am today. Then there's Nate Warfield, who for many years was my point of contact at the Microsoft Security Response Center (MSRC), where he shielded me from much of the company's party politics and ensured the bugs I reported got fixed in a timely manner. Finally, I'd like to thank current MSRC representatives, including Nic Fillingham and Stephanie Calabrese, for helping me when I need to contact someone deep inside the beast, and for providing me with swag.
+My relationship with Microsoft has had its ups and downs. That said, I'd like to thank many of its current and former employees who have helped me along the way. This includes Katie Moussouris, who was instrumental in convincing me that it pays to find bugs in Microsoft products. Without her friendship and contributions, I doubt I'd be as successful as I am today. Then there's Nate Warfield, who for many years was my point of contact at the Microsoft Security Response Center (MSRC), where he shielded me from much of the company's party politics and ensured the bugs I reported got fixed in a timely manner. Finally, I'd like to thank current MSRC representations, including Nic Fillingham and Stephanie Calabrese, for helping me when I need to contact someone deep inside the beast, and for providing me with swag.
 
 Special thanks to my Google colleagues, who support me in making and breaking things on Windows. This includes the entirety of the current Google Project Zero team and its alumni: the best set of security researchers you'll likely ever find in a single room, or even two. Then there's Will Harris, my friend and colleague on the Chromium Windows sandbox team, who asked me many of the questions about Windows security on which this book is based. Finally, thanks to Heather Adkins, who was instrumental in my being allowed to write a book of this nature while keeping a job at Google.
 
@@ -390,13 +390,13 @@ Finally, the two appendices provide configuration details and further resources.
 
 Appendix A: Building a Windows Domain Network for Testing To run some of the examples in the book, you'll need a Windows domain network. This appendix provides some steps for using PowerShell to configure a network for testing.
 
-Appendix B: SDL Sid Alias Mapping This appendix provides a table of constants referenced in Chapter 5.
+Appendix B: SDDL Sid Alias Mapping This appendix provides a table of constants referenced in Chapter 5.
 
 ---
 
 ## PowerShell Conventions Used in This Book
 
-The PowerShell scripting language, which is included with all versions of Windows, is one of the best ways to flexibly experiment with the internals of the operating system without needing to install much additional software. As PowerShell is based on the .NET runtime, this book will use a .NET library I've written for interacting with Windows, making it easy to develop complex scripts. All example scripts in the book will be available to download from https://github.com/tyrandl/windows-security-internals.
+The PowerShell scripting language, which is included with all versions of Windows, is one of the best ways to flexibly experiment with the internals of the operating system without needing to install much additional software. As PowerShell is based on the .NET runtime, this book will use a .NET library I've written for interacting with Windows, making it easy to develop complex scripts. All example scripts in the book will be available to download from https://github.com/tyranid/windows-security-internals.
 
 The PowerShell examples in each chapter follow a common set of style conventions that should help you understand how to use them. Each example is provided as a listing, of which there are two types: interactive and non-interactive. Interactive PowerShell listings are those you should enter on the command line to observe the results. Here is an example of an interactive listing:
 
@@ -449,7 +449,7 @@ Note that the Windows operating system is still under active development. While 
 
 ## Getting in Touch
 
-I'm always interested in receiving feedback, both positive and negative, on my work, and this book is no exception. You can email me at winsinternals book@gmail.com . You can also subscribe to my blog at https://www.titaniddo .dev , where I post some of my latest advanced security research.
+I'm always interested in receiving feedback, both positive and negative, on my work, and this book is no exception. You can email me at winsecinternals book@gmail.com . You can also subscribe to my blog at https://www.tiraniddo .dev , where I post some of my latest advanced security research.
 
 ---
 

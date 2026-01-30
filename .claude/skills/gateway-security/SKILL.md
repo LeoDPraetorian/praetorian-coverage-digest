@@ -70,16 +70,19 @@ This gateway implements 3-tier loading:
 | "frontend security" / "React security" / "XSS"                   | → `reviewing-frontend-security`            |
 | "PlexTrac" / "finding format" / "report writing" / "VKB"         | → `formatting-plextrac-findings`           |
 | "test case" / "testing instructions" / "test documentation" / "test plan generation" | → `generating-security-test-instructions` |
-| "CIS" / "benchmark" / "compliance mapping"                       | → `mapping-to-cis-benchmarks`              |
-| "M365 audit" / "M365 benchmark" / "run CIS M365"                 | → `running-cis-m365-benchmarks`            |
-| "FDA" / "medical device" / "510(k)" / "SBOM"                     | → `mapping-to-fda-cybersecurity`           |
-| "Windows internals" / "kernel" / "CreateProcess"                 | → `windows-internals`                      |
-| "Windows authentication" / "Kerberos" / "NTLM"                   | → `windows-security-internals`             |
-| "EDR" / "EDR evasion" / "function hooking" / "ETW"               | → `evading-edr`                            |
-| "browser extension" / "hypercube" / "Chrome"                     | → `hypercube-browser-extension`            |
-| "Prowler" / "AWS findings" / "triage Prowler"                    | → `triaging-aws-prowler-findings`          |
-| "Shodan" / "host search" / "recon"                               | → use `gateway-mcp-tools`                  |
-| "testing" (general)                                              | → also invoke `gateway-testing`            |
+| "CIS" / "benchmark" / "compliance mapping"                                  | → `mapping-to-cis-benchmarks`              |
+| "M365 audit" / "M365 benchmark" / "run CIS M365"                            | → `running-cis-m365-benchmarks`            |
+| "FDA" / "medical device" / "510(k)" / "SBOM"                                | → `mapping-to-fda-cybersecurity`           |
+| "Windows internals" / "CreateProcess" / "EPROCESS" / "KTHREAD" / "thread scheduling" / "dispatcher" / "virtual memory" / "page tables" / "VAD tree" / "heaps" / "I/O system" / "IRP" / "IRQL" / "DPC" / "security descriptor" / "access token" / "ACL" / "SID" / "UAC" | → `windows-internals`                      |
+| "Windows Internals Part 2" / "Hyper-V" / "VBS" / "VSM" / "VTL" / "Secure Kernel" / "HVCI" / "registry" / "services" / "Task Scheduler" / "ETW" / "WMI" / "NTFS" / "ReFS" / "Cache Manager" / "boot" / "UEFI" / "Secure Boot" / "ALPC" / "WNF" / "Object Manager" | → `windows-internals-part2`                |
+| "Windows authentication" / "Kerberos" / "NTLM"                              | → `windows-security-internals`             |
+| "EDR" / "EDR evasion" / "function hooking" / "ETW"                          | → `evading-edr`                            |
+| "Mac malware" / "macOS malware" / "Mac analysis"                            | → `art-of-mac-malware-development`         |
+| "Mac detection" / "macOS security tools" / "Endpoint Security"              | → `art-of-mac-malware-detection`           |
+| "browser extension" / "hypercube" / "Chrome"                                | → `hypercube-browser-extension`            |
+| "Prowler" / "AWS findings" / "triage Prowler"                               | → `triaging-aws-prowler-findings`          |
+| "Shodan" / "host search" / "recon"                                          | → use `gateway-mcp-tools`                  |
+| "testing" (general)                                                         | → also invoke `gateway-testing`            |
 
 ## Routing Algorithm
 
@@ -151,11 +154,19 @@ This gateway implements 3-tier loading:
 
 ### Windows Security References
 
-| Skill                      | Path                                                                         | Triggers                                                                  |
-| -------------------------- | ---------------------------------------------------------------------------- | ------------------------------------------------------------------------- |
-| Windows Internals          | `.claude/skill-library/security/windows/windows-internals/SKILL.md`          | Windows internals, kernel, process, thread, memory, CreateProcess         |
-| Windows Security Internals | `.claude/skill-library/security/windows/windows-security-internals/SKILL.md` | Windows authentication, Kerberos, NTLM, access token, security descriptor |
-| Evading EDR                | `.claude/skill-library/security/windows/evading-edr/SKILL.md`                | EDR, EDR evasion, function hooking, ETW, kernel callbacks                 |
+| Skill                      | Path                                                                         | Triggers                                                                    |
+| -------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Windows Internals (Part 1) | `.claude/skill-library/security/windows/windows-internals/SKILL.md`          | Windows internals, kernel, process, thread, memory, CreateProcess           |
+| Windows Internals Part 2   | `.claude/skill-library/security/windows/windows-internals-part2/SKILL.md`    | Windows Part 2, Hyper-V, VBS, VSM, registry, ETW, NTFS, Cache Manager, boot |
+| Windows Security Internals | `.claude/skill-library/security/windows/windows-security-internals/SKILL.md` | Windows authentication, Kerberos, NTLM, access token, security descriptor   |
+| Evading EDR                | `.claude/skill-library/security/windows/evading-edr/SKILL.md`                | EDR, EDR evasion, function hooking, ETW, kernel callbacks                   |
+
+### macOS Security References
+
+| Skill                      | Path                                                                           | Triggers                                                                       |
+| -------------------------- | ------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Art of Mac Malware (Vol 1) | `.claude/skill-library/security/macos/art-of-mac-malware-development/SKILL.md` | Mac malware, macOS malware analysis, dylib hijacking, launch agents, Mach-O    |
+| Art of Mac Malware Vol 2   | `.claude/skill-library/security/macos/art-of-mac-malware-detection/SKILL.md`   | Mac detection, macOS security tools, Endpoint Security framework, code signing |
 
 ### Compliance Frameworks
 

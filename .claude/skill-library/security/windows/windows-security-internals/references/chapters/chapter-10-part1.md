@@ -88,7 +88,7 @@ Figure 10-4: Multiple forests with trust relationships
 
 In general, inter-forest trusts relationships are not transitive. So, while in Figure 10-4 vegetable.local trusts mineral.local , it won't automatically trust anything in the sales.animal.local domain even though there's a bidirectional trust relationship between sales.animal.local and sales.mineral.local .
 
-NOTE Managing trust relationships can be complex, especially as the numbers of domains and forests grow. It's possible to inadvertently create trust relationships that a malicious user could exploit to compromise an enterprise network. I won 't discuss how to analyze these relationships to find security issues; however, the security tool BloodHound (https://github.com/SpecterOps/BloodHound) can help with this.
+NOTE Managing trust relationships can be complex, especially as the numbers of domains and forests grow. It' s possible to inadvertently create trust relationships that a malicious user could exploit to compromise an enterprise network. I won 't discuss how to analyze these relationships to find security issues; however, the security tool BloodHound (https://github.com/SpecterOps/BloodHound) can help with this.
 
 The next few chapters will focus on the configuration of a local domain and a simple forest. If you want to know about more complex domain relationships, the Microsoft technical documentation is a good resource. For now, let's continue by detailing how a local domain stores authentication configurations.
 

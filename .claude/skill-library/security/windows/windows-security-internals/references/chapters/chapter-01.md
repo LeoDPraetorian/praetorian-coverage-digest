@@ -36,7 +36,7 @@ Now that we can run unsigned scripts, we can install the PowerShell module we'll
 
 To install a module from the PowerShell Gallery, we use PowerShell's
 
-Install-Module command. For this book, we'll need to install the NtObject
+Install-Module command. For this book, we'll need to install the ntobject
 
 Manager module, which we can do using the following command:
 
