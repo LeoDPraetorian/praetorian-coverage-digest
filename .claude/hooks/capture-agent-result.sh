@@ -46,7 +46,20 @@ fi
 
 # Extract agent type from task input
 subagent_type=$(echo "$input" | jq -r '.tool_input.subagent_type // ""')
-task_output=$(echo "$input" | jq -r '.tool_output // .tool_result // ""')
+
+# Extract task output from the correct path
+# Claude Code stores agent text output in .tool_response.content[].text
+# Concatenate all text content blocks into a single output string
+task_output=$(echo "$input" | jq -r '
+  .tool_response.content // []
+  | map(select(.type == "text") | .text)
+  | join("\n")
+')
+
+# Fallback to legacy paths if tool_response doesn't exist (for backwards compatibility)
+if [[ -z "$task_output" || "$task_output" == "null" ]]; then
+  task_output=$(echo "$input" | jq -r '.tool_output // .tool_result // ""')
+fi
 
 # Skip if no agent type
 [[ -z "$subagent_type" ]] && exit 0
