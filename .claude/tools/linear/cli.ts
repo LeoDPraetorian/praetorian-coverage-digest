@@ -28,6 +28,7 @@ export interface ParsedArgs {
 // Operation registry type
 export interface OperationRegistry {
   createIssue?: (params: unknown) => Promise<unknown>;
+  createComment?: (params: unknown) => Promise<unknown>;
   listIssues?: (params: unknown) => Promise<unknown>;
   getIssue?: (params: unknown) => Promise<unknown>;
   updateIssue?: (params: unknown) => Promise<unknown>;
@@ -41,6 +42,7 @@ export interface OperationRegistry {
 // Available operations (kebab-case to camelCase mapping)
 const OPERATIONS: Record<string, keyof OperationRegistry> = {
   'create-issue': 'createIssue',
+  'create-comment': 'createComment',
   'list-issues': 'listIssues',
   'get-issue': 'getIssue',
   'update-issue': 'updateIssue',
@@ -133,6 +135,7 @@ ${Object.keys(OPERATIONS).map(op => `  - ${op}`).join('\n')}`,
       // Dynamic import of wrapper modules
       const wrapperMap: Record<string, string> = {
         createIssue: './create-issue.js',
+        createComment: './create-comment.js',
         listIssues: './list-issues.js',
         getIssue: './get-issue.js',
         updateIssue: './update-issue.js',

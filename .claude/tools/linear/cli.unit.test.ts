@@ -37,6 +37,16 @@ describe('CLI Runner', () => {
       expect(mockCreateIssue).toHaveBeenCalledWith({ title: 'Test' });
     });
 
+    it('routes to create-comment', async () => {
+      const mockCreateComment = vi.fn().mockResolvedValue({ success: true, comment: { id: 'c1' } });
+      const result = await routeOperation(
+        'create-comment',
+        { issueId: 'ENG-123', body: 'Test comment' },
+        { createComment: mockCreateComment }
+      );
+      expect(mockCreateComment).toHaveBeenCalledWith({ issueId: 'ENG-123', body: 'Test comment' });
+    });
+
     it('returns error for unknown operation', async () => {
       const result = await routeOperation('unknown-op', {}, {});
       expect(result.ok).toBe(false);
