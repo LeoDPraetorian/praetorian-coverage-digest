@@ -100,6 +100,10 @@ const UPDATE_ISSUE_MUTATION = `
         identifier
         title
         url
+        project {
+          id
+          name
+        }
       }
     }
   }
@@ -180,6 +184,10 @@ export const updateIssueOutput = z.object({
   identifier: z.string(),
   title: z.string(),
   url: z.string(),
+  project: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).nullable().optional(),
   estimatedTokens: z.number()
 });
 
@@ -204,6 +212,10 @@ interface IssueUpdateResponse {
       identifier: string;
       title: string;
       url: string;
+      project?: {
+        id: string;
+        name: string;
+      } | null;
     };
   };
 }
@@ -328,7 +340,8 @@ export const updateIssue = {
       id: response.issueUpdate.issue.id,
       identifier: response.issueUpdate.issue.identifier,
       title: response.issueUpdate.issue.title,
-      url: response.issueUpdate.issue.url
+      url: response.issueUpdate.issue.url,
+      project: response.issueUpdate.issue.project || undefined
     };
 
     const filtered = {

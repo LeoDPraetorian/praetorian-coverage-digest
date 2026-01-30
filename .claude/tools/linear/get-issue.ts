@@ -71,6 +71,10 @@ const GET_ISSUE_QUERY = `
         name
         email
       }
+      project {
+        id
+        name
+      }
       url
       branchName
       createdAt
@@ -138,6 +142,12 @@ export const getIssueOutput = z.object({
     email: z.string(),
   }).nullable().optional(),
 
+  // Project is returned as object with id, name
+  project: z.object({
+    id: z.string(),
+    name: z.string(),
+  }).nullable().optional(),
+
   url: z.string().optional(),
   branchName: z.string().optional(),
   createdAt: z.string().optional(),
@@ -177,6 +187,10 @@ interface IssueResponse {
       email: string;
     } | null;
     assigneeId?: string | null;
+    project?: {
+      id: string;
+      name: string;
+    } | null;
     url?: string;
     branchName?: string;
     createdAt?: string;
@@ -256,6 +270,9 @@ export const getIssue = {
 
       // Assignee is an object with id, name, email
       assignee: response.issue.assignee || undefined,
+
+      // Project is an object with id, name
+      project: response.issue.project || undefined,
 
       url: response.issue.url,
       branchName: response.issue.branchName,
