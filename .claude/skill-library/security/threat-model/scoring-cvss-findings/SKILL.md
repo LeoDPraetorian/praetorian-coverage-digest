@@ -127,14 +127,12 @@ Options:
 **Use the included calculator:**
 
 ```bash
-# Navigate to skill directory
-cd .claude/skill-library/security/scoring-cvss-findings/scripts
-
+# Run from repo root (chariot-development-platform/)
 # Calculate CVSS v4.0 score
-uv run cvss-calc.py "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
+uv run .claude/skill-library/security/scoring-cvss-findings/scripts/cvss-calc.py "CVSS:4.0/AV:N/AC:L/AT:N/PR:N/UI:N/VC:H/VI:H/VA:H/SC:N/SI:N/SA:N"
 
 # Calculate CVSS v3.1 score
-uv run cvss-calc.py "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N"
+uv run .claude/skill-library/security/scoring-cvss-findings/scripts/cvss-calc.py "CVSS:3.1/AV:N/AC:L/PR:N/UI:R/S:U/C:H/I:L/A:N"
 ```
 
 **Output format:**
