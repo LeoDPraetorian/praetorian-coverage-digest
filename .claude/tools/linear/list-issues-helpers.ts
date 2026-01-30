@@ -62,6 +62,15 @@ export function buildIssueFilterWithIdDetection(input: ListIssuesInput): Record<
     }
   }
 
+  // Creator filter
+  if (input.creator) {
+    if (isLinearId(input.creator)) {
+      filter.creator = { id: { eq: input.creator } };
+    } else {
+      filter.creator = { name: { eq: input.creator } };
+    }
+  }
+
   // Team filter
   if (input.team) {
     if (isLinearId(input.team)) {

@@ -13,6 +13,7 @@
  *
  * INPUT FIELDS (all optional):
  * - assignee: string - User ID, name, email, or "me"
+ * - creator: string - Creator user ID or name
  * - team: string - Team name or ID
  * - state: string - State name or ID
  * - project: string - Project name or ID
@@ -34,6 +35,8 @@
  * - status: string | null
  * - assignee: string | null - assignee name (extracted from assignee object)
  * - assigneeId: string | null - assignee ID (extracted from assignee object)
+ * - creator: string | null - creator name (extracted from creator object)
+ * - creatorId: string | null - creator ID (extracted from creator object)
  * - url: string
  * - createdAt: string
  * - updatedAt: string
@@ -108,6 +111,10 @@ const LIST_ISSUES_QUERY = `
           id
           name
         }
+        creator {
+          id
+          name
+        }
         url
         createdAt
         updatedAt
@@ -131,6 +138,12 @@ export const listIssuesParams = z.object({
     .refine(validateNoCommandInjection, 'Invalid characters detected')
     .optional()
     .describe('User ID, name, email, or "me"'),
+  creator: z.string()
+    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoPathTraversal, 'Path traversal not allowed')
+    .refine(validateNoCommandInjection, 'Invalid characters detected')
+    .optional()
+    .describe('Creator user ID or name'),
   team: z.string()
     .refine(validateNoControlChars, 'Control characters not allowed')
     .refine(validateNoPathTraversal, 'Path traversal not allowed')
@@ -177,6 +190,7 @@ export type ListIssuesInput = {
   state?: string;
   team?: string;
   assignee?: string;
+  creator?: string;
   includeArchived?: boolean;
   orderBy?: 'createdAt' | 'updatedAt';
   project?: string;
@@ -210,6 +224,9 @@ export const listIssuesOutput = z.object({
     // Assignee is a STRING (name only), extracted from assignee object
     assignee: z.string().optional(),
     assigneeId: z.string().optional(),
+    // Creator is a STRING (name only), extracted from creator object
+    creator: z.string().optional(),
+    creatorId: z.string().optional(),
     url: z.string().optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional()
@@ -239,6 +256,10 @@ interface IssuesListResponse {
         type: string;
       } | null;
       assignee?: {
+        id: string;
+        name: string;
+      } | null;
+      creator?: {
         id: string;
         name: string;
       } | null;
@@ -334,6 +355,8 @@ export const listIssues = {
         status: issue.state?.name || undefined,
         assignee: issue.assignee?.name || undefined, // Extract name as string
         assigneeId: issue.assignee?.id || undefined, // Extract ID separately
+        creator: issue.creator?.name || undefined, // Extract name as string
+        creatorId: issue.creator?.id || undefined, // Extract ID separately
         url: issue.url || undefined,
         createdAt: issue.createdAt || undefined,
         updatedAt: issue.updatedAt || undefined

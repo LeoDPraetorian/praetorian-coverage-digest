@@ -609,6 +609,119 @@ describe('listIssues - Unit Tests', () => {
   });
 
   // ==========================================================================
+  // Category 5b: Creator Filter Tests
+  // ==========================================================================
+
+  describe('Creator filter', () => {
+    it('should build filter with creator name', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [mockIssueNode],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({ creator: 'Nathan Sportsman' });
+
+      // Verify executeGraphQL was called with creator filter
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            creator: { name: { eq: 'Nathan Sportsman' } }
+          })
+        })
+      );
+    });
+
+    it('should build filter with creator UUID', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [mockIssueNode],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({ creator: '7b2c8ce3-314a-41e4-8a8b-36e0b817e4db' });
+
+      // Verify executeGraphQL was called with creator filter by ID
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            creator: { id: { eq: '7b2c8ce3-314a-41e4-8a8b-36e0b817e4db' } }
+          })
+        })
+      );
+    });
+
+    it('should combine creator filter with state and assignee filters', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      await listIssues.execute({
+        creator: 'Nathan Sportsman',
+        state: 'Backlog',
+        assignee: undefined  // No assignee - can't filter for null assignee directly yet
+      });
+
+      // Verify all filters passed
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('IssuesList'),
+        expect.objectContaining({
+          filter: expect.objectContaining({
+            creator: expect.any(Object),
+            state: expect.any(Object)
+          })
+        })
+      );
+    });
+
+    it('should include creator in output when present in response', async () => {
+      // Mock response with creator field
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [{
+            ...mockIssueNode,
+            creator: { id: 'user-456', name: 'Nathan Sportsman' }
+          }],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      const result = await listIssues.execute({});
+
+      // Verify creator in output
+      expect(result.issues[0].creator).toBe('Nathan Sportsman');
+      expect(result.issues[0].creatorId).toBe('user-456');
+    });
+
+    it('should handle null creator gracefully', async () => {
+      vi.mocked(executeGraphQL).mockResolvedValueOnce({
+        issues: {
+          nodes: [{
+            ...mockIssueNode,
+            creator: null
+          }],
+          pageInfo: { hasNextPage: false, endCursor: null },
+        },
+      } as any);
+
+      const result = await listIssues.execute({});
+
+      expect(result.issues[0].creator).toBeUndefined();
+      expect(result.issues[0].creatorId).toBeUndefined();
+    });
+  });
+
+  // ==========================================================================
   // Category 6: Input Validation Tests
   // ==========================================================================
 
@@ -717,6 +830,24 @@ describe('listIssues - Unit Tests', () => {
       ).rejects.toThrow(/control characters/i);
     });
 
+    it('should block path traversal in creator field', async () => {
+      await expect(
+        listIssues.execute({ creator: '../../../etc/passwd' })
+      ).rejects.toThrow(/traversal/i);
+    });
+
+    it('should block command injection in creator field', async () => {
+      await expect(
+        listIssues.execute({ creator: '; rm -rf /' })
+      ).rejects.toThrow(/invalid characters/i);
+    });
+
+    it('should block control characters in creator field', async () => {
+      await expect(
+        listIssues.execute({ creator: 'test\x00null' })
+      ).rejects.toThrow(/control characters/i);
+    });
+
     it('should allow valid filter parameters', async () => {
       vi.mocked(executeGraphQL).mockResolvedValue({
         issues: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } },
@@ -727,8 +858,9 @@ describe('listIssues - Unit Tests', () => {
       await listIssues.execute({ team: 'Engineering' });
       await listIssues.execute({ query: 'authentication bug' });
       await listIssues.execute({ state: 'In Progress' });
+      await listIssues.execute({ creator: 'Nathan Sportsman' });
 
-      expect(executeGraphQL).toHaveBeenCalledTimes(4);
+      expect(executeGraphQL).toHaveBeenCalledTimes(5);
     });
   });
 
