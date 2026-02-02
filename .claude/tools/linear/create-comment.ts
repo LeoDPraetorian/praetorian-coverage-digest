@@ -52,6 +52,7 @@ import { createLinearClient } from './client.js';
 import { executeGraphQL } from './graphql-helpers.js';
 import {
   validateNoControlChars,
+  validateNoControlCharsAllowWhitespace,
   validateNoPathTraversal,
   validateNoCommandInjection,
 } from '../config/lib/sanitize.js';
@@ -89,7 +90,7 @@ export const createCommentParams = z.object({
   // User content - only block control chars, allow special chars for Markdown
   body: z.string()
     .min(1)
-    .refine(validateNoControlChars, 'Control characters not allowed')
+    .refine(validateNoControlCharsAllowWhitespace, 'Control characters not allowed')
     .describe('Comment content (Markdown)'),
   // Reference field - full validation
   parentId: z.string()

@@ -297,6 +297,94 @@ describe('createComment - Unit Tests', () => {
       expect(results.passed).toBe(results.total);
     });
 
+    // HIGH PRIORITY - Positive tests for allowed whitespace
+    it('should allow newlines in body for markdown formatting', async () => {
+      const bodyWithNewlines = 'Line 1\nLine 2\nLine 3';
+
+      const result = await createComment.execute({
+        issueId: 'TEST-1',
+        body: bodyWithNewlines
+      });
+
+      expect(result.success).toBe(true);
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('commentCreate'),
+        expect.objectContaining({
+          body: bodyWithNewlines
+        })
+      );
+    });
+
+    it('should allow tabs in body', async () => {
+      const bodyWithTabs = 'Indented\twith\ttabs';
+
+      const result = await createComment.execute({
+        issueId: 'TEST-1',
+        body: bodyWithTabs
+      });
+
+      expect(result.success).toBe(true);
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('commentCreate'),
+        expect.objectContaining({
+          body: bodyWithTabs
+        })
+      );
+    });
+
+    it('should allow carriage returns in body (CRLF line endings)', async () => {
+      const bodyWithCRLF = 'Windows line\r\nEndings here\r\n';
+
+      const result = await createComment.execute({
+        issueId: 'TEST-1',
+        body: bodyWithCRLF
+      });
+
+      expect(result.success).toBe(true);
+      expect(executeGraphQL).toHaveBeenCalledWith(
+        mockClient,
+        expect.stringContaining('commentCreate'),
+        expect.objectContaining({
+          body: bodyWithCRLF
+        })
+      );
+    });
+
+    // MEDIUM PRIORITY - Negative tests for blocked dangerous control chars
+    it('should block vertical tab (0x0B) in body', async () => {
+      const bodyWithVerticalTab = 'Text with\x0Bvertical tab';
+
+      await expect(
+        createComment.execute({ issueId: 'TEST-1', body: bodyWithVerticalTab })
+      ).rejects.toThrow();
+    });
+
+    it('should block form feed (0x0C) in body', async () => {
+      const bodyWithFormFeed = 'Text with\x0Cform feed';
+
+      await expect(
+        createComment.execute({ issueId: 'TEST-1', body: bodyWithFormFeed })
+      ).rejects.toThrow();
+    });
+
+    it('should block backspace (0x08) in body', async () => {
+      const bodyWithBackspace = 'Text with\x08backspace';
+
+      await expect(
+        createComment.execute({ issueId: 'TEST-1', body: bodyWithBackspace })
+      ).rejects.toThrow();
+    });
+
+    it('should block DEL character (0x7F) in body', async () => {
+      const bodyWithDEL = 'Text with\x7FDEL char';
+
+      await expect(
+        createComment.execute({ issueId: 'TEST-1', body: bodyWithDEL })
+      ).rejects.toThrow();
+    });
+
     it('should block control characters in parentId', async () => {
       const results = await testSecurityScenarios(
         ControlCharacterScenarios,
