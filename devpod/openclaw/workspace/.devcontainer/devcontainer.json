@@ -1,0 +1,17 @@
+{
+  "name": "OpenClaw",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "remoteUser": "vscode",
+  "features": {},
+  "customizations": {
+    "vscode": {
+      "extensions": []
+    }
+  },
+    "postCreateCommand": "echo '✅ OpenClaw environment ready. Run: curl -fsSL https://openclaw.ai/install.sh | bash'",
+  "remoteEnv": {
+    "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
+  }
+}
