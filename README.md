@@ -33,7 +33,7 @@ git clone --recurse-submodules https://github.com/praetorian-inc/praetorian-deve
 make setup
 
 # Deploy complete Chariot stack (CloudFormation + React UI)
-make chariot
+make guard
 
 # Generate test user with UUID credentials
 make user

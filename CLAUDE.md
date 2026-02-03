@@ -186,7 +186,7 @@ git clone --recurse-submodules https://github.com/praetorian-inc/praetorian-deve
 
 # Complete setup sequence
 make setup                    # Install dependencies and configure environment
-make chariot                  # Deploy complete Chariot stack (CloudFormation + React UI)
+make guard                  # Deploy complete Chariot stack (CloudFormation + React UI)
 make user                     # Generate test user with UUID credentials
 make claude-setup             # Display Claude Code plugin installation commands
 
@@ -217,7 +217,7 @@ make install-git-hooks
 
 ```bash
 # Complete platform deployment (REQUIRED for new development)
-make chariot                  # Deploy Chariot stack (CloudFormation + React UI)
+make guard                  # Deploy Chariot stack (CloudFormation + React UI)
 
 # User management
 make user                     # Generate test user with UUID credentials
@@ -363,7 +363,7 @@ git submodule foreach 'git checkout -b feature/your-feature-name'
 **🚨 ONLY USE THIS COMMAND:**
 
 ```bash
-make chariot
+make guard
 ```
 
 **NEVER use**: `docker-compose up`, `npm start`, `go run` for full deployment
@@ -576,7 +576,7 @@ These skills include review/test phases internally.
 
 ## Critical Development Reminders
 
-1. **Deployment**: Only use `make chariot` from super-repo root for full platform
+1. **Deployment**: Only use `make guard` from super-repo root for full platform
 2. **Branch Safety**: Never work directly on main branch - always create feature branches
 3. **File Organization**: Never save working files to root - use appropriate `/modules/` subdirectories
 4. **Testing**: Frontend changes automatically generate E2E tests with Playwright

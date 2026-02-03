@@ -20,7 +20,7 @@ else
 	PROFILE_FILE := $(HOME)/.profile
 endif
 
-chariot:
+guard:
 ifeq (Darwin,$(OS_KERNEL))
 # running docker inside the devcontainer isn't supported yet
 	open -ja Docker
@@ -682,7 +682,7 @@ devpod-setup-remote: ## Run setup inside DevPod workspace (run this from inside 
 	@echo "✅ DevPod environment setup complete!"
 	@echo ""
 	@echo "📝 Next steps:"
-	@echo "   1. Run 'make chariot' to deploy the backend and start the UI"
+	@echo "   1. Run 'make guard' to deploy the backend and start the UI"
 	@echo "   2. Access UI at https://localhost:3000 (auto-forwarded)"
 	@echo "   3. Or launch Chrome: make devpod-chrome"
 	@echo ""
@@ -724,7 +724,7 @@ devpod-help: ## Show DevPod quick reference guide
 	@echo ""
 	@echo "🔧 Inside DevPod (run inside workspace):"
 	@echo "   make devpod-setup-remote         # Run full setup"
-	@echo "   make chariot                     # Deploy backend + start UI"
+	@echo "   make guard                       # Deploy backend + start UI"
 	@echo "   make devpod-chrome               # Launch Chrome (auto-detects headless/X11)"
 	@echo "   make devpod-chrome MODE=headless # Force headless mode"
 	@echo "   make devpod-chrome MODE=x11      # Force X11 forwarding mode"

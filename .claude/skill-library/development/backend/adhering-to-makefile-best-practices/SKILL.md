@@ -338,7 +338,7 @@ The Chariot Development Platform has extensive Makefile usage:
 
 **Root Makefile** (`chariot-development-platform2/Makefile`):
 
-- Super-repository automation (`make chariot`, `make setup`)
+- Super-repository automation (`make guard`, `make setup`)
 - Submodule management (`make submodule-pull`)
 - User/credential generation (`make user`)
 

@@ -5,7 +5,7 @@
 ### RED Phase Documentation
 
 **Gap Identified:**
-The Chariot Development Platform extensively uses Makefiles (root-level Makefile with `make chariot`, `make setup`, module-specific Makefiles in backend/capabilities/etc.), but there was no skill to guide Makefile creation or maintenance following best practices.
+The Chariot Development Platform extensively uses Makefiles (root-level Makefile with `make guard`, `make setup`, module-specific Makefiles in backend/capabilities/etc.), but there was no skill to guide Makefile creation or maintenance following best practices.
 
 **Failure Scenario:**
 Task: "Update the root Makefile to add a new target for running integration tests. Make sure it follows best practices."

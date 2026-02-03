@@ -349,7 +349,7 @@ git clone --recurse-submodules https://github.com/praetorian-inc/chariot-develop
 cd chariot-development-platform
 
 # 2. Deploy Chariot stack
-make chariot
+make guard
 
 # 3. Create .env-acceptance
 cd modules/chariot/acceptance/pkg/lib/env

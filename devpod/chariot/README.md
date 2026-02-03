@@ -74,7 +74,7 @@ This initializes:
 ## Deploy Chariot Stack
 
 ```bash
-make chariot
+make guard
 ```
 
 Access the UI at `https://localhost:3000` (auto-forwarded).

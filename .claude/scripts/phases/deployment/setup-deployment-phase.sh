@@ -106,7 +106,7 @@ fi
 # Deploy the complete Chariot platform
 echo "🚀 Deploying Chariot platform with new feature..."
 DEPLOY_LOG=".claude/features/${FEATURE_ID}/deployment/logs/deploy.log"
-if make chariot 2>&1 | tee "${DEPLOY_LOG}"; then
+if make guard 2>&1 | tee "${DEPLOY_LOG}"; then
     DEPLOY_STATUS="success"
     echo "✅ Deployment completed successfully"
 else

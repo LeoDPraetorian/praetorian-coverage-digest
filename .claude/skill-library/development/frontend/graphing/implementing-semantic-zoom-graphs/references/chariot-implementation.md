@@ -164,7 +164,7 @@ cd modules/chariot/ui
 npm test -- --grep "createAssetToRiskQuery"
 
 # Test with real data
-# 1. Start local Chariot: make chariot
+# 1. Start local Chariot: make guard
 # 2. Navigate to Graph Explorer
 # 3. Load account with 5000+ assets
 # 4. Verify graph renders (previously would hang)
