@@ -13,6 +13,11 @@ INSTANCE_GPU := g4dn.xlarge
 INSTANCE_INFERENTIA := inf2.xlarge
 AWS_PROVIDER := aws-us-east-1
 
+# AMI configurations
+# CPU instances use default Ubuntu AMI
+# GPU instances REQUIRE Deep Learning AMI for NVIDIA Container Toolkit (Docker GPU passthrough)
+AMI_GPU := ami-0e352d4aa794f5377  # Deep Learning Base OSS Nvidia Driver GPU AMI (Ubuntu 24.04)
+
 # IDE configuration (cursor, vscode, goland, none)
 IDE := cursor
 
@@ -83,6 +88,7 @@ devpod-up-cpu-t3-large: ## Create workspace with CPU instance (t3.large) - for c
 devpod-up-gpu-g4dn-xlarge: ## Create workspace with NVIDIA GPU (g4dn.xlarge) - for local models
 	@echo "🦞 Creating OpenClaw workspace: $(WORKSPACE)"
 	@echo "   Instance: $(INSTANCE_GPU) (NVIDIA T4 GPU, 16GB VRAM)"
+	@echo "   AMI:      Deep Learning Base OSS (NVIDIA Container Toolkit pre-installed)"
 	@echo "   Provider: $(AWS_PROVIDER)"
 	@echo "   IDE:      $(IDE)"
 	@echo ""
@@ -93,6 +99,7 @@ devpod-up-gpu-g4dn-xlarge: ## Create workspace with NVIDIA GPU (g4dn.xlarge) - f
 		--id $(WORKSPACE) \
 		--ide $(IDE) \
 		--provider-option AWS_INSTANCE_TYPE=$(INSTANCE_GPU) \
+		--provider-option AWS_AMI=$(AMI_GPU) \
 		--provider-option AWS_AVAILABILITY_ZONE=us-east-1a
 	@echo ""
 	@echo "✅ GPU workspace ready!"

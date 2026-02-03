@@ -22,45 +22,63 @@ openclaw/
 - AWS provider configured (from chariot-development-platform setup)
 - API key (Anthropic, OpenRouter, or AWS Bedrock)
 
+## GPU Support
+
+GPU instances require the **AWS Deep Learning AMI** which includes:
+- NVIDIA drivers pre-installed
+- NVIDIA Container Toolkit (enables Docker GPU passthrough)
+- CUDA libraries
+
+The Makefile automatically uses the correct AMI (`ami-0e352d4aa794f5377`) for GPU targets.
+
+**Why not vanilla Ubuntu?** Standard Ubuntu AMIs don't include NVIDIA Container Toolkit. Without it, Docker containers can't access the GPU even though the EC2 host has one. The Deep Learning AMI solves this at no extra cost.
+
+The devcontainer is configured with:
+- `--gpus all` for GPU passthrough to containers
+- Port 18789 forwarded for OpenClaw Dashboard
+
 ## Quick Start
 
 ```bash
 cd devpod/openclaw
 
 # Create workspace (pick one):
-make up                 # CPU only ($0.08/hr) - for cloud APIs
-make up-gpu-spot        # GPU spot ($0.16/hr) - for local models, 70% cheaper
-make up-gpu-ondemand    # GPU on-demand ($0.53/hr) - for local models, stable
+make devpod-up-cpu-t3-large         # CPU only ($0.08/hr) - for cloud APIs
+make devpod-up-gpu-g4dn-xlarge      # NVIDIA T4 GPU ($0.53/hr) - for local models
 
 # SSH in
-make ssh
+devpod ssh $USER-openclaw
 
-# Inside the instance, run:
-./install-openclaw.sh
+# Inside the instance, run setup:
+./setup.sh
 ```
 
 ## Instance Options
 
-| Target | Instance | Use Case | Cost/hr |
-|--------|----------|----------|---------|
-| `make up` | t3.large | Cloud APIs (Anthropic, Bedrock) | ~$0.08 |
-| `make up-gpu-spot` | g4dn.xlarge | Local models (can be interrupted) | ~$0.16 |
-| `make up-gpu-ondemand` | g4dn.xlarge | Local models (stable) | ~$0.53 |
+| Target | Instance | AMI | Use Case | Cost/hr |
+|--------|----------|-----|----------|---------|
+| `make devpod-up-cpu-t3-large` | t3.large | Ubuntu 24.04 | Cloud APIs (Anthropic, Bedrock) | ~$0.08 |
+| `make devpod-up-gpu-g4dn-xlarge` | g4dn.xlarge | Deep Learning AMI | Local models with GPU | ~$0.53 |
+| `make devpod-up-inferentia-inf2-xlarge` | inf2.xlarge | Ubuntu 24.04 | AWS Inferentia (Neuron SDK) | ~$0.76 |
 
 ## Management Commands
 
 ```bash
-make up                # Create CPU workspace
-make up-gpu-spot       # Create GPU spot workspace
-make up-gpu-ondemand   # Create GPU on-demand workspace
-make ssh               # SSH into workspace
-make stop              # Stop (saves $$$, preserves state)
-make start             # Start existing workspace
-make delete            # Delete completely
-make list              # List all workspaces
-make logs              # View logs
-make status            # Show workspace status
-make help              # Show all commands
+# Create workspaces
+make devpod-up-cpu-t3-large              # CPU workspace
+make devpod-up-gpu-g4dn-xlarge           # GPU workspace (Deep Learning AMI)
+make devpod-up-inferentia-inf2-xlarge    # Inferentia workspace
+
+# Recreate (delete + create)
+make devpod-recreate-gpu-g4dn-xlarge     # Rebuild GPU workspace
+
+# Native devpod commands
+devpod ssh $USER-openclaw                # SSH into workspace
+devpod stop $USER-openclaw               # Stop (saves $$$, preserves state)
+devpod up $USER-openclaw                 # Start existing workspace
+devpod delete $USER-openclaw             # Delete completely
+devpod list                              # List all workspaces
+make help                                # Show all commands
 ```
 
 ## Multi-User Support
@@ -89,18 +107,21 @@ The container includes **Ollama** pre-installed. Run `setup-local-models.sh` to 
 ### GPU Instance Setup
 
 ```bash
-# Create GPU workspace
-make up-gpu-spot    # or make up-gpu-ondemand
+# Create GPU workspace (uses Deep Learning AMI with NVIDIA Container Toolkit)
+make devpod-up-gpu-g4dn-xlarge
 
 # SSH in
-make ssh
+devpod ssh $USER-openclaw
 
-# Pull models (interactive menu)
-./setup-local-models.sh
+# Run setup (installs OpenClaw, optionally pulls local models)
+./setup.sh
 
-# Install openclaw
-./install-openclaw.sh
+# Access OpenClaw Dashboard
+# Port 18789 is auto-forwarded to localhost:18789
 ```
+
+**Dashboard Access:**
+The devcontainer forwards port 18789 automatically. After setup, access the OpenClaw Dashboard at `http://localhost:18789/`
 
 ## OpenClaw Model Routing
 

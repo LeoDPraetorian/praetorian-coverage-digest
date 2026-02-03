@@ -3,14 +3,19 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
+  "runArgs": ["--gpus", "all"],
   "remoteUser": "vscode",
   "features": {},
+  "forwardPorts": [18789],
+  "portsAttributes": {
+    "18789": { "label": "OpenClaw Dashboard", "onAutoForward": "notify" }
+  },
   "customizations": {
     "vscode": {
       "extensions": []
     }
   },
-    "postCreateCommand": "echo '✅ OpenClaw environment ready. Run: curl -fsSL https://openclaw.ai/install.sh | bash'",
+  "postCreateCommand": "echo '✅ OpenClaw environment ready. Run: curl -fsSL https://openclaw.ai/install.sh | bash'",
   "remoteEnv": {
     "ANTHROPIC_API_KEY": "${localEnv:ANTHROPIC_API_KEY}"
   }
