@@ -71,3 +71,4 @@ docs/plans/
 
 # Pyghidra projects
 **/pyghidra_mcp_projects/
+.stack-name
