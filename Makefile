@@ -404,8 +404,15 @@ setup-mac:
 	@brew link --overwrite python@3.14 2>/dev/null || echo "  ℹ️  Python linking skipped (using existing Python installation)"
 	@# Step 2: Install Python-dependent tools (after Python is properly linked)
 	@brew install awscli aws-sam-cli || true
-	@# Verify SAM CLI works (reinstall if virtualenv is broken)
-	@sam --version >/dev/null 2>&1 || (echo "  ⚠️  SAM CLI broken, reinstalling..." && brew reinstall aws-sam-cli)
+	@# Verify SAM CLI deploy works (fix broken virtualenv if needed - homebrew bottle issue)
+	@if ! sam deploy --help >/dev/null 2>&1; then \
+		echo "  ⚠️  SAM CLI virtualenv broken (missing pydantic), fixing..."; \
+		SAM_PYTHON=$$(ls -d /usr/local/Cellar/aws-sam-cli/*/libexec/bin/python 2>/dev/null | head -1); \
+		if [ -n "$$SAM_PYTHON" ]; then \
+			$$SAM_PYTHON -m ensurepip 2>/dev/null || true; \
+			$$SAM_PYTHON -m pip install pydantic >/dev/null 2>&1 && echo "  ✅ SAM CLI fixed"; \
+		fi; \
+	fi
 	@# Step 3: Install remaining tools
 	@brew install curl jq yq node docker go gh pipx uv || true
 	@echo "Installing LSP dependencies..."
@@ -429,8 +436,15 @@ update-mac:
 	@brew link --overwrite python@3.14 2>/dev/null || true
 	@# Step 2: Upgrade Python-dependent tools (after Python is properly linked)
 	@brew upgrade awscli aws-sam-cli || true
-	@# Verify SAM CLI works (reinstall if virtualenv is broken)
-	@sam --version >/dev/null 2>&1 || (echo "  ⚠️  SAM CLI broken, reinstalling..." && brew reinstall aws-sam-cli)
+	@# Verify SAM CLI deploy works (fix broken virtualenv if needed - homebrew bottle issue)
+	@if ! sam deploy --help >/dev/null 2>&1; then \
+		echo "  ⚠️  SAM CLI virtualenv broken (missing pydantic), fixing..."; \
+		SAM_PYTHON=$$(ls -d /usr/local/Cellar/aws-sam-cli/*/libexec/bin/python 2>/dev/null | head -1); \
+		if [ -n "$$SAM_PYTHON" ]; then \
+			$$SAM_PYTHON -m ensurepip 2>/dev/null || true; \
+			$$SAM_PYTHON -m pip install pydantic >/dev/null 2>&1 && echo "  ✅ SAM CLI fixed"; \
+		fi; \
+	fi
 	@# Step 3: Upgrade remaining tools
 	@brew upgrade curl jq yq node docker go gh pipx uv || true
 	@echo "Updating LSP servers..."
