@@ -1,0 +1,31 @@
+# Changelog
+
+## 2026-02-02 - Initial Creation
+
+### Phase 1: RED (Gap Analysis)
+**Gap Identified:** Existing `hibp-check` skill requires frumentarii CLI tool. Users need standalone API-based credential checking using curl/bash without external binaries.
+
+**RED Test:** User wants to check credentials against HIBP/DeHashed but doesn't have frumentarii installed.
+
+### Skill Details
+- **Location:** Library skill (.claude/skill-library/tools/)
+- **Category:** tools/
+- **Type:** Tool Wrapper
+- **Gateway:** gateway-integrations
+
+### Initial Structure
+- SKILL.md: 435 lines (reduced from 906)
+- references/hibp-api-reference.md: 361 lines
+- references/dehashed-api-reference.md: 499 lines
+- references/batch-processing-patterns.md: 524 lines
+
+### Key Features
+- Direct curl commands for HIBP k-anonymity protocol
+- DeHashed password search (free) and rich search (1 credit)
+- API key pattern filtering (compatible with hibp-check logic)
+- No external dependencies (curl + bash only)
+- Complete error handling and rate limit guidance
+
+### Integration
+- Added to gateway-integrations routing table
+- Triggers: HIBP, DeHashed, credential check, breach check, curl API calls
