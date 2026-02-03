@@ -362,8 +362,14 @@ endif
 	@make setup-ui
 	@make claude-skills-build
 	@if ! aws sts get-caller-identity >/dev/null 2>&1; then \
-		echo "AWS credentials not found, running aws configure..."; \
-		aws configure; \
+		echo "AWS credentials not found..."; \
+		if command -v op >/dev/null 2>&1; then \
+			echo "1Password CLI detected. Setting up credential helper..."; \
+			$(MAKE) setup-aws-credential-helper; \
+		else \
+			echo "Running aws configure..."; \
+			aws configure; \
+		fi; \
 	else \
 		echo "AWS credentials already configured, skipping aws configure"; \
 	fi
@@ -544,6 +550,40 @@ configure-cli:
 	echo "" && \
 	echo "Use this command prefix for Praetorian CLI:" && \
 	echo "  praetorian --profile $$UUID"
+
+.PHONY: setup-aws-credential-helper
+setup-aws-credential-helper: ## Install AWS credential helper that fetches credentials from 1Password
+	@echo "🔐 Setting up AWS credential helper (1Password)..."
+	@# Check prerequisites
+	@if ! command -v op >/dev/null 2>&1; then \
+		echo "  ❌ 1Password CLI not found. Install with: brew install --cask 1password-cli"; \
+		exit 1; \
+	fi
+	@if ! op account list >/dev/null 2>&1; then \
+		echo "  ⚠️  1Password CLI not authenticated. Run: op signin"; \
+		exit 1; \
+	fi
+	@# Install credential helper script
+	@mkdir -p ~/.aws
+	@cp .claude/tools/1password/aws-credential-helper.sh ~/.aws/credential-helper.sh
+	@chmod +x ~/.aws/credential-helper.sh
+	@echo "  ✅ Installed ~/.aws/credential-helper.sh"
+	@# Configure AWS to use credential_process (uses aws configure set to avoid duplicate sections)
+	@if ! grep -q "credential_process" ~/.aws/config 2>/dev/null; then \
+		aws configure set credential_process ~/.aws/credential-helper.sh; \
+		aws configure set region us-east-2; \
+		echo "  ✅ Configured ~/.aws/config to use credential helper"; \
+	else \
+		echo "  ✅ ~/.aws/config already has credential_process configured"; \
+	fi
+	@# Test it works (fail if credentials unavailable)
+	@if ~/.aws/credential-helper.sh >/dev/null 2>&1; then \
+		echo "  ✅ Credential helper working - credentials fetched from 1Password"; \
+	else \
+		echo "  ❌ Credential helper test failed. Ensure 'AWS Key' exists in 1Password vault 'Private'"; \
+		echo "  Run: op item get 'AWS Key' --vault Private"; \
+		exit 1; \
+	fi
 
 .PHONY: setup-go-tools
 setup-go-tools: ## [DEPRECATED] gopls now installed via npm postinstall - kept for manual use
