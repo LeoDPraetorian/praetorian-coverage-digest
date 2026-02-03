@@ -399,14 +399,22 @@ endif
 
 setup-mac:
 	@echo "Installing core packages on macOS..."
-	@brew install awscli aws-sam-cli curl jq yq node python docker go gh pipx uv
+	@# Step 1: Install Python first and ensure proper linking
+	@brew install python || true
+	@brew link --overwrite python@3.14 2>/dev/null || echo "  ℹ️  Python linking skipped (using existing Python installation)"
+	@# Step 2: Install Python-dependent tools (after Python is properly linked)
+	@brew install awscli aws-sam-cli || true
+	@# Verify SAM CLI works (reinstall if virtualenv is broken)
+	@sam --version >/dev/null 2>&1 || (echo "  ⚠️  SAM CLI broken, reinstalling..." && brew reinstall aws-sam-cli)
+	@# Step 3: Install remaining tools
+	@brew install curl jq yq node docker go gh pipx uv || true
 	@echo "Installing LSP dependencies..."
 	@command -v rustup >/dev/null 2>&1 && rustup component add rust-analyzer 2>/dev/null || echo "  ⚠️ rustup not found, skipping rust-analyzer"
 	@pipx ensurepath > /dev/null 2>&1 || true
 	@echo "Installing Praetorian CLI..."
 	@pipx install praetorian-cli > /dev/null 2>&1 || pipx upgrade praetorian-cli > /dev/null 2>&1 || echo "⚠️  Warning: Praetorian CLI installation/upgrade failed"
 	@echo "Installing Claude Code..."
-	@npm install -g @anthropic-ai/claude-code > /dev/null
+	@npm install -g @anthropic-ai/claude-code > /dev/null 2>&1 || echo "  ⚠️ Claude Code installation failed - run 'npm install -g @anthropic-ai/claude-code' manually"
 	@echo "Installing LSP servers globally (for Claude Code plugins)..."
 	@npm install -g typescript-language-server typescript pyright > /dev/null 2>&1 || echo "  ⚠️ Some LSP servers failed to install globally"
 	@echo "Installing Claude Agent SDK..."
@@ -416,7 +424,15 @@ setup-mac:
 
 update-mac:
 	@echo "Upgrading core packages on macOS..."
-	@brew upgrade awscli aws-sam-cli curl jq yq node python docker go gh pipx uv
+	@# Step 1: Upgrade Python first and ensure proper linking
+	@brew upgrade python || true
+	@brew link --overwrite python@3.14 2>/dev/null || true
+	@# Step 2: Upgrade Python-dependent tools (after Python is properly linked)
+	@brew upgrade awscli aws-sam-cli || true
+	@# Verify SAM CLI works (reinstall if virtualenv is broken)
+	@sam --version >/dev/null 2>&1 || (echo "  ⚠️  SAM CLI broken, reinstalling..." && brew reinstall aws-sam-cli)
+	@# Step 3: Upgrade remaining tools
+	@brew upgrade curl jq yq node docker go gh pipx uv || true
 	@echo "Updating LSP servers..."
 	@npm update -g typescript-language-server typescript pyright > /dev/null 2>&1 || true
 	@go install golang.org/x/tools/gopls@latest 2>/dev/null || true
