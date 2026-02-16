@@ -1,0 +1,22 @@
+{
+  "name": "praetorian-coverage-digest",
+  "version": "1.0.0",
+  "description": "Daily coverage digest and monitoring for Praetorian Security Inc",
+  "main": "send-daily-digest.js",
+  "type": "module",
+  "scripts": {
+    "digest": "node send-daily-digest.js",
+    "digest:dry-run": "DRY_RUN=true node send-daily-digest.js",
+    "digest:preview": "node send-daily-digest.js --preview",
+    "tracker": "node ../coverage-tracker/cli.js"
+  },
+  "dependencies": {
+    "@sendgrid/mail": "^8.1.0",
+    "dotenv": "^16.4.0",
+    "rss-parser": "^3.13.0",
+    "uuid": "^9.0.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

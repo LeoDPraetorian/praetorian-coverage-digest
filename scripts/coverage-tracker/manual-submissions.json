@@ -1,0 +1,22 @@
+[
+  {
+    "date": "2026-02-13",
+    "source": "Help Net Security",
+    "source_type": "media",
+    "title": "Brutus: Open-source credential testing tool for offensive security",
+    "url": "https://www.helpnetsecurity.com/2026/02/13/brutus-open-source-credential-testing-tool-offensive-security/",
+    "tools_mentioned": ["Brutus"],
+    "excerpt": "Praetorian released Brutus, a high-performance brute force tool supporting SSH, MySQL, PostgreSQL, Redis, MongoDB, SMB, and 20+ protocols.",
+    "submitted_by": "leonardo@praetorian.com"
+  },
+  {
+    "date": "2026-02-10",
+    "source": "Let's Data Science",
+    "source_type": "media",
+    "title": "Praetorian Launches Augustus to Test LLM Security",
+    "url": "https://www.letsdatascience.com/news/praetorian-launches-augustus-to-test-llm-security-499fbca0",
+    "tools_mentioned": ["Augustus"],
+    "excerpt": "Praetorian released Augustus, an open-source vulnerability scanner designed to secure large language models against adversarial threats.",
+    "submitted_by": "leonardo@praetorian.com"
+  }
+]

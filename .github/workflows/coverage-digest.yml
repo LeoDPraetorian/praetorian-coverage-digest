@@ -1,0 +1,52 @@
+name: Daily Coverage Digest
+
+on:
+  schedule:
+    # 8 AM EST = 13:00 UTC (adjust for daylight saving: 12:00 UTC in summer)
+    - cron: '0 13 * * *'
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Dry run (log only, no email)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
+jobs:
+  send-digest:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        working-directory: scripts/coverage-digest
+        run: npm ci
+
+      - name: Run coverage digest
+        working-directory: scripts/coverage-digest
+        env:
+          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
+          DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
+          DIGEST_CC: ${{ secrets.DIGEST_CC }}
+          DIGEST_FROM_EMAIL: digest@praetorian.com
+          DIGEST_FROM_NAME: Praetorian Coverage Digest
+          SKIP_IF_EMPTY: 'true'
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+        run: node send-daily-digest.js
+
+      - name: Upload digest preview (on failure or dry run)
+        if: failure() || github.event.inputs.dry_run == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: digest-preview
+          path: scripts/coverage-digest/preview.html
+          retention-days: 7
