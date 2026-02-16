@@ -1,0 +1,77 @@
+name: Submit Coverage Item
+description: Submit a new media mention, blog post, or event for the coverage digest.
+title: "[Coverage] "
+labels: ["coverage-submission"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Submit Coverage for the Digest
+
+        Found Praetorian mentioned in the press, a blog post, or an event? Submit it here and it'll be added to the next daily coverage digest automatically.
+
+  - type: input
+    id: title
+    attributes:
+      label: Article / Coverage Title
+      description: The headline of the article or coverage item.
+      placeholder: "Praetorian Launches Augustus to Test LLM Security"
+    validations:
+      required: true
+
+  - type: input
+    id: url
+    attributes:
+      label: URL
+      description: Direct link to the article, blog post, or event page.
+      placeholder: "https://www.example.com/article-about-praetorian"
+    validations:
+      required: true
+
+  - type: input
+    id: source
+    attributes:
+      label: Source / Publication
+      description: Name of the publication, blog, or event.
+      placeholder: "Help Net Security, Dark Reading, Praetorian Blog, Black Hat USA"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: source_type
+    attributes:
+      label: Coverage Type
+      description: What kind of coverage is this?
+      options:
+        - Media (external publication)
+        - Blog (Praetorian blog or self-published)
+        - Event (conference, webinar, podcast)
+    validations:
+      required: true
+
+  - type: input
+    id: tools
+    attributes:
+      label: Praetorian Tools Mentioned
+      description: Comma-separated list of tools mentioned (if any).
+      placeholder: "Brutus, Augustus, Chariot"
+    validations:
+      required: false
+
+  - type: textarea
+    id: excerpt
+    attributes:
+      label: Key Excerpt
+      description: A 1-2 sentence summary or quote from the coverage.
+      placeholder: "Praetorian released Brutus, a high-performance brute force tool supporting SSH, MySQL, PostgreSQL, and 20+ protocols."
+    validations:
+      required: false
+
+  - type: input
+    id: date
+    attributes:
+      label: Publication Date
+      description: When was this published? (YYYY-MM-DD format)
+      placeholder: "2026-02-13"
+    validations:
+      required: false

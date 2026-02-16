@@ -194,6 +194,27 @@
           </tr>
           {{/IF_ACTION_NEEDED}}
 
+          <!-- LINKEDIN DRAFTS -->
+          {{#IF_LINKEDIN}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:20px 40px 8px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
+                    <span style="font-size:18px;font-weight:700;color:#11C3DB;">Ready-to-Post LinkedIn Drafts</span>
+                    <div style="font-size:12px;color:#535B61;margin-top:4px;">Copy, paste, post. Each draft is tailored to the coverage type.</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 40px 20px;">
+              {{LINKEDIN_DRAFTS}}
+            </td>
+          </tr>
+          {{/IF_LINKEDIN}}
+
           <!-- FOOTER -->
           <tr>
             <td style="background-color:#1F252A;padding:28px 40px;text-align:center;border-top:1px solid #535B61;">

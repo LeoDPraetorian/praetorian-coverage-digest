@@ -1,0 +1,193 @@
+name: Process Coverage Submission
+
+on:
+  issues:
+    types: [opened]
+
+jobs:
+  process-submission:
+    if: contains(github.event.issue.labels.*.name, 'coverage-submission')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Parse issue and add to tracker
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const body = context.payload.issue.body || '';
+
+            // Parse form fields from GitHub Issue form body
+            function parseField(label) {
+              // GitHub forms render as: ### Label\n\nValue\n\n
+              const regex = new RegExp(`### ${label}\\s*\\n\\n([\\s\\S]*?)(?=\\n\\n###|$)`, 'i');
+              const match = body.match(regex);
+              if (!match) return '';
+              return match[1].trim().replace(/^_No response_$/i, '');
+            }
+
+            const title = parseField('Article / Coverage Title');
+            const url = parseField('URL');
+            const source = parseField('Source / Publication');
+            const sourceTypeRaw = parseField('Coverage Type');
+            const toolsRaw = parseField('Praetorian Tools Mentioned');
+            const excerpt = parseField('Key Excerpt');
+            const dateRaw = parseField('Publication Date');
+
+            // Validate required fields
+            if (!title || !url || !source) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: '❌ **Missing required fields.** Please ensure Title, URL, and Source are filled in.\n\nEdit this issue and resubmit.'
+              });
+              return;
+            }
+
+            // Map source type
+            let sourceType = 'media';
+            if (sourceTypeRaw.toLowerCase().includes('blog')) sourceType = 'blog';
+            if (sourceTypeRaw.toLowerCase().includes('event')) sourceType = 'event';
+
+            // Parse tools
+            const tools = toolsRaw
+              ? toolsRaw.split(',').map(t => t.trim()).filter(Boolean)
+              : [];
+
+            // Parse date
+            const date = dateRaw && /^\d{4}-\d{2}-\d{2}$/.test(dateRaw)
+              ? dateRaw
+              : new Date().toISOString().split('T')[0];
+
+            // Load existing tracker
+            const trackerPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/coverage-tracker/coverage-tracker.json');
+            let tracker = [];
+            try {
+              tracker = JSON.parse(fs.readFileSync(trackerPath, 'utf-8'));
+            } catch (e) {
+              console.log('No existing tracker, starting fresh');
+            }
+
+            // Check for duplicates by URL
+            const normalizedUrl = url.toLowerCase().replace(/\/+$/, '').replace(/^https?:\/\//, '');
+            const exists = tracker.some(item => {
+              const existing = (item.url || '').toLowerCase().replace(/\/+$/, '').replace(/^https?:\/\//, '');
+              return existing === normalizedUrl;
+            });
+
+            if (exists) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: `⚠️ **Duplicate detected.** This URL is already in the coverage tracker.\n\nNo action needed — closing this issue.`
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                state: 'closed',
+                labels: ['coverage-submission', 'duplicate']
+              });
+              return;
+            }
+
+            // Generate new ID
+            const nextId = tracker.length + 1;
+            const paddedId = String(nextId).padStart(3, '0');
+
+            const newItem = {
+              id: `cov-${paddedId}`,
+              date: date,
+              source: source,
+              source_type: sourceType,
+              title: title,
+              url: url,
+              tools_mentioned: tools,
+              excerpt: excerpt || '',
+              status: 'new',
+              amplification: {
+                linkedin_post: null,
+                slack_message: null,
+                employee_shares: [],
+                added_to_website: false
+              },
+              discovered_by: 'github-issue',
+              discovered_at: new Date().toISOString(),
+              submitted_by: context.payload.issue.user.login,
+              issue_number: context.issue.number
+            };
+
+            tracker.push(newItem);
+
+            // Write updated tracker
+            fs.writeFileSync(trackerPath, JSON.stringify(tracker, null, 2) + '\n');
+
+            // Set outputs for git commit
+            core.setOutput('item_id', newItem.id);
+            core.setOutput('title', title);
+            core.setOutput('source', source);
+            core.setOutput('tools', tools.join(', ') || 'None');
+
+      - name: Commit tracker update
+        run: |
+          git config user.name "Coverage Digest Bot"
+          git config user.email "digest-bot@praetorian.com"
+          git add scripts/coverage-tracker/coverage-tracker.json
+          git diff --cached --quiet || git commit -m "chore: add coverage item from issue #${{ github.event.issue.number }} [skip ci]"
+          git push || echo "Push failed (non-critical)"
+
+      - name: Comment on issue with confirmation
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const trackerPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/coverage-tracker/coverage-tracker.json');
+            const tracker = JSON.parse(fs.readFileSync(trackerPath, 'utf-8'));
+            const newItem = tracker[tracker.length - 1];
+
+            if (!newItem) return;
+
+            const toolTags = (newItem.tools_mentioned || []).map(t => `\`${t}\``).join(' ') || '_none_';
+
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: [
+                `✅ **Coverage item added to tracker!**`,
+                ``,
+                `| Field | Value |`,
+                `|-------|-------|`,
+                `| ID | \`${newItem.id}\` |`,
+                `| Title | ${newItem.title} |`,
+                `| Source | ${newItem.source} |`,
+                `| Type | ${newItem.source_type} |`,
+                `| Tools | ${toolTags} |`,
+                `| Date | ${newItem.date} |`,
+                ``,
+                `This item will appear in the **next daily coverage digest email**.`,
+                ``,
+                `Closing this issue automatically.`
+              ].join('\n')
+            });
+
+            await github.rest.issues.update({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              state: 'closed',
+              labels: ['coverage-submission', 'processed']
+            });
