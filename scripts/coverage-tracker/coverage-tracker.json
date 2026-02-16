@@ -6,7 +6,9 @@
     "source_type": "media",
     "title": "Brutus: Open-source credential testing tool for offensive security",
     "url": "https://www.helpnetsecurity.com/2026/02/13/brutus-open-source-credential-testing-tool-offensive-security/",
-    "tools_mentioned": ["Brutus"],
+    "tools_mentioned": [
+      "Brutus"
+    ],
     "excerpt": "Praetorian released Brutus, a high-performance brute force tool supporting SSH, MySQL, PostgreSQL, Redis, MongoDB, SMB, and 20+ protocols.",
     "status": "new",
     "amplification": {
@@ -16,7 +18,8 @@
       "added_to_website": false
     },
     "discovered_by": "manual",
-    "discovered_at": "2026-02-13T10:00:00Z"
+    "discovered_at": "2026-02-13T10:00:00Z",
+    "last_sent_at": "2026-02-16T19:33:47.439562Z"
   },
   {
     "id": "cov-002",
@@ -25,7 +28,9 @@
     "source_type": "media",
     "title": "Introducing Augustus: Open Source LLM Prompt Injection Tool",
     "url": "https://www.praetorian.com/blog/introducing-augustus-open-source-llm-prompt-injection/",
-    "tools_mentioned": ["Augustus"],
+    "tools_mentioned": [
+      "Augustus"
+    ],
     "excerpt": "Augustus is a comprehensive LLM security testing framework with 210+ adversarial attacks against 28 LLM providers.",
     "status": "new",
     "amplification": {
@@ -35,7 +40,8 @@
       "added_to_website": false
     },
     "discovered_by": "manual",
-    "discovered_at": "2026-02-06T10:00:00Z"
+    "discovered_at": "2026-02-06T10:00:00Z",
+    "last_sent_at": "2026-02-16T19:33:47.439562Z"
   },
   {
     "id": "cov-003",
@@ -44,7 +50,9 @@
     "source_type": "media",
     "title": "Praetorian open-sources its Nosey Parker secret scanning tool",
     "url": "https://www.scworld.com/news/praetorian-open-sources-its-nosey-parker-secret-scanning-tool",
-    "tools_mentioned": ["Nosey Parker"],
+    "tools_mentioned": [
+      "Nosey Parker"
+    ],
     "excerpt": "Praetorian announced that it has open-sourced the regular expression-based scanning capabilities of its Nosey Parker secret scanning tool.",
     "status": "archived",
     "amplification": {
@@ -63,7 +71,9 @@
     "source_type": "media",
     "title": "Praetorian Offering a Free Version of the Attack Surface Management Platform",
     "url": "https://digitalitnews.com/praetorian-offering-a-free-version-of-the-attack-surface-management-platform/",
-    "tools_mentioned": ["Chariot"],
+    "tools_mentioned": [
+      "Chariot"
+    ],
     "excerpt": "Praetorian announced a free version of its Chariot attack surface management platform.",
     "status": "archived",
     "amplification": {
@@ -82,7 +92,9 @@
     "source_type": "media",
     "title": "Praetorian Launches Chariot Total Attack Life Cycle Solution",
     "url": "https://www.darkreading.com/cyberattacks-data-breaches/praetorian-launches-chariot-total-attack-life-cycle-solution",
-    "tools_mentioned": ["Chariot"],
+    "tools_mentioned": [
+      "Chariot"
+    ],
     "excerpt": "Praetorian launches Chariot platform for total attack lifecycle management.",
     "status": "archived",
     "amplification": {
@@ -101,7 +113,9 @@
     "source_type": "event",
     "title": "CI/CD Attack Chain Training with CyberproAI",
     "url": "https://www.blackhat.com/us-25/",
-    "tools_mentioned": ["Chariot"],
+    "tools_mentioned": [
+      "Chariot"
+    ],
     "excerpt": "Praetorian and CyberproAI delivered cutting-edge CI/CD attack chain training powered by Cympire at Black Hat USA 2025.",
     "status": "archived",
     "amplification": {
@@ -120,7 +134,9 @@
     "source_type": "media",
     "title": "Praetorian: Ethical Offensive Security Pioneers",
     "url": "https://ciobulletin.com/magazine/profile/praetorian-a-pioneer-in-offensive-security-services",
-    "tools_mentioned": ["Chariot"],
+    "tools_mentioned": [
+      "Chariot"
+    ],
     "excerpt": "Company profile featuring Praetorian as a pioneer in offensive security services.",
     "status": "archived",
     "amplification": {
@@ -139,7 +155,9 @@
     "source_type": "media",
     "title": "Introducing Julius: Open Source LLM Service Fingerprinting",
     "url": "https://www.praetorian.com/blog/introducing-julius-open-source-llm-service-fingerprinting/",
-    "tools_mentioned": ["Julius"],
+    "tools_mentioned": [
+      "Julius"
+    ],
     "excerpt": "Julius detects 17+ AI platforms through active HTTP probing, built as a single Go binary.",
     "status": "new",
     "amplification": {
@@ -149,7 +167,8 @@
       "added_to_website": false
     },
     "discovered_by": "manual",
-    "discovered_at": "2026-01-30T10:00:00Z"
+    "discovered_at": "2026-01-30T10:00:00Z",
+    "last_sent_at": "2026-02-16T19:33:47.439562Z"
   },
   {
     "id": "cov-009",
@@ -158,7 +177,9 @@
     "source_type": "media",
     "title": "Praetorian Launches Augustus to Test LLM Security",
     "url": "https://www.letsdatascience.com/news/praetorian-launches-augustus-to-test-llm-security-499fbca0",
-    "tools_mentioned": ["Augustus"],
+    "tools_mentioned": [
+      "Augustus"
+    ],
     "excerpt": "Praetorian released Augustus, an open-source vulnerability scanner designed to secure large language models against adversarial threats.",
     "status": "new",
     "amplification": {
@@ -168,6 +189,7 @@
       "added_to_website": false
     },
     "discovered_by": "manual",
-    "discovered_at": "2026-02-13T10:00:00Z"
+    "discovered_at": "2026-02-13T10:00:00Z",
+    "last_sent_at": "2026-02-16T19:33:47.439562Z"
   }
 ]
