@@ -10,10 +10,13 @@ jobs:
   send-digest:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -24,11 +27,11 @@ jobs:
         working-directory: scripts/coverage-digest
         run: npm ci
 
-      - name: Render coverage digest HTML
+      - name: Run coverage pipeline (scan + merge + render)
         working-directory: scripts/coverage-digest
-        run: node send-test.js
+        run: node run-digest-pipeline.js
 
-      - name: Read coverage data for issue
+      - name: Read coverage data
         id: coverage
         uses: actions/github-script@v7
         with:
@@ -72,6 +75,34 @@ jobs:
               \"subject\": \"${EMAIL_SUBJECT}\",
               \"html\": ${HTML_BODY}
             }"
+
+      - name: Mark sent items and commit tracker
+        if: steps.coverage.outputs.has_items == 'true'
+        run: |
+          cd scripts/coverage-tracker
+          # Mark all "new" items with last_sent_at timestamp
+          # so next run's pipeline marks them as "sent"
+          python3 -c "
+          import json, datetime
+          with open('coverage-tracker.json', 'r') as f:
+              items = json.load(f)
+          now = datetime.datetime.utcnow().isoformat() + 'Z'
+          changed = 0
+          for item in items:
+              if item.get('status') == 'new' and not item.get('last_sent_at'):
+                  item['last_sent_at'] = now
+                  changed += 1
+          with open('coverage-tracker.json', 'w') as f:
+              json.dump(items, f, indent=2)
+              f.write('\n')
+          print(f'Marked {changed} items with last_sent_at')
+          "
+          cd ../..
+          git config user.name "Coverage Digest Bot"
+          git config user.email "digest-bot@praetorian.com"
+          git add scripts/coverage-tracker/coverage-tracker.json
+          git diff --cached --quiet || git commit -m "chore: update coverage tracker [skip ci]"
+          git push || echo "Push failed (non-critical)"
 
       - name: Create GitHub Issue (backup record)
         if: steps.coverage.outputs.has_items == 'true'
