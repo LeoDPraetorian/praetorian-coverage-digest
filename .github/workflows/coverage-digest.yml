@@ -54,21 +54,24 @@ jobs:
               : `Praetorian Coverage Digest - ${today} - No new items`;
             core.setOutput('subject', subject);
 
-      - name: Send branded HTML email
-        if: steps.coverage.outputs.has_items == 'true'
+      - name: Send branded HTML email via Resend
+        if: steps.coverage.outputs.has_items == 'true' && secrets.RESEND_API_KEY != ''
         continue-on-error: true
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
-          server_port: ${{ secrets.SMTP_PORT || 465 }}
-          secure: true
-          username: ${{ secrets.SMTP_USERNAME }}
-          password: ${{ secrets.SMTP_PASSWORD }}
-          subject: ${{ steps.coverage.outputs.subject }}
-          to: ${{ secrets.DIGEST_RECIPIENT }}
-          from: ${{ secrets.SMTP_FROM || 'Praetorian Coverage Digest <digest@praetorian.com>' }}
-          html_body: file://scripts/coverage-digest/preview.html
-          priority: normal
+        env:
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
+          EMAIL_SUBJECT: ${{ steps.coverage.outputs.subject }}
+        run: |
+          HTML_BODY=$(cat scripts/coverage-digest/preview.html | python3 -c "import sys,json; print(json.dumps(sys.stdin.read()))")
+          curl -s -X POST 'https://api.resend.com/emails' \
+            -H "Authorization: Bearer ${RESEND_API_KEY}" \
+            -H 'Content-Type: application/json' \
+            -d "{
+              \"from\": \"Praetorian Coverage Digest <onboarding@resend.dev>\",
+              \"to\": [\"${DIGEST_RECIPIENT}\"],
+              \"subject\": \"${EMAIL_SUBJECT}\",
+              \"html\": ${HTML_BODY}
+            }"
 
       - name: Create GitHub Issue (backup record)
         if: steps.coverage.outputs.has_items == 'true'
