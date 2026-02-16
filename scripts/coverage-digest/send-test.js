@@ -1,12 +1,13 @@
 #!/usr/bin/env node
 
 /**
- * Quick test: Generate digest from ALL tracked coverage and save as preview HTML.
- * Bypasses the 24h lookback window to show a full, populated email.
+ * Quick test: Generate digest from coverage tracker and save as preview HTML.
+ * Only includes items with status "new" (actionable items).
  *
  * Usage:
  *   node send-test.js              # Save preview.html
  *   node send-test.js --open       # Save and open in browser
+ *   node send-test.js --all        # Include ALL items (for testing layout)
  */
 
 import { config } from './config.js';
@@ -16,19 +17,30 @@ import { join } from 'path';
 import { execSync } from 'child_process';
 
 async function main() {
-  console.log('=== Test Digest Email ===\n');
+  console.log('=== Praetorian Coverage Digest - Preview ===\n');
 
-  // Load ALL items from the coverage tracker (ignore date filtering)
+  const includeAll = process.argv.includes('--all');
+
+  // Load items from the coverage tracker
   const trackerPath = join(config.paths.root, '..', 'coverage-tracker', 'coverage-tracker.json');
   const raw = await readFile(trackerPath, 'utf-8');
   const allCoverage = JSON.parse(raw);
 
+  // Filter: only "new" items unless --all flag
+  const filtered = includeAll
+    ? allCoverage
+    : allCoverage.filter(item => item.status === 'new');
+
+  if (filtered.length === 0) {
+    console.log('No items with status "new" found. Use --all to include all items.');
+    console.log('Rendering empty state...\n');
+  }
+
   // Convert tracker format to digest item format with proper categorization
-  const items = allCoverage.map(item => {
+  const items = filtered.map(item => {
     const source = item.source || '';
     const sourceType = item.source_type || 'media';
 
-    // Determine sourceType for the renderer
     let mappedType;
     if (sourceType === 'event') {
       mappedType = 'event';
@@ -54,11 +66,12 @@ async function main() {
   // Sort newest first
   items.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-  console.log(`Loaded ${items.length} coverage items from tracker`);
   const media = items.filter(i => i.sourceType === 'media');
   const blog = items.filter(i => i.sourceType === 'blog');
   const events = items.filter(i => i.sourceType === 'event');
-  console.log(`  Media: ${media.length}, Blog: ${blog.length}, Events: ${events.length}`);
+
+  console.log(`Items: ${items.length} total (${includeAll ? 'all' : 'new only'})`);
+  console.log(`  Media: ${media.length} | Blog: ${blog.length} | Events: ${events.length}`);
   for (const item of items) {
     console.log(`  [${item.sourceType}] ${item.title} (${item.source})`);
   }
@@ -70,7 +83,7 @@ async function main() {
   // Save preview
   const previewPath = join(config.paths.root, 'preview.html');
   await writeFile(previewPath, html);
-  console.log(`\nPreview saved to: ${previewPath}`);
+  console.log(`Preview saved to: ${previewPath}`);
 
   // Open in browser if --open flag
   if (process.argv.includes('--open')) {
@@ -81,7 +94,7 @@ async function main() {
       console.log('Could not auto-open. Open the file manually.');
     }
   } else {
-    console.log('Run with --open to open in browser, or open the file manually.');
+    console.log('Run with --open to open in browser.');
   }
 }
 

@@ -32,15 +32,19 @@ export async function renderDigest(items) {
   // Logo URL (hosted on GitHub raw)
   const logoUrl = config.logoUrl || 'https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png';
 
-  // Replace summary stats
-  template = template.replace('{{DATE}}', dateStr);
-  template = template.replace('{{TOTAL_ITEMS}}', String(items.length));
-  template = template.replace('{{MEDIA_COUNT}}', String(mediaItems.length));
-  template = template.replace('{{TOOLS_MENTIONED}}', String(allTools.length));
-  template = template.replace('{{BLOG_COUNT}}', String(blogItems.length));
-  template = template.replace('{{ACTION_COUNT}}', String(items.length));
-  template = template.replace('{{SOURCE_COUNT}}', String(config.rssFeeds.length + config.googleAlertsFeeds.length));
-  template = template.replace('{{LOGO_URL}}', logoUrl);
+  // Replace summary stats (replaceAll to handle multiple occurrences)
+  template = template.replaceAll('{{DATE}}', dateStr);
+  template = template.replaceAll('{{TOTAL_ITEMS}}', String(items.length));
+  template = template.replaceAll('{{MEDIA_COUNT}}', String(mediaItems.length));
+  template = template.replaceAll('{{TOOLS_MENTIONED}}', String(allTools.length));
+  template = template.replaceAll('{{BLOG_COUNT}}', String(blogItems.length));
+  template = template.replaceAll('{{ACTION_COUNT}}', String(items.length));
+  template = template.replaceAll('{{SOURCE_COUNT}}', String(config.rssFeeds.length + config.googleAlertsFeeds.length));
+  template = template.replaceAll('{{LOGO_URL}}', logoUrl);
+
+  // Generate smart action items
+  const actionItems = generateActionItems(mediaItems, blogItems, manualItems, allTools);
+  template = template.replaceAll('{{ACTION_ITEMS}}', actionItems);
 
   // Render sections
   if (items.length === 0) {
@@ -56,7 +60,7 @@ export async function renderDigest(items) {
     if (mediaItems.length > 0) {
       const renderedMedia = mediaItems.map(item => renderItem(itemTemplate, item)).join('');
       template = renderSection(template, 'IF_MEDIA', '');
-      template = template.replace('{{MEDIA_ITEMS}}', renderedMedia);
+      template = template.replaceAll('{{MEDIA_ITEMS}}', renderedMedia);
     } else {
       template = removeSection(template, 'IF_MEDIA');
     }
@@ -65,7 +69,7 @@ export async function renderDigest(items) {
     if (blogItems.length > 0) {
       const renderedBlog = blogItems.map(item => renderItem(itemTemplate, item)).join('');
       template = renderSection(template, 'IF_BLOG', '');
-      template = template.replace('{{BLOG_ITEMS}}', renderedBlog);
+      template = template.replaceAll('{{BLOG_ITEMS}}', renderedBlog);
     } else {
       template = removeSection(template, 'IF_BLOG');
     }
@@ -74,7 +78,7 @@ export async function renderDigest(items) {
     if (manualItems.length > 0) {
       const renderedManual = manualItems.map(item => renderItem(itemTemplate, item)).join('');
       template = renderSection(template, 'IF_MANUAL', '');
-      template = template.replace('{{MANUAL_ITEMS}}', renderedManual);
+      template = template.replaceAll('{{MANUAL_ITEMS}}', renderedManual);
     } else {
       template = removeSection(template, 'IF_MANUAL');
     }
@@ -87,12 +91,79 @@ export async function renderDigest(items) {
 }
 
 /**
+ * Generate smart, contextual action items based on coverage types.
+ * Returns rendered HTML for the action items list.
+ */
+function generateActionItems(mediaItems, blogItems, manualItems, allTools) {
+  const actions = [];
+  const toolStr = allTools.slice(0, 3).join(', ');
+
+  // Priority 1: Media coverage actions (highest value - third party validation)
+  if (mediaItems.length > 0) {
+    const topMedia = mediaItems[0]; // Most recent
+    actions.push({
+      priority: 'high',
+      emoji: '1',
+      text: `Post ${escapeHtml(topMedia.source)} coverage of <strong>${escapeHtml((topMedia.toolsMentioned || [])[0] || 'Praetorian')}</strong> to LinkedIn company page — third-party validation drives 3x more engagement than self-promotion`,
+    });
+    actions.push({
+      priority: 'high',
+      emoji: '2',
+      text: `Send pre-written reshare template to <strong>#amplification-crew</strong> — employee reshares are the highest-ROI amplification action (10-15 key voices)`,
+    });
+  }
+
+  // Priority 2: Blog post actions
+  if (blogItems.length > 0) {
+    const topBlog = blogItems[0];
+    const blogTool = (topBlog.toolsMentioned || [])[0] || '';
+    actions.push({
+      priority: 'medium',
+      emoji: String(actions.length + 1),
+      text: `Promote <strong>${escapeHtml(topBlog.title)}</strong> with 3 key takeaways on LinkedIn — ${blogTool ? `position ${escapeHtml(blogTool)} as the go-to solution in this space` : 'drive organic traffic to the blog'}`,
+    });
+  }
+
+  // Priority 3: Sales enablement (when tools are mentioned)
+  if (allTools.length > 0) {
+    actions.push({
+      priority: 'medium',
+      emoji: String(actions.length + 1),
+      text: `Brief sales team: <strong>${escapeHtml(toolStr)}</strong> ${mediaItems.length > 0 ? 'featured in ' + mediaItems.length + ' publications' : 'covered this week'} — add links to prospect outreach for social proof`,
+    });
+  }
+
+  // Priority 4: Website update (batched)
+  actions.push({
+    priority: 'normal',
+    emoji: String(actions.length + 1),
+    text: `Update <strong>praetorian.com/news</strong> "In the News" page with this week's coverage — keeps SEO fresh and gives prospects confidence`,
+  });
+
+  // Cap at 5 items
+  return actions.slice(0, 5).map(action => {
+    const color = action.priority === 'high' ? '#E63948' : action.priority === 'medium' ? '#11C3DB' : '#A0A4A8';
+    return `<tr>
+      <td style="padding:6px 0;">
+        <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+          <td style="vertical-align:top;padding-right:12px;">
+            <div style="width:24px;height:24px;border-radius:50%;background-color:${color};text-align:center;line-height:24px;font-size:12px;font-weight:700;color:#FFFFFF;">${action.emoji}</div>
+          </td>
+          <td style="vertical-align:top;">
+            <div style="font-size:13px;color:#A0A4A8;line-height:1.5;">${action.text}</div>
+          </td>
+        </tr></table>
+      </td>
+    </tr>`;
+  }).join('\n');
+}
+
+/**
  * Check if an item is external media coverage.
  */
 function isMedia(item) {
   const source = (item.source || '').toLowerCase();
   const type = (item.sourceType || '').toLowerCase();
-  // External media: RSS items that are NOT from Praetorian's own blog
   if (type === 'rss' || type === 'media') {
     return !source.includes('praetorian blog') && !source.includes('praetorian.com/blog');
   }
@@ -106,7 +177,6 @@ function isBlog(item) {
   const source = (item.source || '').toLowerCase();
   const type = (item.sourceType || '').toLowerCase();
   if (type === 'blog') return true;
-  // Praetorian blog posts that came through RSS or manual
   if (source.includes('praetorian blog') || source.includes('praetorian.com/blog')) return true;
   return false;
 }
@@ -126,21 +196,34 @@ function renderItem(template, item) {
   let html = template;
 
   const itemDate = new Date(item.date);
-  const dateStr = itemDate.toLocaleDateString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-  });
+  const now = new Date();
+  const daysAgo = Math.floor((now - itemDate) / (1000 * 60 * 60 * 24));
 
-  html = html.replace('{{ITEM_TITLE}}', escapeHtml(item.title));
-  html = html.replace('{{ITEM_URL}}', item.url || '#');
-  html = html.replace('{{ITEM_SOURCE}}', escapeHtml(item.source));
-  html = html.replace('{{ITEM_DATE}}', dateStr);
+  // Show relative time for recent items, absolute date for older
+  let dateStr;
+  if (daysAgo === 0) {
+    dateStr = 'Today';
+  } else if (daysAgo === 1) {
+    dateStr = 'Yesterday';
+  } else if (daysAgo <= 7) {
+    dateStr = `${daysAgo} days ago`;
+  } else {
+    dateStr = itemDate.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+    });
+  }
+
+  html = html.replaceAll('{{ITEM_TITLE}}', escapeHtml(item.title));
+  html = html.replaceAll('{{ITEM_URL}}', item.url || '#');
+  html = html.replaceAll('{{ITEM_SOURCE}}', escapeHtml(item.source));
+  html = html.replaceAll('{{ITEM_DATE}}', dateStr);
 
   // Tools mentioned
   if (item.toolsMentioned && item.toolsMentioned.length > 0) {
     html = renderSection(html, 'IF_TOOLS', '');
-    html = html.replace('{{ITEM_TOOLS}}', item.toolsMentioned.join(', '));
+    html = html.replaceAll('{{ITEM_TOOLS}}', item.toolsMentioned.join(', '));
   } else {
     html = removeSection(html, 'IF_TOOLS');
   }
@@ -148,7 +231,7 @@ function renderItem(template, item) {
   // Excerpt
   if (item.excerpt) {
     html = renderSection(html, 'IF_EXCERPT', '');
-    html = html.replace('{{ITEM_EXCERPT}}', escapeHtml(item.excerpt));
+    html = html.replaceAll('{{ITEM_EXCERPT}}', escapeHtml(item.excerpt));
   } else {
     html = removeSection(html, 'IF_EXCERPT');
   }
@@ -160,8 +243,8 @@ function renderItem(template, item) {
  * Keep a conditional section (remove only the markers).
  */
 function renderSection(html, sectionName, _placeholder) {
-  html = html.replace(`{{#${sectionName}}}`, '');
-  html = html.replace(`{{/${sectionName}}}`, '');
+  html = html.replaceAll(`{{#${sectionName}}}`, '');
+  html = html.replaceAll(`{{/${sectionName}}}`, '');
   return html;
 }
 

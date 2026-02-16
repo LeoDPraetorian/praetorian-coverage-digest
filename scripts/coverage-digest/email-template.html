@@ -175,15 +175,18 @@
           </tr>
           {{/IF_EMPTY}}
 
-          <!-- ACTION NEEDED BANNER -->
+          <!-- MARKETING PLAYBOOK -->
           {{#IF_ACTION_NEEDED}}
           <tr>
             <td style="background-color:#0D0D0D;padding:20px 40px;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-left:4px solid #E63948;">
                 <tr>
                   <td style="padding:20px 24px;">
-                    <div style="font-size:13px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Action Required</div>
-                    <div style="font-size:14px;color:#A0A4A8;line-height:1.6;">{{ACTION_COUNT}} items awaiting amplification. Queue LinkedIn posts, update #praetorian-in-the-wild, and notify the amplification crew.</div>
+                    <div style="font-size:13px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Marketing Playbook</div>
+                    <div style="font-size:12px;color:#535B61;margin-bottom:16px;">{{ACTION_COUNT}} items to amplify — here's your prioritized action plan:</div>
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      {{ACTION_ITEMS}}
+                    </table>
                   </td>
                 </tr>
               </table>
