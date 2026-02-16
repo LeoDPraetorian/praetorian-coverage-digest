@@ -26,7 +26,7 @@ jobs:
 
       - name: Render coverage digest HTML
         working-directory: scripts/coverage-digest
-        run: node send-daily-digest.js --preview
+        run: node send-test.js
 
       - name: Read coverage data for issue
         id: coverage
@@ -56,6 +56,7 @@ jobs:
 
       - name: Send branded HTML email
         if: steps.coverage.outputs.has_items == 'true'
+        continue-on-error: true
         uses: dawidd6/action-send-mail@v3
         with:
           server_address: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
