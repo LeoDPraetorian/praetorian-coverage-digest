@@ -55,7 +55,7 @@ jobs:
             core.setOutput('subject', subject);
 
       - name: Send branded HTML email via Resend
-        if: steps.coverage.outputs.has_items == 'true' && secrets.RESEND_API_KEY != ''
+        if: steps.coverage.outputs.has_items == 'true'
         continue-on-error: true
         env:
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
