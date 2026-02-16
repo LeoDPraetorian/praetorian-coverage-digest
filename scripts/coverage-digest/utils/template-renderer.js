@@ -12,9 +12,10 @@ export async function renderDigest(items) {
   let template = await readFile(templatePath, 'utf-8');
   const itemTemplate = await readFile(itemTemplatePath, 'utf-8');
 
-  // Categorize items
-  const mediaItems = items.filter(i => i.sourceType === 'rss' || i.sourceType === 'media');
-  const manualItems = items.filter(i => i.sourceType === 'manual' || i.sourceType === 'event' || i.sourceType === 'podcast');
+  // Categorize items into three buckets
+  const mediaItems = items.filter(i => isMedia(i));
+  const blogItems = items.filter(i => isBlog(i));
+  const manualItems = items.filter(i => isManualOrEvent(i));
 
   // Collect all unique tools mentioned
   const allTools = [...new Set(items.flatMap(i => i.toolsMentioned || []))];
@@ -28,37 +29,48 @@ export async function renderDigest(items) {
     day: 'numeric',
   });
 
+  // Logo URL (hosted on GitHub raw)
+  const logoUrl = config.logoUrl || 'https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png';
+
   // Replace summary stats
   template = template.replace('{{DATE}}', dateStr);
   template = template.replace('{{TOTAL_ITEMS}}', String(items.length));
   template = template.replace('{{MEDIA_COUNT}}', String(mediaItems.length));
   template = template.replace('{{TOOLS_MENTIONED}}', String(allTools.length));
+  template = template.replace('{{BLOG_COUNT}}', String(blogItems.length));
+  template = template.replace('{{ACTION_COUNT}}', String(items.length));
   template = template.replace('{{SOURCE_COUNT}}', String(config.rssFeeds.length + config.googleAlertsFeeds.length));
-  template = template.replace('{{REPLY_TO}}', config.email.replyTo);
+  template = template.replace('{{LOGO_URL}}', logoUrl);
 
   // Render sections
   if (items.length === 0) {
     template = removeSection(template, 'IF_MEDIA');
-    template = removeSection(template, 'IF_RSS');
+    template = removeSection(template, 'IF_BLOG');
     template = removeSection(template, 'IF_MANUAL');
     template = removeSection(template, 'IF_ACTION_NEEDED');
     template = renderSection(template, 'IF_EMPTY', '');
   } else {
     template = removeSection(template, 'IF_EMPTY');
 
-    // Media / RSS items (combine into one section for now)
+    // External Media Coverage
     if (mediaItems.length > 0) {
       const renderedMedia = mediaItems.map(item => renderItem(itemTemplate, item)).join('');
       template = renderSection(template, 'IF_MEDIA', '');
       template = template.replace('{{MEDIA_ITEMS}}', renderedMedia);
-      // Hide duplicate RSS section if all items are in media
-      template = removeSection(template, 'IF_RSS');
     } else {
       template = removeSection(template, 'IF_MEDIA');
-      template = removeSection(template, 'IF_RSS');
     }
 
-    // Manual submissions
+    // Blog & Publications
+    if (blogItems.length > 0) {
+      const renderedBlog = blogItems.map(item => renderItem(itemTemplate, item)).join('');
+      template = renderSection(template, 'IF_BLOG', '');
+      template = template.replace('{{BLOG_ITEMS}}', renderedBlog);
+    } else {
+      template = removeSection(template, 'IF_BLOG');
+    }
+
+    // Events & Submissions
     if (manualItems.length > 0) {
       const renderedManual = manualItems.map(item => renderItem(itemTemplate, item)).join('');
       template = renderSection(template, 'IF_MANUAL', '');
@@ -67,13 +79,44 @@ export async function renderDigest(items) {
       template = removeSection(template, 'IF_MANUAL');
     }
 
-    // Action needed
-    const actionCount = items.length;
+    // Action needed banner
     template = renderSection(template, 'IF_ACTION_NEEDED', '');
-    template = template.replace('{{ACTION_COUNT}}', String(actionCount));
   }
 
   return template;
+}
+
+/**
+ * Check if an item is external media coverage.
+ */
+function isMedia(item) {
+  const source = (item.source || '').toLowerCase();
+  const type = (item.sourceType || '').toLowerCase();
+  // External media: RSS items that are NOT from Praetorian's own blog
+  if (type === 'rss' || type === 'media') {
+    return !source.includes('praetorian blog') && !source.includes('praetorian.com/blog');
+  }
+  return false;
+}
+
+/**
+ * Check if an item is a blog/self-published piece.
+ */
+function isBlog(item) {
+  const source = (item.source || '').toLowerCase();
+  const type = (item.sourceType || '').toLowerCase();
+  if (type === 'blog') return true;
+  // Praetorian blog posts that came through RSS or manual
+  if (source.includes('praetorian blog') || source.includes('praetorian.com/blog')) return true;
+  return false;
+}
+
+/**
+ * Check if an item is an event, podcast, or manual submission.
+ */
+function isManualOrEvent(item) {
+  const type = (item.sourceType || '').toLowerCase();
+  return type === 'manual' || type === 'event' || type === 'podcast';
 }
 
 /**

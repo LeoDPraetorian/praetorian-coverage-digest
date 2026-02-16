@@ -26,6 +26,9 @@ export const config = {
     replyTo: process.env.DIGEST_RECIPIENT || 'leonardo@praetorian.com',
   },
 
+  // Logo URL for email template
+  logoUrl: process.env.LOGO_URL || 'https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png',
+
   // Behavior
   skipIfEmpty: process.env.SKIP_IF_EMPTY !== 'false',
   dryRun: process.env.DRY_RUN === 'true',

@@ -24,31 +24,62 @@ jobs:
         working-directory: scripts/coverage-digest
         run: npm ci
 
-      - name: Run coverage digest (collect items)
+      - name: Render coverage digest HTML
         working-directory: scripts/coverage-digest
-        env:
-          SKIP_IF_EMPTY: 'true'
-          DRY_RUN: 'true'
         run: node send-daily-digest.js --preview
 
-      - name: Create GitHub Issue with digest
+      - name: Read coverage data for issue
+        id: coverage
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const path = require('path');
 
-            // Read the coverage tracker for issue body
             const trackerPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/coverage-tracker/coverage-tracker.json');
             const items = JSON.parse(fs.readFileSync(trackerPath, 'utf-8'));
-
-            // Filter to "new" items only
             const newItems = items.filter(i => i.status === 'new');
 
-            if (newItems.length === 0) {
-              console.log('No new coverage items. Skipping issue creation.');
-              return;
-            }
+            core.setOutput('count', newItems.length);
+            core.setOutput('has_items', newItems.length > 0 ? 'true' : 'false');
+
+            // Build subject line
+            const today = new Date().toLocaleDateString('en-US', {
+              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+            const tools = [...new Set(newItems.flatMap(i => i.tools_mentioned || []))];
+            const toolStr = tools.slice(0, 3).join(', ');
+            const subject = newItems.length > 0
+              ? `Praetorian Coverage Digest - ${today} - ${newItems.length} new items (${toolStr})`
+              : `Praetorian Coverage Digest - ${today} - No new items`;
+            core.setOutput('subject', subject);
+
+      - name: Send branded HTML email
+        if: steps.coverage.outputs.has_items == 'true'
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.SMTP_SERVER || 'smtp.gmail.com' }}
+          server_port: ${{ secrets.SMTP_PORT || 465 }}
+          secure: true
+          username: ${{ secrets.SMTP_USERNAME }}
+          password: ${{ secrets.SMTP_PASSWORD }}
+          subject: ${{ steps.coverage.outputs.subject }}
+          to: ${{ secrets.DIGEST_RECIPIENT }}
+          from: ${{ secrets.SMTP_FROM || 'Praetorian Coverage Digest <digest@praetorian.com>' }}
+          html_body: file://scripts/coverage-digest/preview.html
+          priority: normal
+
+      - name: Create GitHub Issue (backup record)
+        if: steps.coverage.outputs.has_items == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const trackerPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/coverage-tracker/coverage-tracker.json');
+            const items = JSON.parse(fs.readFileSync(trackerPath, 'utf-8'));
+            const newItems = items.filter(i => i.status === 'new');
 
             const today = new Date().toLocaleDateString('en-US', {
               weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -56,13 +87,11 @@ jobs:
 
             const tools = [...new Set(newItems.flatMap(i => i.tools_mentioned || []))];
 
-            // Build markdown body
-            let body = `## 📊 Summary\n\n`;
+            let body = `## Summary\n\n`;
             body += `| Metric | Count |\n|--------|-------|\n`;
             body += `| New Items | ${newItems.length} |\n`;
             body += `| Tools Mentioned | ${tools.join(', ') || 'None'} |\n\n`;
-
-            body += `---\n\n## 📰 Coverage Items\n\n`;
+            body += `---\n\n## Coverage Items\n\n`;
 
             for (const item of newItems.sort((a, b) => new Date(b.date) - new Date(a.date))) {
               const toolTags = (item.tools_mentioned || []).map(t => `\`${t}\``).join(' ');
@@ -72,13 +101,13 @@ jobs:
               body += `---\n\n`;
             }
 
-            body += `## ⚡ Action Needed\n\n`;
+            body += `## Action Needed\n\n`;
             body += `- [ ] Queue LinkedIn posts for each item\n`;
             body += `- [ ] Post to #praetorian-in-the-wild\n`;
             body += `- [ ] Update website "In the News" page\n`;
             body += `- [ ] Notify #amplification-crew for reshares\n`;
 
-            const title = `Coverage Digest - ${today} - ${newItems.length} new items (${tools.slice(0, 3).join(', ')})`;
+            const title = `Coverage Digest - ${today} - ${newItems.length} new items`;
 
             await github.rest.issues.create({
               owner: context.repo.owner,
@@ -89,3 +118,11 @@ jobs:
             });
 
             console.log(`Created issue: ${title}`);
+
+      - name: Upload HTML email as artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-digest-email
+          path: scripts/coverage-digest/preview.html
+          retention-days: 30

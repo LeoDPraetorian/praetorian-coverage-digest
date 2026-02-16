@@ -5,146 +5,199 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Praetorian Coverage Digest</title>
 </head>
-<body style="margin:0;padding:0;background-color:#f4f4f7;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f7;">
+<body style="margin:0;padding:0;background-color:#0D0D0D;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#FFFFFF;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0D0D0D;">
     <tr>
-      <td align="center" style="padding:24px 0;">
-        <table role="presentation" width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background-color:#ffffff;border-radius:8px;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+      <td align="center" style="padding:0;">
+        <table role="presentation" width="640" cellpadding="0" cellspacing="0" style="max-width:640px;width:100%;">
 
-          <!-- HEADER -->
+          <!-- HERO HEADER -->
           <tr>
-            <td style="background-color:#0d0d28;padding:32px 40px;text-align:center;">
+            <td style="background:linear-gradient(135deg, #1F252A 0%, #0D0D0D 50%, #2a1015 100%);padding:48px 40px 40px;text-align:center;border-bottom:3px solid #E63948;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="text-align:center;">
-                    <div style="font-size:28px;font-weight:700;color:#ffffff;letter-spacing:2px;">PRAETORIAN</div>
-                    <div style="font-size:11px;font-weight:500;color:#e63948;letter-spacing:3px;margin-top:4px;text-transform:uppercase;">Coverage Digest</div>
+                  <td align="center" style="padding-bottom:24px;">
+                    <img src="{{LOGO_URL}}" alt="Praetorian" width="220" style="max-width:220px;height:auto;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <div style="font-size:32px;font-weight:700;color:#FFFFFF;line-height:1.2;">Good Morning!</div>
+                    <div style="font-size:20px;font-weight:400;color:#A0A4A8;margin-top:8px;">Here's your daily coverage digest.</div>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- DATE BAR -->
+          <!-- DATE & SUMMARY BAR -->
           <tr>
-            <td style="background-color:#e63948;padding:10px 40px;text-align:center;">
-              <span style="font-size:13px;font-weight:600;color:#ffffff;letter-spacing:1px;">{{DATE}}</span>
-            </td>
-          </tr>
-
-          <!-- SUMMARY STATS -->
-          <tr>
-            <td style="padding:28px 40px 16px;">
+            <td style="background-color:#1F252A;padding:16px 40px;border-bottom:1px solid #535B61;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td width="33%" align="center" style="padding:12px 0;">
-                    <div style="font-size:28px;font-weight:700;color:#0d0d28;">{{TOTAL_ITEMS}}</div>
-                    <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">New Items</div>
-                  </td>
-                  <td width="33%" align="center" style="padding:12px 0;border-left:1px solid #e5e7eb;border-right:1px solid #e5e7eb;">
-                    <div style="font-size:28px;font-weight:700;color:#e63948;">{{MEDIA_COUNT}}</div>
-                    <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Media Hits</div>
-                  </td>
-                  <td width="33%" align="center" style="padding:12px 0;">
-                    <div style="font-size:28px;font-weight:700;color:#0d0d28;">{{TOOLS_MENTIONED}}</div>
-                    <div style="font-size:11px;color:#6b7280;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Tools Mentioned</div>
+                  <td>
+                    <span style="font-size:14px;color:#A0A4A8;">{{DATE}}</span>
+                    <span style="font-size:14px;color:#535B61;">&nbsp;&bull;&nbsp;</span>
+                    <span style="font-size:14px;font-weight:600;color:#E63948;">{{TOTAL_ITEMS}} items need attention</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
 
-          <!-- DIVIDER -->
+          <!-- STAT CARDS -->
           <tr>
-            <td style="padding:0 40px;">
-              <div style="border-top:1px solid #e5e7eb;"></div>
+            <td style="background-color:#0D0D0D;padding:24px 28px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <!-- Card 1: Media Hits -->
+                  <td width="25%" align="center" style="padding:0 4px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #E63948;">
+                      <tr>
+                        <td style="padding:16px 8px;text-align:center;">
+                          <div style="font-size:32px;font-weight:700;color:#E63948;">{{MEDIA_COUNT}}</div>
+                          <div style="font-size:10px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Media Hits</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 2: Tools Mentioned -->
+                  <td width="25%" align="center" style="padding:0 4px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #11C3DB;">
+                      <tr>
+                        <td style="padding:16px 8px;text-align:center;">
+                          <div style="font-size:32px;font-weight:700;color:#11C3DB;">{{TOOLS_MENTIONED}}</div>
+                          <div style="font-size:10px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Tools Cited</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 3: Blog Posts -->
+                  <td width="25%" align="center" style="padding:0 4px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #D4AF37;">
+                      <tr>
+                        <td style="padding:16px 8px;text-align:center;">
+                          <div style="font-size:32px;font-weight:700;color:#D4AF37;">{{BLOG_COUNT}}</div>
+                          <div style="font-size:10px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Blog Posts</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 4: Action Needed -->
+                  <td width="25%" align="center" style="padding:0 4px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #A0A4A8;">
+                      <tr>
+                        <td style="padding:16px 8px;text-align:center;">
+                          <div style="font-size:32px;font-weight:700;color:#FFFFFF;">{{ACTION_COUNT}}</div>
+                          <div style="font-size:10px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Need Action</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
 
           <!-- MEDIA COVERAGE SECTION -->
           {{#IF_MEDIA}}
           <tr>
-            <td style="padding:24px 40px 8px;">
+            <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td>
-                    <div style="font-size:11px;font-weight:700;color:#e63948;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">&#128240; Media Coverage</div>
+                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
+                    <span style="font-size:18px;font-weight:700;color:#E63948;">External Media Coverage</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          {{MEDIA_ITEMS}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{MEDIA_ITEMS}}
+              </table>
+            </td>
+          </tr>
           {{/IF_MEDIA}}
 
-          <!-- RSS / BLOG MENTIONS SECTION -->
-          {{#IF_RSS}}
+          <!-- BLOG / SELF-PUBLISHED SECTION -->
+          {{#IF_BLOG}}
           <tr>
-            <td style="padding:24px 40px 8px;">
+            <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td>
-                    <div style="font-size:11px;font-weight:700;color:#e63948;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">&#128225; Blog & Publication Mentions</div>
+                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
+                    <span style="font-size:18px;font-weight:700;color:#11C3DB;">Blog &amp; Publications</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          {{RSS_ITEMS}}
-          {{/IF_RSS}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{BLOG_ITEMS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_BLOG}}
 
-          <!-- MANUAL SUBMISSIONS SECTION -->
+          <!-- EVENTS / MANUAL SECTION -->
           {{#IF_MANUAL}}
           <tr>
-            <td style="padding:24px 40px 8px;">
+            <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td>
-                    <div style="font-size:11px;font-weight:700;color:#e63948;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">&#9997;&#65039; Team Submissions</div>
+                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
+                    <span style="font-size:18px;font-weight:700;color:#D4AF37;">Events &amp; Submissions</span>
                   </td>
                 </tr>
               </table>
             </td>
           </tr>
-          {{MANUAL_ITEMS}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{MANUAL_ITEMS}}
+              </table>
+            </td>
+          </tr>
           {{/IF_MANUAL}}
 
           <!-- EMPTY STATE -->
           {{#IF_EMPTY}}
           <tr>
-            <td style="padding:40px;text-align:center;">
-              <div style="font-size:16px;color:#6b7280;">No new coverage items today.</div>
-              <div style="font-size:13px;color:#9ca3af;margin-top:8px;">Check back tomorrow or add items manually.</div>
+            <td style="background-color:#0D0D0D;padding:48px 40px;text-align:center;">
+              <div style="font-size:18px;color:#A0A4A8;">No new coverage items today.</div>
+              <div style="font-size:14px;color:#535B61;margin-top:8px;">The monitors are watching. You'll hear from us when something drops.</div>
             </td>
           </tr>
           {{/IF_EMPTY}}
 
-          <!-- DIVIDER -->
-          <tr>
-            <td style="padding:8px 40px 0;">
-              <div style="border-top:1px solid #e5e7eb;"></div>
-            </td>
-          </tr>
-
-          <!-- ACTION ITEMS -->
+          <!-- ACTION NEEDED BANNER -->
           {{#IF_ACTION_NEEDED}}
           <tr>
-            <td style="padding:24px 40px;">
-              <div style="background-color:#fef3c7;border-left:4px solid #f59e0b;padding:16px 20px;border-radius:0 6px 6px 0;">
-                <div style="font-size:12px;font-weight:700;color:#92400e;text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;">Action Needed</div>
-                <div style="font-size:14px;color:#78350f;line-height:1.5;">{{ACTION_COUNT}} items awaiting amplification. Review and queue LinkedIn posts, Slack announcements, and website updates.</div>
-              </div>
+            <td style="background-color:#0D0D0D;padding:20px 40px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-left:4px solid #E63948;">
+                <tr>
+                  <td style="padding:20px 24px;">
+                    <div style="font-size:13px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px;">Action Required</div>
+                    <div style="font-size:14px;color:#A0A4A8;line-height:1.6;">{{ACTION_COUNT}} items awaiting amplification. Queue LinkedIn posts, update #praetorian-in-the-wild, and notify the amplification crew.</div>
+                  </td>
+                </tr>
+              </table>
             </td>
           </tr>
           {{/IF_ACTION_NEEDED}}
 
           <!-- FOOTER -->
           <tr>
-            <td style="background-color:#0d0d28;padding:24px 40px;text-align:center;">
-              <div style="font-size:12px;color:#9ca3af;line-height:1.6;">
+            <td style="background-color:#1F252A;padding:28px 40px;text-align:center;border-top:1px solid #535B61;">
+              <div style="font-size:11px;color:#535B61;line-height:1.6;">
                 Praetorian Coverage Digest &middot; Generated automatically<br>
-                <span style="color:#6b7280;">Monitoring {{SOURCE_COUNT}} sources for Praetorian mentions</span><br>
-                <a href="mailto:{{REPLY_TO}}" style="color:#e63948;text-decoration:none;font-size:11px;">Manage preferences</a>
+                Monitoring {{SOURCE_COUNT}} sources &middot; <span style="color:#A0A4A8;">praetorian.com</span><br>
+                <span style="color:#3A4044;margin-top:4px;display:inline-block;">Continuous Offensive Security &amp; Threat Exposure Management</span>
               </div>
             </td>
           </tr>
