@@ -4,20 +4,13 @@ on:
   schedule:
     # 8 AM EST = 13:00 UTC (adjust for daylight saving: 12:00 UTC in summer)
     - cron: '0 13 * * *'
-  workflow_dispatch:
-    inputs:
-      dry_run:
-        description: 'Dry run (log only, no email)'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - 'false'
-          - 'true'
+  workflow_dispatch: {}
 
 jobs:
   send-digest:
     runs-on: ubuntu-latest
+    permissions:
+      issues: write
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -31,22 +24,68 @@ jobs:
         working-directory: scripts/coverage-digest
         run: npm ci
 
-      - name: Run coverage digest
+      - name: Run coverage digest (collect items)
         working-directory: scripts/coverage-digest
         env:
-          SENDGRID_API_KEY: ${{ secrets.SENDGRID_API_KEY }}
-          DIGEST_RECIPIENT: ${{ secrets.DIGEST_RECIPIENT }}
-          DIGEST_CC: ${{ secrets.DIGEST_CC }}
-          DIGEST_FROM_EMAIL: digest@praetorian.com
-          DIGEST_FROM_NAME: Praetorian Coverage Digest
           SKIP_IF_EMPTY: 'true'
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
-        run: node send-daily-digest.js
+          DRY_RUN: 'true'
+        run: node send-daily-digest.js --preview
 
-      - name: Upload digest preview (on failure or dry run)
-        if: failure() || github.event.inputs.dry_run == 'true'
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Issue with digest
+        uses: actions/github-script@v7
         with:
-          name: digest-preview
-          path: scripts/coverage-digest/preview.html
-          retention-days: 7
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            // Read the coverage tracker for issue body
+            const trackerPath = path.join(process.env.GITHUB_WORKSPACE, 'scripts/coverage-tracker/coverage-tracker.json');
+            const items = JSON.parse(fs.readFileSync(trackerPath, 'utf-8'));
+
+            // Filter to "new" items only
+            const newItems = items.filter(i => i.status === 'new');
+
+            if (newItems.length === 0) {
+              console.log('No new coverage items. Skipping issue creation.');
+              return;
+            }
+
+            const today = new Date().toLocaleDateString('en-US', {
+              weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+            });
+
+            const tools = [...new Set(newItems.flatMap(i => i.tools_mentioned || []))];
+
+            // Build markdown body
+            let body = `## 📊 Summary\n\n`;
+            body += `| Metric | Count |\n|--------|-------|\n`;
+            body += `| New Items | ${newItems.length} |\n`;
+            body += `| Tools Mentioned | ${tools.join(', ') || 'None'} |\n\n`;
+
+            body += `---\n\n## 📰 Coverage Items\n\n`;
+
+            for (const item of newItems.sort((a, b) => new Date(b.date) - new Date(a.date))) {
+              const toolTags = (item.tools_mentioned || []).map(t => `\`${t}\``).join(' ');
+              body += `### [${item.title}](${item.url})\n`;
+              body += `**${item.source}** · ${item.date} ${toolTags}\n\n`;
+              if (item.excerpt) body += `> ${item.excerpt}\n\n`;
+              body += `---\n\n`;
+            }
+
+            body += `## ⚡ Action Needed\n\n`;
+            body += `- [ ] Queue LinkedIn posts for each item\n`;
+            body += `- [ ] Post to #praetorian-in-the-wild\n`;
+            body += `- [ ] Update website "In the News" page\n`;
+            body += `- [ ] Notify #amplification-crew for reshares\n`;
+
+            const title = `Coverage Digest - ${today} - ${newItems.length} new items (${tools.slice(0, 3).join(', ')})`;
+
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: title,
+              body: body,
+              labels: ['coverage-digest']
+            });
+
+            console.log(`Created issue: ${title}`);
