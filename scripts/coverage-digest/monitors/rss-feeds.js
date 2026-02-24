@@ -57,7 +57,12 @@ function extractExcerpt(item, maxLength = 200) {
  */
 async function checkFeed(feed, since) {
   try {
-    const parsed = await parser.parseURL(feed.url);
+    const parsed = await Promise.race([
+      parser.parseURL(feed.url),
+      new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Feed fetch timed out after 30s')), 30000)
+      ),
+    ]);
     const items = [];
 
     for (const item of parsed.items || []) {

@@ -3,6 +3,92 @@ import { join } from 'path';
 import { config } from '../config.js';
 
 /**
+ * Render the interactive marketing dashboard HTML.
+ * Unlike the email, this is a full web page with CSS/JS interactivity.
+ */
+export async function renderDashboard(items) {
+  const templatePath = join(config.paths.templates, 'dashboard-template.html');
+  let template = await readFile(templatePath, 'utf-8');
+
+  const mediaItems = items.filter(i => isMedia(i));
+  const blogItems = items.filter(i => isBlog(i));
+  const allTools = [...new Set(items.flatMap(i => i.toolsMentioned || []))];
+
+  const today = new Date();
+  const dateStr = today.toLocaleDateString('en-US', {
+    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
+  });
+
+  // Quarterly data (fetches from praetorian.com)
+  const q = await calculateQuarterlyProgress(items);
+
+  // Build tool coverage data: count mentions per tool
+  const toolCounts = {};
+  for (const item of items) {
+    for (const t of item.toolsMentioned || []) {
+      toolCounts[t] = (toolCounts[t] || 0) + 1;
+    }
+  }
+  // Also count blog post tool mentions by title keywords
+  for (const post of q.blogPosts) {
+    for (const tool of config.tools) {
+      if (post.title.toLowerCase().includes(tool.toLowerCase())) {
+        toolCounts[tool] = (toolCounts[tool] || 0) + 1;
+      }
+    }
+  }
+  const toolData = Object.entries(toolCounts)
+    .sort((a, b) => b[1] - a[1])
+    .map(([name, count]) => ({ name, count }));
+
+  // Generate LinkedIn drafts data for copy buttons
+  const linkedInData = items.map(item => {
+    const tool = (item.toolsMentioned || [])[0] || '';
+    let draft = '';
+    if (isBlog(item)) draft = generateBlogLinkedInDraft(item, tool);
+    else if (isMedia(item)) draft = generateMediaLinkedInDraft(item, tool);
+    else draft = generateEventLinkedInDraft(item, tool);
+    draft += '\n\n' + buildHashtags(item);
+    const typeLabel = isBlog(item) ? 'Blog' : isMedia(item) ? 'Media' : 'Event';
+    return { title: item.title, type: typeLabel, draft, url: item.url };
+  });
+
+  // Action items
+  const actionData = [];
+  const toolStr = allTools.slice(0, 3).join(', ');
+  if (mediaItems.length > 0) {
+    actionData.push({ priority: 'high', text: `Post ${mediaItems[0].source} coverage to LinkedIn company page` });
+    actionData.push({ priority: 'high', text: `Send reshare template to #amplification-crew (10-15 key voices)` });
+  }
+  if (blogItems.length > 0) {
+    actionData.push({ priority: 'medium', text: `Promote "${blogItems[0].title}" with 3 key takeaways on LinkedIn` });
+  }
+  if (allTools.length > 0) {
+    actionData.push({ priority: 'medium', text: `Brief sales team: ${toolStr} featured in publications` });
+  }
+  actionData.push({ priority: 'normal', text: `Update praetorian.com/news "In the News" page` });
+
+  // Inject data as JSON into template
+  template = template.replaceAll('{{DATE}}', dateStr);
+  template = template.replaceAll('{{Q_LABEL}}', q.label);
+  template = template.replaceAll('{{BLOG_COUNT}}', String(q.blogCount));
+  template = template.replaceAll('{{BLOG_GOAL}}', String(q.blogGoal));
+  template = template.replaceAll('{{BLOG_PCT}}', String(q.blogPct));
+  template = template.replaceAll('{{MEDIA_COUNT}}', String(q.mediaCount));
+  template = template.replaceAll('{{MEDIA_GOAL}}', String(q.mediaGoal));
+  template = template.replaceAll('{{MEDIA_PCT}}', String(q.mediaPct));
+  template = template.replaceAll('{{TOOLS_COUNT}}', String(allTools.length));
+  template = template.replaceAll('{{TOTAL_ITEMS}}', String(items.length));
+  template = template.replaceAll('\'{{BLOG_POSTS_JSON}}\'', JSON.stringify(q.blogPosts));
+  template = template.replaceAll('\'{{MEDIA_POSTS_JSON}}\'', JSON.stringify(q.mediaPosts));
+  template = template.replaceAll('\'{{TOOL_DATA_JSON}}\'', JSON.stringify(toolData));
+  template = template.replaceAll('\'{{LINKEDIN_DATA_JSON}}\'', JSON.stringify(linkedInData));
+  template = template.replaceAll('\'{{ACTION_DATA_JSON}}\'', JSON.stringify(actionData));
+
+  return template;
+}
+
+/**
  * Render the digest email HTML from template + items.
  */
 export async function renderDigest(items) {
@@ -41,6 +127,27 @@ export async function renderDigest(items) {
   template = template.replaceAll('{{ACTION_COUNT}}', String(items.length));
   template = template.replaceAll('{{SOURCE_COUNT}}', String(config.rssFeeds.length + config.googleAlertsFeeds.length));
   template = template.replaceAll('{{LOGO_URL}}', logoUrl);
+
+  // Dashboard URL (for the CTA button in the email)
+  const dashboardUrl = process.env.DASHBOARD_URL || 'https://praetorian-inc.github.io/people-operations/';
+  template = template.replaceAll('{{DASHBOARD_URL}}', dashboardUrl);
+
+  // Quarterly progress tracker (fetches blog count from praetorian.com)
+  const quarterlyData = await calculateQuarterlyProgress(items);
+  template = template.replaceAll('{{Q_LABEL}}', quarterlyData.label);
+  template = template.replaceAll('{{BLOG_PROGRESS}}', String(quarterlyData.blogCount));
+  template = template.replaceAll('{{BLOG_GOAL}}', String(quarterlyData.blogGoal));
+  template = template.replaceAll('{{BLOG_PCT}}', String(quarterlyData.blogPct));
+  template = template.replaceAll('{{MEDIA_PROGRESS}}', String(quarterlyData.mediaCount));
+  template = template.replaceAll('{{MEDIA_GOAL}}', String(quarterlyData.mediaGoal));
+  template = template.replaceAll('{{MEDIA_PCT}}', String(quarterlyData.mediaPct));
+
+  // Show quarterly section if we have data
+  if (quarterlyData.blogCount > 0 || quarterlyData.mediaCount > 0) {
+    template = renderSection(template, 'IF_QUARTERLY', '');
+  } else {
+    template = removeSection(template, 'IF_QUARTERLY');
+  }
 
   // Generate smart action items
   const actionItems = generateActionItems(mediaItems, blogItems, manualItems, allTools);
@@ -172,7 +279,8 @@ function generateActionItems(mediaItems, blogItems, manualItems, allTools) {
 
 /**
  * Generate ready-to-post LinkedIn drafts for each coverage item.
- * Returns rendered HTML with copy-paste-ready posts.
+ * Returns rendered HTML with copy-paste-ready posts optimized for
+ * LinkedIn's algorithm: strong hook, value in middle, CTA at end.
  */
 function generateLinkedInDrafts(items) {
   if (items.length === 0) return '';
@@ -192,27 +300,35 @@ function generateLinkedInDrafts(items) {
 
     draft += `\n\n${hashtags}`;
 
-    const typeLabel = isBlog(item) ? 'BLOG' : isMedia(item) ? 'MEDIA' : 'EVENT';
+    const typeLabel = isBlog(item) ? '📝 BLOG' : isMedia(item) ? '📰 MEDIA' : '🎤 EVENT';
     const typeColor = isBlog(item) ? '#D4AF37' : isMedia(item) ? '#E63948' : '#11C3DB';
+    const typeEmoji = isBlog(item) ? '💡' : isMedia(item) ? '🔒' : '🎯';
 
     return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:16px;">
       <tr>
-        <td style="background-color:#1F252A;border-radius:8px;border-left:4px solid ${typeColor};padding:20px 24px;">
+        <td style="background-color:#1F252A;border-radius:10px;border-left:4px solid ${typeColor};padding:20px 24px;">
           <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
             <tr>
               <td>
-                <span style="display:inline-block;font-size:10px;font-weight:700;color:${typeColor};text-transform:uppercase;letter-spacing:1.5px;background-color:rgba(0,0,0,0.3);padding:3px 8px;border-radius:3px;">${typeLabel} POST ${idx + 1}</span>
-                <div style="font-size:12px;color:#535B61;margin-top:6px;margin-bottom:12px;">${escapeHtml(item.title)}</div>
+                <span style="display:inline-block;font-size:10px;font-weight:700;color:${typeColor};text-transform:uppercase;letter-spacing:1.5px;background-color:rgba(0,0,0,0.3);padding:4px 10px;border-radius:4px;">${typeEmoji} ${typeLabel} POST ${idx + 1}</span>
+                <div style="font-size:12px;color:#6B7280;margin-top:8px;margin-bottom:14px;font-style:italic;">${escapeHtml(item.title)}</div>
               </td>
             </tr>
             <tr>
-              <td style="background-color:#0D0D0D;border-radius:6px;padding:16px;">
-                <div style="font-size:13px;color:#FFFFFF;line-height:1.6;white-space:pre-wrap;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(draft)}</div>
+              <td style="background-color:#0D0D0D;border-radius:8px;padding:20px;border:1px solid #2A2F35;">
+                <div style="font-size:13px;color:#E5E7EB;line-height:1.7;white-space:pre-wrap;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">${escapeHtml(draft)}</div>
               </td>
             </tr>
             <tr>
-              <td style="padding-top:10px;">
-                <a href="${item.url || '#'}" style="display:inline-block;font-size:11px;color:#11C3DB;text-decoration:none;">Open article &rarr;</a>
+              <td style="padding-top:12px;">
+                <table role="presentation" cellpadding="0" cellspacing="0"><tr>
+                  <td style="padding-right:16px;">
+                    <a href="${item.url || '#'}" style="display:inline-block;font-size:11px;font-weight:600;color:#11C3DB;text-decoration:none;padding:6px 12px;border:1px solid #11C3DB;border-radius:4px;">Open article &rarr;</a>
+                  </td>
+                  <td>
+                    <span style="font-size:10px;color:#535B61;">Ready to copy &amp; paste to LinkedIn</span>
+                  </td>
+                </tr></table>
               </td>
             </tr>
           </table>
@@ -224,61 +340,173 @@ function generateLinkedInDrafts(items) {
 
 /**
  * Generate LinkedIn draft for media coverage (third-party validation).
+ * Leads with publication credibility, uses social proof language,
+ * and ends with an engagement-driving question.
  */
 function generateMediaLinkedInDraft(item, tool) {
-  const source = item.source || 'a leading publication';
-  const toolPhrase = tool ? `our open-source tool ${tool}` : 'Praetorian';
+  const source = item.source || 'a leading cybersecurity publication';
+  const toolName = tool || 'Praetorian';
+  const url = item.url || '';
 
-  if (item.excerpt) {
-    return `Proud to see ${toolPhrase} featured in ${source}!\n\n${item.excerpt}\n\nThis is what happens when you build security tools that solve real problems — the community takes notice.\n\nCheck it out: ${item.url || ''}`;
+  if (tool && item.excerpt) {
+    return `🔒 When ${source} covers your open-source tool, you know you're onto something.
+
+${toolName} — ${item.excerpt}
+
+The best security tools should be accessible to everyone defending networks. That's why we build in the open.
+
+Full article: ${url}
+
+What open-source security tools are in your daily rotation? 👇`;
   }
 
-  return `Proud to see ${toolPhrase} featured in ${source}!\n\nAt Praetorian, we build open-source security tools that help defenders stay ahead. Great to see the community recognizing this work.\n\nRead more: ${item.url || ''}`;
+  if (tool) {
+    return `🔒 ${source} just featured ${toolName}, and the industry is taking notice.
+
+Building offensive security tools in the open isn't just a philosophy — it's how we make the entire ecosystem stronger.
+
+→ 100% open-source
+→ Built by practitioners, for practitioners
+→ Solving real problems that defenders face daily
+
+Full article: ${url}
+
+What security challenges are you tackling right now? 👇`;
+  }
+
+  return `⚡ Praetorian was just recognized by ${source}.
+
+When leading publications take notice, it validates what we've been building — security tools and research that push the industry forward.
+
+We believe offensive security knowledge should be open and accessible. That's the mission.
+
+Read the full feature: ${url}
+
+What security trends are you watching most closely? 👇`;
 }
 
 /**
  * Generate LinkedIn draft for blog/self-published content.
+ * Leads with the problem being solved, teases key insights,
+ * and positions Praetorian as thought leaders.
  */
 function generateBlogLinkedInDraft(item, tool) {
-  const toolPhrase = tool ? ` for ${tool}` : '';
+  const url = item.url || '';
 
-  if (item.excerpt) {
-    return `New from the Praetorian team${toolPhrase}:\n\n${item.excerpt}\n\nWe're sharing this openly because offensive security knowledge shouldn't be gatekept. Whether you're red team, blue team, or somewhere in between — this is for you.\n\nRead the full post: ${item.url || ''}`;
+  if (tool && item.excerpt) {
+    return `💡 Most security teams are still doing this the hard way.
+
+We just published a deep dive on ${tool}: ${item.excerpt}
+
+Here's what we cover:
+→ The problem most teams overlook
+→ A practical approach that actually scales
+→ Real-world results from offensive engagements
+
+Offensive security knowledge shouldn't be gatekept. Red team, blue team, purple team — this one's for you.
+
+Full post: ${url}
+
+What's your biggest security testing challenge right now? 🔥`;
   }
 
-  return `New from the Praetorian team${toolPhrase}: ${item.title}\n\nWe believe the best security research should be open and accessible. Dive in and let us know what you think.\n\nRead more: ${item.url || ''}`;
+  if (item.excerpt) {
+    return `🚀 New research just dropped from the Praetorian team.
+
+${item.excerpt}
+
+We're sharing this openly because the cybersecurity community gets stronger when knowledge flows freely.
+
+Whether you're breaking in or defending — there's something here for you.
+
+Read the full post: ${url}
+
+Tag someone who needs to see this 👇`;
+  }
+
+  return `💡 New from the Praetorian blog: ${item.title}
+
+We spend our days breaking into the most hardened environments in the world. Now we're sharing what we've learned.
+
+This isn't theory — it's battle-tested offensive security research from practitioners in the trenches.
+
+Read it here: ${url}
+
+What topics should we cover next? Drop your ideas below 👇`;
 }
 
 /**
  * Generate LinkedIn draft for events/conferences.
+ * Creates FOMO, highlights key takeaways, and drives community engagement.
  */
 function generateEventLinkedInDraft(item, tool) {
-  const toolPhrase = tool ? ` featuring ${tool}` : '';
+  const url = item.url || '';
+  const toolMention = tool ? ` on ${tool}` : '';
+  const isPast = item.date && new Date(item.date) < new Date();
 
-  return `${item.title}${toolPhrase}\n\n${item.excerpt || 'Join us for an exciting session on offensive security and threat exposure management.'}\n\nIf you're attending, come say hello — we love connecting with the security community.\n\nDetails: ${item.url || ''}`;
+  if (isPast) {
+    return `🎯 If you missed this, here's what you need to know.
+
+${item.title}${toolMention} — the conversations were incredible.
+
+${item.excerpt || 'Key takeaway: The offensive security landscape is evolving faster than most organizations can keep up. The teams that invest in continuous security testing are the ones staying ahead.'}
+
+The energy in the cybersecurity community right now is unmatched. Grateful to be part of it.
+
+${url ? `Recap & resources: ${url}` : ''}
+
+Were you there? What was your biggest takeaway? 👇`;
+  }
+
+  return `🎯 Mark your calendars — this is one you don't want to miss.
+
+${item.title}${toolMention}
+
+${item.excerpt || 'We\'re diving deep into offensive security, threat exposure management, and what the next generation of security testing looks like.'}
+
+The best conversations in cybersecurity happen when practitioners get in the same room.
+
+${url ? `Details & registration: ${url}` : ''}
+
+Who else is going? Drop a 🔥 below if you'll be there!`;
 }
 
 /**
  * Build relevant hashtags for a LinkedIn post.
+ * Strategy: core security tags + tool-specific + engagement + brand.
+ * Targets 6-8 hashtags for optimal LinkedIn reach.
  */
 function buildHashtags(item) {
-  const tags = ['#cybersecurity', '#infosec'];
+  const tags = ['#cybersecurity', '#offensivesecurity', '#infosec'];
 
+  // Tool-specific tags
   const tools = item.toolsMentioned || [];
   for (const tool of tools.slice(0, 2)) {
     const tag = '#' + tool.replace(/\s+/g, '').toLowerCase();
     if (!tags.includes(tag)) tags.push(tag);
   }
 
+  // Content-type engagement tags
   if (isBlog(item)) {
-    tags.push('#opensourcesecurity');
+    tags.push('#securityresearch');
+    tags.push('#opensource');
   } else if (isMedia(item)) {
-    tags.push('#securitynews');
+    tags.push('#securitytools');
+    tags.push('#opensource');
+  } else {
+    tags.push('#securitycommunity');
   }
 
+  // Community + engagement tags
+  tags.push('#redteam');
+  tags.push('#pentesting');
+
+  // Brand tag always last
   tags.push('#praetorian');
 
-  return tags.slice(0, 6).join(' ');
+  // Deduplicate and cap at 8
+  const uniqueTags = [...new Set(tags)];
+  return uniqueTags.slice(0, 8).join(' ');
 }
 
 /**
@@ -338,10 +566,21 @@ function renderItem(template, item) {
     });
   }
 
+  // Determine accent color based on item type
+  let accentColor;
+  if (isMedia(item)) {
+    accentColor = '#E63948'; // red for external media
+  } else if (isBlog(item)) {
+    accentColor = '#11C3DB'; // cyan for blog/publications
+  } else {
+    accentColor = '#D4AF37'; // gold for events/manual
+  }
+
   html = html.replaceAll('{{ITEM_TITLE}}', escapeHtml(item.title));
   html = html.replaceAll('{{ITEM_URL}}', item.url || '#');
   html = html.replaceAll('{{ITEM_SOURCE}}', escapeHtml(item.source));
   html = html.replaceAll('{{ITEM_DATE}}', dateStr);
+  html = html.replaceAll('{{ITEM_ACCENT_COLOR}}', accentColor);
 
   // Tools mentioned
   if (item.toolsMentioned && item.toolsMentioned.length > 0) {
@@ -377,6 +616,90 @@ function renderSection(html, sectionName, _placeholder) {
 function removeSection(html, sectionName) {
   const regex = new RegExp(`{{#${sectionName}}}[\\s\\S]*?{{/${sectionName}}}`, 'g');
   return html.replace(regex, '');
+}
+
+/**
+ * Calculate quarterly progress for blog posts and tier-1 media pickups.
+ * Blog posts are fetched from praetorian.com/blog RSS feed (source of truth).
+ * Media items come from the coverage tracker.
+ * Q1 = Jan-Mar, Q2 = Apr-Jun, Q3 = Jul-Sep, Q4 = Oct-Dec
+ *
+ * Returns counts AND the full list of blog/media items for the dashboard.
+ */
+async function calculateQuarterlyProgress(items) {
+  const now = new Date();
+  const year = now.getFullYear();
+  const quarter = Math.floor(now.getMonth() / 3) + 1;
+  const qStart = new Date(year, (quarter - 1) * 3, 1);
+  const label = `Q${quarter} ${year}`;
+
+  // Goals
+  const blogGoal = 16;
+  const mediaGoal = 5;
+
+  // Blog posts: fetch details from praetorian.com blog RSS feeds
+  const blogPosts = [];
+  try {
+    const feedUrls = [
+      'https://www.praetorian.com/blog/feed/',
+      'https://www.praetorian.com/blog/feed/?paged=2',
+    ];
+    for (const feedUrl of feedUrls) {
+      const res = await fetch(feedUrl, { signal: AbortSignal.timeout(10000) });
+      if (!res.ok) continue;
+      const xml = await res.text();
+      // Extract individual <item> blocks
+      const itemBlocks = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)];
+      for (const block of itemBlocks) {
+        const content = block[1];
+        const title = content.match(/<title>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/title>/)?.[1] || '';
+        const link = content.match(/<link>(.*?)<\/link>/)?.[1] || '';
+        const pubDate = content.match(/<pubDate>(.*?)<\/pubDate>/)?.[1] || '';
+        const creator = content.match(/<dc:creator>(?:<!\[CDATA\[)?(.*?)(?:\]\]>)?<\/dc:creator>/)?.[1] || '';
+        const date = new Date(pubDate);
+        if (date >= qStart && date <= now) {
+          blogPosts.push({ title, url: link, date: date.toISOString(), author: creator });
+        }
+      }
+    }
+    // Sort newest first
+    blogPosts.sort((a, b) => new Date(b.date) - new Date(a.date));
+    console.log(`  Blog posts from praetorian.com in ${label}: ${blogPosts.length}`);
+  } catch (err) {
+    console.warn(`  Warning: Could not fetch blog RSS: ${err.message}`);
+    // Fallback: use blog items from coverage tracker
+    for (const item of items) {
+      if (isBlog(item) && new Date(item.date) >= qStart) {
+        blogPosts.push({ title: item.title, url: item.url, date: item.date, author: '' });
+      }
+    }
+  }
+
+  // Media items: from coverage tracker (external media pickups)
+  const mediaPosts = [];
+  for (const item of items) {
+    if (isMedia(item) && new Date(item.date) >= qStart) {
+      mediaPosts.push({
+        title: item.title,
+        url: item.url,
+        date: item.date,
+        source: item.source,
+        tools: item.toolsMentioned || [],
+      });
+    }
+  }
+
+  return {
+    label,
+    blogCount: blogPosts.length,
+    blogGoal,
+    blogPct: Math.min(100, Math.round((blogPosts.length / blogGoal) * 100)),
+    mediaCount: mediaPosts.length,
+    mediaGoal,
+    mediaPct: Math.min(100, Math.round((mediaPosts.length / mediaGoal) * 100)),
+    blogPosts,
+    mediaPosts,
+  };
 }
 
 /**
