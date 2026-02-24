@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Marketing Command Center — Q1 2026 | Praetorian</title>
+  <style>
+    :root {
+      --red: #E63948;
+      --red-dim: rgba(230,57,72,0.15);
+      --blue: #11C3DB;
+      --blue-dim: rgba(17,195,219,0.15);
+      --gold: #D4AF37;
+      --gold-dim: rgba(212,175,55,0.15);
+      --bg-primary: #0D0D0D;
+      --bg-secondary: #1F252A;
+      --bg-tertiary: #3A4044;
+      --border: #535B61;
+      --text-primary: #FFFFFF;
+      --text-secondary: #A0A4A8;
+      --text-muted: #535B61;
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+    a { color: var(--blue); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 50%, #2a1015 100%);
+      border-bottom: 3px solid var(--red);
+      padding: 40px 0;
+      text-align: center;
+    }
+    .header-tag {
+      font-size: 11px; font-weight: 700; color: var(--red);
+      text-transform: uppercase; letter-spacing: 3px; margin-bottom: 8px;
+    }
+    .header h1 { font-size: 28px; font-weight: 700; margin-bottom: 4px; }
+    .header .subtitle { color: var(--text-secondary); font-size: 15px; }
+    .header .date-badge {
+      display: inline-block; margin-top: 16px; padding: 6px 16px;
+      background: var(--bg-tertiary); border-radius: 20px;
+      font-size: 12px; color: var(--text-secondary);
+    }
+
+    /* Layout */
+    .container { max-width: 1100px; margin: 0 auto; padding: 32px 24px; }
+
+    /* Scorecard Row */
+    .scorecard { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 32px; }
+    .score-card {
+      background: var(--bg-secondary); border-radius: 10px; padding: 24px; text-align: center;
+      border-top: 3px solid var(--border); transition: transform 0.2s;
+    }
+    .score-card:hover { transform: translateY(-2px); }
+    .score-card.red { border-top-color: var(--red); }
+    .score-card.blue { border-top-color: var(--blue); }
+    .score-card.gold { border-top-color: var(--gold); }
+    .score-number { font-size: 40px; font-weight: 700; line-height: 1; }
+    .score-number.red { color: var(--red); }
+    .score-number.blue { color: var(--blue); }
+    .score-number.gold { color: var(--gold); }
+    .score-label {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px;
+      color: var(--text-secondary); margin-top: 8px;
+    }
+
+    /* Progress Section */
+    .progress-section {
+      background: var(--bg-secondary); border-radius: 10px; padding: 28px;
+      margin-bottom: 32px;
+    }
+    .progress-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;
+    }
+    .section-tag {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 2px; color: var(--gold);
+    }
+    .progress-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+    .progress-item h3 { font-size: 14px; font-weight: 600; margin-bottom: 8px; }
+    .progress-stats { font-size: 13px; color: var(--text-secondary); margin-bottom: 10px; }
+    .progress-bar-track {
+      height: 8px; background: var(--bg-tertiary); border-radius: 4px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 4px; transition: width 1s ease-out;
+    }
+    .progress-bar-fill.blue { background: linear-gradient(90deg, var(--blue), #0ea5c7); }
+    .progress-bar-fill.red { background: linear-gradient(90deg, var(--red), #c22d3a); }
+
+    /* Expandable Sections */
+    .expand-section {
+      background: var(--bg-secondary); border-radius: 10px;
+      margin-bottom: 24px; overflow: hidden;
+    }
+    .expand-header {
+      padding: 20px 28px; cursor: pointer; display: flex;
+      justify-content: space-between; align-items: center;
+      transition: background 0.2s; user-select: none;
+    }
+    .expand-header:hover { background: rgba(255,255,255,0.03); }
+    .expand-header h2 { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+    .expand-header .indicator {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 24px; height: 24px; border-radius: 6px; background: var(--bg-tertiary);
+      font-size: 11px; color: var(--text-secondary); transition: transform 0.3s;
+    }
+    .expand-header .indicator.open { transform: rotate(90deg); }
+    .expand-header .count-badge {
+      display: inline-block; padding: 2px 10px; border-radius: 12px;
+      font-size: 11px; font-weight: 700;
+    }
+    .count-badge.red { background: var(--red-dim); color: var(--red); }
+    .count-badge.blue { background: var(--blue-dim); color: var(--blue); }
+    .count-badge.gold { background: var(--gold-dim); color: var(--gold); }
+    .expand-body { max-height: 0; overflow: hidden; transition: max-height 0.4s ease-out; }
+    .expand-body.open { max-height: 2000px; }
+    .expand-body-inner { padding: 0 28px 24px; }
+
+    /* Data Tables */
+    .data-table { width: 100%; border-collapse: collapse; }
+    .data-table th {
+      text-align: left; padding: 10px 12px; font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted);
+      border-bottom: 1px solid var(--bg-tertiary);
+    }
+    .data-table td {
+      padding: 12px; font-size: 13px; border-bottom: 1px solid rgba(58,64,68,0.5);
+      vertical-align: top;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .data-table .title-cell { font-weight: 500; }
+    .data-table .title-cell a { color: var(--text-primary); }
+    .data-table .title-cell a:hover { color: var(--blue); }
+    .data-table .date-cell { color: var(--text-secondary); white-space: nowrap; font-size: 12px; }
+    .data-table .author-cell { color: var(--text-secondary); font-size: 12px; }
+    .data-table .source-cell { font-size: 12px; font-weight: 600; color: var(--text-secondary); }
+    .tool-pill {
+      display: inline-block; padding: 2px 8px; margin: 1px 2px; border-radius: 4px;
+      font-size: 10px; font-weight: 700; letter-spacing: 0.5px;
+      background: var(--red-dim); color: var(--red); border: 1px solid rgba(230,57,72,0.3);
+    }
+
+    /* Tool Heatmap */
+    .tool-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+    .tool-card {
+      display: flex; align-items: center; gap: 10px;
+      background: var(--bg-tertiary); border-radius: 8px; padding: 10px 16px;
+      min-width: 140px;
+    }
+    .tool-card .tool-count {
+      font-size: 22px; font-weight: 700; color: var(--red); min-width: 28px;
+    }
+    .tool-card .tool-name { font-size: 13px; font-weight: 500; }
+
+    /* LinkedIn Drafts */
+    .linkedin-card {
+      background: var(--bg-primary); border: 1px solid var(--bg-tertiary);
+      border-radius: 10px; padding: 20px; margin-bottom: 16px;
+    }
+    .linkedin-card-header {
+      display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+    }
+    .linkedin-type {
+      font-size: 10px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 1.5px; padding: 3px 10px; border-radius: 4px;
+    }
+    .linkedin-type.media { background: var(--red-dim); color: var(--red); }
+    .linkedin-type.blog { background: var(--gold-dim); color: var(--gold); }
+    .linkedin-type.event { background: var(--blue-dim); color: var(--blue); }
+    .linkedin-title { font-size: 12px; color: var(--text-muted); font-style: italic; margin-bottom: 12px; }
+    .linkedin-draft {
+      background: var(--bg-secondary); border-radius: 8px; padding: 16px;
+      font-size: 13px; color: #E5E7EB; line-height: 1.7; white-space: pre-wrap;
+      max-height: 200px; overflow-y: auto;
+    }
+    .linkedin-actions { display: flex; gap: 12px; margin-top: 12px; }
+    .btn {
+      padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s;
+    }
+    .btn-copy {
+      background: var(--red); color: white;
+    }
+    .btn-copy:hover { background: #c22d3a; }
+    .btn-copy.copied { background: #22c55e; }
+    .btn-outline {
+      background: transparent; color: var(--blue); border: 1px solid var(--blue);
+    }
+    .btn-outline:hover { background: var(--blue-dim); }
+
+    /* Action Items */
+    .action-item {
+      display: flex; align-items: flex-start; gap: 12px; padding: 12px 0;
+      border-bottom: 1px solid rgba(58,64,68,0.4);
+    }
+    .action-item:last-child { border-bottom: none; }
+    .action-badge {
+      flex-shrink: 0; width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: white;
+    }
+    .action-badge.high { background: var(--red); }
+    .action-badge.medium { background: var(--blue); }
+    .action-badge.normal { background: var(--text-muted); }
+    .action-text { font-size: 13px; color: var(--text-secondary); line-height: 1.5; padding-top: 3px; }
+
+    /* Dot indicators */
+    .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; }
+    .dot.red { background: var(--red); }
+    .dot.blue { background: var(--blue); }
+    .dot.gold { background: var(--gold); }
+
+    /* Footer */
+    .footer {
+      text-align: center; padding: 40px 24px; color: var(--text-muted); font-size: 12px;
+      border-top: 1px solid var(--bg-tertiary);
+    }
+    .footer a { color: var(--text-muted); }
+    .footer .brand {
+      font-size: 10px; text-transform: uppercase; letter-spacing: 2px;
+      color: var(--text-muted); margin-top: 12px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .scorecard { grid-template-columns: repeat(2, 1fr); }
+      .progress-grid { grid-template-columns: 1fr; }
+      .container { padding: 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-tag">Continuous Offensive Security</div>
+    <h1>Marketing Command Center</h1>
+    <div class="subtitle">Q1 2026 Coverage &amp; Content Tracker</div>
+    <div class="date-badge">Generated Tuesday, February 24, 2026</div>
+  </div>
+
+  <div class="container">
+
+    <!-- SCORECARD -->
+    <div class="scorecard">
+      <div class="score-card red">
+        <div class="score-number red">2</div>
+        <div class="score-label">Media Pickups</div>
+      </div>
+      <div class="score-card blue">
+        <div class="score-number blue">14</div>
+        <div class="score-label">Blog Posts</div>
+      </div>
+      <div class="score-card gold">
+        <div class="score-number gold">3</div>
+        <div class="score-label">Tools Cited</div>
+      </div>
+      <div class="score-card red">
+        <div class="score-number red">4</div>
+        <div class="score-label">Coverage Items</div>
+      </div>
+    </div>
+
+    <!-- QUARTERLY PROGRESS -->
+    <div class="progress-section">
+      <div class="progress-header">
+        <div class="section-tag">Quarterly Progress &mdash; Q1 2026</div>
+      </div>
+      <div class="progress-grid">
+        <div class="progress-item">
+          <h3><span class="dot blue"></span>Blog Posts</h3>
+          <div class="progress-stats">14 / 16 &middot; 88%</div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill blue" style="width: 0%;" data-target="88"></div>
+          </div>
+        </div>
+        <div class="progress-item">
+          <h3><span class="dot red"></span>Tier-1 Media Pickups</h3>
+          <div class="progress-stats">2 / 5 &middot; 40%</div>
+          <div class="progress-bar-track">
+            <div class="progress-bar-fill red" style="width: 0%;" data-target="40"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BLOG POSTS TABLE -->
+    <div class="expand-section" id="blog-section">
+      <div class="expand-header" onclick="toggleSection('blog-section')">
+        <h2><span class="dot blue"></span>Blog Posts This Quarter <span class="count-badge blue">14</span></h2>
+        <span class="indicator">&#9654;</span>
+      </div>
+      <div class="expand-body">
+        <div class="expand-body-inner">
+          <table class="data-table" id="blog-table">
+            <thead>
+              <tr>
+                <th style="width:50%">Title</th>
+                <th style="width:20%">Date</th>
+                <th style="width:20%">Author</th>
+                <th style="width:10%">Link</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TIER-1 MEDIA TABLE -->
+    <div class="expand-section" id="media-section">
+      <div class="expand-header" onclick="toggleSection('media-section')">
+        <h2><span class="dot red"></span>Tier-1 Media Coverage <span class="count-badge red">2</span></h2>
+        <span class="indicator">&#9654;</span>
+      </div>
+      <div class="expand-body">
+        <div class="expand-body-inner">
+          <table class="data-table" id="media-table">
+            <thead>
+              <tr>
+                <th style="width:40%">Title</th>
+                <th style="width:15%">Outlet</th>
+                <th style="width:15%">Date</th>
+                <th style="width:20%">Tools</th>
+                <th style="width:10%">Link</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- TOOL COVERAGE MAP -->
+    <div class="expand-section" id="tools-section">
+      <div class="expand-header" onclick="toggleSection('tools-section')">
+        <h2><span class="dot gold"></span>Tool Coverage Map <span class="count-badge gold">3 tools</span></h2>
+        <span class="indicator">&#9654;</span>
+      </div>
+      <div class="expand-body">
+        <div class="expand-body-inner">
+          <div class="tool-grid" id="tool-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LINKEDIN DRAFTS -->
+    <div class="expand-section" id="linkedin-section">
+      <div class="expand-header" onclick="toggleSection('linkedin-section')">
+        <h2><span class="dot blue"></span>Ready-to-Post LinkedIn Drafts <span class="count-badge blue">4</span></h2>
+        <span class="indicator">&#9654;</span>
+      </div>
+      <div class="expand-body">
+        <div class="expand-body-inner" id="linkedin-container"></div>
+      </div>
+    </div>
+
+    <!-- ACTION ITEMS -->
+    <div class="expand-section" id="actions-section">
+      <div class="expand-header" onclick="toggleSection('actions-section')">
+        <h2><span class="dot red"></span>Marketing Playbook</h2>
+        <span class="indicator">&#9654;</span>
+      </div>
+      <div class="expand-body">
+        <div class="expand-body-inner" id="actions-container"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div>
+      <a href="https://www.linkedin.com/company/praetorian">LinkedIn</a> &middot;
+      <a href="https://github.com/praetorian-inc">GitHub</a> &middot;
+      <a href="https://twitter.com/praetorian">Twitter</a> &middot;
+      <a href="https://praetorian.com">praetorian.com</a>
+    </div>
+    <div class="brand">Powered by Praetorian Security</div>
+  </div>
+
+  <script>
+    // Data injected by renderer
+    const blogPosts = [{"title":"There&#8217;s Always Something: Secrets Detection at Engagement Scale with Titus","url":"https://www.praetorian.com/blog/titus-open-source-secret-scanner/","date":"2026-02-20T14:42:22.000Z","author":"Josh Endres"},{"title":"Praetorian Guard finds critical flaws in OpenClaw &#8211; And What It Means for Your Software Supply Chain","url":"https://www.praetorian.com/blog/praetorian-guard-finds-critical-flaws-in-openclaw-and-what-it-means-for-your-software-supply-chain/","date":"2026-02-19T17:42:23.000Z","author":"Justin Copeland"},{"title":"MCP Server Security: The Hidden AI Attack Surface","url":"https://www.praetorian.com/blog/mcp-server-security-the-hidden-ai-attack-surface/","date":"2026-02-17T15:25:06.000Z","author":"Justin Copeland"},{"title":"Julius Update: From 17 to 33 Probes (and Now Detecting OpenClaw)","url":"https://www.praetorian.com/blog/julius-update-from-17-to-33-probes-and-now-detecting-openclaw/","date":"2026-02-13T18:19:43.000Z","author":"Justin Copeland"},{"title":"Et Tu, Default Creds? Introducing Brutus for Modern Credential Testing","url":"https://www.praetorian.com/blog/et-tu-default-creds-introducing-brutus-for-modern-credential-testing/","date":"2026-02-13T00:58:50.000Z","author":"Justin Copeland"},{"title":"Introducing Augustus: Open Source LLM Prompt Injection Tool","url":"https://www.praetorian.com/blog/introducing-augustus-open-source-llm-prompt-injection/","date":"2026-02-06T20:37:00.000Z","author":"Nathan Sportsman"},{"title":"Deterministic AI Orchestration: A Platform Architecture for Autonomous Development","url":"https://www.praetorian.com/blog/deterministic-ai-orchestration-a-platform-architecture-for-autonomous-development/","date":"2026-02-05T22:44:38.000Z","author":"Nathan Sportsman"},{"title":"Gone Phishing, Got a Token: When Separate Flaws Combine","url":"https://www.praetorian.com/blog/gone-phishing-got-a-token-when-separate-flaws-combine/","date":"2026-02-04T15:21:18.000Z","author":"Justin Copeland"},{"title":"Introducing Julius: Open Source LLM Service Fingerprinting","url":"https://www.praetorian.com/blog/introducing-julius-open-source-llm-service-fingerprinting/","date":"2026-01-30T21:22:18.000Z","author":"Justin Copeland"},{"title":"Corrupting the Hive Mind: Persistence Through Forgotten Windows Internals","url":"https://www.praetorian.com/blog/corrupting-the-hive-mind-persistence-through-forgotten-windows-internals/","date":"2026-01-26T20:35:16.000Z","author":"Justin Copeland"},{"title":"Stealing AI Models Through the API: A Practical Model Extraction Attack","url":"https://www.praetorian.com/blog/stealing-ai-models-through-the-api-a-practical-model-extraction-attack/","date":"2026-01-23T19:13:10.000Z","author":"Justin Copeland"},{"title":"As Strong As Your Weakest Parameter: An AI Authorization Bypass","url":"https://www.praetorian.com/blog/as-strong-as-your-weakest-parameter-an-ai-authorization-bypass/","date":"2026-01-21T16:29:05.000Z","author":"Justin Copeland"},{"title":"Exploiting LLM Write Primitives: System Prompt Extraction When Chat Output Is Locked Down","url":"https://www.praetorian.com/blog/exploiting-llm-write-primitives-system-prompt-extraction-when-chat-output-is-locked-down/","date":"2026-01-13T22:08:12.000Z","author":"Justin Copeland"},{"title":"Where AI Systems Leak Data: A Lifecycle Review of Real Exposure Paths","url":"https://www.praetorian.com/blog/where-ai-systems-leak-data-a-lifecycle-review-of-real-exposure-paths/","date":"2026-01-07T22:12:05.000Z","author":"Josh Endres"}];
+    const mediaPosts = [{"title":"Brutus: Open-source credential testing tool for offensive security","url":"https://www.helpnetsecurity.com/2026/02/13/brutus-open-source-credential-testing-tool-offensive-security/","date":"2026-02-13T00:00:00.000Z","source":"Help Net Security","tools":["Brutus"]},{"title":"Praetorian Launches Augustus to Test LLM Security","url":"https://www.letsdatascience.com/news/praetorian-launches-augustus-to-test-llm-security-499fbca0","date":"2026-02-10T00:00:00.000Z","source":"Let's Data Science","tools":["Augustus"]}];
+    const toolData = [{"name":"Augustus","count":3},{"name":"Julius","count":3},{"name":"Brutus","count":2}];
+    const linkedInData = [{"title":"Brutus: Open-source credential testing tool for offensive security","type":"Media","draft":"🔒 When Help Net Security covers your open-source tool, you know you're onto something.\n\nBrutus — Praetorian released Brutus, a high-performance brute force tool supporting SSH, MySQL, PostgreSQL, Redis, MongoDB, SMB, and 20+ protocols.\n\nThe best security tools should be accessible to everyone defending networks. That's why we build in the open.\n\nFull article: https://www.helpnetsecurity.com/2026/02/13/brutus-open-source-credential-testing-tool-offensive-security/\n\nWhat open-source security tools are in your daily rotation? 👇\n\n#cybersecurity #offensivesecurity #infosec #brutus #securitytools #opensource #redteam #pentesting","url":"https://www.helpnetsecurity.com/2026/02/13/brutus-open-source-credential-testing-tool-offensive-security/"},{"title":"Praetorian Launches Augustus to Test LLM Security","type":"Media","draft":"🔒 When Let's Data Science covers your open-source tool, you know you're onto something.\n\nAugustus — Praetorian released Augustus, an open-source vulnerability scanner designed to secure large language models against adversarial threats.\n\nThe best security tools should be accessible to everyone defending networks. That's why we build in the open.\n\nFull article: https://www.letsdatascience.com/news/praetorian-launches-augustus-to-test-llm-security-499fbca0\n\nWhat open-source security tools are in your daily rotation? 👇\n\n#cybersecurity #offensivesecurity #infosec #augustus #securitytools #opensource #redteam #pentesting","url":"https://www.letsdatascience.com/news/praetorian-launches-augustus-to-test-llm-security-499fbca0"},{"title":"Introducing Augustus: Open Source LLM Prompt Injection Tool","type":"Blog","draft":"💡 Most security teams are still doing this the hard way.\n\nWe just published a deep dive on Augustus: Augustus is a comprehensive LLM security testing framework with 210+ adversarial attacks against 28 LLM providers.\n\nHere's what we cover:\n→ The problem most teams overlook\n→ A practical approach that actually scales\n→ Real-world results from offensive engagements\n\nOffensive security knowledge shouldn't be gatekept. Red team, blue team, purple team — this one's for you.\n\nFull post: https://www.praetorian.com/blog/introducing-augustus-open-source-llm-prompt-injection/\n\nWhat's your biggest security testing challenge right now? 🔥\n\n#cybersecurity #offensivesecurity #infosec #augustus #securityresearch #opensource #redteam #pentesting","url":"https://www.praetorian.com/blog/introducing-augustus-open-source-llm-prompt-injection/"},{"title":"Introducing Julius: Open Source LLM Service Fingerprinting","type":"Blog","draft":"💡 Most security teams are still doing this the hard way.\n\nWe just published a deep dive on Julius: Julius detects 17+ AI platforms through active HTTP probing, built as a single Go binary.\n\nHere's what we cover:\n→ The problem most teams overlook\n→ A practical approach that actually scales\n→ Real-world results from offensive engagements\n\nOffensive security knowledge shouldn't be gatekept. Red team, blue team, purple team — this one's for you.\n\nFull post: https://www.praetorian.com/blog/introducing-julius-open-source-llm-service-fingerprinting/\n\nWhat's your biggest security testing challenge right now? 🔥\n\n#cybersecurity #offensivesecurity #infosec #julius #securityresearch #opensource #redteam #pentesting","url":"https://www.praetorian.com/blog/introducing-julius-open-source-llm-service-fingerprinting/"}];
+    const actionData = [{"priority":"high","text":"Post Help Net Security coverage to LinkedIn company page"},{"priority":"high","text":"Send reshare template to #amplification-crew (10-15 key voices)"},{"priority":"medium","text":"Promote \"Introducing Augustus: Open Source LLM Prompt Injection Tool\" with 3 key takeaways on LinkedIn"},{"priority":"medium","text":"Brief sales team: Brutus, Augustus, Julius featured in publications"},{"priority":"normal","text":"Update praetorian.com/news \"In the News\" page"}];
+
+    // Format date helper
+    function fmtDate(iso) {
+      const d = new Date(iso);
+      return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    }
+
+    // Toggle expandable section
+    function toggleSection(id) {
+      const section = document.getElementById(id);
+      const body = section.querySelector('.expand-body');
+      const indicator = section.querySelector('.indicator');
+      body.classList.toggle('open');
+      indicator.classList.toggle('open');
+    }
+
+    // Copy to clipboard
+    function copyDraft(idx) {
+      const text = linkedInData[idx].draft;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copy-btn-' + idx);
+        btn.textContent = 'Copied!';
+        btn.classList.add('copied');
+        setTimeout(() => { btn.textContent = 'Copy Draft'; btn.classList.remove('copied'); }, 2000);
+      });
+    }
+
+    // Populate blog table
+    function renderBlogTable() {
+      const tbody = document.querySelector('#blog-table tbody');
+      tbody.innerHTML = blogPosts.map(p => `
+        <tr>
+          <td class="title-cell"><a href="${p.url}" target="_blank">${p.title}</a></td>
+          <td class="date-cell">${fmtDate(p.date)}</td>
+          <td class="author-cell">${p.author || '—'}</td>
+          <td><a href="${p.url}" target="_blank" style="font-size:12px;">Open &rarr;</a></td>
+        </tr>
+      `).join('');
+    }
+
+    // Populate media table
+    function renderMediaTable() {
+      const tbody = document.querySelector('#media-table tbody');
+      if (mediaPosts.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="color:var(--text-muted);text-align:center;padding:24px;">No tier-1 media pickups tracked yet this quarter</td></tr>';
+        return;
+      }
+      tbody.innerHTML = mediaPosts.map(p => `
+        <tr>
+          <td class="title-cell"><a href="${p.url}" target="_blank">${p.title}</a></td>
+          <td class="source-cell">${p.source || '—'}</td>
+          <td class="date-cell">${fmtDate(p.date)}</td>
+          <td>${(p.tools || []).map(t => '<span class="tool-pill">' + t + '</span>').join(' ')}</td>
+          <td><a href="${p.url}" target="_blank" style="font-size:12px;">Open &rarr;</a></td>
+        </tr>
+      `).join('');
+    }
+
+    // Populate tool grid
+    function renderToolGrid() {
+      const grid = document.getElementById('tool-grid');
+      if (toolData.length === 0) {
+        grid.innerHTML = '<div style="color:var(--text-muted);">No tool mentions detected this quarter</div>';
+        return;
+      }
+      grid.innerHTML = toolData.map(t => `
+        <div class="tool-card">
+          <div class="tool-count">${t.count}</div>
+          <div class="tool-name">${t.name}</div>
+        </div>
+      `).join('');
+    }
+
+    // Populate LinkedIn drafts
+    function renderLinkedIn() {
+      const container = document.getElementById('linkedin-container');
+      container.innerHTML = linkedInData.map((item, idx) => `
+        <div class="linkedin-card">
+          <div class="linkedin-card-header">
+            <span class="linkedin-type ${item.type.toLowerCase()}">${item.type} Post</span>
+          </div>
+          <div class="linkedin-title">${item.title}</div>
+          <div class="linkedin-draft">${item.draft.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+          <div class="linkedin-actions">
+            <button class="btn btn-copy" id="copy-btn-${idx}" onclick="copyDraft(${idx})">Copy Draft</button>
+            <a href="${item.url}" target="_blank" class="btn btn-outline">Open Article &rarr;</a>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Populate action items
+    function renderActions() {
+      const container = document.getElementById('actions-container');
+      container.innerHTML = actionData.map((a, i) => `
+        <div class="action-item">
+          <div class="action-badge ${a.priority}">${i + 1}</div>
+          <div class="action-text">${a.text}</div>
+        </div>
+      `).join('');
+    }
+
+    // Animate progress bars
+    function animateBars() {
+      document.querySelectorAll('.progress-bar-fill').forEach(bar => {
+        const target = bar.getAttribute('data-target');
+        setTimeout(() => { bar.style.width = target + '%'; }, 300);
+      });
+    }
+
+    // Auto-expand blog and media sections on load
+    function init() {
+      renderBlogTable();
+      renderMediaTable();
+      renderToolGrid();
+      renderLinkedIn();
+      renderActions();
+      animateBars();
+      // Auto-expand blog and media
+      toggleSection('blog-section');
+      toggleSection('media-section');
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
