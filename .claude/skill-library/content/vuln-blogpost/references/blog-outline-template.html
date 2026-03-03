@@ -1,0 +1,1416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{OUTLINE_TITLE}} - Praetorian Blog Outline</title>
+  <style>
+    /* ========================================
+       PRAETORIAN BRAND SYSTEM
+       Colors verified against praetorian.com
+       Font: Inter (primary), Lekton (accent)
+       ======================================== */
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Lekton:wght@400;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      /* Praetorian Marketing Color Guide - Official Brand Colors */
+      --p-bg-primary: #0D0D0D;
+      --p-bg-secondary: #1F252A;
+      --p-bg-card: #1F252A;
+      --p-bg-card-hover: #3A4044;
+      --p-red: #E63948;
+      --p-red-dark: #98242D;
+      --p-red-glow: rgba(230, 57, 72, 0.15);
+      --p-cyan: #11C3DB;
+      --p-cyan-glow: rgba(17, 195, 219, 0.15);
+      --p-gold: #D4AF37;
+      --p-gold-glow: rgba(212, 175, 55, 0.15);
+      --p-green: #34D399;
+      --p-green-glow: rgba(52, 211, 153, 0.15);
+      --p-blue-accent: #11C3DB;
+      --p-blue-accent-glow: rgba(17, 195, 219, 0.15);
+      --p-text-primary: #FFFFFF;
+      --p-text-secondary: #A0A4A8;
+      --p-text-muted: #535B61;
+      --p-border: #3A4044;
+      --p-border-subtle: #1F252A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--p-bg-primary);
+      color: var(--p-text-primary);
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* Print-friendly overrides */
+    @media print {
+      body { background: #0D0D0D !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+      .page-break { page-break-before: always; }
+      .no-print { display: none !important; }
+      @page { margin: 0.5in; size: letter; }
+    }
+
+    /* ========================================
+       LAYOUT
+       ======================================== */
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ========================================
+       HEADER
+       ======================================== */
+    .header {
+      background: linear-gradient(135deg, #1F252A 0%, #0D0D0D 40%, #2a1015 100%);
+      border-bottom: 3px solid var(--p-red);
+      padding: 48px 0 40px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(circle at 30% 50%, rgba(230, 57, 72, 0.06) 0%, transparent 50%),
+                  radial-gradient(circle at 70% 50%, rgba(17, 195, 219, 0.04) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .header-logo {
+      max-width: 200px;
+      height: auto;
+      margin-bottom: 24px;
+      position: relative;
+    }
+
+    .header-subtitle {
+      font-family: 'Lekton', monospace;
+      font-size: 12px;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--p-red);
+      margin-bottom: 16px;
+      position: relative;
+    }
+
+    .header-title {
+      font-size: 28px;
+      font-weight: 800;
+      line-height: 1.2;
+      max-width: 600px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    .header-meta {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+      position: relative;
+    }
+
+    /* ========================================
+       BADGES & PILLS
+       ======================================== */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-red { background: var(--p-red-glow); color: var(--p-red); border: 1px solid rgba(230, 57, 72, 0.3); }
+    .badge-cyan { background: var(--p-cyan-glow); color: var(--p-cyan); border: 1px solid rgba(17, 195, 219, 0.3); }
+    .badge-gold { background: var(--p-gold-glow); color: var(--p-gold); border: 1px solid rgba(212, 175, 55, 0.3); }
+    .badge-green { background: var(--p-green-glow); color: var(--p-green); border: 1px solid rgba(52, 211, 153, 0.3); }
+    .badge-blue { background: var(--p-blue-accent-glow); color: var(--p-blue-accent); border: 1px solid rgba(17, 195, 219, 0.3); }
+
+    .status-pill {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .status-anonymized { background: var(--p-green); color: #0D0D0D; }
+    .status-requires-approval { background: var(--p-gold); color: #0D0D0D; }
+    .status-draft { background: var(--p-blue-accent); color: #0D0D0D; }
+
+    /* ========================================
+       SCORE DISPLAY
+       ======================================== */
+    .score-section {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 32px 0;
+      flex-wrap: wrap;
+    }
+
+    .score-card {
+      text-align: center;
+      padding: 24px 32px;
+      background: var(--p-bg-card);
+      border-radius: 16px;
+      border: 1px solid var(--p-border);
+      min-width: 160px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .score-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+    }
+
+    .score-card.score-high::before { background: var(--p-green); }
+    .score-card.score-mid::before { background: var(--p-gold); }
+    .score-card.score-low::before { background: var(--p-red); }
+
+    .score-number {
+      font-size: 48px;
+      font-weight: 900;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--p-red) 0%, #FF6B7A 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .score-label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--p-text-secondary);
+      margin-top: 8px;
+    }
+
+    .score-sublabel {
+      font-size: 12px;
+      color: var(--p-text-muted);
+      margin-top: 4px;
+    }
+
+    /* ========================================
+       SECTION CARDS
+       ======================================== */
+    .section {
+      margin: 24px 0;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--p-border-subtle);
+    }
+
+    .section-icon {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .section-icon-red { background: var(--p-red-glow); }
+    .section-icon-cyan { background: var(--p-cyan-glow); }
+    .section-icon-gold { background: var(--p-gold-glow); }
+    .section-icon-green { background: var(--p-green-glow); }
+    .section-icon-blue { background: var(--p-blue-accent-glow); }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .section-number {
+      font-family: 'Lekton', monospace;
+      font-size: 12px;
+      color: var(--p-text-muted);
+      letter-spacing: 2px;
+    }
+
+    .card {
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .card p, .card li {
+      color: var(--p-text-secondary);
+      margin-bottom: 8px;
+    }
+
+    .card ul, .card ol {
+      padding-left: 20px;
+    }
+
+    /* ========================================
+       TITLE OPTIONS
+       ======================================== */
+    .title-option {
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: flex-start;
+      gap: 16px;
+      transition: border-color 0.2s;
+    }
+
+    .title-option.recommended {
+      border-color: var(--p-red);
+      background: linear-gradient(135deg, var(--p-bg-card) 0%, rgba(230, 57, 72, 0.05) 100%);
+    }
+
+    .title-option-number {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 14px;
+      flex-shrink: 0;
+      background: var(--p-border);
+      color: var(--p-text-secondary);
+    }
+
+    .title-option.recommended .title-option-number {
+      background: var(--p-red);
+      color: white;
+    }
+
+    .title-option-text {
+      font-size: 16px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+
+    .title-option-tag {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 6px;
+    }
+
+    /* ========================================
+       BLOG STRUCTURE (H2 Map)
+       ======================================== */
+    .structure-item {
+      display: flex;
+      gap: 16px;
+      padding: 16px 0;
+      border-bottom: 1px solid var(--p-border-subtle);
+    }
+
+    .structure-item:last-child { border-bottom: none; }
+
+    .structure-tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 8px;
+      border-radius: 6px;
+      background: var(--p-border);
+      color: var(--p-text-secondary);
+      white-space: nowrap;
+      height: fit-content;
+      margin-top: 2px;
+    }
+
+    .structure-heading {
+      font-weight: 600;
+      font-size: 15px;
+      margin-bottom: 4px;
+    }
+
+    .structure-detail {
+      font-size: 13px;
+      color: var(--p-text-muted);
+    }
+
+    .word-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--p-text-muted);
+      margin-left: 8px;
+    }
+
+    /* ========================================
+       ENGINEER MARKERS (Callouts)
+       ======================================== */
+    .engineer-marker {
+      background: linear-gradient(135deg, rgba(230, 57, 72, 0.08) 0%, rgba(230, 57, 72, 0.03) 100%);
+      border: 1px solid rgba(230, 57, 72, 0.25);
+      border-left: 4px solid var(--p-red);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 12px 0;
+      font-size: 13px;
+    }
+
+    .engineer-marker-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-red);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .engineer-marker p {
+      color: var(--p-text-secondary);
+      margin: 0;
+    }
+
+    /* ========================================
+       CODE BLOCKS (Terminal Style)
+       ======================================== */
+    .code-block {
+      background: #0D0D0D;
+      border: 1px solid var(--p-border);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 16px 0;
+    }
+
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      background: rgba(255,255,255,0.03);
+      border-bottom: 1px solid var(--p-border);
+    }
+
+    .code-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+    }
+
+    .code-dot-red { background: #FF5F57; }
+    .code-dot-yellow { background: #FFBD2E; }
+    .code-dot-green { background: #28CA42; }
+
+    .code-block-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--p-text-muted);
+      margin-left: 8px;
+    }
+
+    .code-block pre {
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      line-height: 1.7;
+      color: #E0E0E0;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+
+    .code-comment { color: #6A7B8B; }
+    .code-keyword { color: var(--p-red); }
+    .code-string { color: var(--p-green); }
+    .code-function { color: var(--p-cyan); }
+
+    /* ========================================
+       FAQ SECTION
+       ======================================== */
+    .faq-item {
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 12px;
+    }
+
+    .faq-question {
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--p-cyan);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .faq-question::before {
+      content: 'Q';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 24px;
+      height: 24px;
+      border-radius: 6px;
+      background: var(--p-cyan-glow);
+      color: var(--p-cyan);
+      font-size: 12px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .faq-answer {
+      color: var(--p-text-secondary);
+      font-size: 13px;
+      padding-left: 34px;
+      border-left: 2px solid var(--p-border-subtle);
+      margin-left: 12px;
+    }
+
+    /* ========================================
+       CVE TABLE
+       ======================================== */
+    .cve-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 16px 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--p-border);
+    }
+
+    .cve-table th {
+      background: rgba(255,255,255,0.04);
+      padding: 12px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--p-text-muted);
+      border-bottom: 1px solid var(--p-border);
+    }
+
+    .cve-table td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: var(--p-text-secondary);
+      border-bottom: 1px solid var(--p-border-subtle);
+    }
+
+    .cve-table tr:last-child td { border-bottom: none; }
+
+    .cve-id {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      color: var(--p-gold);
+    }
+
+    /* ========================================
+       KEYWORDS & TAGS
+       ======================================== */
+    .keyword-cloud {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 12px 0;
+    }
+
+    .keyword {
+      padding: 6px 14px;
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 50px;
+      font-size: 12px;
+      font-weight: 500;
+      color: var(--p-text-secondary);
+    }
+
+    /* ========================================
+       CHECKLIST
+       ======================================== */
+    .checklist-group {
+      margin-bottom: 24px;
+    }
+
+    .checklist-group-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--p-border-subtle);
+      font-size: 13px;
+      color: var(--p-text-secondary);
+    }
+
+    .checklist-item:last-child { border-bottom: none; }
+
+    .checkbox {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--p-border);
+      border-radius: 6px;
+      flex-shrink: 0;
+      margin-top: 1px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .checkbox.checked {
+      background: var(--p-green);
+      border-color: var(--p-green);
+    }
+
+    .checkbox.checked::after {
+      content: '✓';
+      color: #0D0D0D;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    /* ========================================
+       SOCIAL MEDIA DRAFTS
+       ======================================== */
+    .social-cards {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin: 16px 0;
+    }
+
+    @media (max-width: 600px) {
+      .social-cards { grid-template-columns: 1fr; }
+    }
+
+    .social-card {
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .social-card-header {
+      padding: 12px 16px;
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      border-bottom: 1px solid var(--p-border);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .social-card-body {
+      padding: 16px;
+      font-size: 13px;
+      color: var(--p-text-secondary);
+      line-height: 1.6;
+    }
+
+    /* ========================================
+       INTERNAL LINKS
+       ======================================== */
+    .link-suggestion {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: var(--p-bg-card);
+      border: 1px solid var(--p-border);
+      border-radius: 10px;
+      margin-bottom: 8px;
+      font-size: 13px;
+    }
+
+    .link-suggestion-icon {
+      color: var(--p-blue-accent);
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .link-suggestion-title {
+      font-weight: 600;
+      color: var(--p-text-primary);
+    }
+
+    .link-suggestion-match {
+      font-size: 11px;
+      color: var(--p-text-muted);
+      margin-left: auto;
+      padding: 2px 8px;
+      background: var(--p-blue-accent-glow);
+      border-radius: 50px;
+      white-space: nowrap;
+    }
+
+    /* ========================================
+       DIVIDER
+       ======================================== */
+    .divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent 0%, var(--p-border) 50%, transparent 100%);
+      margin: 32px 0;
+    }
+
+    /* ========================================
+       PROGRESS PIPELINE
+       ======================================== */
+    .pipeline {
+      display: flex;
+      justify-content: space-between;
+      padding: 24px 0;
+      position: relative;
+    }
+
+    .pipeline::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 10%;
+      right: 10%;
+      height: 2px;
+      background: var(--p-border);
+      transform: translateY(-50%);
+    }
+
+    .pipeline-step {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .pipeline-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 800;
+      border: 2px solid var(--p-border);
+      background: var(--p-bg-primary);
+    }
+
+    .pipeline-dot.active {
+      background: var(--p-red);
+      border-color: var(--p-red);
+      color: white;
+      box-shadow: 0 0 20px rgba(230, 57, 72, 0.4);
+    }
+
+    .pipeline-dot.complete {
+      background: var(--p-green);
+      border-color: var(--p-green);
+      color: #0D0D0D;
+    }
+
+    .pipeline-label {
+      font-size: 10px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--p-text-muted);
+      white-space: nowrap;
+    }
+
+    /* ========================================
+       ACHIEVEMENT BANNERS
+       ======================================== */
+    .achievement {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 14px 20px;
+      border-radius: 10px;
+      margin: 8px 0;
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .achievement-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .achievement-high-impact {
+      background: linear-gradient(135deg, rgba(230, 57, 72, 0.12) 0%, rgba(230, 57, 72, 0.04) 100%);
+      border: 1px solid rgba(230, 57, 72, 0.25);
+      color: var(--p-red);
+    }
+
+    .achievement-novel {
+      background: linear-gradient(135deg, rgba(17, 195, 219, 0.12) 0%, rgba(17, 195, 219, 0.04) 100%);
+      border: 1px solid rgba(17, 195, 219, 0.25);
+      color: var(--p-blue-accent);
+    }
+
+    .achievement-trending {
+      background: linear-gradient(135deg, rgba(17, 195, 219, 0.12) 0%, rgba(17, 195, 219, 0.04) 100%);
+      border: 1px solid rgba(17, 195, 219, 0.25);
+      color: var(--p-cyan);
+    }
+
+    .achievement-compelling {
+      background: linear-gradient(135deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.04) 100%);
+      border: 1px solid rgba(212, 175, 55, 0.25);
+      color: var(--p-gold);
+    }
+
+    /* ========================================
+       FOOTER
+       ======================================== */
+    .footer {
+      text-align: center;
+      padding: 40px 0;
+      margin-top: 48px;
+      border-top: 1px solid var(--p-border);
+    }
+
+    .footer-brand {
+      font-size: 11px;
+      color: var(--p-text-muted);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .footer-confidential {
+      font-size: 11px;
+      color: var(--p-red);
+      margin-top: 8px;
+      font-weight: 600;
+    }
+
+    .footer-generated {
+      font-size: 11px;
+      color: var(--p-text-muted);
+      margin-top: 4px;
+    }
+
+    /* ========================================
+       CONTENT DIRECTION BOX
+       ======================================== */
+    .content-direction {
+      background: rgba(17, 195, 219, 0.05);
+      border: 1px solid rgba(17, 195, 219, 0.15);
+      border-left: 4px solid var(--p-cyan);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 12px 0;
+    }
+
+    .content-direction-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-cyan);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+
+    .content-direction p, .content-direction li {
+      font-size: 13px;
+      color: var(--p-text-secondary);
+    }
+
+    /* ========================================
+       VOICE NOTES
+       ======================================== */
+    .voice-note {
+      background: rgba(212, 175, 55, 0.05);
+      border: 1px solid rgba(212, 175, 55, 0.15);
+      border-left: 4px solid var(--p-gold);
+      border-radius: 0 8px 8px 0;
+      padding: 12px 20px;
+      margin: 12px 0;
+      font-size: 13px;
+      color: var(--p-text-secondary);
+    }
+
+    .voice-note-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--p-gold);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+    }
+
+    /* ========================================
+       ANONYMIZATION LOG
+       ======================================== */
+    .anon-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--p-border);
+      margin: 16px 0;
+    }
+
+    .anon-table th {
+      background: rgba(255,255,255,0.04);
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--p-text-muted);
+      border-bottom: 1px solid var(--p-border);
+    }
+
+    .anon-table td {
+      padding: 10px 16px;
+      font-size: 13px;
+      color: var(--p-text-secondary);
+      border-bottom: 1px solid var(--p-border-subtle);
+    }
+
+    .anon-table tr:last-child td { border-bottom: none; }
+
+    .anon-preserve { color: var(--p-green); font-weight: 600; }
+    .anon-redact { color: var(--p-red); font-weight: 600; }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================
+       HEADER
+       ============================================ -->
+  <div class="header">
+    <div class="container">
+      <img src="https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png"
+           alt="Praetorian" class="header-logo" />
+      <div class="header-subtitle">Vulnerability Blog Outline</div>
+      <h1 class="header-title">{{OUTLINE_TITLE}}</h1>
+      <div class="header-meta">
+        <span class="badge badge-red">{{OUTLINE_NUMBER}}</span>
+        <span class="badge badge-cyan">{{SESSION_DATE}}</span>
+        <span class="status-pill {{STATUS_CLASS}}">{{STATUS_TEXT}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
+
+    <!-- ============================================
+         PIPELINE TRACKER
+         ============================================ -->
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="pipeline-dot active">1</div>
+        <div class="pipeline-label">Outline</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-dot">2</div>
+        <div class="pipeline-label">Engineer Fill</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-dot">3</div>
+        <div class="pipeline-label">Legal Review</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-dot">4</div>
+        <div class="pipeline-label">SEO Check</div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-dot">5</div>
+        <div class="pipeline-label">Publish</div>
+      </div>
+    </div>
+
+    <!-- ============================================
+         SCORE CARDS
+         ============================================ -->
+    <div class="score-section">
+      <div class="score-card score-high">
+        <div class="score-number">{{BLOG_POTENTIAL_SCORE}}</div>
+        <div class="score-label">Blog Potential</div>
+        <div class="score-sublabel">out of 10</div>
+      </div>
+      <div class="score-card score-high">
+        <div class="score-number" style="font-size: 36px;">{{READ_TIME}}</div>
+        <div class="score-label">Est. Read Time</div>
+        <div class="score-sublabel">minutes</div>
+      </div>
+      <div class="score-card score-mid">
+        <div class="score-number" style="font-size: 36px;">{{ENGINEER_MARKERS_COUNT}}</div>
+        <div class="score-label">Engineer Items</div>
+        <div class="score-sublabel">to complete</div>
+      </div>
+      <div class="score-card score-mid">
+        <div class="score-number" style="font-size: 36px;">{{FINDINGS_COUNT}}</div>
+        <div class="score-label">Findings</div>
+        <div class="score-sublabel">in transcript</div>
+      </div>
+    </div>
+
+    <!-- ACHIEVEMENTS (populated based on scoring) -->
+    <!-- {{ACHIEVEMENTS_BLOCK}} -->
+    <!--
+    <div class="achievement achievement-high-impact">
+      <span class="achievement-icon">&#9889;</span> High Impact Finding - CVSS 9.0+
+    </div>
+    <div class="achievement achievement-novel">
+      <span class="achievement-icon">&#10024;</span> Novel Technique - First public documentation
+    </div>
+    <div class="achievement achievement-compelling">
+      <span class="achievement-icon">&#128214;</span> Compelling Story - Strong narrative arc
+    </div>
+    <div class="achievement achievement-trending">
+      <span class="achievement-icon">&#128293;</span> Trending Topic - High industry relevance
+    </div>
+    -->
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         TITLE OPTIONS
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-red">&#9997;</div>
+        <div>
+          <div class="section-title">Title Options</div>
+          <div class="section-number">A/B TEST CANDIDATES</div>
+        </div>
+      </div>
+
+      <!-- {{TITLE_OPTIONS_BLOCK}} -->
+      <!--
+      <div class="title-option recommended">
+        <div class="title-option-number">1</div>
+        <div>
+          <div class="title-option-text">"Title goes here"</div>
+          <div class="title-option-tag" style="color: var(--p-red);">&#9733; Recommended - Narrative Hook</div>
+        </div>
+      </div>
+      <div class="title-option">
+        <div class="title-option-number">2</div>
+        <div>
+          <div class="title-option-text">"Title goes here"</div>
+          <div class="title-option-tag" style="color: var(--p-text-muted);">Technical Depth / SEO</div>
+        </div>
+      </div>
+      <div class="title-option">
+        <div class="title-option-number">3</div>
+        <div>
+          <div class="title-option-text">"Title goes here"</div>
+          <div class="title-option-tag" style="color: var(--p-text-muted);">Practitioner-Focused</div>
+        </div>
+      </div>
+      -->
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         KEYWORDS & META
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-cyan">&#128269;</div>
+        <div>
+          <div class="section-title">SEO Keywords &amp; Meta</div>
+          <div class="section-number">SEARCH OPTIMIZATION</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Primary Keywords</div>
+        <div class="keyword-cloud">
+          <!-- {{KEYWORDS_BLOCK}} -->
+          <!-- <span class="keyword">keyword here</span> -->
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Meta Description <span class="word-count">155 chars max</span></div>
+        <p style="color: var(--p-text-secondary); font-style: italic;">
+          <!-- {{META_DESCRIPTION}} -->
+        </p>
+      </div>
+
+      <div class="card">
+        <div class="card-title">URL Slug</div>
+        <p style="font-family: 'JetBrains Mono', monospace; color: var(--p-cyan); font-size: 13px;">
+          <!-- /blog/{{URL_SLUG}} -->
+        </p>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         BLOG STRUCTURE
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">&#128209;</div>
+        <div>
+          <div class="section-title">Blog Structure</div>
+          <div class="section-number">SECTION-BY-SECTION OUTLINE</div>
+        </div>
+      </div>
+
+      <!-- {{BLOG_STRUCTURE_BLOCK}} -->
+      <!--
+      REPEAT FOR EACH SECTION:
+
+      <div class="card">
+        <div class="card-title">
+          <span class="structure-tag">H2</span>
+          Section Title Here
+          <span class="word-count">200-300 words</span>
+        </div>
+
+        <div class="content-direction">
+          <div class="content-direction-label">Content Direction</div>
+          <ul>
+            <li>Key point 1</li>
+            <li>Key point 2</li>
+          </ul>
+        </div>
+
+        <div class="voice-note">
+          <div class="voice-note-label">Voice Note</div>
+          Professional tone, let facts create impact
+        </div>
+
+        <div class="engineer-marker">
+          <div class="engineer-marker-label">&#9888; Engineer to Complete</div>
+          <p>Description of what the engineer needs to fill in</p>
+        </div>
+      </div>
+      -->
+    </div>
+
+    <div class="divider"></div>
+    <div class="page-break"></div>
+
+    <!-- ============================================
+         FAQ SECTION (AEO)
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-cyan">&#128172;</div>
+        <div>
+          <div class="section-title">FAQ Section</div>
+          <div class="section-number">ANSWER ENGINE OPTIMIZATION</div>
+        </div>
+      </div>
+
+      <!-- {{FAQ_BLOCK}} -->
+      <!--
+      <div class="faq-item">
+        <div class="faq-question">Question here?</div>
+        <div class="faq-answer">Direct answer optimized for AI extraction here.</div>
+      </div>
+      -->
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         CODE SCAFFOLDS
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-green">&#128187;</div>
+        <div>
+          <div class="section-title">Code Scaffolds</div>
+          <div class="section-number">EXTRACTED FROM TRANSCRIPT</div>
+        </div>
+      </div>
+
+      <!-- {{CODE_SCAFFOLDS_BLOCK}} -->
+      <!--
+      <div class="code-block">
+        <div class="code-block-header">
+          <span class="code-dot code-dot-red"></span>
+          <span class="code-dot code-dot-yellow"></span>
+          <span class="code-dot code-dot-green"></span>
+          <span class="code-block-title">poc-script.py</span>
+        </div>
+        <pre>code here</pre>
+      </div>
+      <div class="engineer-marker">
+        <div class="engineer-marker-label">&#9888; Engineer to Complete</div>
+        <p>Verify accuracy, sanitize credentials, test reproduction</p>
+      </div>
+      -->
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         CVE CROSS-REFERENCES
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-gold">&#128274;</div>
+        <div>
+          <div class="section-title">CVE Cross-References</div>
+          <div class="section-number">RELATED VULNERABILITIES</div>
+        </div>
+      </div>
+
+      <table class="cve-table">
+        <thead>
+          <tr>
+            <th>CVE</th>
+            <th>Description</th>
+            <th>Relevance</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- {{CVE_TABLE_ROWS}} -->
+          <!--
+          <tr>
+            <td><span class="cve-id">CVE-2024-XXXXX</span></td>
+            <td>Description here</td>
+            <td>Same vulnerability class</td>
+            <td><span class="badge badge-green">Published</span></td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         INTERNAL LINKING SUGGESTIONS
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-blue">&#128279;</div>
+        <div>
+          <div class="section-title">Internal Linking Suggestions</div>
+          <div class="section-number">CROSS-PROMOTION</div>
+        </div>
+      </div>
+
+      <!-- {{INTERNAL_LINKS_BLOCK}} -->
+      <!--
+      <div class="link-suggestion">
+        <span class="link-suggestion-icon">&#128279;</span>
+        <div>
+          <div class="link-suggestion-title">"Related Post Title" (2024-06-15)</div>
+        </div>
+        <span class="link-suggestion-match">topical match</span>
+      </div>
+      -->
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         SOCIAL MEDIA DRAFTS
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-cyan">&#128225;</div>
+        <div>
+          <div class="section-title">Social Media Drafts</div>
+          <div class="section-number">READY TO POST</div>
+        </div>
+      </div>
+
+      <div class="social-cards">
+        <div class="social-card">
+          <div class="social-card-header" style="color: var(--p-cyan);">
+            &#128101; LinkedIn
+          </div>
+          <div class="social-card-body">
+            <!-- {{LINKEDIN_DRAFT}} -->
+          </div>
+        </div>
+        <div class="social-card">
+          <div class="social-card-header" style="color: var(--p-text-primary);">
+            &#120143; / Twitter Thread
+          </div>
+          <div class="social-card-body">
+            <!-- {{TWITTER_DRAFT}} -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ============================================
+         ANONYMIZATION LOG
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-red">&#128274;</div>
+        <div>
+          <div class="section-title">Anonymization Log</div>
+          <div class="section-number">ENTITY DECISIONS</div>
+        </div>
+      </div>
+
+      <table class="anon-table">
+        <thead>
+          <tr>
+            <th>Original</th>
+            <th>Decision</th>
+            <th>Anonymized To</th>
+            <th>Reason</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- {{ANONYMIZATION_LOG_ROWS}} -->
+          <!--
+          <tr>
+            <td>Entity Name</td>
+            <td><span class="anon-preserve">PRESERVE</span></td>
+            <td>-</td>
+            <td>Public company, NYSE listed</td>
+          </tr>
+          <tr>
+            <td>Client Name</td>
+            <td><span class="anon-redact">REDACT</span></td>
+            <td>"a healthcare company"</td>
+            <td>Client under NDA</td>
+          </tr>
+          -->
+        </tbody>
+      </table>
+    </div>
+
+    <div class="divider"></div>
+    <div class="page-break"></div>
+
+    <!-- ============================================
+         PUBLISHING CHECKLIST
+         ============================================ -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-icon section-icon-green">&#9989;</div>
+        <div>
+          <div class="section-title">Publishing Checklist</div>
+          <div class="section-number">VALIDATION GATES</div>
+        </div>
+      </div>
+
+      <!-- {{PUBLISHING_CHECKLIST_BLOCK}} -->
+      <!--
+      <div class="checklist-group">
+        <div class="checklist-group-title">&#128736; Technical Validation</div>
+        <div class="checklist-item">
+          <div class="checkbox"></div>
+          <div>Disclosure timeline verified</div>
+        </div>
+        <div class="checklist-item">
+          <div class="checkbox"></div>
+          <div>CVSS score calculated</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">&#9878; Legal Review</div>
+        <div class="checklist-item">
+          <div class="checkbox checked"></div>
+          <div>Client approval - NOT REQUIRED</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">&#128269; SEO / AEO</div>
+        <div class="checklist-item">
+          <div class="checkbox"></div>
+          <div>Schema markup implemented</div>
+        </div>
+      </div>
+
+      <div class="checklist-group">
+        <div class="checklist-group-title">&#128227; Marketing</div>
+        <div class="checklist-item">
+          <div class="checkbox"></div>
+          <div>Social media drafts finalized</div>
+        </div>
+      </div>
+      -->
+    </div>
+
+    <!-- ============================================
+         FOOTER
+         ============================================ -->
+    <div class="footer">
+      <img src="https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png"
+           alt="Praetorian" style="max-width: 140px; height: auto; opacity: 0.5; margin-bottom: 16px;" />
+      <div class="footer-brand">Praetorian &middot; Vulnerability Blog Program</div>
+      <div class="footer-confidential">INTERNAL - DO NOT DISTRIBUTE</div>
+      <div class="footer-generated">Generated {{GENERATION_DATE}} &middot; vuln-blogpost v2.0</div>
+    </div>
+
+  </div>
+
+</body>
+</html>
