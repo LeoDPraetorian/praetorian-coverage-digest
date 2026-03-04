@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Morning Command Center &mdash; {{DATE_FORMATTED}}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#0D0D0D;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;color:#FFFFFF;">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#0D0D0D;">
+    <tr>
+      <td align="center" style="padding:0;">
+        <table role="presentation" width="660" cellpadding="0" cellspacing="0" style="max-width:660px;width:100%;">
+
+          <!-- ═══════════════════════════════════════ HERO HEADER ════ -->
+          <tr>
+            <td style="background:linear-gradient(135deg, #1F252A 0%, #0D0D0D 50%, #1a0c0e 100%);padding:48px 40px 40px;text-align:center;border-bottom:3px solid #E63948;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:20px;">
+                    <img src="{{LOGO_URL}}" alt="Praetorian" width="200" style="max-width:200px;height:auto;" />
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center">
+                    <div style="font-size:10px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:3px;margin-bottom:14px;">Morning Command Center</div>
+                    <div style="font-size:34px;font-weight:700;color:#FFFFFF;line-height:1.2;margin-bottom:8px;">Good Morning, Leonardo!</div>
+                    <div style="font-size:15px;font-weight:400;color:#A0A4A8;margin-top:8px;">{{DATE_FORMATTED}} &nbsp;&bull;&nbsp; Your day, pre-loaded.</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════════ DAY SUMMARY ════ -->
+          {{#IF_DAY_SUMMARY}}
+          <tr>
+            <td style="background-color:#1F252A;padding:18px 40px;border-bottom:1px solid #2A3038;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="vertical-align:middle;padding-right:12px;width:24px;">
+                    <div style="width:8px;height:8px;border-radius:50%;background-color:#E63948;margin-top:2px;"></div>
+                  </td>
+                  <td>
+                    <div style="font-size:13px;font-weight:600;color:#FFFFFF;line-height:1.5;">{{DAY_SUMMARY}}</div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/IF_DAY_SUMMARY}}
+
+          <!-- ═══════════════════════════════════════ STAT CARDS ════ -->
+          <tr>
+            <td style="background-color:#0D0D0D;padding:28px 28px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <!-- Card 1: Meetings Today -->
+                  <td width="25%" align="center" style="padding:0 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:10px;border-top:3px solid #11C3DB;">
+                      <tr>
+                        <td style="padding:18px 8px 16px;text-align:center;">
+                          <div style="font-size:36px;font-weight:700;color:#11C3DB;line-height:1;">{{STAT_MEETINGS}}</div>
+                          <div style="font-size:9px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;">Meetings</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 2: Action Items -->
+                  <td width="25%" align="center" style="padding:0 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:10px;border-top:3px solid #E63948;">
+                      <tr>
+                        <td style="padding:18px 8px 16px;text-align:center;">
+                          <div style="font-size:36px;font-weight:700;color:#E63948;line-height:1;">{{STAT_ACTIONS}}</div>
+                          <div style="font-size:9px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;">Action Items</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 3: Unread Emails -->
+                  <td width="25%" align="center" style="padding:0 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:10px;border-top:3px solid #D4AF37;">
+                      <tr>
+                        <td style="padding:18px 8px 16px;text-align:center;">
+                          <div style="font-size:36px;font-weight:700;color:#D4AF37;line-height:1;">{{STAT_EMAILS}}</div>
+                          <div style="font-size:9px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;">Unread Emails</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                  <!-- Card 4: Linear Tickets -->
+                  <td width="25%" align="center" style="padding:0 5px;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:10px;border-top:3px solid #34C759;">
+                      <tr>
+                        <td style="padding:18px 8px 16px;text-align:center;">
+                          <div style="font-size:36px;font-weight:700;color:#34C759;line-height:1;">{{STAT_LINEAR}}</div>
+                          <div style="font-size:9px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1.5px;margin-top:6px;">Linear Tickets</div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- ═══════════════════════════════════════ TODAY'S AGENDA ════ -->
+          <tr>
+            <td style="background-color:#0D0D0D;padding:32px 40px 0;">
+              <!-- Section header -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:16px;border-bottom:2px solid #11C3DB;background:linear-gradient(90deg, rgba(17,195,219,0.08) 0%, transparent 100%);">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:2px;background-color:#11C3DB;margin-right:10px;vertical-align:middle;"></span>
+                    <span style="font-size:16px;font-weight:700;color:#11C3DB;vertical-align:middle;">Today&rsquo;s Agenda</span>
+                    <span style="font-size:11px;color:#535B61;margin-left:10px;vertical-align:middle;">{{DEEP_WORK_LABEL}}</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          {{#IF_CALENDAR}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 40px 8px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{CALENDAR_ROWS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_CALENDAR}}
+
+          {{#IF_NO_CALENDAR}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:20px 40px;">
+              <div style="font-size:13px;color:#535B61;text-align:center;padding:20px 0;">No calendar events today &mdash; full deep work day.</div>
+            </td>
+          </tr>
+          {{/IF_NO_CALENDAR}}
+
+          <!-- ═══════════════════════════════════════ ACTION ITEMS ════ -->
+          <tr>
+            <td style="background-color:#0D0D0D;padding:32px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:16px;border-bottom:2px solid #E63948;background:linear-gradient(90deg, rgba(230,57,72,0.08) 0%, transparent 100%);">
+                    <span style="display:inline-block;width:8px;height:8px;border-radius:50%;background-color:#E63948;margin-right:10px;vertical-align:middle;"></span>
+                    <span style="font-size:16px;font-weight:700;color:#E63948;vertical-align:middle;">Action Items</span>
+                    <span style="font-size:11px;color:#535B61;margin-left:10px;vertical-align:middle;">{{STAT_ACTIONS}} items &bull; AI-extracted</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          {{#IF_ACTIONS}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:16px 40px 8px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{ACTION_ROWS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_ACTIONS}}
+
+          {{#IF_NO_ACTIONS}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:20px 40px;">
+              <div style="font-size:13px;color:#535B61;text-align:center;padding:20px 0;">No action items found &mdash; clear inbox!</div>
+            </td>
+          </tr>
+          {{/IF_NO_ACTIONS}}
+
+          <!-- ═══════════════════════════════════════ REFERENCE: SLACK ════ -->
+          {{#IF_SLACK}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:32px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:14px;border-bottom:1px solid #2A3038;">
+                    <span style="font-size:12px;font-weight:700;color:#535B61;text-transform:uppercase;letter-spacing:2px;">Reference &mdash; </span>
+                    <span style="font-size:14px;font-weight:700;color:#A0A4A8;">Slack</span>
+                    <span style="font-size:11px;color:#535B61;margin-left:8px;">{{SLACK_COUNT}} messages</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#0D0D0D;padding:12px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{SLACK_ROWS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_SLACK}}
+
+          <!-- ═══════════════════════════════════════ REFERENCE: EMAIL ════ -->
+          {{#IF_EMAIL}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:32px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:14px;border-bottom:1px solid #2A3038;">
+                    <span style="font-size:12px;font-weight:700;color:#535B61;text-transform:uppercase;letter-spacing:2px;">&#128233; Email Digest &mdash; </span>
+                    <span style="font-size:14px;font-weight:700;color:#A0A4A8;">{{EMAIL_COUNT}} emails analyzed</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#0D0D0D;padding:12px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{EMAIL_ROWS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_EMAIL}}
+
+          <!-- ═══════════════════════════════════════ REFERENCE: LINEAR ════ -->
+          {{#IF_LINEAR}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:32px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td style="padding-bottom:14px;border-bottom:1px solid #2A3038;">
+                    <span style="font-size:12px;font-weight:700;color:#535B61;text-transform:uppercase;letter-spacing:2px;">Reference &mdash; </span>
+                    <span style="font-size:14px;font-weight:700;color:#A0A4A8;">Linear</span>
+                    <span style="font-size:11px;color:#535B61;margin-left:8px;">{{LINEAR_COUNT}} active tickets</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td style="background-color:#0D0D0D;padding:12px 40px 0;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                {{LINEAR_ROWS}}
+              </table>
+            </td>
+          </tr>
+          {{/IF_LINEAR}}
+
+          <!-- ═══════════════════════════════════════ FOOTER ════ -->
+          <tr>
+            <td style="background-color:#1F252A;padding:36px 40px 0;text-align:center;border-top:1px solid #2A3038;margin-top:40px;">
+
+              <!-- Logo small -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:20px;">
+                    <img src="{{LOGO_URL}}" alt="Praetorian" width="140" style="max-width:140px;height:auto;opacity:0.7;" />
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Social Links -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#3A4044;border-radius:6px;margin-bottom:20px;">
+                <tr>
+                  <td align="center" style="padding:12px 16px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                      <tr>
+                        <td style="padding:0 4px;">
+                          <a href="https://www.linkedin.com/company/praetorian" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">LinkedIn</a>
+                        </td>
+                        <td style="padding:0 4px;">
+                          <a href="https://github.com/praetorian-inc" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">GitHub</a>
+                        </td>
+                        <td style="padding:0 4px;">
+                          <a href="https://praetorian.com" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">praetorian.com</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Legal / Info -->
+              <div style="font-size:11px;color:#535B61;line-height:1.8;padding-bottom:16px;">
+                Morning Command Center &middot; {{DATE_FORMATTED}}<br>
+                Powered by Claude AI &middot; <a href="https://praetorian.com" style="color:#535B61;text-decoration:none;">praetorian.com</a>
+              </div>
+
+              <!-- Brand closer -->
+              <div style="background-color:#3A4044;margin:0 -40px;padding:10px 40px;">
+                <div style="font-size:10px;color:#535B61;letter-spacing:1px;text-transform:uppercase;">Powered by Morning Command Center</div>
+              </div>
+
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

@@ -1,0 +1,20 @@
+{
+  "name": "praetorian-morning-digest",
+  "version": "1.0.0",
+  "description": "Personal morning command center — consolidates Slack, Email, Linear, and Calendar into a daily digest",
+  "type": "module",
+  "scripts": {
+    "digest": "node run-digest.js",
+    "preview": "node run-digest.js --preview",
+    "dry-run": "node run-digest.js --dry-run"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@slack/web-api": "^7.8.0",
+    "imapflow": "^1.0.171",
+    "googleapis": "^144.0.0",
+    "nodemailer": "^6.9.16",
+    "mailparser": "^3.7.2",
+    "dotenv": "^16.4.7"
+  }
+}
