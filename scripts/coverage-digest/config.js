@@ -62,11 +62,6 @@ export const config = {
       icon: '🌑',
     },
     {
-      name: 'SC Media',
-      url: 'https://www.scworld.com/feed',
-      icon: '🛡️',
-    },
-    {
       name: 'Bleeping Computer',
       url: 'https://www.bleepingcomputer.com/feed/',
       icon: '💻',

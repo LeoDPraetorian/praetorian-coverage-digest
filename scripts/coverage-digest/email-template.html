@@ -16,14 +16,15 @@
             <td style="background:linear-gradient(135deg, #1F252A 0%, #0D0D0D 50%, #2a1015 100%);padding:48px 40px 40px;text-align:center;border-bottom:3px solid #E63948;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td align="center" style="padding-bottom:24px;">
+                  <td align="center" style="padding-bottom:20px;">
                     <img src="{{LOGO_URL}}" alt="Praetorian" width="220" style="max-width:220px;height:auto;" />
                   </td>
                 </tr>
                 <tr>
                   <td align="center">
+                    <div style="font-size:11px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:3px;margin-bottom:12px;">Continuous Offensive Security</div>
                     <div style="font-size:32px;font-weight:700;color:#FFFFFF;line-height:1.2;">Good Morning!</div>
-                    <div style="font-size:20px;font-weight:400;color:#A0A4A8;margin-top:8px;">Here's your daily coverage digest.</div>
+                    <div style="font-size:18px;font-weight:400;color:#A0A4A8;margin-top:10px;line-height:1.5;">Here&rsquo;s your daily coverage digest.</div>
                   </td>
                 </tr>
               </table>
@@ -85,10 +86,10 @@
                   </td>
                   <!-- Card 4: Action Needed -->
                   <td width="25%" align="center" style="padding:0 4px;">
-                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #A0A4A8;">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;border-top:3px solid #E63948;">
                       <tr>
                         <td style="padding:16px 8px;text-align:center;">
-                          <div style="font-size:32px;font-weight:700;color:#FFFFFF;">{{ACTION_COUNT}}</div>
+                          <div style="font-size:32px;font-weight:700;color:#E63948;">{{ACTION_COUNT}}</div>
                           <div style="font-size:10px;color:#A0A4A8;text-transform:uppercase;letter-spacing:1px;margin-top:4px;">Need Action</div>
                         </td>
                       </tr>
@@ -99,14 +100,85 @@
             </td>
           </tr>
 
+          <!-- DASHBOARD CTA -->
+          <tr>
+            <td style="background-color:#0D0D0D;padding:20px 28px 8px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center">
+                    <a href="{{DASHBOARD_URL}}" style="display:inline-block;padding:14px 36px;background:linear-gradient(135deg, #E63948 0%, #c22d3a 100%);border-radius:6px;font-size:14px;font-weight:700;color:#FFFFFF;text-decoration:none;letter-spacing:0.5px;">Open Marketing Command Center &rarr;</a>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="padding-top:8px;">
+                    <span style="font-size:11px;color:#535B61;">Interactive dashboard with full quarterly breakdown, copy-paste LinkedIn drafts &amp; more</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- QUARTERLY PROGRESS TRACKER -->
+          {{#IF_QUARTERLY}}
+          <tr>
+            <td style="background-color:#0D0D0D;padding:0 28px 24px;">
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:8px;">
+                <tr>
+                  <td style="padding:20px 24px 24px;">
+                    <!-- Section header -->
+                    <div style="font-size:10px;font-weight:700;color:#D4AF37;text-transform:uppercase;letter-spacing:2px;margin-bottom:16px;">Quarterly Progress &mdash; {{Q_LABEL}}</div>
+                    <!-- Two progress bars side by side -->
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <!-- Blog Posts progress -->
+                        <td width="48%" style="padding-right:8px;vertical-align:top;">
+                          <div style="font-size:11px;font-weight:600;color:#FFFFFF;margin-bottom:6px;">Blog Posts</div>
+                          <div style="font-size:11px;color:#A0A4A8;margin-bottom:8px;">{{BLOG_PROGRESS}} / {{BLOG_GOAL}} &nbsp;&middot;&nbsp; {{BLOG_PCT}}%</div>
+                          <!-- Progress track -->
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#3A4044;border-radius:4px;height:6px;">
+                            <tr>
+                              <td width="{{BLOG_PCT}}%" style="background-color:#11C3DB;border-radius:4px;height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                              <td style="height:6px;"></td>
+                            </tr>
+                          </table>
+                        </td>
+                        <!-- Spacer -->
+                        <td width="4%"></td>
+                        <!-- Tier-1 Media progress -->
+                        <td width="48%" style="padding-left:8px;vertical-align:top;">
+                          <div style="font-size:11px;font-weight:600;color:#FFFFFF;margin-bottom:6px;">Tier-1 Media</div>
+                          <div style="font-size:11px;color:#A0A4A8;margin-bottom:8px;">{{MEDIA_PROGRESS}} / {{MEDIA_GOAL}} &nbsp;&middot;&nbsp; {{MEDIA_PCT}}%</div>
+                          <!-- Progress track -->
+                          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#3A4044;border-radius:4px;height:6px;">
+                            <tr>
+                              <td width="{{MEDIA_PCT}}%" style="background-color:#E63948;border-radius:4px;height:6px;line-height:6px;font-size:0;">&nbsp;</td>
+                              <td style="height:6px;"></td>
+                            </tr>
+                          </table>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          {{/IF_QUARTERLY}}
+
           <!-- MEDIA COVERAGE SECTION -->
           {{#IF_MEDIA}}
           <tr>
             <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
-                    <span style="font-size:18px;font-weight:700;color:#E63948;">External Media Coverage</span>
+                  <td style="padding:20px 0 12px;border-bottom:2px solid #E63948;background:linear-gradient(90deg, rgba(230,57,72,0.08) 0%, transparent 100%);">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <span style="display:inline-block;width:10px;height:10px;border-radius:50%;background-color:#E63948;margin-right:8px;vertical-align:middle;"></span><span style="font-size:18px;font-weight:700;color:#E63948;vertical-align:middle;">External Media Coverage</span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -127,8 +199,14 @@
             <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
-                    <span style="font-size:18px;font-weight:700;color:#11C3DB;">Blog &amp; Publications</span>
+                  <td style="padding:20px 0 12px;border-bottom:2px solid #11C3DB;background:linear-gradient(90deg, rgba(17,195,219,0.08) 0%, transparent 100%);">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background-color:#11C3DB;margin-right:8px;vertical-align:middle;"></span><span style="font-size:18px;font-weight:700;color:#11C3DB;vertical-align:middle;">Blog &amp; Publications</span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -149,8 +227,14 @@
             <td style="background-color:#0D0D0D;padding:8px 40px 0;">
               <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                 <tr>
-                  <td style="padding:20px 0 12px;border-bottom:1px solid #535B61;">
-                    <span style="font-size:18px;font-weight:700;color:#D4AF37;">Events &amp; Submissions</span>
+                  <td style="padding:20px 0 12px;border-bottom:2px solid #D4AF37;background:linear-gradient(90deg, rgba(212,175,55,0.08) 0%, transparent 100%);">
+                    <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td style="vertical-align:middle;">
+                          <span style="display:inline-block;width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:10px solid #D4AF37;margin-right:8px;vertical-align:middle;display:inline-block;"></span><span style="font-size:18px;font-weight:700;color:#D4AF37;vertical-align:middle;">Events &amp; Submissions</span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
               </table>
@@ -170,7 +254,7 @@
           <tr>
             <td style="background-color:#0D0D0D;padding:48px 40px;text-align:center;">
               <div style="font-size:18px;color:#A0A4A8;">No new coverage items today.</div>
-              <div style="font-size:14px;color:#535B61;margin-top:8px;">The monitors are watching. You'll hear from us when something drops.</div>
+              <div style="font-size:14px;color:#535B61;margin-top:8px;">The monitors are watching. You&rsquo;ll hear from us when something drops.</div>
             </td>
           </tr>
           {{/IF_EMPTY}}
@@ -183,7 +267,7 @@
                 <tr>
                   <td style="padding:20px 24px;">
                     <div style="font-size:13px;font-weight:700;color:#E63948;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:4px;">Marketing Playbook</div>
-                    <div style="font-size:12px;color:#535B61;margin-bottom:16px;">{{ACTION_COUNT}} items to amplify — here's your prioritized action plan:</div>
+                    <div style="font-size:12px;color:#535B61;margin-bottom:16px;">{{ACTION_COUNT}} items to amplify &mdash; here&rsquo;s your prioritized action plan:</div>
                     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
                       {{ACTION_ITEMS}}
                     </table>
@@ -217,12 +301,50 @@
 
           <!-- FOOTER -->
           <tr>
-            <td style="background-color:#1F252A;padding:28px 40px;text-align:center;border-top:1px solid #535B61;">
-              <div style="font-size:11px;color:#535B61;line-height:1.6;">
+            <td style="background-color:#1F252A;padding:32px 40px 0;text-align:center;border-top:1px solid #535B61;">
+
+              <!-- CTA Button -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                <tr>
+                  <td align="center" style="padding-bottom:28px;">
+                    <a href="https://praetorian.com" style="display:inline-block;padding:10px 28px;border:1.5px solid #E63948;border-radius:4px;font-size:13px;font-weight:600;color:#E63948;text-decoration:none;letter-spacing:0.5px;">Visit praetorian.com &rarr;</a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Social Links Bar -->
+              <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#3A4044;border-radius:6px;margin-bottom:20px;">
+                <tr>
+                  <td align="center" style="padding:12px 16px;">
+                    <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto;">
+                      <tr>
+                        <td style="padding:0 4px;">
+                          <a href="https://www.linkedin.com/company/praetorian" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">LinkedIn</a>
+                        </td>
+                        <td style="padding:0 4px;">
+                          <a href="https://github.com/praetorian-inc" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">GitHub</a>
+                        </td>
+                        <td style="padding:0 4px;">
+                          <a href="https://twitter.com/praetorian" style="display:inline-block;padding:4px 12px;background-color:#1F252A;border:1px solid #535B61;border-radius:12px;font-size:11px;font-weight:600;color:#A0A4A8;text-decoration:none;letter-spacing:0.3px;">Twitter</a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Legal / Info -->
+              <div style="font-size:11px;color:#535B61;line-height:1.8;padding-bottom:16px;">
                 Praetorian Coverage Digest &middot; Generated automatically<br>
-                Monitoring {{SOURCE_COUNT}} sources &middot; <span style="color:#A0A4A8;">praetorian.com</span><br>
-                <span style="color:#3A4044;margin-top:4px;display:inline-block;">Continuous Offensive Security &amp; Threat Exposure Management</span>
+                Monitoring {{SOURCE_COUNT}} sources &middot; <a href="https://praetorian.com" style="color:#535B61;text-decoration:none;">praetorian.com</a><br>
+                <span style="color:#3A4044;">Continuous Offensive Security &amp; Threat Exposure Management</span>
               </div>
+
+              <!-- Brand closer -->
+              <div style="background-color:#3A4044;margin:0 -40px;padding:10px 40px;">
+                <div style="font-size:10px;color:#535B61;letter-spacing:1px;text-transform:uppercase;">Powered by Praetorian Security</div>
+              </div>
+
             </td>
           </tr>
 

@@ -1,0 +1,1297 @@
+<!--
+  ============================================================
+  WRITER MODE INJECTION SNIPPET
+  Praetorian Blog Pipeline v2.0
+  ============================================================
+
+  This is the self-contained Writer Mode code block extracted
+  from the blog outline HTML template. It provides an interactive
+  writing companion that guides authors section-by-section through
+  composing their blog draft.
+
+  PLACEMENT INSTRUCTIONS:
+  Paste this entire snippet AFTER the closing
+      </div><!-- end pitch-mode -->
+  tag and BEFORE the closing </body></html> tags.
+
+  It includes:
+    1. Start Writing floating button (HTML)
+    2. Writer Mode overlay with sidebar, editor, modals (HTML)
+    3. All Writer Mode styles (CSS <style> block)
+    4. Writer Mode engine with section extraction, persistence,
+       markdown generation, and export (JS <script> block)
+
+  DEPENDENCIES:
+  - Requires a #pitch-mode container with .section, .card,
+    .card-title, .content-direction, .voice-note, .engineer-marker
+    elements (the standard blog outline structure).
+  - Uses localStorage for auto-save (keyed by document.title).
+  - Fonts: Inter, Lekton, JetBrains Mono (loaded in <head>).
+  ============================================================
+-->
+
+<!-- Start Writing Button -->
+<button class="start-writing-btn" onclick="enterWriterMode()">
+  <span class="btn-icon">&#9997;</span>
+  <span>Start Writing</span>
+</button>
+
+
+<!-- ============================================
+     WRITER MODE — INTERACTIVE WRITING COMPANION
+     Praetorian Blog Pipeline v2.0
+     ============================================ -->
+
+<!-- Writer Mode Overlay (hidden by default) -->
+<div id="writer-overlay" class="writer-overlay" style="display:none;">
+
+  <!-- Writer Header -->
+  <div class="writer-header">
+    <div class="writer-header-inner">
+      <img src="https://raw.githubusercontent.com/LeoDPraetorian/praetorian-coverage-digest/main/scripts/coverage-digest/assets/logo-white.png"
+           alt="Praetorian" style="height: 22px; opacity: 0.7;" />
+      <div class="writer-header-title">Blog Writer</div>
+      <div class="writer-header-progress">
+        <span id="writer-progress-text">0 / 0 sections</span>
+        <div class="writer-progress-bar">
+          <div class="writer-progress-fill" id="writer-progress-fill"></div>
+        </div>
+      </div>
+      <div class="writer-timer" id="writer-timer">
+        <span class="timer-icon">&#9201;</span>
+        <span id="timer-display">0:00</span>
+      </div>
+      <button class="writer-exit-btn" onclick="exitWriterMode()">
+        <span>&#10005;</span> Back to Outline
+      </button>
+    </div>
+  </div>
+
+  <!-- Writer Body -->
+  <div class="writer-body">
+
+    <!-- Sidebar -->
+    <div class="writer-sidebar" id="writer-sidebar">
+      <div class="sidebar-section-label">SECTIONS</div>
+      <div id="sidebar-sections"></div>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-section-label">TOOLS</div>
+      <button class="sidebar-tool-btn" onclick="showExportModal()">
+        <span>&#128196;</span> Generate Draft
+      </button>
+      <button class="sidebar-tool-btn" onclick="saveAllProgress()">
+        <span>&#128190;</span> Save Progress
+      </button>
+      <button class="sidebar-tool-btn" onclick="clearAllProgress()">
+        <span>&#128465;</span> Start Fresh
+      </button>
+      <div class="sidebar-divider"></div>
+      <div class="sidebar-autosave" id="autosave-status">
+        Auto-saved just now
+      </div>
+    </div>
+
+    <!-- Main Writing Area -->
+    <div class="writer-main">
+      <div id="writer-content"></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Export Modal -->
+<div id="export-modal" class="export-modal" style="display:none;" onclick="if(event.target===this)closeExportModal()">
+  <div class="export-modal-content">
+    <div class="export-modal-header">
+      <h2>Generate Blog Draft</h2>
+      <button class="export-close-btn" onclick="closeExportModal()">&#10005;</button>
+    </div>
+    <div class="export-modal-body">
+      <div class="export-stats" id="export-stats"></div>
+      <div class="export-preview" id="export-preview"></div>
+      <div class="export-actions">
+        <button class="export-btn export-btn-primary" onclick="downloadMarkdown()">
+          <span>&#11015;</span> Download .md File
+        </button>
+        <button class="export-btn export-btn-secondary" onclick="copyMarkdown()">
+          <span>&#128203;</span> Copy to Clipboard
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Celebration Overlay -->
+<div id="celebration" class="celebration" style="display:none;">
+  <div class="celebration-content">
+    <div class="celebration-icon">&#127881;</div>
+    <div class="celebration-title">Section Complete!</div>
+    <div class="celebration-subtitle" id="celebration-text"></div>
+  </div>
+</div>
+
+<!-- Completion Overlay -->
+<div id="completion-overlay" class="completion-overlay" style="display:none;">
+  <div class="completion-content">
+    <div class="completion-fireworks">&#127878; &#127881; &#127878;</div>
+    <h1 class="completion-title">Draft Complete!</h1>
+    <p class="completion-subtitle">You just wrote an entire blog post. That was <strong id="completion-time">0 minutes</strong> well spent.</p>
+    <div class="completion-stats" id="completion-stats"></div>
+    <div class="completion-actions">
+      <button class="export-btn export-btn-primary" onclick="showExportModal();document.getElementById('completion-overlay').style.display='none';">
+        Generate Draft File
+      </button>
+      <button class="export-btn export-btn-secondary" onclick="document.getElementById('completion-overlay').style.display='none';">
+        Keep Editing
+      </button>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* ========================================
+     WRITER MODE STYLES
+     Praetorian Marketing Color Guide
+     ======================================== */
+
+  .writer-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #0D0D0D;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    animation: writerFadeIn 0.4s ease;
+  }
+  @keyframes writerFadeIn {
+    from { opacity: 0; transform: scale(0.98); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
+  .writer-header {
+    background: #1F252A;
+    border-bottom: 2px solid #E63948;
+    padding: 0 24px;
+    height: 56px;
+    flex-shrink: 0;
+  }
+  .writer-header-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+  .writer-header-title {
+    font-family: 'Lekton', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    color: #E63948;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .writer-header-progress {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+  #writer-progress-text {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #A0A4A8;
+  }
+  .writer-progress-bar {
+    width: 140px;
+    height: 6px;
+    background: #3A4044;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .writer-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #E63948, #FF6B7A);
+    border-radius: 3px;
+    transition: width 0.5s ease;
+    width: 0%;
+  }
+  .writer-timer {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #535B61;
+  }
+  .timer-icon { font-size: 14px; }
+  .writer-exit-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    background: transparent;
+    border: 1px solid #3A4044;
+    border-radius: 6px;
+    color: #A0A4A8;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .writer-exit-btn:hover {
+    border-color: #E63948;
+    color: #E63948;
+  }
+
+  /* Writer Body Layout */
+  .writer-body {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  /* Sidebar */
+  .writer-sidebar {
+    width: 240px;
+    background: #1F252A;
+    border-right: 1px solid #3A4044;
+    padding: 20px 16px;
+    overflow-y: auto;
+    flex-shrink: 0;
+  }
+  .sidebar-section-label {
+    font-family: 'Lekton', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    color: #535B61;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .sidebar-step {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 4px;
+    font-size: 13px;
+    color: #A0A4A8;
+  }
+  .sidebar-step:hover { background: #3A4044; }
+  .sidebar-step.active {
+    background: rgba(230, 57, 72, 0.12);
+    color: #FFFFFF;
+    border: 1px solid rgba(230, 57, 72, 0.3);
+  }
+  .sidebar-step.completed { color: #34D399; }
+  .sidebar-step-icon {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 800;
+    border: 2px solid #3A4044;
+    flex-shrink: 0;
+    background: #0D0D0D;
+  }
+  .sidebar-step.active .sidebar-step-icon {
+    border-color: #E63948;
+    background: #E63948;
+    color: white;
+  }
+  .sidebar-step.completed .sidebar-step-icon {
+    border-color: #34D399;
+    background: #34D399;
+    color: #0D0D0D;
+  }
+  .sidebar-step-label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sidebar-divider {
+    height: 1px;
+    background: #3A4044;
+    margin: 16px 0;
+  }
+  .sidebar-tool-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 10px 12px;
+    background: transparent;
+    border: 1px solid #3A4044;
+    border-radius: 8px;
+    color: #A0A4A8;
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-bottom: 6px;
+    text-align: left;
+  }
+  .sidebar-tool-btn:hover {
+    border-color: #11C3DB;
+    color: #11C3DB;
+  }
+  .sidebar-autosave {
+    font-size: 11px;
+    color: #535B61;
+    text-align: center;
+    padding: 8px 0;
+  }
+
+  /* Main Writing Area */
+  .writer-main {
+    flex: 1;
+    overflow-y: auto;
+    padding: 40px;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .writer-section-header {
+    margin-bottom: 24px;
+  }
+  .writer-section-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 6px;
+    background: #3A4044;
+    color: #A0A4A8;
+    display: inline-block;
+    margin-bottom: 8px;
+  }
+  .writer-section-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #FFFFFF;
+    line-height: 1.3;
+  }
+  .writer-section-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #535B61;
+  }
+
+  /* Reference Cards in Writer */
+  .writer-ref-card {
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    font-size: 13px;
+  }
+  .writer-ref-card.direction {
+    background: rgba(17, 195, 219, 0.06);
+    border: 1px solid rgba(17, 195, 219, 0.15);
+    border-left: 4px solid #11C3DB;
+  }
+  .writer-ref-card.voice {
+    background: rgba(212, 175, 55, 0.06);
+    border: 1px solid rgba(212, 175, 55, 0.15);
+    border-left: 4px solid #D4AF37;
+  }
+  .writer-ref-card.engineer {
+    background: rgba(230, 57, 72, 0.06);
+    border: 1px solid rgba(230, 57, 72, 0.15);
+    border-left: 4px solid #E63948;
+  }
+  .writer-ref-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+  .writer-ref-card.direction .writer-ref-label { color: #11C3DB; }
+  .writer-ref-card.voice .writer-ref-label { color: #D4AF37; }
+  .writer-ref-card.engineer .writer-ref-label { color: #E63948; }
+  .writer-ref-card p, .writer-ref-card li { color: #A0A4A8; margin: 2px 0; }
+  .writer-ref-card ul { padding-left: 18px; }
+
+  /* Text Area */
+  .writer-textarea-wrapper {
+    margin-top: 20px;
+  }
+  .writer-textarea-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #FFFFFF;
+    margin-bottom: 8px;
+  }
+  .writer-textarea {
+    width: 100%;
+    min-height: 200px;
+    background: #1F252A;
+    border: 2px solid #3A4044;
+    border-radius: 12px;
+    padding: 20px;
+    color: #FFFFFF;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.8;
+    resize: vertical;
+    transition: border-color 0.3s;
+    outline: none;
+  }
+  .writer-textarea:focus {
+    border-color: #E63948;
+    box-shadow: 0 0 0 3px rgba(230, 57, 72, 0.1);
+  }
+  .writer-textarea::placeholder {
+    color: #535B61;
+    font-style: italic;
+  }
+
+  /* Word Count Bar */
+  .word-count-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .word-count-display {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: #A0A4A8;
+    min-width: 100px;
+  }
+  .word-count-display.low { color: #A0A4A8; }
+  .word-count-display.good { color: #34D399; }
+  .word-count-display.over { color: #D4AF37; }
+  .word-count-progress {
+    flex: 1;
+    height: 4px;
+    background: #3A4044;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+  .word-count-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.3s, background 0.3s;
+  }
+  .word-count-fill.low { background: #535B61; }
+  .word-count-fill.good { background: #34D399; }
+  .word-count-fill.over { background: #D4AF37; }
+
+  /* Navigation Buttons */
+  .writer-nav {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 32px;
+    padding-top: 24px;
+    border-top: 1px solid #3A4044;
+  }
+  .writer-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .writer-nav-btn.secondary {
+    background: #1F252A;
+    color: #A0A4A8;
+    border: 1px solid #3A4044;
+  }
+  .writer-nav-btn.secondary:hover {
+    border-color: #535B61;
+    color: #FFFFFF;
+  }
+  .writer-nav-btn.primary {
+    background: linear-gradient(135deg, #E63948 0%, #FF6B7A 100%);
+    color: white;
+  }
+  .writer-nav-btn.primary:hover {
+    box-shadow: 0 4px 20px rgba(230, 57, 72, 0.4);
+    transform: translateY(-1px);
+  }
+  .writer-nav-btn.finish {
+    background: linear-gradient(135deg, #34D399 0%, #6EE7B7 100%);
+    color: #0D0D0D;
+  }
+  .writer-nav-btn.finish:hover {
+    box-shadow: 0 4px 20px rgba(52, 211, 153, 0.4);
+    transform: translateY(-1px);
+  }
+
+  /* Start Writing Button (replaces old interactive toggle) */
+  .start-writing-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    background: linear-gradient(135deg, #E63948 0%, #FF6B7A 100%);
+    color: white;
+    border: none;
+    padding: 16px 28px;
+    border-radius: 50px;
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    box-shadow: 0 4px 24px rgba(230, 57, 72, 0.4);
+    transition: all 0.3s ease;
+    letter-spacing: 0.3px;
+  }
+  .start-writing-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 32px rgba(230, 57, 72, 0.5);
+  }
+  .start-writing-btn .btn-icon {
+    font-size: 20px;
+  }
+
+  /* Export Modal */
+  .export-modal {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.8);
+    z-index: 3000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.2s ease;
+  }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .export-modal-content {
+    background: #1F252A;
+    border: 1px solid #3A4044;
+    border-radius: 16px;
+    width: 90%;
+    max-width: 700px;
+    max-height: 80vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  .export-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 24px;
+    border-bottom: 1px solid #3A4044;
+  }
+  .export-modal-header h2 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+  .export-close-btn {
+    background: none;
+    border: none;
+    color: #535B61;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 4px 8px;
+  }
+  .export-close-btn:hover { color: #E63948; }
+  .export-modal-body {
+    padding: 24px;
+    overflow-y: auto;
+  }
+  .export-stats {
+    display: flex;
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+  .export-stat {
+    text-align: center;
+  }
+  .export-stat-number {
+    font-size: 28px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #E63948, #FF6B7A);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .export-stat-label {
+    font-size: 11px;
+    color: #535B61;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .export-preview {
+    background: #0D0D0D;
+    border: 1px solid #3A4044;
+    border-radius: 10px;
+    padding: 20px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: #A0A4A8;
+    white-space: pre-wrap;
+    margin-bottom: 20px;
+  }
+  .export-actions {
+    display: flex;
+    gap: 12px;
+  }
+  .export-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s;
+  }
+  .export-btn-primary {
+    background: linear-gradient(135deg, #E63948, #FF6B7A);
+    color: white;
+  }
+  .export-btn-primary:hover {
+    box-shadow: 0 4px 20px rgba(230, 57, 72, 0.4);
+  }
+  .export-btn-secondary {
+    background: #3A4044;
+    color: #FFFFFF;
+  }
+  .export-btn-secondary:hover {
+    background: #535B61;
+  }
+  .export-btn.copied {
+    background: #34D399 !important;
+    color: #0D0D0D !important;
+  }
+
+  /* Celebration */
+  .celebration {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 2500;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .celebration-content {
+    text-align: center;
+    animation: celebPop 0.6s ease;
+  }
+  @keyframes celebPop {
+    0% { transform: scale(0.5); opacity: 0; }
+    50% { transform: scale(1.2); opacity: 1; }
+    100% { transform: scale(1); opacity: 0; }
+  }
+  .celebration-icon { font-size: 64px; }
+  .celebration-title {
+    font-size: 24px;
+    font-weight: 800;
+    color: #34D399;
+    margin-top: 8px;
+  }
+  .celebration-subtitle {
+    font-size: 14px;
+    color: #A0A4A8;
+    margin-top: 4px;
+  }
+
+  /* Completion Overlay */
+  .completion-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.9);
+    z-index: 2600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .completion-content {
+    text-align: center;
+    max-width: 500px;
+    animation: completionIn 0.5s ease;
+  }
+  @keyframes completionIn {
+    from { transform: translateY(40px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  .completion-fireworks { font-size: 48px; margin-bottom: 16px; }
+  .completion-title {
+    font-size: 36px;
+    font-weight: 900;
+    background: linear-gradient(135deg, #E63948, #FF6B7A, #D4AF37);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .completion-subtitle {
+    font-size: 16px;
+    color: #A0A4A8;
+    margin-top: 12px;
+    line-height: 1.5;
+  }
+  .completion-stats {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    margin: 24px 0;
+  }
+  .completion-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 24px;
+  }
+
+  @media print {
+    .start-writing-btn,
+    .writer-overlay,
+    .export-modal,
+    .celebration,
+    .completion-overlay,
+    #interactive-banner,
+    .interactive-toggle,
+    .copy-btn { display: none !important; }
+  }
+</style>
+
+<script>
+  // ========================================
+  // WRITER MODE ENGINE
+  // ========================================
+
+  const STORE_KEY = 'praet-writer-' + document.title.replace(/[^a-z0-9]/gi, '-').substring(0, 40);
+  let writerSections = [];
+  let currentStep = 0;
+  let timerInterval = null;
+  let timerSeconds = 0;
+  let writerActive = false;
+
+  // --- Data Extraction from Pitch Mode DOM ---
+  function extractSections() {
+    const sections = [];
+
+    // Find the Blog Structure section
+    const allSections = document.querySelectorAll('#pitch-mode .section');
+    let blogStructureSection = null;
+
+    allSections.forEach(sec => {
+      const title = sec.querySelector('.section-title');
+      if (title && title.textContent.includes('Blog Structure')) {
+        blogStructureSection = sec;
+      }
+    });
+
+    if (!blogStructureSection) return sections;
+
+    const cards = blogStructureSection.querySelectorAll('.card');
+    cards.forEach((card, i) => {
+      const titleEl = card.querySelector('.card-title');
+      if (!titleEl) return;
+
+      const wordCountEl = titleEl.querySelector('.word-count');
+      const tagEl = titleEl.querySelector('.structure-tag');
+
+      // Get section title (without the tag and word count text)
+      let sectionTitle = titleEl.textContent.trim();
+      if (wordCountEl) sectionTitle = sectionTitle.replace(wordCountEl.textContent, '').trim();
+      if (tagEl) sectionTitle = sectionTitle.replace(tagEl.textContent, '').trim();
+
+      const wordTarget = wordCountEl ? wordCountEl.textContent.trim() : '200-300 words';
+      const tag = tagEl ? tagEl.textContent.trim() : 'H2';
+
+      // Extract content direction
+      const directionEl = card.querySelector('.content-direction');
+      let direction = '';
+      if (directionEl) {
+        const items = directionEl.querySelectorAll('li');
+        if (items.length > 0) {
+          direction = Array.from(items).map(li => li.textContent.trim()).join('\n');
+        } else {
+          const p = directionEl.querySelector('p');
+          if (p) direction = p.textContent.trim();
+        }
+      }
+
+      // Extract voice note
+      const voiceEl = card.querySelector('.voice-note');
+      let voice = '';
+      if (voiceEl) {
+        const voiceContent = voiceEl.cloneNode(true);
+        const label = voiceContent.querySelector('.voice-note-label');
+        if (label) label.remove();
+        voice = voiceContent.textContent.trim();
+      }
+
+      // Extract engineer markers
+      const markerEl = card.querySelector('.engineer-marker');
+      let marker = '';
+      if (markerEl) {
+        const p = markerEl.querySelector('p');
+        if (p) marker = p.textContent.trim();
+      }
+
+      // Parse word count range
+      const match = wordTarget.match(/(\d+)\s*-\s*(\d+)/);
+      const minWords = match ? parseInt(match[1]) : 150;
+      const maxWords = match ? parseInt(match[2]) : 300;
+
+      sections.push({
+        index: i,
+        title: sectionTitle,
+        tag: tag,
+        wordTarget: wordTarget,
+        minWords: minWords,
+        maxWords: maxWords,
+        direction: direction,
+        voice: voice,
+        marker: marker,
+        text: ''
+      });
+    });
+
+    return sections;
+  }
+
+  // --- Extract metadata for markdown generation ---
+  function extractMeta() {
+    const meta = {};
+
+    // Title
+    const headerTitle = document.querySelector('#pitch-mode .header-title');
+    meta.title = headerTitle ? headerTitle.textContent.trim() : 'Untitled Blog Post';
+
+    // Keywords
+    const keywords = document.querySelectorAll('#pitch-mode .keyword');
+    meta.keywords = Array.from(keywords).map(k => k.textContent.trim());
+
+    // Meta description
+    const metaCards = document.querySelectorAll('#pitch-mode .card');
+    metaCards.forEach(card => {
+      const title = card.querySelector('.card-title');
+      if (title && title.textContent.includes('Meta Description')) {
+        const p = card.querySelector('p');
+        if (p) meta.description = p.textContent.trim();
+      }
+      if (title && title.textContent.includes('URL Slug')) {
+        const p = card.querySelector('p');
+        if (p) meta.slug = p.textContent.trim();
+      }
+    });
+
+    // FAQ
+    const faqItems = document.querySelectorAll('#pitch-mode .faq-item');
+    meta.faq = Array.from(faqItems).map(item => ({
+      question: item.querySelector('.faq-question') ? item.querySelector('.faq-question').textContent.replace(/^Q\s*/, '').trim() : '',
+      answer: item.querySelector('.faq-answer') ? item.querySelector('.faq-answer').textContent.trim() : ''
+    }));
+
+    return meta;
+  }
+
+  // --- UI Building ---
+  function buildSidebar() {
+    const container = document.getElementById('sidebar-sections');
+    container.innerHTML = '';
+
+    writerSections.forEach((sec, i) => {
+      const step = document.createElement('div');
+      step.className = 'sidebar-step' + (i === currentStep ? ' active' : '') + (sec.text.trim().length > 0 ? ' completed' : '');
+      step.onclick = () => goToStep(i);
+
+      const icon = document.createElement('div');
+      icon.className = 'sidebar-step-icon';
+      icon.textContent = sec.text.trim().length > 0 ? '\u2713' : (i + 1);
+
+      const label = document.createElement('div');
+      label.className = 'sidebar-step-label';
+      // Truncate long titles for sidebar
+      const shortTitle = sec.title.length > 22 ? sec.title.substring(0, 22) + '...' : sec.title;
+      label.textContent = shortTitle;
+
+      step.appendChild(icon);
+      step.appendChild(label);
+      container.appendChild(step);
+    });
+  }
+
+  function buildWriterContent(stepIndex) {
+    const sec = writerSections[stepIndex];
+    const container = document.getElementById('writer-content');
+
+    let html = '<div class="writer-section-header">';
+    html += '<div class="writer-section-tag">' + sec.tag + ' &middot; Section ' + (stepIndex + 1) + ' of ' + writerSections.length + '</div>';
+    html += '<div class="writer-section-title">' + escapeHtml(sec.title) + '</div>';
+    html += '<div class="writer-section-meta">';
+    html += '<span>Target: ' + sec.wordTarget + '</span>';
+    const wc = countWords(sec.text);
+    if (wc > 0) html += '<span>&middot; Current: ' + wc + ' words</span>';
+    html += '</div></div>';
+
+    // Content direction
+    if (sec.direction) {
+      html += '<div class="writer-ref-card direction">';
+      html += '<div class="writer-ref-label">Content Direction</div>';
+      html += '<ul>';
+      sec.direction.split('\n').forEach(line => {
+        if (line.trim()) html += '<li>' + escapeHtml(line.trim()) + '</li>';
+      });
+      html += '</ul></div>';
+    }
+
+    // Voice note
+    if (sec.voice) {
+      html += '<div class="writer-ref-card voice">';
+      html += '<div class="writer-ref-label">Voice Note</div>';
+      html += '<p>' + escapeHtml(sec.voice) + '</p></div>';
+    }
+
+    // Engineer marker
+    if (sec.marker) {
+      html += '<div class="writer-ref-card engineer">';
+      html += '<div class="writer-ref-label">&#9888; Engineer To Complete</div>';
+      html += '<p>' + escapeHtml(sec.marker) + '</p></div>';
+    }
+
+    // Text area
+    html += '<div class="writer-textarea-wrapper">';
+    html += '<div class="writer-textarea-label">Write your section below:</div>';
+    html += '<textarea class="writer-textarea" id="section-textarea" placeholder="Start writing here... The content direction above is your guide. Write in your own voice."';
+    html += ' oninput="onTextInput(this)">' + escapeHtml(sec.text) + '</textarea>';
+    html += '</div>';
+
+    // Word count bar
+    const pct = Math.min(100, Math.round((wc / sec.maxWords) * 100));
+    const wcClass = wc < sec.minWords ? 'low' : (wc <= sec.maxWords * 1.2 ? 'good' : 'over');
+    html += '<div class="word-count-bar">';
+    html += '<div class="word-count-display ' + wcClass + '">' + wc + ' / ' + sec.minWords + '-' + sec.maxWords + ' words</div>';
+    html += '<div class="word-count-progress"><div class="word-count-fill ' + wcClass + '" style="width:' + pct + '%"></div></div>';
+    html += '</div>';
+
+    // Navigation
+    html += '<div class="writer-nav">';
+    if (stepIndex > 0) {
+      html += '<button class="writer-nav-btn secondary" onclick="goToStep(' + (stepIndex - 1) + ')">&larr; Previous</button>';
+    } else {
+      html += '<div></div>';
+    }
+    if (stepIndex < writerSections.length - 1) {
+      html += '<button class="writer-nav-btn primary" onclick="saveAndNext()">Save &amp; Next &rarr;</button>';
+    } else {
+      html += '<button class="writer-nav-btn finish" onclick="finishWriting()">&#127881; Finish Draft</button>';
+    }
+    html += '</div>';
+
+    container.innerHTML = html;
+
+    // Focus textarea
+    setTimeout(() => {
+      const ta = document.getElementById('section-textarea');
+      if (ta && !sec.text) ta.focus();
+    }, 100);
+  }
+
+  // --- Actions ---
+  function enterWriterMode() {
+    writerSections = extractSections();
+    if (writerSections.length === 0) {
+      alert('Could not extract blog sections from the outline. Please check the HTML structure.');
+      return;
+    }
+
+    // Load saved progress
+    loadProgress();
+
+    // Hide pitch, show writer
+    document.getElementById('pitch-mode').style.display = 'none';
+    document.getElementById('writer-overlay').style.display = 'flex';
+    document.querySelector('.start-writing-btn').style.display = 'none';
+    writerActive = true;
+
+    // Find first incomplete section or start at 0
+    currentStep = writerSections.findIndex(s => !s.text.trim());
+    if (currentStep === -1) currentStep = 0;
+
+    buildSidebar();
+    buildWriterContent(currentStep);
+    updateWriterProgress();
+    startTimer();
+  }
+
+  function exitWriterMode() {
+    saveProgress();
+    stopTimer();
+    writerActive = false;
+
+    document.getElementById('writer-overlay').style.display = 'none';
+    document.getElementById('pitch-mode').style.display = '';
+    document.querySelector('.start-writing-btn').style.display = 'flex';
+  }
+
+  function goToStep(index) {
+    // Save current text first
+    const ta = document.getElementById('section-textarea');
+    if (ta) writerSections[currentStep].text = ta.value;
+
+    currentStep = index;
+    buildSidebar();
+    buildWriterContent(currentStep);
+    updateWriterProgress();
+    saveProgress();
+
+    // Scroll writer main to top
+    document.querySelector('.writer-main').scrollTop = 0;
+  }
+
+  function saveAndNext() {
+    const ta = document.getElementById('section-textarea');
+    if (ta) writerSections[currentStep].text = ta.value;
+
+    const hadText = writerSections[currentStep].text.trim().length > 0;
+
+    saveProgress();
+
+    if (hadText && currentStep < writerSections.length - 1) {
+      showCelebration(writerSections[currentStep].title);
+    }
+
+    if (currentStep < writerSections.length - 1) {
+      goToStep(currentStep + 1);
+    }
+  }
+
+  function finishWriting() {
+    const ta = document.getElementById('section-textarea');
+    if (ta) writerSections[currentStep].text = ta.value;
+    saveProgress();
+
+    // Check completion
+    const completed = writerSections.filter(s => s.text.trim().length > 0).length;
+    const total = writerSections.length;
+    const totalWords = writerSections.reduce((sum, s) => sum + countWords(s.text), 0);
+    const minutes = Math.round(timerSeconds / 60);
+
+    if (completed < total) {
+      const proceed = confirm('You have ' + (total - completed) + ' empty sections. Generate draft anyway?');
+      if (!proceed) return;
+    }
+
+    // Show completion overlay
+    document.getElementById('completion-time').textContent = minutes + ' minutes';
+    document.getElementById('completion-stats').innerHTML =
+      '<div class="export-stat"><div class="export-stat-number">' + completed + '/' + total + '</div><div class="export-stat-label">Sections</div></div>' +
+      '<div class="export-stat"><div class="export-stat-number">' + totalWords + '</div><div class="export-stat-label">Words</div></div>' +
+      '<div class="export-stat"><div class="export-stat-number">' + minutes + '</div><div class="export-stat-label">Minutes</div></div>';
+    document.getElementById('completion-overlay').style.display = 'flex';
+  }
+
+  function onTextInput(textarea) {
+    writerSections[currentStep].text = textarea.value;
+    const wc = countWords(textarea.value);
+    const sec = writerSections[currentStep];
+    const pct = Math.min(100, Math.round((wc / sec.maxWords) * 100));
+    const wcClass = wc < sec.minWords ? 'low' : (wc <= sec.maxWords * 1.2 ? 'good' : 'over');
+
+    const display = document.querySelector('.word-count-display');
+    const fill = document.querySelector('.word-count-fill');
+    if (display) {
+      display.textContent = wc + ' / ' + sec.minWords + '-' + sec.maxWords + ' words';
+      display.className = 'word-count-display ' + wcClass;
+    }
+    if (fill) {
+      fill.style.width = pct + '%';
+      fill.className = 'word-count-fill ' + wcClass;
+    }
+
+    // Debounced auto-save
+    clearTimeout(window._autoSaveTimeout);
+    window._autoSaveTimeout = setTimeout(() => {
+      saveProgress();
+      updateWriterProgress();
+      buildSidebar();
+      document.getElementById('autosave-status').textContent = 'Auto-saved just now';
+    }, 1500);
+  }
+
+  // --- Markdown Generation ---
+  function generateMarkdown() {
+    const meta = extractMeta();
+    let md = '';
+
+    md += '---\n';
+    md += 'title: "' + meta.title + '"\n';
+    if (meta.slug) md += 'slug: ' + meta.slug + '\n';
+    md += 'author: "[Your Name], [Title] at Praetorian"\n';
+    md += 'date: ' + new Date().toISOString().split('T')[0] + '\n';
+    md += 'category: vulnerability-research\n';
+    if (meta.keywords.length) md += 'tags: [' + meta.keywords.join(', ') + ']\n';
+    if (meta.description) md += 'meta_description: "' + meta.description + '"\n';
+    md += '---\n\n';
+
+    md += '# ' + meta.title + '\n\n';
+
+    writerSections.forEach(sec => {
+      md += '## ' + sec.title + '\n\n';
+      if (sec.text.trim()) {
+        md += sec.text.trim() + '\n\n';
+      } else {
+        md += '*[Section not yet written]*\n\n';
+      }
+    });
+
+    // FAQ
+    if (meta.faq && meta.faq.length > 0) {
+      md += '---\n\n## Frequently Asked Questions\n\n';
+      meta.faq.forEach(faq => {
+        md += '### ' + faq.question + '\n\n';
+        md += faq.answer + '\n\n';
+      });
+    }
+
+    md += '---\n\n';
+    md += '*[Author bio and CTA to be added by marketing]*\n';
+
+    return md;
+  }
+
+  function showExportModal() {
+    const md = generateMarkdown();
+    const completed = writerSections.filter(s => s.text.trim().length > 0).length;
+    const totalWords = writerSections.reduce((sum, s) => sum + countWords(s.text), 0);
+
+    document.getElementById('export-stats').innerHTML =
+      '<div class="export-stat"><div class="export-stat-number">' + completed + '/' + writerSections.length + '</div><div class="export-stat-label">Sections</div></div>' +
+      '<div class="export-stat"><div class="export-stat-number">' + totalWords + '</div><div class="export-stat-label">Total Words</div></div>' +
+      '<div class="export-stat"><div class="export-stat-number">' + Math.ceil(totalWords / 238) + '</div><div class="export-stat-label">Min Read</div></div>';
+
+    document.getElementById('export-preview').textContent = md;
+    document.getElementById('export-modal').style.display = 'flex';
+  }
+  function closeExportModal() { document.getElementById('export-modal').style.display = 'none'; }
+
+  function downloadMarkdown() {
+    const md = generateMarkdown();
+    const meta = extractMeta();
+    const slug = (meta.slug || 'blog-draft').replace(/^\/blog\//, '').replace(/[^a-z0-9-]/g, '-');
+    const blob = new Blob([md], { type: 'text/markdown' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = slug + '.md';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  function copyMarkdown() {
+    const md = generateMarkdown();
+    navigator.clipboard.writeText(md).then(() => {
+      const btn = event.target.closest('.export-btn');
+      if (btn) {
+        btn.classList.add('copied');
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<span>&#10003;</span> Copied!';
+        setTimeout(() => { btn.innerHTML = orig; btn.classList.remove('copied'); }, 2000);
+      }
+    });
+  }
+
+  // --- Celebration ---
+  function showCelebration(sectionTitle) {
+    const el = document.getElementById('celebration');
+    document.getElementById('celebration-text').textContent = '"' + sectionTitle + '" saved';
+    el.style.display = 'flex';
+    setTimeout(() => { el.style.display = 'none'; }, 800);
+  }
+
+  // --- Progress ---
+  function updateWriterProgress() {
+    const completed = writerSections.filter(s => s.text.trim().length > 0).length;
+    const total = writerSections.length;
+    const pct = total ? Math.round((completed / total) * 100) : 0;
+
+    document.getElementById('writer-progress-text').textContent = completed + ' / ' + total + ' sections';
+    document.getElementById('writer-progress-fill').style.width = pct + '%';
+  }
+
+  // --- Timer ---
+  function startTimer() {
+    const saved = localStorage.getItem(STORE_KEY + '-timer');
+    timerSeconds = saved ? parseInt(saved) : 0;
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      updateTimerDisplay();
+      if (timerSeconds % 30 === 0) localStorage.setItem(STORE_KEY + '-timer', timerSeconds);
+    }, 1000);
+  }
+  function stopTimer() {
+    clearInterval(timerInterval);
+    localStorage.setItem(STORE_KEY + '-timer', timerSeconds);
+  }
+  function updateTimerDisplay() {
+    const m = Math.floor(timerSeconds / 60);
+    const s = timerSeconds % 60;
+    document.getElementById('timer-display').textContent = m + ':' + (s < 10 ? '0' : '') + s;
+  }
+
+  // --- Persistence ---
+  function saveProgress() {
+    const data = writerSections.map(s => s.text);
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+  }
+  function loadProgress() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORE_KEY) || '[]');
+      saved.forEach((text, i) => {
+        if (writerSections[i]) writerSections[i].text = text;
+      });
+    } catch(e) {}
+  }
+  function saveAllProgress() {
+    const ta = document.getElementById('section-textarea');
+    if (ta) writerSections[currentStep].text = ta.value;
+    saveProgress();
+    document.getElementById('autosave-status').textContent = 'Saved!';
+    setTimeout(() => { document.getElementById('autosave-status').textContent = 'Auto-saved just now'; }, 2000);
+  }
+  function clearAllProgress() {
+    if (!confirm('This will erase all your writing progress. Are you sure?')) return;
+    localStorage.removeItem(STORE_KEY);
+    localStorage.removeItem(STORE_KEY + '-timer');
+    writerSections.forEach(s => s.text = '');
+    timerSeconds = 0;
+    currentStep = 0;
+    buildSidebar();
+    buildWriterContent(0);
+    updateWriterProgress();
+    updateTimerDisplay();
+  }
+
+  // --- Utilities ---
+  function countWords(text) {
+    return text.trim() ? text.trim().split(/\s+/).length : 0;
+  }
+  function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
+  }
+</script>

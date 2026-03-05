@@ -11,7 +11,7 @@
  */
 
 import { config } from './config.js';
-import { renderDigest } from './utils/template-renderer.js';
+import { renderDigest, renderDashboard } from './utils/template-renderer.js';
 import { readFile, writeFile } from 'fs/promises';
 import { join } from 'path';
 import { execSync } from 'child_process';
@@ -26,13 +26,15 @@ async function main() {
   const raw = await readFile(trackerPath, 'utf-8');
   const allCoverage = JSON.parse(raw);
 
-  // Filter: only "new" items unless --all flag
+  // Default: only items from Jan 1, 2026 onwards
+  // --all: include everything regardless of date
+  const cutoffDate = new Date('2026-01-01');
   const filtered = includeAll
-    ? allCoverage
+    ? allCoverage.filter(item => new Date(item.date) >= cutoffDate)
     : allCoverage.filter(item => item.status === 'new');
 
   if (filtered.length === 0) {
-    console.log('No items with status "new" found. Use --all to include all items.');
+    console.log('No items found since January 1, 2026. Use --all for all recent items.');
     console.log('Rendering empty state...\n');
   }
 
@@ -76,25 +78,31 @@ async function main() {
     console.log(`  [${item.sourceType}] ${item.title} (${item.source})`);
   }
 
-  // Render
+  // Render email
   console.log('\nRendering email...');
   const html = await renderDigest(items);
-
-  // Save preview
   const previewPath = join(config.paths.root, 'preview.html');
   await writeFile(previewPath, html);
   console.log(`Preview saved to: ${previewPath}`);
 
+  // Render interactive dashboard
+  console.log('Rendering dashboard...');
+  const dashboardHtml = await renderDashboard(items);
+  const dashboardPath = join(config.paths.root, 'dashboard.html');
+  await writeFile(dashboardPath, dashboardHtml);
+  console.log(`Dashboard saved to: ${dashboardPath}`);
+
   // Open in browser if --open flag
+  const openTarget = process.argv.includes('--dashboard') ? dashboardPath : previewPath;
   if (process.argv.includes('--open')) {
     try {
-      execSync(`open "${previewPath}"`);
-      console.log('Opened in browser.');
+      execSync(`open "${openTarget}"`);
+      console.log(`Opened ${openTarget === dashboardPath ? 'dashboard' : 'email preview'} in browser.`);
     } catch {
       console.log('Could not auto-open. Open the file manually.');
     }
   } else {
-    console.log('Run with --open to open in browser.');
+    console.log('Run with --open to open in browser, --dashboard --open for dashboard.');
   }
 }
 

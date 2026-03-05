@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Center — {{DATE_FORMATTED}}</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0D0D0D;
+      color: #FFFFFF;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+    .header { text-align: center; padding: 40px 0 32px; border-bottom: 3px solid #E63948; margin-bottom: 32px; }
+    .header-label { font-size: 10px; font-weight: 700; color: #E63948; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
+    .header-title { font-size: 32px; font-weight: 700; color: #FFF; margin-bottom: 6px; }
+    .header-date { font-size: 14px; color: #A0A4A8; }
+
+    /* ── Progress Bar ──────────────────────────────────── */
+    .progress-section { margin-bottom: 32px; }
+    .progress-stats { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .progress-label { font-size: 13px; font-weight: 600; color: #A0A4A8; }
+    .progress-pct { font-size: 28px; font-weight: 700; color: #34C759; }
+    .progress-track { width: 100%; height: 10px; background: #1F252A; border-radius: 5px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #E63948 0%, #D4AF37 40%, #34C759 100%); border-radius: 5px; transition: width 0.4s ease; }
+
+    /* ── Day Summary ───────────────────────────────────── */
+    .day-summary { background: #1F252A; border-left: 4px solid #E63948; padding: 16px 20px; border-radius: 8px; margin-bottom: 32px; font-size: 14px; line-height: 1.6; color: #A0A4A8; }
+
+    /* ── Sections ──────────────────────────────────────── */
+    .section { margin-bottom: 36px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #2A3038; margin-bottom: 16px; }
+    .section-title { font-size: 12px; font-weight: 700; color: #535B61; text-transform: uppercase; letter-spacing: 2px; }
+    .section-count { font-size: 11px; color: #535B61; }
+
+    /* ── Checklist Items ───────────────────────────────── */
+    .checklist-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #1F252A; border-radius: 8px; padding: 14px 18px;
+      margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+      border-left: 4px solid transparent;
+    }
+    .checklist-item:hover { background: #252C33; }
+    .checklist-item.checked { opacity: 0.5; }
+    .checklist-item.checked .item-title { text-decoration: line-through; color: #535B61; }
+    .checklist-item.priority-HIGH { border-left-color: #E63948; }
+    .checklist-item.priority-MEDIUM { border-left-color: #D4AF37; }
+    .checklist-item.priority-LOW { border-left-color: #34C759; }
+    .checklist-item.priority-custom { border-left-color: #11C3DB; }
+
+    .checkbox {
+      width: 22px; height: 22px; min-width: 22px; border: 2px solid #535B61;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all 0.2s;
+    }
+    .checked .checkbox { background: #34C759; border-color: #34C759; }
+    .checked .checkbox::after { content: '✓'; color: #0D0D0D; font-size: 13px; font-weight: 700; }
+
+    .item-content { flex: 1; min-width: 0; }
+    .item-title { font-size: 14px; font-weight: 500; color: #FFF; line-height: 1.4; }
+    .item-detail { font-size: 11px; color: #535B61; margin-top: 4px; line-height: 1.4; }
+    .item-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+    .badge {
+      display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .badge-high { color: #E63948; background: rgba(230,57,72,0.15); }
+    .badge-medium { color: #D4AF37; background: rgba(212,175,55,0.15); }
+    .badge-low { color: #34C759; background: rgba(52,199,89,0.15); }
+    .badge-source { color: #11C3DB; background: rgba(17,195,219,0.12); }
+    .badge-custom { color: #11C3DB; background: rgba(17,195,219,0.12); }
+
+    /* ── Calendar Timeline ─────────────────────────────── */
+    .timeline-item { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #1F252A; }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-time { width: 80px; text-align: right; font-size: 12px; color: #A0A4A8; white-space: nowrap; padding-top: 2px; }
+    .timeline-body { flex: 1; }
+    .timeline-title { font-size: 14px; font-weight: 600; color: #FFF; }
+    .timeline-subtitle { font-size: 11px; color: #535B61; margin-top: 3px; }
+    .timeline-free { font-size: 12px; color: #34C759; font-family: monospace; letter-spacing: 1px; }
+    .timeline-prep { background: #1F252A; border-left: 3px solid #D4AF37; padding: 10px 14px; border-radius: 6px; margin-top: 8px; }
+    .timeline-prep-label { font-size: 10px; font-weight: 700; color: #D4AF37; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+    .timeline-prep-text { font-size: 12px; color: #A0A4A8; line-height: 1.6; }
+
+    /* ── Add Task Form ─────────────────────────────────── */
+    .add-task-form {
+      display: flex; gap: 10px; align-items: center;
+      background: #1F252A; border-radius: 8px; padding: 10px 14px;
+      border: 1px dashed #2A3038; margin-top: 12px;
+    }
+    .add-task-form input[type="text"] {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-size: 14px; color: #FFF; font-family: inherit;
+    }
+    .add-task-form input::placeholder { color: #535B61; }
+    .add-task-form select {
+      background: #0D0D0D; border: 1px solid #2A3038; color: #A0A4A8;
+      font-size: 11px; padding: 5px 8px; border-radius: 6px; outline: none;
+    }
+    .add-task-btn {
+      background: #11C3DB; color: #0D0D0D; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 700; padding: 7px 16px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-task-btn:hover { background: #0EAAC0; }
+
+    /* ── Email Digest ──────────────────────────────────── */
+    .email-item {
+      background: #1F252A; border-radius: 6px; padding: 12px 16px;
+      margin-bottom: 6px; border-left: 3px solid #535B61;
+    }
+    .email-item.cat-action-required { border-left-color: #E63948; }
+    .email-item.cat-needs-reply { border-left-color: #D4AF37; }
+    .email-item.cat-fyi { border-left-color: #535B61; }
+    .email-item.cat-newsletter { border-left-color: #2A3038; }
+    .email-item.cat-automated { border-left-color: #2A3038; }
+    .email-from { font-size: 11px; color: #535B61; }
+    .email-subject { font-size: 13px; font-weight: 500; color: #FFF; margin-top: 3px; }
+    .email-summary { font-size: 11px; color: #A0A4A8; margin-top: 3px; line-height: 1.4; }
+
+    /* ── Linear Tickets ────────────────────────────────── */
+    .linear-item { background: #1F252A; border-radius: 6px; padding: 12px 16px; margin-bottom: 6px; }
+    .linear-header { display: flex; justify-content: space-between; align-items: center; }
+    .linear-id { font-size: 11px; font-weight: 700; color: #535B61; font-family: monospace; }
+    .linear-status { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; border: 1px solid; }
+    .linear-title { font-size: 13px; font-weight: 500; color: #FFF; margin-top: 5px; }
+
+    /* ── Keyboard hint ─────────────────────────────────── */
+    .keyboard-hint { text-align: center; font-size: 11px; color: #2A3038; padding: 32px 0 16px; }
+    kbd { background: #1F252A; padding: 2px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #2A3038; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-label">Morning Command Center</div>
+      <div class="header-title">Good Morning, Leonardo!</div>
+      <div class="header-date">{{DATE_FORMATTED}}</div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-stats">
+        <span class="progress-label"><span id="done-count">0</span> of <span id="total-count">0</span> tasks completed</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Day Summary -->
+    {{#IF_DAY_SUMMARY}}
+    <div class="day-summary">{{DAY_SUMMARY}}</div>
+    {{/IF_DAY_SUMMARY}}
+
+    <!-- Action Items Checklist -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#9889; Action Items</span>
+        <span class="section-count" id="actions-count"></span>
+      </div>
+      <div id="checklist-actions">
+        {{ACTION_CHECKLIST_ITEMS}}
+      </div>
+      <div class="add-task-form">
+        <input type="text" id="new-task-input" placeholder="Add a task..." />
+        <select id="new-task-priority">
+          <option value="HIGH">High</option>
+          <option value="MEDIUM" selected>Medium</option>
+          <option value="LOW">Low</option>
+        </select>
+        <button class="add-task-btn" onclick="addCustomTask()">Add</button>
+      </div>
+    </div>
+
+    <!-- Calendar Timeline -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128197; Today's Schedule</span>
+        <span class="section-count">{{DEEP_WORK_LABEL}}</span>
+      </div>
+      <div id="timeline">
+        {{CALENDAR_TIMELINE_ITEMS}}
+      </div>
+    </div>
+
+    <!-- Email Digest -->
+    {{#IF_EMAIL}}
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128233; Email Digest</span>
+        <span class="section-count">{{EMAIL_COUNT}} analyzed</span>
+      </div>
+      <div id="email-digest">
+        {{EMAIL_DIGEST_ITEMS}}
+      </div>
+    </div>
+    {{/IF_EMAIL}}
+
+    <!-- Linear Tickets -->
+    {{#IF_LINEAR}}
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128203; Linear Tickets</span>
+        <span class="section-count">{{LINEAR_COUNT}} active</span>
+      </div>
+      <div id="linear-tickets">
+        {{LINEAR_TICKET_ITEMS}}
+      </div>
+    </div>
+    {{/IF_LINEAR}}
+
+    <div class="keyboard-hint">
+      <kbd>Space</kbd> to check focused item &middot; <kbd>↑</kbd><kbd>↓</kbd> to navigate &middot; <kbd>N</kbd> to add task
+    </div>
+  </div>
+
+  <script>
+    // ── State Management ───────────────────────────────────
+    const STORAGE_KEY = 'mcc-checklist-{{DATE_KEY}}';
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch { return {}; }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // ── Checklist Logic ────────────────────────────────────
+    function toggleItem(id) {
+      const state = loadState();
+      state[id] = !state[id];
+      saveState(state);
+      renderCheckStates();
+    }
+
+    function renderCheckStates() {
+      const state = loadState();
+      const items = document.querySelectorAll('.checklist-item[data-id]');
+      let total = items.length;
+      let done = 0;
+
+      items.forEach(item => {
+        const id = item.dataset.id;
+        if (state[id]) {
+          item.classList.add('checked');
+          done++;
+        } else {
+          item.classList.remove('checked');
+        }
+      });
+
+      // Update progress
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('done-count').textContent = done;
+      document.getElementById('total-count').textContent = total;
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('progress-fill').style.width = pct + '%';
+
+      // Color the percentage
+      const pctEl = document.getElementById('progress-pct');
+      if (pct === 100) pctEl.style.color = '#34C759';
+      else if (pct >= 50) pctEl.style.color = '#D4AF37';
+      else pctEl.style.color = '#E63948';
+
+      document.getElementById('actions-count').textContent =
+        `${done}/${total} done`;
+    }
+
+    // ── Add Custom Task ────────────────────────────────────
+    let customTaskCounter = parseInt(localStorage.getItem(STORAGE_KEY + '-counter') || '0');
+
+    function addCustomTask() {
+      const input = document.getElementById('new-task-input');
+      const priority = document.getElementById('new-task-priority').value;
+      const title = input.value.trim();
+      if (!title) return;
+
+      customTaskCounter++;
+      localStorage.setItem(STORAGE_KEY + '-counter', String(customTaskCounter));
+
+      const id = 'custom-' + customTaskCounter;
+      const container = document.getElementById('checklist-actions');
+
+      const html = `
+        <div class="checklist-item priority-custom" data-id="${id}" onclick="toggleItem('${id}')">
+          <div class="checkbox"></div>
+          <div class="item-content">
+            <div class="item-title">${escapeHtml(title)}</div>
+            <div class="item-meta">
+              <span class="badge badge-${priority.toLowerCase()}">${priority}</span>
+              <span class="badge badge-custom">CUSTOM</span>
+            </div>
+          </div>
+        </div>`;
+
+      // Insert before the add form
+      const form = container.parentElement.querySelector('.add-task-form');
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      container.appendChild(temp.firstElementChild);
+
+      // Save the custom task
+      const customTasks = JSON.parse(localStorage.getItem(STORAGE_KEY + '-custom') || '[]');
+      customTasks.push({ id, title, priority });
+      localStorage.setItem(STORAGE_KEY + '-custom', JSON.stringify(customTasks));
+
+      input.value = '';
+      renderCheckStates();
+    }
+
+    function restoreCustomTasks() {
+      const customTasks = JSON.parse(localStorage.getItem(STORAGE_KEY + '-custom') || '[]');
+      const container = document.getElementById('checklist-actions');
+
+      customTasks.forEach(task => {
+        const html = `
+          <div class="checklist-item priority-custom" data-id="${task.id}" onclick="toggleItem('${task.id}')">
+            <div class="checkbox"></div>
+            <div class="item-content">
+              <div class="item-title">${escapeHtml(task.title)}</div>
+              <div class="item-meta">
+                <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
+                <span class="badge badge-custom">CUSTOM</span>
+              </div>
+            </div>
+          </div>`;
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        container.appendChild(temp.firstElementChild);
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Keyboard Navigation ────────────────────────────────
+    let focusedIndex = -1;
+    document.addEventListener('keydown', (e) => {
+      const items = [...document.querySelectorAll('.checklist-item[data-id]')];
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        focusedIndex = Math.min(focusedIndex + 1, items.length - 1);
+        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        items.forEach(i => i.style.outline = 'none');
+        items[focusedIndex].style.outline = '2px solid #11C3DB';
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        focusedIndex = Math.max(focusedIndex - 1, 0);
+        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        items.forEach(i => i.style.outline = 'none');
+        items[focusedIndex].style.outline = '2px solid #11C3DB';
+      } else if (e.key === ' ' && focusedIndex >= 0 && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        items[focusedIndex].click();
+      } else if (e.key === 'n' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        document.getElementById('new-task-input').focus();
+      }
+    });
+
+    // Enter key in input adds task
+    document.getElementById('new-task-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { addCustomTask(); }
+      if (e.key === 'Escape') { e.target.blur(); }
+    });
+
+    // ── Init ───────────────────────────────────────────────
+    restoreCustomTasks();
+    renderCheckStates();
+  </script>
+</body>
+</html>

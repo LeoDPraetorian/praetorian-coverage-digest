@@ -26,6 +26,13 @@ import { checkRssFeeds } from './monitors/rss-feeds.js';
 import { checkManualSubmissions } from './monitors/manual-submissions.js';
 import { renderDigest } from './utils/template-renderer.js';
 
+// Safety: kill process if it hasn't finished in 5 minutes
+const GLOBAL_TIMEOUT_MS = 5 * 60 * 1000;
+setTimeout(() => {
+  console.error('\nFATAL: Pipeline exceeded 5-minute safety timeout. Forcing exit.');
+  process.exit(2);
+}, GLOBAL_TIMEOUT_MS).unref();
+
 const isDryRun = process.argv.includes('--dry-run');
 
 async function main() {
@@ -275,7 +282,9 @@ function countByStatus(tracker) {
   return counts;
 }
 
-main().catch(err => {
+main().then(() => {
+  process.exit(0);
+}).catch(err => {
   console.error('\nFATAL:', err.message);
   process.exit(1);
 });

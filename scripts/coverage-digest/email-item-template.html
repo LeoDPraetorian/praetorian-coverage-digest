@@ -4,27 +4,59 @@
     <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
       <tr>
         <td>
-          <a href="{{ITEM_URL}}" style="font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;line-height:1.4;">{{ITEM_TITLE}}</a>
+          <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#1F252A;border-radius:6px;border-left:4px solid {{ITEM_ACCENT_COLOR}};">
+            <tr>
+              <td style="padding:14px 16px;">
+
+                <!-- Title -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0">
+                  <tr>
+                    <td>
+                      <a href="{{ITEM_URL}}" style="font-size:15px;font-weight:600;color:#FFFFFF;text-decoration:none;line-height:1.4;">{{ITEM_TITLE}}</a>
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Meta: source, date, tools -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+                  <tr>
+                    <td>
+                      <span style="font-size:12px;font-weight:600;color:#A0A4A8;">{{ITEM_SOURCE}}</span>
+                      <span style="font-size:12px;color:#535B61;">&nbsp;&middot;&nbsp;</span>
+                      <span style="font-size:12px;color:#535B61;">{{ITEM_DATE}}</span>
+                      {{#IF_TOOLS}}
+                      <span style="font-size:12px;color:#535B61;">&nbsp;&middot;&nbsp;</span>
+                      <span style="display:inline-block;font-size:10px;font-weight:700;color:{{ITEM_ACCENT_COLOR}};background-color:rgba(0,0,0,0.3);border:1px solid {{ITEM_ACCENT_COLOR}};padding:2px 8px;border-radius:3px;letter-spacing:0.5px;">{{ITEM_TOOLS}}</span>
+                      {{/IF_TOOLS}}
+                    </td>
+                  </tr>
+                </table>
+
+                <!-- Excerpt -->
+                {{#IF_EXCERPT}}
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:8px;">
+                  <tr>
+                    <td>
+                      <div style="font-size:13px;color:#A0A4A8;line-height:1.5;">{{ITEM_EXCERPT}}</div>
+                    </td>
+                  </tr>
+                </table>
+                {{/IF_EXCERPT}}
+
+                <!-- Read article link -->
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:10px;">
+                  <tr>
+                    <td>
+                      <a href="{{ITEM_URL}}" style="font-size:12px;font-weight:600;color:{{ITEM_ACCENT_COLOR}};text-decoration:none;">Read article &rarr;</a>
+                    </td>
+                  </tr>
+                </table>
+
+              </td>
+            </tr>
+          </table>
         </td>
       </tr>
-      <tr>
-        <td style="padding-top:6px;">
-          <span style="font-size:12px;font-weight:600;color:#A0A4A8;">{{ITEM_SOURCE}}</span>
-          <span style="font-size:12px;color:#535B61;">&nbsp;&middot;&nbsp;</span>
-          <span style="font-size:12px;color:#535B61;">{{ITEM_DATE}}</span>
-          {{#IF_TOOLS}}
-          <span style="font-size:12px;color:#535B61;">&nbsp;&middot;&nbsp;</span>
-          <span style="display:inline-block;font-size:10px;font-weight:700;color:#E63948;background-color:#2a1015;padding:2px 8px;border-radius:3px;letter-spacing:0.5px;">{{ITEM_TOOLS}}</span>
-          {{/IF_TOOLS}}
-        </td>
-      </tr>
-      {{#IF_EXCERPT}}
-      <tr>
-        <td style="padding-top:8px;">
-          <div style="font-size:13px;color:#A0A4A8;line-height:1.5;">{{ITEM_EXCERPT}}</div>
-        </td>
-      </tr>
-      {{/IF_EXCERPT}}
     </table>
   </td>
 </tr>

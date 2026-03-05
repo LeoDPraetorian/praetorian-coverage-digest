@@ -10,7 +10,7 @@
       "Brutus"
     ],
     "excerpt": "Praetorian released Brutus, a high-performance brute force tool supporting SSH, MySQL, PostgreSQL, Redis, MongoDB, SMB, and 20+ protocols.",
-    "status": "new",
+    "status": "sent",
     "amplification": {
       "linkedin_post": null,
       "slack_message": null,
@@ -32,7 +32,7 @@
       "Augustus"
     ],
     "excerpt": "Augustus is a comprehensive LLM security testing framework with 210+ adversarial attacks against 28 LLM providers.",
-    "status": "new",
+    "status": "sent",
     "amplification": {
       "linkedin_post": null,
       "slack_message": null,
@@ -159,7 +159,7 @@
       "Julius"
     ],
     "excerpt": "Julius detects 17+ AI platforms through active HTTP probing, built as a single Go binary.",
-    "status": "new",
+    "status": "sent",
     "amplification": {
       "linkedin_post": null,
       "slack_message": null,
@@ -181,7 +181,7 @@
       "Augustus"
     ],
     "excerpt": "Praetorian released Augustus, an open-source vulnerability scanner designed to secure large language models against adversarial threats.",
-    "status": "new",
+    "status": "sent",
     "amplification": {
       "linkedin_post": null,
       "slack_message": null,
