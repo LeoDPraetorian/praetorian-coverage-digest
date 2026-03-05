@@ -51,6 +51,7 @@ export function renderDigest(data) {
   html = replaceAll(html, '{{STAT_ACTIONS}}', String(actionItems.length || stats.actions || 0));
   html = replaceAll(html, '{{STAT_EMAILS}}', String(stats.emails || 0));
   html = replaceAll(html, '{{STAT_LINEAR}}', String(stats.linear || 0));
+  html = replaceAll(html, '{{DASHBOARD_URL}}', config.dashboardUrl || 'https://leodpraetorian.github.io/praetorian-coverage-digest/dashboard.html');
 
   // ── Day summary (bulleted by topic) ─────────────────────────────────────────
   if (daySummary) {

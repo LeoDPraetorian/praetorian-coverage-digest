@@ -15,6 +15,11 @@ on:
           - send
           - dry-run
 
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
 jobs:
   morning-digest:
     runs-on: ubuntu-latest
@@ -51,10 +56,29 @@ jobs:
             node run-digest.js
           fi
 
+      - name: Deploy dashboard to GitHub Pages
+        if: success()
+        run: |
+          mkdir -p pages
+          cp scripts/morning-digest/dashboard.html pages/index.html
+          cp scripts/morning-digest/dashboard.html pages/dashboard.html
+
+      - name: Upload Pages artifact
+        if: success()
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./pages
+
+      - name: Deploy to GitHub Pages
+        if: success()
+        uses: actions/deploy-pages@v4
+
       - name: Upload preview artifact
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: morning-digest-preview
-          path: scripts/morning-digest/preview.html
+          path: |
+            scripts/morning-digest/preview.html
+            scripts/morning-digest/dashboard.html
           retention-days: 7
