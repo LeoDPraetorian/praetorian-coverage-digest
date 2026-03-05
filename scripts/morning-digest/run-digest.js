@@ -170,6 +170,8 @@ async function main() {
   } else {
     console.log(`\n  Sending email to ${config.recipient}...`);
     await sendDigestEmail(html, subject);
+    console.log(`\n  Opening interactive dashboard...`);
+    execSync(`open "${dashboardPath}"`);
   }
 
   const elapsed = ((Date.now() - startTime) / 1000).toFixed(1);
