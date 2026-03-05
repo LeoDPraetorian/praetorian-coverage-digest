@@ -1,0 +1,782 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Center — Thursday, March 5, 2026</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0D0D0D;
+      color: #FFFFFF;
+      font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── Layout ─────────────────────────────────────────── */
+    .container { max-width: 900px; margin: 0 auto; padding: 32px 24px 64px; }
+    .header { text-align: center; padding: 40px 0 32px; border-bottom: 3px solid #E63948; margin-bottom: 32px; }
+    .header-label { font-size: 10px; font-weight: 700; color: #E63948; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 12px; }
+    .header-title { font-size: 32px; font-weight: 700; color: #FFF; margin-bottom: 6px; }
+    .header-date { font-size: 14px; color: #A0A4A8; }
+
+    /* ── Progress Bar ──────────────────────────────────── */
+    .progress-section { margin-bottom: 32px; }
+    .progress-stats { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+    .progress-label { font-size: 13px; font-weight: 600; color: #A0A4A8; }
+    .progress-pct { font-size: 28px; font-weight: 700; color: #34C759; }
+    .progress-track { width: 100%; height: 10px; background: #1F252A; border-radius: 5px; overflow: hidden; }
+    .progress-fill { height: 100%; background: linear-gradient(90deg, #E63948 0%, #D4AF37 40%, #34C759 100%); border-radius: 5px; transition: width 0.4s ease; }
+
+    /* ── Day Summary ───────────────────────────────────── */
+    .day-summary { background: #1F252A; border-left: 4px solid #E63948; padding: 16px 20px; border-radius: 8px; margin-bottom: 32px; font-size: 14px; line-height: 1.6; color: #A0A4A8; }
+
+    /* ── Sections ──────────────────────────────────────── */
+    .section { margin-bottom: 36px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid #2A3038; margin-bottom: 16px; }
+    .section-title { font-size: 12px; font-weight: 700; color: #535B61; text-transform: uppercase; letter-spacing: 2px; }
+    .section-count { font-size: 11px; color: #535B61; }
+
+    /* ── Checklist Items ───────────────────────────────── */
+    .checklist-item {
+      display: flex; align-items: flex-start; gap: 14px;
+      background: #1F252A; border-radius: 8px; padding: 14px 18px;
+      margin-bottom: 8px; cursor: pointer; transition: all 0.2s;
+      border-left: 4px solid transparent;
+    }
+    .checklist-item:hover { background: #252C33; }
+    .checklist-item.checked { opacity: 0.5; }
+    .checklist-item.checked .item-title { text-decoration: line-through; color: #535B61; }
+    .checklist-item.priority-HIGH { border-left-color: #E63948; }
+    .checklist-item.priority-MEDIUM { border-left-color: #D4AF37; }
+    .checklist-item.priority-LOW { border-left-color: #34C759; }
+    .checklist-item.priority-custom { border-left-color: #11C3DB; }
+
+    .checkbox {
+      width: 22px; height: 22px; min-width: 22px; border: 2px solid #535B61;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      margin-top: 1px; transition: all 0.2s;
+    }
+    .checked .checkbox { background: #34C759; border-color: #34C759; }
+    .checked .checkbox::after { content: '✓'; color: #0D0D0D; font-size: 13px; font-weight: 700; }
+
+    .item-content { flex: 1; min-width: 0; }
+    .item-title { font-size: 14px; font-weight: 500; color: #FFF; line-height: 1.4; }
+    .item-detail { font-size: 11px; color: #535B61; margin-top: 4px; line-height: 1.4; }
+    .item-meta { display: flex; gap: 8px; margin-top: 6px; flex-wrap: wrap; }
+
+    .badge {
+      display: inline-block; font-size: 9px; font-weight: 700; padding: 2px 8px;
+      border-radius: 10px; letter-spacing: 1px; text-transform: uppercase;
+    }
+    .badge-high { color: #E63948; background: rgba(230,57,72,0.15); }
+    .badge-medium { color: #D4AF37; background: rgba(212,175,55,0.15); }
+    .badge-low { color: #34C759; background: rgba(52,199,89,0.15); }
+    .badge-source { color: #11C3DB; background: rgba(17,195,219,0.12); }
+    .badge-custom { color: #11C3DB; background: rgba(17,195,219,0.12); }
+
+    /* ── Calendar Timeline ─────────────────────────────── */
+    .timeline-item { display: flex; gap: 16px; padding: 12px 0; border-bottom: 1px solid #1F252A; }
+    .timeline-item:last-child { border-bottom: none; }
+    .timeline-time { width: 80px; text-align: right; font-size: 12px; color: #A0A4A8; white-space: nowrap; padding-top: 2px; }
+    .timeline-body { flex: 1; }
+    .timeline-title { font-size: 14px; font-weight: 600; color: #FFF; }
+    .timeline-subtitle { font-size: 11px; color: #535B61; margin-top: 3px; }
+    .timeline-free { font-size: 12px; color: #34C759; font-family: monospace; letter-spacing: 1px; }
+    .timeline-prep { background: #1F252A; border-left: 3px solid #D4AF37; padding: 10px 14px; border-radius: 6px; margin-top: 8px; }
+    .timeline-prep-label { font-size: 10px; font-weight: 700; color: #D4AF37; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 6px; }
+    .timeline-prep-text { font-size: 12px; color: #A0A4A8; line-height: 1.6; }
+
+    /* ── Add Task Form ─────────────────────────────────── */
+    .add-task-form {
+      display: flex; gap: 10px; align-items: center;
+      background: #1F252A; border-radius: 8px; padding: 10px 14px;
+      border: 1px dashed #2A3038; margin-top: 12px;
+    }
+    .add-task-form input[type="text"] {
+      flex: 1; background: transparent; border: none; outline: none;
+      font-size: 14px; color: #FFF; font-family: inherit;
+    }
+    .add-task-form input::placeholder { color: #535B61; }
+    .add-task-form select {
+      background: #0D0D0D; border: 1px solid #2A3038; color: #A0A4A8;
+      font-size: 11px; padding: 5px 8px; border-radius: 6px; outline: none;
+    }
+    .add-task-btn {
+      background: #11C3DB; color: #0D0D0D; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 700; padding: 7px 16px; cursor: pointer;
+      transition: background 0.2s;
+    }
+    .add-task-btn:hover { background: #0EAAC0; }
+
+    /* ── Email Digest ──────────────────────────────────── */
+    .email-item {
+      background: #1F252A; border-radius: 6px; padding: 12px 16px;
+      margin-bottom: 6px; border-left: 3px solid #535B61;
+    }
+    .email-item.cat-action-required { border-left-color: #E63948; }
+    .email-item.cat-needs-reply { border-left-color: #D4AF37; }
+    .email-item.cat-fyi { border-left-color: #535B61; }
+    .email-item.cat-newsletter { border-left-color: #2A3038; }
+    .email-item.cat-automated { border-left-color: #2A3038; }
+    .email-from { font-size: 11px; color: #535B61; }
+    .email-subject { font-size: 13px; font-weight: 500; color: #FFF; margin-top: 3px; }
+    .email-summary { font-size: 11px; color: #A0A4A8; margin-top: 3px; line-height: 1.4; }
+
+    /* ── Linear Tickets ────────────────────────────────── */
+    .linear-item { background: #1F252A; border-radius: 6px; padding: 12px 16px; margin-bottom: 6px; }
+    .linear-header { display: flex; justify-content: space-between; align-items: center; }
+    .linear-id { font-size: 11px; font-weight: 700; color: #535B61; font-family: monospace; }
+    .linear-status { font-size: 10px; font-weight: 600; padding: 3px 8px; border-radius: 10px; border: 1px solid; }
+    .linear-title { font-size: 13px; font-weight: 500; color: #FFF; margin-top: 5px; }
+
+    /* ── Keyboard hint ─────────────────────────────────── */
+    .keyboard-hint { text-align: center; font-size: 11px; color: #2A3038; padding: 32px 0 16px; }
+    kbd { background: #1F252A; padding: 2px 6px; border-radius: 4px; font-size: 10px; border: 1px solid #2A3038; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <div class="header-label">Morning Command Center</div>
+      <div class="header-title">Good Morning, Leonardo!</div>
+      <div class="header-date">Thursday, March 5, 2026</div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section">
+      <div class="progress-stats">
+        <span class="progress-label"><span id="done-count">0</span> of <span id="total-count">0</span> tasks completed</span>
+        <span class="progress-pct" id="progress-pct">0%</span>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <!-- Day Summary -->
+    
+    <div class="day-summary"><div style="display:flex;gap:10px;margin-bottom:8px;"><span style="color:#E63948;font-size:16px;line-height:1.2;">&#8226;</span><span>Top priority today is advancing the April 1 compensation cycle — finalize decisions in Pave (PEO-196) and update Growth Plans in Rippling (PEO-198) before these become blockers.</span></div><div style="display:flex;gap:10px;margin-bottom:8px;"><span style="color:#E63948;font-size:16px;line-height:1.2;">&#8226;</span><span>Key meetings include a pre-sync with Lucas Nguyen on n8n at 11:30 AM, the Automation War Room at noon, and the Rippling Feedback App vendor demo at 2:00 PM — all require focused preparation.</span></div><div style="display:flex;gap:10px;margin-bottom:8px;"><span style="color:#E63948;font-size:16px;line-height:1.2;">&#8226;</span><span>The 2 overdue Rippling tasks and Casey Hofmann&#39;s 401(k) callback are the most time-sensitive personal action items that need to be resolved early in the day.</span></div><div style="display:flex;gap:10px;margin-bottom:8px;"><span style="color:#E63948;font-size:16px;line-height:1.2;">&#8226;</span><span>Strategically, today is heavy on automation and people-systems work — the n8n sessions and Rippling demo both feed into longer-term retention and ops efficiency goals.</span></div></div>
+    
+
+    <!-- Action Items Checklist -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#9889; Action Items</span>
+        <span class="section-count" id="actions-count"></span>
+      </div>
+      <div id="checklist-actions">
+        <div class="checklist-item priority-HIGH" data-id="action-0" onclick="toggleItem('action-0')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Call Casey Hofmann back to help them complete their 401(k) setup with Fidelity.</div>
+        <div class="item-detail">Casey M. Hofmann emailed directly asking Leonardo to call — they hit a blocker with Fidelity during 401(k) setup. Direct personal request requiring a response.</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-HIGH" data-id="action-1" onclick="toggleItem('action-1')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Review and respond to the Mike Piotrowski email thread regarding the Block laptop return.</div>
+        <div class="item-detail">Leonardo is CC&#39;d on a thread involving Mike Piotrowski, Ian Herzing, and Jay Johnston about a laptop return for ian.nespolo17@gmail.com — likely an offboarding or equipment recovery issue relevant to ops.</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-HIGH" data-id="action-2" onclick="toggleItem('action-2')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Complete the 1 new and 2 overdue tasks flagged in Rippling before today&#39;s Rippling Feedback App meeting.</div>
+        <div class="item-detail">Rippling sent a direct action-required notification to Leonardo flagging 1 new and 2 overdue Praetorian tasks — overdue items should be resolved before the 2:00 PM vendor demo.</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-HIGH" data-id="action-3" onclick="toggleItem('action-3')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Prepare for the Rippling Feedback App demo at 2:00 PM and evaluate the module against PEO-283 objectives.</div>
+        <div class="item-detail">Meeting with marango@rippling.com at 2:00–2:30 PM. Directly tied to Linear ticket PEO-283 (Attend Demo for New Rippling Feedback Module, High priority, In Progress).</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📅 calendar</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-HIGH" data-id="action-4" onclick="toggleItem('action-4')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Advance compensation decisions in Pave as part of the April 1 compensation cycle (PEO-196, PEO-199).</div>
+        <div class="item-detail">PEO-196 (Finalize Compensation Decisions in Pave) is In Progress and PEO-199 (Process Compensation Changes for April 1) is Todo — April 1 deadline is 27 days out, making this week critical for finalization.</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📋 linear</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-HIGH" data-id="action-5" onclick="toggleItem('action-5')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Update Growth Plans and Goals in Rippling to unblock the compensation cycle (PEO-198).</div>
+        <div class="item-detail">PEO-198 is High priority and Todo — likely a dependency for PEO-196 and PEO-199. Should be addressed this week given the April 1 deadline.</div>
+        <div class="item-meta">
+          <span class="badge badge-high">HIGH</span>
+          <span class="badge badge-source">📋 linear</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-MEDIUM" data-id="action-6" onclick="toggleItem('action-6')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Review the Google Cloud billing alert and determine if the budget needs to be increased or spend reduced.</div>
+        <div class="item-detail">Google Cloud Billing Alerts sent a 90%-of-budget warning to ap@praetorian.com — as a senior ops leader, Leonardo should be aware and confirm whether action is needed before the budget is exceeded.</div>
+        <div class="item-meta">
+          <span class="badge badge-medium">MEDIUM</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-MEDIUM" data-id="action-7" onclick="toggleItem('action-7')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Prepare automation talking points and updates for the Automation War Room at 12:00 PM.</div>
+        <div class="item-detail">Weekly sync with Axel Tuxen, Ian Herzing, Sam Jung, Andrea Carranza, and Michael Jordan. OPS-352 (Automate PTO Request Processing via Rippling → Kantata → Jira) is In Progress and directly relevant — bring a status update.</div>
+        <div class="item-meta">
+          <span class="badge badge-medium">MEDIUM</span>
+          <span class="badge badge-source">📅 calendar</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-MEDIUM" data-id="action-8" onclick="toggleItem('action-8')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Align with Lucas Nguyen on n8n automation work at 11:30 AM and surface any blockers.</div>
+        <div class="item-detail">30-minute 1:1 with Lucas Nguyen immediately before the Automation War Room — good opportunity to sync on OPS-352 progress and any shared n8n workflows ahead of the group session.</div>
+        <div class="item-meta">
+          <span class="badge badge-medium">MEDIUM</span>
+          <span class="badge badge-source">📅 calendar</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-MEDIUM" data-id="action-9" onclick="toggleItem('action-9')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Review the Nathan Sportman DocuSign activity on the Ted Johansson Repurchase document.</div>
+        <div class="item-detail">Leonardo received a DocuSign notification that Nathan Sportman viewed the Ted Johansson Repurchase document on 3/4/2026 — confirm whether next steps or signatures are pending.</div>
+        <div class="item-meta">
+          <span class="badge badge-medium">MEDIUM</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+<div class="checklist-item priority-LOW" data-id="action-10" onclick="toggleItem('action-10')">
+      <div class="checkbox"></div>
+      <div class="item-content">
+        <div class="item-title">Check whether the two Ramp bill payments for Myriam Jaidi (#1154 and #1155) are expected and accurate.</div>
+        <div class="item-detail">Two separate Ramp bill payment notifications were sent directly to Leonardo — quick sanity check to confirm both payments are legitimate and correctly authorized.</div>
+        <div class="item-meta">
+          <span class="badge badge-low">LOW</span>
+          <span class="badge badge-source">📧 email</span>
+        </div>
+      </div>
+    </div>
+      </div>
+      <div class="add-task-form">
+        <input type="text" id="new-task-input" placeholder="Add a task..." />
+        <select id="new-task-priority">
+          <option value="HIGH">High</option>
+          <option value="MEDIUM" selected>Medium</option>
+          <option value="LOW">Low</option>
+        </select>
+        <button class="add-task-btn" onclick="addCustomTask()">Add</button>
+      </div>
+    </div>
+
+    <!-- Calendar Timeline -->
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128197; Today's Schedule</span>
+        <span class="section-count">6h 15m deep work</span>
+      </div>
+      <div id="timeline">
+        <div class="timeline-item">
+      <div class="timeline-time">9:30 AM – 10:45 AM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">Admin</div>
+        
+        
+      </div>
+    </div>
+<div class="timeline-item">
+      <div class="timeline-time">11:30 AM – 12:00 PM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">Leonardo / Lucas N8N</div>
+        <div class="timeline-subtitle">2 attendees</div>
+        <div class="timeline-prep">
+          <div class="timeline-prep-label">Meeting Prep</div>
+          <div class="timeline-prep-text">• Review current status of OPS-352 (Automate PTO Request Processing: Rippling → Kantata → Jira) to share progress and surface blockers with Lucas.
+• Identify any n8n workflow dependencies or handoffs needed before the Automation War Room immediately following at 12:00 PM.
+• Come with a prioritized list of automation ideas or issues so the 30 minutes can be used efficiently as a pre-sync.</div>
+        </div>
+      </div>
+    </div>
+<div class="timeline-item">
+      <div class="timeline-time">12:00 PM – 12:30 PM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">Automation War Room</div>
+        <div class="timeline-subtitle">14 attendees</div>
+        <div class="timeline-prep">
+          <div class="timeline-prep-label">Meeting Prep</div>
+          <div class="timeline-prep-text">• Bring a status update on OPS-352 (PTO automation skill) — note what&#39;s working across Rippling, Kantata, and Jira and what remains to be built or tested.
+• Be ready to contribute brainstorm items for new automation opportunities; review any recent manual processes that could be offloaded to n8n.
+• Coordinate with Ian Herzing, who is also involved in the Block laptop return thread, if there&#39;s any overlap with ops automation needs.</div>
+        </div>
+      </div>
+    </div>
+<div class="timeline-item">
+      <div class="timeline-time">12:30 PM – 1:00 PM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">optional - Claude Skills Uplift Office Hours Huddle</div>
+        <div class="timeline-subtitle">3 attendees</div>
+        
+      </div>
+    </div>
+<div class="timeline-item">
+        <div class="timeline-time">8:00 AM</div>
+        <div class="timeline-body">
+          <div class="timeline-free">░░ FREE — 1h 30m ░░</div>
+        </div>
+      </div>
+<div class="timeline-item">
+      <div class="timeline-time">2:00 PM – 2:30 PM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">Praetorian | Rippling Feedback App</div>
+        <div class="timeline-subtitle">2 attendees</div>
+        <div class="timeline-prep">
+          <div class="timeline-prep-label">Meeting Prep</div>
+          <div class="timeline-prep-text">• This demo directly maps to PEO-283 (Attend Demo for New Rippling Feedback Module, High/In Progress) — arrive with evaluation criteria aligned to PEO-138 (Retention System Rebuild) goals around performance feedback and A-Player identification.
+• Resolve the 2 overdue Rippling tasks flagged this morning before the call so there&#39;s no distraction or open items during the vendor conversation.
+• Prepare questions about the feedback module&#39;s configurability, integration with existing Rippling workflows, and timeline for deployment.</div>
+        </div>
+      </div>
+    </div>
+<div class="timeline-item">
+      <div class="timeline-time">2:30 PM – 3:00 PM</div>
+      <div class="timeline-body">
+        <div class="timeline-title">Weekly Vulnerability Show and Tell</div>
+        <div class="timeline-subtitle">3 attendees</div>
+        
+      </div>
+    </div>
+<div class="timeline-item">
+        <div class="timeline-time">10:45 AM</div>
+        <div class="timeline-body">
+          <div class="timeline-free">░░ FREE — 45m ░░</div>
+        </div>
+      </div>
+<div class="timeline-item">
+        <div class="timeline-time">1:00 PM</div>
+        <div class="timeline-body">
+          <div class="timeline-free">░░ FREE — 1h ░░</div>
+        </div>
+      </div>
+<div class="timeline-item">
+        <div class="timeline-time">3:00 PM</div>
+        <div class="timeline-body">
+          <div class="timeline-free">░░ FREE — 3h ░░</div>
+        </div>
+      </div>
+      </div>
+    </div>
+
+    <!-- Email Digest -->
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128233; Email Digest</span>
+        <span class="section-count">20 analyzed</span>
+      </div>
+      <div id="email-digest">
+        <div class="email-item cat-action-required">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚠ ACTION</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Rippling</span>
+      </div>
+      <div class="email-subject">Action required: 1 new, 2 overdue Praetorian tasks</div>
+      <div class="email-summary">Rippling is flagging 1 new and 2 overdue tasks assigned to Leonardo — these should be completed as soon as possible, ideally before today&#39;s Rippling demo at 2:00 PM.</div>
+    </div>
+<div class="email-item cat-needs-reply">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">↩ REPLY</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Casey M. Hofmann</span>
+      </div>
+      <div class="email-subject">Re: Information About Your Praetorian Security, Inc. 401(k) Plan Account</div>
+      <div class="email-summary">Casey Hofmann is asking Leonardo to call them after hitting a blocker with Fidelity while trying to set up their 401(k) plan — a callback is needed.</div>
+    </div>
+<div class="email-item cat-fyi">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">ℹ FYI</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Docusign via Docusign</span>
+      </div>
+      <div class="email-subject">Nathan Sportman viewed Complete with Docusign: Ted Johansson Repurchase</div>
+      <div class="email-summary">Nathan Sportman opened and viewed the Ted Johansson Repurchase DocuSign document on 3/4/2026 — Leonardo should confirm whether any follow-up signatures or next steps are pending.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Adobe Acrobat</span>
+      </div>
+      <div class="email-subject">Listen to your docs and retain more</div>
+      <div class="email-summary">Marketing email from Adobe promoting a document audio feature — no action required.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Wondr</span>
+      </div>
+      <div class="email-subject">Your benefit from BCBSTX is waiting</div>
+      <div class="email-summary">BCBSTX-linked wellness benefit invitation from Wondr Health — no immediate action required, Leonardo may review at his discretion.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Glassdoor</span>
+      </div>
+      <div class="email-subject">One login to connect Glassdoor and Indeed</div>
+      <div class="email-summary">Glassdoor is prompting Leonardo to link his Glassdoor and Indeed accounts — no action required.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">PitchBook News</span>
+      </div>
+      <div class="email-subject">AI promise vs. proof</div>
+      <div class="email-summary">PitchBook&#39;s newsletter covering AI trends — read at Leonardo&#39;s discretion, no action required.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Namely</span>
+      </div>
+      <div class="email-subject">Tell Us How We&#39;re Doing!</div>
+      <div class="email-summary">Namely satisfaction survey — optional feedback, no action required.</div>
+    </div>
+<div class="email-item cat-newsletter">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">📰 NEWS</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">NotebookLM</span>
+      </div>
+      <div class="email-subject">Feature Unlock: The latest from NotebookLM has arrived</div>
+      <div class="email-summary">Google NotebookLM announcing new features — informational, no action required.</div>
+    </div>
+<div class="email-item cat-automated">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚙ AUTO</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Ramp</span>
+      </div>
+      <div class="email-subject">Bill payment initiated: Myriam Jaidi #1154</div>
+      <div class="email-summary">Ramp notification that a bill payment for Myriam Jaidi (#1154) has been initiated — Leonardo should verify this payment is expected.</div>
+    </div>
+<div class="email-item cat-automated">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚙ AUTO</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Ramp</span>
+      </div>
+      <div class="email-subject">Bill payment initiated: Myriam Jaidi #1155</div>
+      <div class="email-summary">Ramp notification that a second bill payment for Myriam Jaidi (#1155) has been initiated — Leonardo should confirm both #1154 and #1155 are authorized.</div>
+    </div>
+<div class="email-item cat-automated">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚙ AUTO</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">no-reply@elevate.inc</span>
+      </div>
+      <div class="email-subject">Replenishment Invoice ready</div>
+      <div class="email-summary">A replenishment invoice has been generated via Rippling/Elevate — likely a benefits or payroll-related charge, may be worth a quick review.</div>
+    </div>
+<div class="email-item cat-automated">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚙ AUTO</span>
+        <span class="badge" style="color:#11C3DB;background:rgba(17,195,219,0.15);margin-left:6px;">TO YOU</span>
+        <span class="email-from" style="margin-left:8px;">Morning Command Center</span>
+      </div>
+      <div class="email-subject">Morning Command Center — Thursday, March 5, 2026</div>
+      <div class="email-summary">Leonardo&#39;s own automated daily briefing email — superseded by this briefing, no separate action needed.</div>
+    </div>
+<div class="email-item cat-action-required">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚠ ACTION</span>
+        
+        <span class="email-from" style="margin-left:8px;">Google Cloud Billing Alerts via Accounts Payable</span>
+      </div>
+      <div class="email-subject">[ap] 90% of budget reached</div>
+      <div class="email-summary">Google Cloud has reached 90% of a billing budget threshold — ops leadership should review whether to increase the budget or reduce spend before it is exceeded.</div>
+    </div>
+<div class="email-item cat-action-required">
+      <div>
+        <span class="badge" style="color:#A0A4A8;background:rgba(0,0,0,0.3);">⚠ ACTION</span>
+        
+        <span class="email-from" style="margin-left:8px;">Mike Piotrowski</span>
+      </div>
+      <div class="email-subject">Re: Praetorian Follow Up - Block Laptop Return</div>
+      <div class="email-summary">Mike Piotrowski is following up on a laptop return involving Ian Nespolo (personal Gmail) with Ian Herzing and Jay Johnston also copied — Leonardo should review and determine if any ops action is needed on his end.</div>
+    </div>
+      </div>
+    </div>
+    
+
+    <!-- Linear Tickets -->
+    
+    <div class="section">
+      <div class="section-header">
+        <span class="section-title">&#128203; Linear Tickets</span>
+        <span class="section-count">8 active</span>
+      </div>
+      <div id="linear-tickets">
+        <div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-283</span>
+        <span class="linear-status" style="color:#11C3DB;border-color:#11C3DB;">In Progress</span>
+      </div>
+      <div class="linear-title">Attend Demo for New Rippling Feedback Module</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-138</span>
+        <span class="linear-status" style="color:#11C3DB;border-color:#11C3DB;">In Progress</span>
+      </div>
+      <div class="linear-title">Retention System Rebuild</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-198</span>
+        <span class="linear-status" style="color:#535B61;border-color:#535B61;">Todo</span>
+      </div>
+      <div class="linear-title">Update Growth Plans &amp; Goals in Rippling</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-196</span>
+        <span class="linear-status" style="color:#11C3DB;border-color:#11C3DB;">In Progress</span>
+      </div>
+      <div class="linear-title">Finalize Compensation Decisions in Pave</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-199</span>
+        <span class="linear-status" style="color:#535B61;border-color:#535B61;">Todo</span>
+      </div>
+      <div class="linear-title">Process Compensation Changes for April 1</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-200</span>
+        <span class="linear-status" style="color:#535B61;border-color:#535B61;">Todo</span>
+      </div>
+      <div class="linear-title">Post-Cycle Review, Analysis, &amp; Documentation</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">PEO-292</span>
+        <span class="linear-status" style="color:#11C3DB;border-color:#11C3DB;">In Progress</span>
+      </div>
+      <div class="linear-title">Collect and verify GitHub usernames as system of record in Rippling</div>
+    </div>
+<div class="linear-item">
+      <div class="linear-header">
+        <span class="linear-id">OPS-352</span>
+        <span class="linear-status" style="color:#11C3DB;border-color:#11C3DB;">In Progress</span>
+      </div>
+      <div class="linear-title">Automate PTO Request Processing (Rippling → Kantata → Jira)</div>
+    </div>
+      </div>
+    </div>
+    
+
+    <div class="keyboard-hint">
+      <kbd>Space</kbd> to check focused item &middot; <kbd>↑</kbd><kbd>↓</kbd> to navigate &middot; <kbd>N</kbd> to add task
+    </div>
+  </div>
+
+  <script>
+    // ── State Management ───────────────────────────────────
+    const STORAGE_KEY = 'mcc-checklist-2026-03-05';
+
+    function loadState() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || {};
+      } catch { return {}; }
+    }
+
+    function saveState(state) {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    // ── Checklist Logic ────────────────────────────────────
+    function toggleItem(id) {
+      const state = loadState();
+      state[id] = !state[id];
+      saveState(state);
+      renderCheckStates();
+    }
+
+    function renderCheckStates() {
+      const state = loadState();
+      const items = document.querySelectorAll('.checklist-item[data-id]');
+      let total = items.length;
+      let done = 0;
+
+      items.forEach(item => {
+        const id = item.dataset.id;
+        if (state[id]) {
+          item.classList.add('checked');
+          done++;
+        } else {
+          item.classList.remove('checked');
+        }
+      });
+
+      // Update progress
+      const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+      document.getElementById('done-count').textContent = done;
+      document.getElementById('total-count').textContent = total;
+      document.getElementById('progress-pct').textContent = pct + '%';
+      document.getElementById('progress-fill').style.width = pct + '%';
+
+      // Color the percentage
+      const pctEl = document.getElementById('progress-pct');
+      if (pct === 100) pctEl.style.color = '#34C759';
+      else if (pct >= 50) pctEl.style.color = '#D4AF37';
+      else pctEl.style.color = '#E63948';
+
+      document.getElementById('actions-count').textContent =
+        `${done}/${total} done`;
+    }
+
+    // ── Add Custom Task ────────────────────────────────────
+    let customTaskCounter = parseInt(localStorage.getItem(STORAGE_KEY + '-counter') || '0');
+
+    function addCustomTask() {
+      const input = document.getElementById('new-task-input');
+      const priority = document.getElementById('new-task-priority').value;
+      const title = input.value.trim();
+      if (!title) return;
+
+      customTaskCounter++;
+      localStorage.setItem(STORAGE_KEY + '-counter', String(customTaskCounter));
+
+      const id = 'custom-' + customTaskCounter;
+      const container = document.getElementById('checklist-actions');
+
+      const html = `
+        <div class="checklist-item priority-custom" data-id="${id}" onclick="toggleItem('${id}')">
+          <div class="checkbox"></div>
+          <div class="item-content">
+            <div class="item-title">${escapeHtml(title)}</div>
+            <div class="item-meta">
+              <span class="badge badge-${priority.toLowerCase()}">${priority}</span>
+              <span class="badge badge-custom">CUSTOM</span>
+            </div>
+          </div>
+        </div>`;
+
+      // Insert before the add form
+      const form = container.parentElement.querySelector('.add-task-form');
+      const temp = document.createElement('div');
+      temp.innerHTML = html;
+      container.appendChild(temp.firstElementChild);
+
+      // Save the custom task
+      const customTasks = JSON.parse(localStorage.getItem(STORAGE_KEY + '-custom') || '[]');
+      customTasks.push({ id, title, priority });
+      localStorage.setItem(STORAGE_KEY + '-custom', JSON.stringify(customTasks));
+
+      input.value = '';
+      renderCheckStates();
+    }
+
+    function restoreCustomTasks() {
+      const customTasks = JSON.parse(localStorage.getItem(STORAGE_KEY + '-custom') || '[]');
+      const container = document.getElementById('checklist-actions');
+
+      customTasks.forEach(task => {
+        const html = `
+          <div class="checklist-item priority-custom" data-id="${task.id}" onclick="toggleItem('${task.id}')">
+            <div class="checkbox"></div>
+            <div class="item-content">
+              <div class="item-title">${escapeHtml(task.title)}</div>
+              <div class="item-meta">
+                <span class="badge badge-${task.priority.toLowerCase()}">${task.priority}</span>
+                <span class="badge badge-custom">CUSTOM</span>
+              </div>
+            </div>
+          </div>`;
+        const temp = document.createElement('div');
+        temp.innerHTML = html;
+        container.appendChild(temp.firstElementChild);
+      });
+    }
+
+    function escapeHtml(str) {
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+
+    // ── Keyboard Navigation ────────────────────────────────
+    let focusedIndex = -1;
+    document.addEventListener('keydown', (e) => {
+      const items = [...document.querySelectorAll('.checklist-item[data-id]')];
+      if (!items.length) return;
+
+      if (e.key === 'ArrowDown' || e.key === 'j') {
+        e.preventDefault();
+        focusedIndex = Math.min(focusedIndex + 1, items.length - 1);
+        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        items.forEach(i => i.style.outline = 'none');
+        items[focusedIndex].style.outline = '2px solid #11C3DB';
+      } else if (e.key === 'ArrowUp' || e.key === 'k') {
+        e.preventDefault();
+        focusedIndex = Math.max(focusedIndex - 1, 0);
+        items[focusedIndex].scrollIntoView({ block: 'nearest' });
+        items.forEach(i => i.style.outline = 'none');
+        items[focusedIndex].style.outline = '2px solid #11C3DB';
+      } else if (e.key === ' ' && focusedIndex >= 0 && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        items[focusedIndex].click();
+      } else if (e.key === 'n' && document.activeElement.tagName !== 'INPUT') {
+        e.preventDefault();
+        document.getElementById('new-task-input').focus();
+      }
+    });
+
+    // Enter key in input adds task
+    document.getElementById('new-task-input').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { addCustomTask(); }
+      if (e.key === 'Escape') { e.target.blur(); }
+    });
+
+    // ── Init ───────────────────────────────────────────────
+    restoreCustomTasks();
+    renderCheckStates();
+  </script>
+</body>
+</html>
